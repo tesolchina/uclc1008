@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 
 const STAFF_PASSWORD = "ue2026";
@@ -69,6 +70,7 @@ const StaffSpace = () => {
   const [materialMarkdown, setMaterialMarkdown] = useState("");
   const [isConvertingMaterial, setIsConvertingMaterial] = useState(false);
   const [isSavingMaterial, setIsSavingMaterial] = useState(false);
+  const [deletingMaterialId, setDeletingMaterialId] = useState<string | null>(null);
 
   const loadThreads = async () => {
     setIsLoadingThreads(true);
@@ -328,6 +330,60 @@ const StaffSpace = () => {
     }
   };
 
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = typeof e.target?.result === "string" ? e.target.result : "";
+      if (text) {
+        setMaterialOriginal(text);
+        if (!materialTitle) {
+          const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+          setMaterialTitle(nameWithoutExt);
+        }
+        toast({ title: "File loaded into materials editor." });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Could not read file",
+          description: "Please try a plain text file or paste the content manually.",
+        });
+      }
+    };
+    reader.onerror = () => {
+      toast({
+        variant: "destructive",
+        title: "File read error",
+        description: "Please try again or use copy-paste instead.",
+      });
+    };
+    reader.readAsText(file);
+  };
+
+  const handleDeleteMaterial = async (materialId: string) => {
+    const confirmed = window.confirm("Delete this material from the database? This cannot be undone.");
+    if (!confirmed) return;
+
+    setDeletingMaterialId(materialId);
+    const { error } = await supabase.from("staff_materials").delete().eq("id", materialId);
+    setDeletingMaterialId(null);
+
+    if (error) {
+      console.error("Error deleting material", error);
+      toast({
+        variant: "destructive",
+        title: "Could not delete material",
+        description: error.message,
+      });
+      return;
+    }
+
+    setMaterials((prev) => prev.filter((m) => m.id !== materialId));
+    toast({ title: "Material deleted." });
+  };
+
   const selectedThread = threads.find((t) => t.id === selectedThreadId) ?? null;
 
   return (
@@ -472,7 +528,21 @@ const StaffSpace = () => {
                 <Separator className="my-1" />
 
                 <div className="space-y-2">
-                  <p className="text-xs font-medium text-muted-foreground">Comments</p>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-xs font-medium text-muted-foreground">Comments</p>
+                    <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                      <span>Posting as</span>
+                      <Select value={commentAuthor} onValueChange={setCommentAuthor}>
+                        <SelectTrigger className="h-7 w-[120px] text-xs">
+                          <SelectValue placeholder="Choose" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Simon">Simon</SelectItem>
+                          <SelectItem value="Naina">Naina</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
                   <div className="space-y-2 rounded-md border border-border/70 bg-background/60 p-2">
                     {comments.length === 0 ? (
                       <p className="text-[11px] text-muted-foreground">No comments yet. Add one below.</p>
@@ -496,21 +566,13 @@ const StaffSpace = () => {
                   </div>
 
                   <form onSubmit={handleAddComment} className="space-y-1.5">
-                    <div className="flex gap-2">
-                      <Input
-                        value={commentAuthor}
-                        onChange={(e) => setCommentAuthor(e.target.value)}
-                        placeholder="Name"
-                        className="h-8 max-w-[120px] text-xs"
-                      />
-                      <Textarea
-                        value={commentContent}
-                        onChange={(e) => setCommentContent(e.target.value)}
-                        placeholder="Add a quick note or idea"
-                        className="text-xs"
-                        rows={2}
-                      />
-                    </div>
+                    <Textarea
+                      value={commentContent}
+                      onChange={(e) => setCommentContent(e.target.value)}
+                      placeholder={`Add a quick note or idea as ${commentAuthor}`}
+                      className="text-xs"
+                      rows={2}
+                    />
                     <div className="flex justify-end">
                       <Button type="submit" size="sm" disabled={isSavingComment}>
                         {isSavingComment ? "Posting a0 a0 a0" : "Post comment"}
@@ -525,7 +587,7 @@ const StaffSpace = () => {
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <p className="text-xs font-medium text-muted-foreground">Materials attached to this thread</p>
                     <p className="text-[11px] text-muted-foreground/80">
-                      {materials.length === 0 ? "No materials yet" : `${materials.length} material(s) saved`}
+                      {materials.length === 0 ? "No materials yet" : `${materials.length} material(s) saved in the database`}
                     </p>
                   </div>
 
@@ -534,10 +596,23 @@ const StaffSpace = () => {
                       {materials.map((material) => (
                         <div key={material.id} className="space-y-1 rounded-md bg-card/80 p-2">
                           <div className="flex items-center justify-between gap-2">
-                            <p className="text-xs font-semibold">{material.title}</p>
-                            <p className="text-[10px] text-muted-foreground/80">
-                              Saved {formatDateTime(material.created_at)}
-                            </p>
+                            <div className="min-w-0">
+                              <p className="truncate text-xs font-semibold">{material.title}</p>
+                              <p className="text-[10px] text-muted-foreground/80">
+                                Saved {formatDateTime(material.created_at)}
+                              </p>
+                            </div>
+                            <Button
+                              type="button"
+                              size="icon"
+                              variant="ghost"
+                              className="h-6 w-6 text-destructive"
+                              onClick={() => handleDeleteMaterial(material.id)}
+                              disabled={deletingMaterialId === material.id}
+                              aria-label="Delete material"
+                            >
+                              {deletingMaterialId === material.id ? " a0 a0 a0" : " d7"}
+                            </Button>
                           </div>
                           {material.original_content && (
                             <details className="group text-[11px] text-muted-foreground">
@@ -564,7 +639,10 @@ const StaffSpace = () => {
                     </div>
                   )}
 
-                  <form onSubmit={handleSaveMaterial} className="space-y-2 rounded-md border border-dashed border-border/70 bg-background/60 p-3">
+                  <form
+                    onSubmit={handleSaveMaterial}
+                    className="space-y-2 rounded-md border border-dashed border-border/70 bg-background/60 p-3"
+                  >
                     <p className="text-xs font-medium text-muted-foreground">Add new material</p>
                     <Input
                       value={materialTitle}
@@ -572,6 +650,20 @@ const StaffSpace = () => {
                       placeholder="Title for this material (e.g. Week 3 reading guide)"
                       className="text-sm"
                     />
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-medium text-muted-foreground">
+                        Upload text file (optional)
+                      </label>
+                      <Input
+                        type="file"
+                        accept=".txt,.md,.markdown,.html"
+                        onChange={handleFileUpload}
+                        className="h-8 text-xs"
+                      />
+                      <p className="text-[10px] text-muted-foreground">
+                        We'll read the text into the box below; for Word/PDF files, please paste the text manually.
+                      </p>
+                    </div>
                     <Textarea
                       value={materialOriginal}
                       onChange={(e) => setMaterialOriginal(e.target.value)}
@@ -593,6 +685,9 @@ const StaffSpace = () => {
                         Uses the shared Poe API key stored securely in the backend.
                       </p>
                     </div>
+                    <p className="text-[11px] font-medium text-muted-foreground">
+                      Step 2  2014 review and edit the Markdown before saving
+                    </p>
                     <Textarea
                       value={materialMarkdown}
                       onChange={(e) => setMaterialMarkdown(e.target.value)}
@@ -602,7 +697,7 @@ const StaffSpace = () => {
                     />
                     <div className="flex justify-end">
                       <Button type="submit" size="sm" disabled={isSavingMaterial}>
-                        {isSavingMaterial ? "Saving a0 a0 a0" : "Save material to thread"}
+                        {isSavingMaterial ? "Saving a0 a0 a0" : "Save reviewed material to thread"}
                       </Button>
                     </div>
                   </form>
