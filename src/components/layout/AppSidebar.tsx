@@ -14,13 +14,31 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-const weeks = Array.from({ length: 13 }, (_, i) => {
-  const weekNumber = i + 1;
-  return {
-    title: `Week ${weekNumber}`,
-    url: `/week/${weekNumber}`,
-  };
-});
+type WeekNavItem = {
+  title: string;
+  url: string;
+  assignment?: string;
+};
+
+const weeks: WeekNavItem[] = [
+  { title: "Week 1", url: "/week/1" },
+  { title: "Week 2", url: "/week/2", assignment: "Pre-course Writing (2.5%) due this week" },
+  { title: "Week 3", url: "/week/3", assignment: "Referencing Quiz (2.5%) this week" },
+  { title: "Week 4", url: "/week/4" },
+  { title: "Week 5", url: "/week/5" },
+  { title: "Week 6", url: "/week/6", assignment: "Academic Writing Quiz (15%) in class" },
+  { title: "Week 7", url: "/week/7" },
+  { title: "Week 8", url: "/week/8" },
+  { title: "Week 9", url: "/week/9", assignment: "Argument Construction & Evaluation Draft (15%)" },
+  { title: "Week 10", url: "/week/10" },
+  { title: "Week 11", url: "/week/11" },
+  { title: "Week 12", url: "/week/12", assignment: "Peer Evaluation on Draft (5%)" },
+  {
+    title: "Week 13",
+    url: "/week/13",
+    assignment: "Critical Response (20%) & final submissions",
+  },
+];
 
 const overviewItems = [
   { title: "Course overview", url: "/", icon: BookOpen },
@@ -72,25 +90,34 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {weeks.map((week) => {
-                const active = isActive(week.url);
-                return (
-                  <SidebarMenuItem key={week.title}>
-                    <SidebarMenuButton asChild data-active={active}>
-                      <NavLink
-                        to={week.url}
-                        end
-                        className="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
-                        activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
-                      >
-                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-sidebar-accent/40 text-[10px] font-semibold text-sidebar-foreground">
-                          {week.title.replace("Week ", "W")}
-                        </span>
-                        {!collapsed && <span className="truncate">{week.title}</span>}
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
+               const active = isActive(week.url);
+               return (
+                 <SidebarMenuItem key={week.title}>
+                   <SidebarMenuButton asChild data-active={active}>
+                     <NavLink
+                       to={week.url}
+                       end
+                       className="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
+                       activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
+                     >
+                       <span className="flex h-5 w-5 items-center justify-center rounded-full bg-sidebar-accent/40 text-[10px] font-semibold text-sidebar-foreground">
+                         {week.title.replace("Week ", "W")}
+                       </span>
+                       {!collapsed && (
+                         <span className="flex min-w-0 flex-col">
+                           <span className="truncate">{week.title}</span>
+                           {week.assignment && (
+                             <span className="truncate text-[10px] text-sidebar-foreground/60">
+                               {week.assignment}
+                             </span>
+                           )}
+                         </span>
+                       )}
+                     </NavLink>
+                   </SidebarMenuButton>
+                 </SidebarMenuItem>
+               );
+             })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
