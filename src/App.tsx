@@ -21,6 +21,7 @@ const App = () => (
           <Route element={<AppLayout />}>
             <Route index element={<Index />} />
             <Route path="week/:weekId" element={<WeekPage />} />
+            <Route path="staff" element={<Staff />} />
           </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
