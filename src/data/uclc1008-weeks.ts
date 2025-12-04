@@ -16,6 +16,47 @@ export type WeekData = {
   aiPromptHint: string;
 };
 
+export type WeekMeta = {
+  dateRange: string;
+  assignmentTagline?: string;
+};
+
+export const weekMeta: Record<number, WeekMeta> = {
+  1: { dateRange: "12-16 Jan 2026" },
+  2: {
+    dateRange: "19-23 Jan 2026",
+    assignmentTagline: "Pre-course Writing (2.5%) due this week",
+  },
+  3: {
+    dateRange: "26-30 Jan 2026",
+    assignmentTagline: "Referencing Quiz (2.5%) this week",
+  },
+  4: { dateRange: "2-6 Feb 2026" },
+  5: { dateRange: "9-13 Feb 2026" },
+  6: {
+    dateRange: "23-27 Feb 2026",
+    assignmentTagline: "Academic Writing Quiz (15%) in class",
+  },
+  7: { dateRange: "2-6 Mar 2026" },
+  8: { dateRange: "9-13 Mar 2026" },
+  9: {
+    dateRange: "16-20 Mar 2026",
+    assignmentTagline: "Argument Construction & Evaluation Draft (15%)",
+  },
+  10: { dateRange: "23-27 Mar 2026" },
+  11: { dateRange: "30 Mar-3 Apr 2026" },
+  12: {
+    dateRange: "13-17 Apr 2026",
+    assignmentTagline: "Peer Evaluation on Draft (5%)",
+  },
+  13: {
+    dateRange: "20-24 Apr 2026",
+    assignmentTagline: "Critical Response (20%) & final submissions",
+  },
+};
+
+export const getWeekMetaById = (id: number): WeekMeta | undefined => weekMeta[id];
+
 export const weeks: WeekData[] = [
   {
     id: 1,

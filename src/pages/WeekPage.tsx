@@ -1,5 +1,5 @@
 import { useParams, Navigate } from "react-router-dom";
-import { getWeekById } from "@/data/uclc1008-weeks";
+import { getWeekById, getWeekMetaById } from "@/data/uclc1008-weeks";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { LessonAiTutor } from "@/components/LessonAiTutor";
@@ -8,6 +8,7 @@ export const WeekPage = () => {
   const params = useParams();
   const id = Number(params.weekId);
   const week = Number.isNaN(id) ? undefined : getWeekById(id);
+  const meta = Number.isNaN(id) ? undefined : getWeekMetaById(id);
 
   if (!week) {
     return <Navigate to="/" replace />;
@@ -22,6 +23,7 @@ export const WeekPage = () => {
             <div className="flex flex-wrap items-center gap-2">
               <span className="week-pill">{week.title}</span>
               <span className="hero-badge">Theme: {week.theme}</span>
+              {meta?.dateRange && <span className="hero-badge">{meta.dateRange}</span>}
             </div>
             <h1 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
               Self-access lesson for {week.title}
