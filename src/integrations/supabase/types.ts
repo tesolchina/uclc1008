@@ -14,7 +14,106 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      staff_comments: {
+        Row: {
+          author_name: string | null
+          content: string
+          created_at: string
+          id: string
+          thread_id: string
+        }
+        Insert: {
+          author_name?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          thread_id: string
+        }
+        Update: {
+          author_name?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          thread_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_comments_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "staff_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staff_materials: {
+        Row: {
+          created_at: string
+          id: string
+          markdown_content: string | null
+          original_content: string | null
+          thread_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          markdown_content?: string | null
+          original_content?: string | null
+          thread_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          markdown_content?: string | null
+          original_content?: string | null
+          thread_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_materials_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "staff_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staff_threads: {
+        Row: {
+          created_at: string
+          decided_summary: string | null
+          description: string | null
+          id: string
+          is_decided: boolean
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          decided_summary?: string | null
+          description?: string | null
+          id?: string
+          is_decided?: boolean
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          decided_summary?: string | null
+          description?: string | null
+          id?: string
+          is_decided?: boolean
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { WeekPage } from "./pages/WeekPage";
 import { AppLayout } from "@/components/layout/AppLayout";
+import Staff from "./pages/Staff";
 
 const queryClient = new QueryClient();
 
