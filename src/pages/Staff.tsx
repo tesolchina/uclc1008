@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/use-toast";
 
-const STAFF_PASSWORD = "uclc1008-staff";
+const STAFF_PASSWORD = "ue2026";
 
 type StaffThread = {
   id: string;
