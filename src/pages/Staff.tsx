@@ -448,7 +448,7 @@ const StaffSpace = () => {
         </p>
       </header>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+      <div className="grid gap-6">
         <Card className="border-border/70 bg-card/60 backdrop-blur">
           <CardHeader className="space-y-2">
             <CardTitle className="text-base">Discussion threads</CardTitle>
