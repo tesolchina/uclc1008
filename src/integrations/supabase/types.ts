@@ -46,6 +46,89 @@ export type Database = {
           },
         ]
       }
+      staff_library_files: {
+        Row: {
+          created_at: string
+          filename: string
+          folder_id: string | null
+          id: string
+          is_archived: boolean
+          markdown_content: string | null
+          original_content: string | null
+          thread_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          filename: string
+          folder_id?: string | null
+          id?: string
+          is_archived?: boolean
+          markdown_content?: string | null
+          original_content?: string | null
+          thread_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          filename?: string
+          folder_id?: string | null
+          id?: string
+          is_archived?: boolean
+          markdown_content?: string | null
+          original_content?: string | null
+          thread_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_library_files_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "staff_library_folders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_library_files_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "staff_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staff_library_folders: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          parent_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          parent_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          parent_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_library_folders_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "staff_library_folders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       staff_materials: {
         Row: {
           created_at: string
