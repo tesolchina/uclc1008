@@ -9,6 +9,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/components/ui/use-toast";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { StaffLibrarySidebar } from "@/components/staff/StaffLibrarySidebar";
+import * as pdfjsLib from "pdfjs-dist";
+import pdfjsWorker from "pdfjs-dist/build/pdf.worker.min?url";
+import mammoth from "mammoth";
+
+(pdfjsLib as any).GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 const STAFF_PASSWORD = "ue2026";
 
@@ -333,36 +338,67 @@ const StaffSpace = () => {
     }
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const text = typeof e.target?.result === "string" ? e.target.result : "";
-      if (text) {
-        setMaterialOriginal(text);
-        if (!materialTitle) {
-          const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
-          setMaterialTitle(nameWithoutExt);
+    const extension = file.name.toLowerCase().split(".").pop() ?? "";
+
+    try {
+      let text = "";
+
+      if (extension === "pdf") {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await (pdfjsLib as any).getDocument({ data: arrayBuffer }).promise;
+        let combined = "";
+
+        for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+          const page = await pdf.getPage(pageNumber);
+          const content = await page.getTextContent();
+          const pageText = (content.items ?? [])
+            .map((item: any) => (typeof item.str === "string" ? item.str : (item.string as string | undefined) ?? ""))
+            .join(" ");
+          combined += pageText + "\n\n";
         }
-        toast({ title: "File loaded into materials editor." });
+
+        text = combined.trim();
+      } else if (extension === "docx" || extension === "doc") {
+        const arrayBuffer = await file.arrayBuffer();
+        const result = await (mammoth as any).extractRawText({ arrayBuffer });
+        text = (result?.value as string | undefined)?.trim() ?? "";
       } else {
+        text = (await file.text()).trim();
+      }
+
+      if (!text) {
         toast({
           variant: "destructive",
           title: "Could not read file",
-          description: "Please try a plain text file or paste the content manually.",
+          description: "Please check the file and try again, or paste the text manually.",
         });
+        return;
       }
-    };
-    reader.onerror = () => {
+
+      setMaterialOriginal(text);
+      if (!materialTitle) {
+        const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+        setMaterialTitle(nameWithoutExt);
+      }
+      toast({
+        title: "File loaded into materials editor.",
+        description:
+          extension === "pdf" || extension === "docx" || extension === "doc"
+            ? "We have extracted the text from your document."
+            : undefined,
+      });
+    } catch (error) {
+      console.error("File read error", error);
       toast({
         variant: "destructive",
         title: "File read error",
-        description: "Please try again or use copy-paste instead.",
+        description: "PDF and Word support basic text extraction only. If this fails, please paste the text manually.",
       });
-    };
-    reader.readAsText(file);
+    }
   };
 
   const handleDeleteMaterial = async (materialId: string) => {
@@ -667,16 +703,16 @@ const StaffSpace = () => {
                     />
                     <div className="space-y-1">
                       <label className="text-[11px] font-medium text-muted-foreground">
-                        Upload text file (optional)
+                        Upload text, PDF, or Word file (optional)
                       </label>
                       <Input
                         type="file"
-                        accept=".txt,.md,.markdown,.html"
+                        accept=".txt,.md,.markdown,.html,.pdf,.doc,.docx"
                         onChange={handleFileUpload}
                         className="h-8 text-xs"
                       />
                       <p className="text-[10px] text-muted-foreground">
-                        We'll read the text into the box below; for Word/PDF files, please paste the text manually.
+                        We will pull out the text for you. For complex layouts, you can also paste the text manually.
                       </p>
                     </div>
                     <Textarea
