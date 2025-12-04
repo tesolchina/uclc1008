@@ -7,6 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { StaffLibrarySidebar } from "@/components/staff/StaffLibrarySidebar";
 
 const STAFF_PASSWORD = "ue2026";
 
@@ -71,6 +73,7 @@ const StaffSpace = () => {
   const [isConvertingMaterial, setIsConvertingMaterial] = useState(false);
   const [isSavingMaterial, setIsSavingMaterial] = useState(false);
   const [deletingMaterialId, setDeletingMaterialId] = useState<string | null>(null);
+  const [isLibraryOpen, setIsLibraryOpen] = useState(false);
 
   const loadThreads = async () => {
     setIsLoadingThreads(true);
@@ -388,9 +391,21 @@ const StaffSpace = () => {
 
   return (
     <section className="space-y-6">
-      <header className="space-y-1">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Staff space</p>
-        <h1 className="text-2xl font-semibold tracking-tight">Planning & materials workspace</h1>
+      <header className="space-y-2">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="space-y-1">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Staff space</p>
+            <h1 className="text-2xl font-semibold tracking-tight">Planning & materials workspace</h1>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setIsLibraryOpen(true)}
+          >
+            Open library & AI agent
+          </Button>
+        </div>
         <p className="text-sm text-muted-foreground">
           A private area for Simon and Naina to discuss lessons, record decisions, and build shared materials for
           UCLC&nbsp;1008.
@@ -707,6 +722,22 @@ const StaffSpace = () => {
           </CardContent>
         </Card>
       </div>
+
+      <Sheet open={isLibraryOpen} onOpenChange={setIsLibraryOpen}>
+        <SheetContent
+          side="right"
+          className="flex w-full max-w-md flex-col gap-3 border-l border-border/70 bg-background/95 p-4 sm:max-w-lg"
+        >
+          <SheetHeader className="space-y-1">
+            <SheetTitle className="text-sm font-semibold">Library & AI agent</SheetTitle>
+            <SheetDescription className="text-xs">
+              Shared file library for staff. Use natural language instructions to create folders and files,
+              move items, archive them, or link them to the active thread.
+            </SheetDescription>
+          </SheetHeader>
+          <StaffLibrarySidebar selectedThreadId={selectedThreadId} />
+        </SheetContent>
+      </Sheet>
     </section>
   );
 };
