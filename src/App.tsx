@@ -22,7 +22,7 @@ const App = () => (
           <Route element={<AppLayout />}>
             <Route index element={<Index />} />
             <Route path="week/:weekId" element={<WeekPage />} />
-            <Route path="week/:weekId/assignment" element={<WeekAssignmentPage />} />
+            <Route path="week/:weekId/assignment/:assignmentId" element={<WeekAssignmentPage />} />
             <Route path="staff" element={<Staff />} />
           </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
