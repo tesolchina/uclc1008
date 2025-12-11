@@ -3,6 +3,7 @@ export type LessonResource = {
   type: "video" | "reading" | "practice" | "project" | "quiz" | "listening";
   duration?: string;
   description?: string;
+  url?: string;
 };
 
 export type WeekData = {
@@ -10,6 +11,7 @@ export type WeekData = {
   title: string;
   theme: string;
   overview: string;
+  inClassActivities: string[];
   learningOutcomes: string[];
   resources: LessonResource[];
   practiceTasks: string[];
@@ -61,9 +63,14 @@ export const weeks: WeekData[] = [
   {
     id: 1,
     title: "Week 1",
-    theme: "Course introduction & journal articles (1)",
+    theme: "Course Introduction",
     overview:
       "Settle into the course, understand how UCLC1008 works, and take a first look at academic journal articles.",
+    inClassActivities: [
+      "Course Introduction",
+      "Module 1: Activities 1.1, 1.2, 1.3",
+      "Module 1: Activities 2.1, 2.2",
+    ],
     learningOutcomes: [
       "Describe the overall aims and assessment structure of UCLC1008.",
       "Identify the main components of an academic journal article (e.g. abstract, introduction, methods).",
@@ -82,14 +89,16 @@ export const weeks: WeekData[] = [
         duration: "12 min",
       },
       {
-        title: "Flipped video: in-text citations & reference list",
+        title: "Flipped video: Citing Journal Articles in APA 7th Style",
         type: "video",
         duration: "8 min",
+        url: "https://www.youtube.com/watch?v=JpT1YwNcV04",
       },
       {
-        title: "Flipped video: secondary citations",
+        title: "Flipped video: Citing Secondary Sources in APA 7th Style",
         type: "video",
         duration: "6 min",
+        url: "https://www.youtube.com/watch?v=qB6eFDNyz0E",
       },
     ],
     practiceTasks: [
@@ -103,9 +112,15 @@ export const weeks: WeekData[] = [
   {
     id: 2,
     title: "Week 2",
-    theme: "Journal articles (2) & first paraphrasing steps",
+    theme: "Summarising, Paraphrasing & Synthesising Skills",
     overview:
       "Continue exploring academic journal articles while beginning to practise summarising, paraphrasing, and synthesising.",
+    inClassActivities: [
+      "Module 1: Activities 3.1, 3.2, 3.3",
+      "Module 1: Activities 4.1, 4.2",
+      "Module 1: Part 5 (Referencing)",
+      "Module 2: Activities 1.1, 1.2, 1.3",
+    ],
     learningOutcomes: [
       "Recognise how ideas are organised within research articles.",
       "Write short summaries of sections of an article in your own words.",
@@ -123,10 +138,11 @@ export const weeks: WeekData[] = [
         duration: "10 min",
       },
       {
-        title: "Flipped video: AI literacy (authenticity)",
+        title: "Flipped video: AI Literacy (Authenticity)",
         type: "video",
         duration: "10 min",
         description: "How to use AI tools ethically when preparing your own writing.",
+        url: "https://www.youtube.com/watch?v=6uhUqUG4-Vo",
       },
     ],
     practiceTasks: [
@@ -140,9 +156,13 @@ export const weeks: WeekData[] = [
   {
     id: 3,
     title: "Week 3",
-    theme: "Summarising & paraphrasing for referencing quiz",
+    theme: "Summarising & Paraphrasing Skills (continued)",
     overview:
       "Deepen your summarising and paraphrasing skills in preparation for the Referencing Quiz.",
+    inClassActivities: [
+      "Module 1: Activity 5.1",
+      "Module 2: Activities 1.1, 1.2, 1.3 (continued)",
+    ],
     learningOutcomes: [
       "Summarise short academic passages accurately and concisely.",
       "Paraphrase ideas while maintaining original meaning and citation information.",
@@ -175,9 +195,13 @@ export const weeks: WeekData[] = [
   {
     id: 4,
     title: "Week 4",
-    theme: "Advanced paraphrasing & AI tools workshop (1)",
+    theme: "Summarising Skills & AI Workshop 1",
     overview:
       "Consolidate paraphrasing and synthesising while exploring AI tools for precise, ethical academic reading and writing.",
+    inClassActivities: [
+      "Module 2: Summarising skills",
+      "AI Workshop 1: AI Tools for Academic English – Precision in Reading & Writing and Ethical Considerations (1-hour)",
+    ],
     learningOutcomes: [
       "Combine information from more than one source into a short synthetic paragraph.",
       "Explain the risks and benefits of using AI tools in academic work.",
@@ -210,9 +234,12 @@ export const weeks: WeekData[] = [
   {
     id: 5,
     title: "Week 5",
-    theme: "Argumentation model (1)",
+    theme: "Argumentation Model",
     overview:
       "Move into Module 3 and learn how academic arguments are structured using an argumentation model.",
+    inClassActivities: [
+      "Module 3: Introduction and activities",
+    ],
     learningOutcomes: [
       "Identify claims, reasons, and evidence in academic arguments.",
       "Describe a basic argumentation model (e.g. Toulmin).",
@@ -245,9 +272,12 @@ export const weeks: WeekData[] = [
   {
     id: 6,
     title: "Week 6",
-    theme: "Argumentation model (2) & Academic Writing Quiz",
+    theme: "Argumentation Model & Academic Writing Quiz",
     overview:
-      "Apply the argumentation model in your own writing and get ready for the in-class Academic Writing Quiz.",
+      "Apply the argumentation model in your own writing and complete the in-class Academic Writing Quiz.",
+    inClassActivities: [
+      "In-class Academic Writing Quiz (15%) [45-50 minutes]",
+    ],
     learningOutcomes: [
       "Plan a short written response using an argumentation model.",
       "Use appropriate academic tone and citations in timed writing.",
@@ -280,9 +310,14 @@ export const weeks: WeekData[] = [
   {
     id: 7,
     title: "Week 7",
-    theme: "Developing stronger arguments",
+    theme: "Developing Stronger Arguments",
     overview:
-      "Strengthen your use of the argumentation model by adding counterarguments and rebuttals.",
+      "Strengthen your use of the argumentation model by adding counterarguments and rebuttals, and prepare for the ACE Draft.",
+    inClassActivities: [
+      "Module 3: Activities on warrants, counterarguments, and rebuttals (2.3, 2.4, 2.6, 2.8)",
+      "Review of Sample ACE Draft and Study Guide",
+      "Test arrangement briefing for ACE Draft",
+    ],
     learningOutcomes: [
       "Write a clear main claim supported by reasons and evidence.",
       "Include a relevant counterargument and rebuttal in a short written piece.",
@@ -315,9 +350,15 @@ export const weeks: WeekData[] = [
   {
     id: 8,
     title: "Week 8",
-    theme: "Critical response to academic arguments (1)",
+    theme: "Critical Response to Academic Arguments (1)",
     overview:
-      "Begin Module 4 by learning how to respond critically to arguments in academic texts and talks.",
+      "Begin Module 4 by learning how to respond critically to arguments. Receive feedback on previous work and prepare for the ACE Draft test.",
+    inClassActivities: [
+      "Feedback on ACE Draft Practice",
+      "Test details for the upcoming ACE Draft",
+      "Module 4: Part 1",
+      "Feedback on Academic Writing Quiz (AWQ)",
+    ],
     learningOutcomes: [
       "Identify main arguments and key points in academic texts or audio.",
       "Distinguish between summarising and critiquing.",
@@ -350,9 +391,14 @@ export const weeks: WeekData[] = [
   {
     id: 9,
     title: "Week 9",
-    theme: "Critical response & draft argument assignment",
+    theme: "Critical Response & ACE Draft Test",
     overview:
-      "Continue Module 4 and prepare for the in-class Argument Construction and Evaluation (Draft).",
+      "Continue Module 4 and complete the in-class Argument Construction and Evaluation (Draft) test.",
+    inClassActivities: [
+      "In-class Argument Construction and Evaluation (Draft) Test (15%) [100 minutes]",
+      "Module 4: Part 2 (Activity 2.1)",
+      "Reminder: Bring necessary devices and disable writing-support apps for the test",
+    ],
     learningOutcomes: [
       "Apply an argumentation model to the draft of a longer written assignment.",
       "Integrate summary and critique of source ideas in your own argument.",
@@ -385,9 +431,13 @@ export const weeks: WeekData[] = [
   {
     id: 10,
     title: "Week 10",
-    theme: "Critical response & AI tools workshop (2)",
+    theme: "Critical Response & AI Workshop 2",
     overview:
       "Use AI tools to refine structured arguments ethically in preparation for your final written work.",
+    inClassActivities: [
+      "Module 4: Part 2 (Activities 2.2-2.5)",
+      "AI Workshop 2: AI Tools for Structured Argumentation and Ethical Considerations (1-hour)",
+    ],
     learningOutcomes: [
       "Use AI tools to check structure and clarity of your argument.",
       "Record how AI suggestions influence your revisions.",
@@ -420,9 +470,14 @@ export const weeks: WeekData[] = [
   {
     id: 11,
     title: "Week 11",
-    theme: "Extending critical response & preparing for peer evaluation",
+    theme: "Critical Response & Preparing for Peer Evaluation",
     overview:
       "Consolidate your critical response skills and get ready to give and receive peer feedback on your draft.",
+    inClassActivities: [
+      "Briefing on forthcoming assignments",
+      "Module 4: Part 3",
+      "Reminder: Week 12 – In-class Peer Evaluation on Argument Construction and Evaluation (Draft) (5%)",
+    ],
     learningOutcomes: [
       "Identify strengths and areas for improvement in a peer's argumentative draft.",
       "Give constructive, specific feedback linked to the argumentation model.",
@@ -455,9 +510,14 @@ export const weeks: WeekData[] = [
   {
     id: 12,
     title: "Week 12",
-    theme: "Peer evaluation, consultations & spoken critical response",
+    theme: "Peer Evaluation & Consultations",
     overview:
       "Engage in peer evaluation and consultations while continuing to practise spoken and written critical response.",
+    inClassActivities: [
+      "In-class Peer Evaluation on Argument Construction and Evaluation (Draft) (5%)",
+      "Consultations",
+      "Module 4: Parts 3.5, 4, and 5.1",
+    ],
     learningOutcomes: [
       "Use peer feedback to revise your draft more effectively.",
       "Prepare a short spoken critical response to an argument.",
@@ -481,48 +541,51 @@ export const weeks: WeekData[] = [
     ],
     practiceTasks: [
       "Revise one section of your draft based on peer comments.",
-      "Practise giving a 1–2 minute spoken response to the sample audio clip.",
-      "Ask the AI tutor to help you prepare questions for your consultation so you can use the time well.",
+      "Prepare and record a brief spoken critical response to a short audio or text extract.",
+      "Ask the AI tutor for suggestions on structuring your final argument more clearly.",
     ],
     aiPromptHint:
-      "You help students turn peer feedback and consultations into concrete revisions and clearer spoken critical responses.",
+      "You help students refine their drafts through peer feedback and prepare confident spoken responses to academic arguments.",
   },
   {
     id: 13,
     title: "Week 13",
-    theme: "Final critical response, portfolio & next steps",
+    theme: "Critical Response to Academic Arguments (CRAA) Test",
     overview:
-      "Bring together your skills for the in-class Critical Response task, final written assignment, and Reflective Learning Portfolio.",
+      "Complete the in-class CRAA test and finalise all outstanding submissions.",
+    inClassActivities: [
+      "In-class Critical Response to Academic Arguments (CRAA) Test",
+      "Venue: To be confirmed",
+    ],
     learningOutcomes: [
-      "Plan and deliver a clear critical response to an argument in audio form.",
-      "Finalise the Argument Construction and Evaluation (Final) with appropriate use of AI.",
-      "Reflect on your learning journey in the Reflective Learning Portfolio.",
+      "Synthesise skills from the whole semester in a summative critical response task.",
+      "Manage time and stress during a formal assessment.",
+      "Reflect on overall learning and progress in UCLC1008.",
     ],
     resources: [
       {
-        title: "Assessment brief: Critical Response to Academic Arguments (20%)",
+        title: "CRAA test preparation guide",
+        type: "reading",
+        duration: "20 min",
+      },
+      {
+        title: "Reflective Learning Portfolio rubric (10%)",
         type: "reading",
         duration: "15 min",
       },
       {
-        title: "Assessment brief: Argument Construction and Evaluation (Final) & AI reflection",
-        type: "reading",
-        duration: "15 min",
-      },
-      {
-        title: "Reflective Learning Portfolio guidelines (10%)",
-        type: "reading",
-        duration: "15 min",
+        title: "Final submission checklist",
+        type: "practice",
       },
     ],
     practiceTasks: [
-      "Practise planning a spoken critical response to a new short audio or text argument.",
-      "Review a draft of your final written assignment and note where AI supported your revisions.",
-      "Draft your Reflective Learning Portfolio entry and ask the AI tutor to help you express your ideas more clearly, without changing your meaning.",
+      "Complete a timed practice response using a previous sample prompt.",
+      "Finish and proofread your Reflective Learning Portfolio before the deadline.",
+      "Ask the AI tutor to help you check your final argument for structure and citation accuracy.",
     ],
     aiPromptHint:
-      "You support students in preparing for their final critical response, polishing their written assignment, and writing an honest, thoughtful Reflective Learning Portfolio.",
+      "You support students in final exam preparation and help them review their work for clarity, coherence, and proper referencing.",
   },
 ];
 
-export const getWeekById = (id: number) => weeks.find((w) => w.id === id);
+export const getWeekById = (id: number) => weeks.find((week) => week.id === id);
