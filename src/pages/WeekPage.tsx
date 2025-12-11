@@ -74,6 +74,25 @@ export const WeekPage = () => {
           </CardContent>
         </Card>
 
+        {week.inClassActivities && week.inClassActivities.length > 0 && (
+          <Card className="card-elevated border-primary/20 bg-primary/5">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">In-class activities</CardTitle>
+              <CardDescription>What to expect during your classroom sessions this week.</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                {week.inClassActivities.map((activity) => (
+                  <li key={activity} className="flex gap-2">
+                    <span className="mt-1 h-1.5 w-1.5 rounded-full bg-primary" aria-hidden="true" />
+                    <span>{activity}</span>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        )}
+
         <Card className="card-elevated">
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Learning outcomes</CardTitle>
@@ -103,7 +122,18 @@ export const WeekPage = () => {
                 className="flex items-start justify-between gap-3 rounded-xl bg-muted/60 px-3 py-2.5 text-sm"
               >
                 <div className="flex flex-col gap-1">
-                  <p className="font-medium text-foreground">{res.title}</p>
+                  {res.url ? (
+                    <a
+                      href={res.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-medium text-foreground hover:text-primary hover:underline"
+                    >
+                      {res.title}
+                    </a>
+                  ) : (
+                    <p className="font-medium text-foreground">{res.title}</p>
+                  )}
                   {res.description ? (
                     <p className="text-xs text-muted-foreground">{res.description}</p>
                   ) : null}
