@@ -43,8 +43,9 @@ export type WeekData = {
 };
 
 export type WeekMeta = {
-  dateRange: string;
+  dateRange?: string;
   assignmentTagline?: string;
+  assignmentIds?: string[];
 };
 
 // All skills taught in the course
@@ -319,37 +320,45 @@ export const weekMeta: Record<number, WeekMeta> = {
   1: { dateRange: "12-16 Jan 2026" },
   2: {
     dateRange: "19-23 Jan 2026",
-    assignmentTagline: "Pre-course Writing (2.5%) due this week",
+    assignmentTagline: "Pre-course Writing (2.5%)",
+    assignmentIds: ["pre-course-writing"],
   },
   3: {
     dateRange: "26-30 Jan 2026",
-    assignmentTagline: "Referencing Quiz (2.5%) this week",
+    assignmentTagline: "Referencing Quiz (2.5%)",
+    assignmentIds: ["referencing-quiz"],
   },
   4: { dateRange: "2-6 Feb 2026" },
   5: { dateRange: "9-13 Feb 2026" },
   6: {
     dateRange: "23-27 Feb 2026",
-    assignmentTagline: "Academic Writing Quiz (15%) in class",
+    assignmentTagline: "Academic Writing Quiz (15%)",
+    assignmentIds: ["academic-writing-quiz"],
   },
   7: { dateRange: "2-6 Mar 2026" },
   8: { dateRange: "9-13 Mar 2026" },
   9: {
     dateRange: "16-20 Mar 2026",
-    assignmentTagline: "Argument Construction & Evaluation Draft (15%)",
+    assignmentTagline: "ACE Draft (15%)",
+    assignmentIds: ["ace-draft"],
   },
   10: { dateRange: "23-27 Mar 2026" },
   11: { dateRange: "30 Mar-3 Apr 2026" },
   12: {
     dateRange: "13-17 Apr 2026",
-    assignmentTagline: "Peer Evaluation on Draft (5%)",
+    assignmentTagline: "Peer Evaluation (5%)",
+    assignmentIds: ["peer-evaluation"],
   },
   13: {
     dateRange: "20-24 Apr 2026",
-    assignmentTagline: "CRAA (20%) & Final Submissions",
+    assignmentTagline: "Final Assessments",
+    assignmentIds: ["ace-final", "ai-reflection", "craa"],
   },
 };
 
 export const getWeekMetaById = (id: number): WeekMeta | undefined => weekMeta[id];
+export const getAssignmentById = (id: string): Assignment | undefined => 
+  courseAssignments.find((a) => a.id === id);
 
 export const weeks: WeekData[] = [
   {
@@ -926,7 +935,6 @@ export const weeks: WeekData[] = [
 
 export const getWeekById = (id: number) => weeks.find((week) => week.id === id);
 export const getSkillById = (id: string) => courseSkills.find((skill) => skill.id === id);
-export const getAssignmentById = (id: string) => courseAssignments.find((a) => a.id === id);
 export const getAssignmentsByWeek = (weekId: number) => courseAssignments.filter((a) => a.dueWeek === weekId);
 export const getSkillsForWeek = (weekId: number) => {
   const week = getWeekById(weekId);
