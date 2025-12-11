@@ -1,6 +1,6 @@
 import { BookOpen, CalendarRange, MessageCircle, Sparkles, Target } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
-import { getWeekMetaById, courseAssignments } from "@/data/uclc1008-weeks";
+import { getWeekMetaById } from "@/data/uclc1008-weeks";
 import { useLocation } from "react-router-dom";
 
 import {
@@ -18,19 +18,17 @@ import {
 type WeekNavItem = {
   title: string;
   url: string;
-  assignments: { id: string; title: string; weight: string }[];
+  assignment?: string;
 };
 
 const weeks: WeekNavItem[] = Array.from({ length: 13 }, (_, index) => {
   const id = index + 1;
-  const weekAssignments = courseAssignments
-    .filter((a) => a.dueWeek === id)
-    .map((a) => ({ id: a.id, title: a.title, weight: a.weight }));
+  const meta = getWeekMetaById(id);
 
   return {
     title: `Week ${id}`,
     url: `/week/${id}`,
-    assignments: weekAssignments,
+    assignment: meta?.assignmentTagline,
   };
 });
 
@@ -88,44 +86,40 @@ export function AppSidebar() {
                 const assignmentPath = `${week.url}/assignment`;
                 const assignmentActive = isActive(assignmentPath);
 
-                return (
-                  <div key={week.title}>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton asChild data-active={active}>
+                return [
+                  <SidebarMenuItem key={week.title}>
+                    <SidebarMenuButton asChild data-active={active}>
+                      <NavLink
+                        to={week.url}
+                        end
+                        className="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
+                        activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
+                      >
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-sidebar-accent/40 text-[10px] font-semibold text-sidebar-foreground">
+                          {week.title.replace("Week ", "W")}
+                        </span>
+                        {!collapsed && <span className="truncate">{week.title}</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>,
+                  week.assignment && !collapsed ? (
+                    <SidebarMenuItem key={`${week.title}-assignment`}>
+                      <SidebarMenuButton asChild data-active={assignmentActive}>
                         <NavLink
-                          to={week.url}
+                          to={assignmentPath}
                           end
-                          className="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
+                          className="flex items-center gap-2 rounded-md px-6 py-1.5 text-[11px] text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
                           activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
                         >
-                          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-sidebar-accent/40 text-[10px] font-semibold text-sidebar-foreground">
-                            {week.title.replace("Week ", "W")}
+                          <span className="flex h-4 w-4 items-center justify-center rounded-full bg-sidebar-accent/40 text-[9px] font-semibold text-sidebar-foreground">
+                            A
                           </span>
-                          {!collapsed && <span className="truncate">{week.title}</span>}
+                          <span className="truncate">{week.assignment}</span>
                         </NavLink>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
-                    {week.assignments.length > 0 && !collapsed && (
-                      <SidebarMenuItem>
-                        <SidebarMenuButton asChild data-active={assignmentActive}>
-                          <NavLink
-                            to={assignmentPath}
-                            end
-                            className="flex items-center gap-2 rounded-md px-6 py-1.5 text-[11px] text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
-                            activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
-                          >
-                            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-destructive/20 text-[9px] font-semibold text-destructive">
-                              A
-                            </span>
-                            <span className="truncate">
-                              {week.assignments.map((a) => `${a.title} (${a.weight})`).join(", ")}
-                            </span>
-                          </NavLink>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    )}
-                  </div>
-                );
+                  ) : null,
+                ];
               })}
             </SidebarMenu>
           </SidebarGroupContent>
