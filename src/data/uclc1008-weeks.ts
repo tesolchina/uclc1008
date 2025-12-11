@@ -6,6 +6,26 @@ export type LessonResource = {
   url?: string;
 };
 
+export type Skill = {
+  id: string;
+  name: string;
+  description: string;
+  category: "reading" | "writing" | "critical-thinking" | "ai-literacy" | "speaking";
+};
+
+export type Assignment = {
+  id: string;
+  title: string;
+  weight: string;
+  dueWeek: number;
+  type: "in-class" | "take-home" | "online";
+  duration?: string;
+  description: string;
+  requirements: string[];
+  skillsAssessed: string[];
+  resources?: { title: string; url?: string }[];
+};
+
 export type WeekData = {
   id: number;
   title: string;
@@ -16,12 +36,284 @@ export type WeekData = {
   resources: LessonResource[];
   practiceTasks: string[];
   aiPromptHint: string;
+  skillsIntroduced: string[];
+  skillsReinforced: string[];
+  assignmentsDue?: string[];
+  assignmentsUpcoming?: string[];
 };
 
 export type WeekMeta = {
   dateRange: string;
   assignmentTagline?: string;
 };
+
+// All skills taught in the course
+export const courseSkills: Skill[] = [
+  // Reading Skills
+  {
+    id: "journal-structure",
+    name: "Journal Article Structure",
+    description: "Identify and understand the main components of academic journal articles (abstract, introduction, methods, results, discussion).",
+    category: "reading",
+  },
+  {
+    id: "citation-recognition",
+    name: "Citation Recognition",
+    description: "Recognise in-text citations and reference list formats, particularly APA 7th style.",
+    category: "reading",
+  },
+  {
+    id: "secondary-citations",
+    name: "Secondary Citations",
+    description: "Understand and use secondary citations correctly when the original source is not available.",
+    category: "reading",
+  },
+  // Writing Skills
+  {
+    id: "summarising",
+    name: "Summarising",
+    description: "Condense academic texts into concise summaries while maintaining key ideas and proper attribution.",
+    category: "writing",
+  },
+  {
+    id: "paraphrasing",
+    name: "Paraphrasing",
+    description: "Restate ideas from sources in your own words while preserving meaning and avoiding plagiarism.",
+    category: "writing",
+  },
+  {
+    id: "synthesising",
+    name: "Synthesising",
+    description: "Combine information from multiple sources to create coherent, integrated arguments.",
+    category: "writing",
+  },
+  {
+    id: "academic-tone",
+    name: "Academic Tone",
+    description: "Write using appropriate formal register, hedging language, and objective voice.",
+    category: "writing",
+  },
+  {
+    id: "apa-referencing",
+    name: "APA Referencing",
+    description: "Apply APA 7th edition citation style for in-text citations and reference lists.",
+    category: "writing",
+  },
+  // Critical Thinking Skills
+  {
+    id: "argument-identification",
+    name: "Argument Identification",
+    description: "Identify claims, reasons, and evidence in academic arguments.",
+    category: "critical-thinking",
+  },
+  {
+    id: "toulmin-model",
+    name: "Toulmin Argumentation Model",
+    description: "Apply the Toulmin model (claim, grounds, warrant, backing, qualifier, rebuttal) to analyse and construct arguments.",
+    category: "critical-thinking",
+  },
+  {
+    id: "counterarguments",
+    name: "Counterarguments & Rebuttals",
+    description: "Develop relevant counterarguments and effective rebuttals to strengthen your position.",
+    category: "critical-thinking",
+  },
+  {
+    id: "critical-evaluation",
+    name: "Critical Evaluation",
+    description: "Assess the strengths and weaknesses of academic arguments objectively.",
+    category: "critical-thinking",
+  },
+  {
+    id: "peer-feedback",
+    name: "Peer Feedback",
+    description: "Give and receive constructive feedback on academic writing using clear criteria.",
+    category: "critical-thinking",
+  },
+  // AI Literacy Skills
+  {
+    id: "ai-ethics",
+    name: "AI Ethics & Authenticity",
+    description: "Understand ethical considerations when using AI tools in academic work.",
+    category: "ai-literacy",
+  },
+  {
+    id: "ai-editing",
+    name: "AI-Assisted Editing",
+    description: "Use AI tools appropriately for checking clarity, grammar, and structure while maintaining authorship.",
+    category: "ai-literacy",
+  },
+  {
+    id: "ai-reflection",
+    name: "AI Use Reflection",
+    description: "Critically reflect on and document how AI tools influenced your writing process.",
+    category: "ai-literacy",
+  },
+  // Speaking Skills
+  {
+    id: "spoken-response",
+    name: "Spoken Critical Response",
+    description: "Deliver a verbal summary and rebuttal of an academic argument clearly and persuasively.",
+    category: "speaking",
+  },
+];
+
+// All assignments in the course
+export const courseAssignments: Assignment[] = [
+  {
+    id: "pre-course-writing",
+    title: "Pre-course Writing",
+    weight: "2.5%",
+    dueWeek: 2,
+    type: "take-home",
+    description: "An initial writing task to assess your current academic writing skills before the course begins.",
+    requirements: [
+      "Complete the writing task following the given prompt",
+      "Use your own words without AI assistance",
+      "Submit via Moodle by the deadline",
+    ],
+    skillsAssessed: ["summarising", "paraphrasing", "academic-tone"],
+  },
+  {
+    id: "referencing-quiz",
+    title: "Referencing Quiz",
+    weight: "2.5%",
+    dueWeek: 3,
+    type: "online",
+    description: "Watch two short videos on APA 7th citation style and complete the quiz. You have only ONE attempt.",
+    requirements: [
+      "Watch Video 1: Citing Journal Articles in APA 7th Style",
+      "Watch Video 2: Citing Secondary Sources in APA 7th Style",
+      "Complete the quiz on Moodle (one attempt only)",
+      "Review both videos thoroughly before attempting",
+    ],
+    skillsAssessed: ["citation-recognition", "apa-referencing", "secondary-citations"],
+    resources: [
+      { title: "Video 1: Citing Journal Articles in APA 7th Style", url: "https://www.youtube.com/watch?v=JpT1YwNcV04" },
+      { title: "Video 2: Citing Secondary Sources in APA 7th Style", url: "https://www.youtube.com/watch?v=qB6eFDNyz0E" },
+    ],
+  },
+  {
+    id: "academic-writing-quiz",
+    title: "Academic Writing Quiz (AWQ)",
+    weight: "15%",
+    dueWeek: 6,
+    type: "in-class",
+    duration: "45-50 minutes",
+    description: "Analyse academic texts to summarise, synthesise, and paraphrase key information with proper citations and academic tone.",
+    requirements: [
+      "Summarise key information from provided academic texts",
+      "Synthesise ideas from multiple sources",
+      "Paraphrase accurately while maintaining meaning",
+      "Use appropriate academic tone throughout",
+      "Include proper in-text citations and references",
+    ],
+    skillsAssessed: ["summarising", "paraphrasing", "synthesising", "academic-tone", "apa-referencing"],
+  },
+  {
+    id: "ace-draft",
+    title: "Argument Construction and Evaluation (Draft)",
+    weight: "15%",
+    dueWeek: 9,
+    type: "in-class",
+    duration: "100 minutes",
+    description: "Write a 400-500 word draft using an argumentation model to construct a detailed argument, counterargument, and rebuttal on a selected topic.",
+    requirements: [
+      "Write 400-500 words following a specific argumentation model (e.g., Toulmin)",
+      "Construct a clear main claim with supporting reasons and evidence",
+      "Include a relevant counterargument",
+      "Provide an effective rebuttal",
+      "Select, summarise, synthesise, and paraphrase ideas from provided academic articles",
+      "Bring necessary devices and disable writing-support apps",
+    ],
+    skillsAssessed: ["argument-identification", "toulmin-model", "counterarguments", "summarising", "synthesising", "paraphrasing", "apa-referencing"],
+  },
+  {
+    id: "peer-evaluation",
+    title: "Peer Evaluation on ACE Draft",
+    weight: "5%",
+    dueWeek: 12,
+    type: "in-class",
+    description: "Evaluate a peer's ACE Draft using provided criteria and give constructive feedback.",
+    requirements: [
+      "Read your assigned peer's draft carefully",
+      "Apply the peer evaluation criteria systematically",
+      "Provide specific, constructive feedback",
+      "Identify strengths and areas for improvement",
+      "Link feedback to the argumentation model",
+    ],
+    skillsAssessed: ["peer-feedback", "critical-evaluation", "toulmin-model"],
+  },
+  {
+    id: "ace-final",
+    title: "Argument Construction and Evaluation (Final)",
+    weight: "20%",
+    dueWeek: 13,
+    type: "take-home",
+    description: "Revise and extend your draft to approximately 800 words, incorporating feedback from teachers, AI tools, and peers.",
+    requirements: [
+      "Extend the draft to approximately 800 words",
+      "Incorporate feedback from teachers, AI tools, and peers",
+      "Strengthen your argument, counterargument, and rebuttal",
+      "Follow a selected argumentation model clearly and persuasively",
+      "Ensure proper citations and references",
+      "Submit via Moodle by the deadline",
+    ],
+    skillsAssessed: ["toulmin-model", "counterarguments", "synthesising", "academic-tone", "apa-referencing", "ai-editing"],
+  },
+  {
+    id: "ai-reflection",
+    title: "Reflection on AI Use in ACE (Final)",
+    weight: "5%",
+    dueWeek: 13,
+    type: "take-home",
+    description: "Reflect on working with AI and critique AI-generated material, justifying changes made in your final paper.",
+    requirements: [
+      "Describe how you used AI tools during the writing process",
+      "Critique AI-generated suggestions you received",
+      "Justify which suggestions you accepted or rejected",
+      "Explain how AI use influenced your final paper",
+      "Submit together with ACE Final",
+    ],
+    skillsAssessed: ["ai-reflection", "ai-ethics", "ai-editing"],
+  },
+  {
+    id: "craa",
+    title: "Critical Response to Academic Arguments (CRAA)",
+    weight: "20%",
+    dueWeek: 13,
+    type: "in-class",
+    description: "Listen to a short audio clip with background information and an argument, then prepare and deliver a verbal summary and rebuttal.",
+    requirements: [
+      "Listen carefully to the audio clip (background info + argument)",
+      "Prepare a spoken response within the given time",
+      "Summarise the argument you heard accurately",
+      "Deliver a clear rebuttal to the argument",
+      "Present verbally in the assessment venue",
+    ],
+    skillsAssessed: ["spoken-response", "summarising", "counterarguments", "critical-evaluation"],
+    resources: [
+      { title: "CRAA Practice Materials", url: "https://hkbuhk.sharepoint.com/sites/AllStudents_LC/Shared%20Documents/Forms/AllItems.aspx?id=%2Fsites%2FAllStudents%5FLC%2FShared%20Documents%2FMoodle%2FEnglish%2FUCLC1008%20University%20English%20I%2FUE1%5F202526%2FUE1%5F2526S1%2FCritical%20Response%20to%20Academic%20Arguments&p=true&ga=1" },
+    ],
+  },
+  {
+    id: "reflective-portfolio",
+    title: "Reflective Learning Portfolio",
+    weight: "10%",
+    dueWeek: 14,
+    type: "take-home",
+    description: "A 500-word reflective analysis of 2-3 learning episodes using AI tools throughout the course, comparing original work with AI-generated versions.",
+    requirements: [
+      "Write approximately 500 words",
+      "Reflect on 2-3 learning episodes involving AI tools",
+      "Compare your original work with AI-generated versions",
+      "Explain your rationale for adopting or rejecting AI suggestions",
+      "Include a comprehensive record of AI interactions (dialogues, drafts, revisions, final versions)",
+      "Submit via Moodle by deadline (NO LATE submissions accepted)",
+    ],
+    skillsAssessed: ["ai-reflection", "ai-ethics", "critical-evaluation"],
+  },
+];
 
 export const weekMeta: Record<number, WeekMeta> = {
   1: { dateRange: "12-16 Jan 2026" },
@@ -53,7 +345,7 @@ export const weekMeta: Record<number, WeekMeta> = {
   },
   13: {
     dateRange: "20-24 Apr 2026",
-    assignmentTagline: "Critical Response (20%) & final submissions",
+    assignmentTagline: "CRAA (20%) & Final Submissions",
   },
 };
 
@@ -108,6 +400,9 @@ export const weeks: WeekData[] = [
     ],
     aiPromptHint:
       "You help first-year students understand the UCLC1008 course structure and the basic components of academic journal articles and citations.",
+    skillsIntroduced: ["journal-structure", "citation-recognition", "secondary-citations"],
+    skillsReinforced: [],
+    assignmentsUpcoming: ["pre-course-writing", "referencing-quiz"],
   },
   {
     id: 2,
@@ -152,6 +447,10 @@ export const weeks: WeekData[] = [
     ],
     aiPromptHint:
       "You support students in planning their Pre-course Writing and in producing short, safe paraphrases from journal articles without writing the assignment for them.",
+    skillsIntroduced: ["summarising", "paraphrasing", "ai-ethics"],
+    skillsReinforced: ["journal-structure", "citation-recognition"],
+    assignmentsDue: ["pre-course-writing"],
+    assignmentsUpcoming: ["referencing-quiz"],
   },
   {
     id: 3,
@@ -191,6 +490,9 @@ export const weeks: WeekData[] = [
     ],
     aiPromptHint:
       "You help students practise summarising and paraphrasing with correct in-text citations so they feel prepared for the Referencing Quiz.",
+    skillsIntroduced: ["apa-referencing"],
+    skillsReinforced: ["summarising", "paraphrasing", "citation-recognition", "secondary-citations"],
+    assignmentsDue: ["referencing-quiz"],
   },
   {
     id: 4,
@@ -230,6 +532,9 @@ export const weeks: WeekData[] = [
     ],
     aiPromptHint:
       "You help students use AI tools as careful reading and editing partners while maintaining academic integrity.",
+    skillsIntroduced: ["synthesising", "ai-editing"],
+    skillsReinforced: ["summarising", "paraphrasing", "ai-ethics"],
+    assignmentsUpcoming: ["academic-writing-quiz"],
   },
   {
     id: 5,
@@ -268,6 +573,9 @@ export const weeks: WeekData[] = [
     ],
     aiPromptHint:
       "You specialise in helping students recognise and label the parts of academic arguments using a standard argumentation model.",
+    skillsIntroduced: ["argument-identification", "toulmin-model"],
+    skillsReinforced: ["summarising", "synthesising"],
+    assignmentsUpcoming: ["academic-writing-quiz"],
   },
   {
     id: 6,
@@ -306,6 +614,10 @@ export const weeks: WeekData[] = [
     ],
     aiPromptHint:
       "You help students plan and rehearse short argument-based writing so they feel more confident in the Academic Writing Quiz.",
+    skillsIntroduced: ["academic-tone"],
+    skillsReinforced: ["summarising", "paraphrasing", "synthesising", "apa-referencing", "argument-identification"],
+    assignmentsDue: ["academic-writing-quiz"],
+    assignmentsUpcoming: ["ace-draft"],
   },
   {
     id: 7,
@@ -346,6 +658,9 @@ export const weeks: WeekData[] = [
     ],
     aiPromptHint:
       "You coach students to construct balanced arguments that acknowledge counterarguments and respond to them effectively.",
+    skillsIntroduced: ["counterarguments"],
+    skillsReinforced: ["toulmin-model", "argument-identification", "synthesising"],
+    assignmentsUpcoming: ["ace-draft"],
   },
   {
     id: 8,
@@ -387,6 +702,9 @@ export const weeks: WeekData[] = [
     ],
     aiPromptHint:
       "You help students move from basic summary to thoughtful critical response to academic arguments.",
+    skillsIntroduced: ["critical-evaluation"],
+    skillsReinforced: ["summarising", "argument-identification", "toulmin-model", "counterarguments"],
+    assignmentsUpcoming: ["ace-draft"],
   },
   {
     id: 9,
@@ -427,6 +745,10 @@ export const weeks: WeekData[] = [
     ],
     aiPromptHint:
       "You guide students in planning and testing out ideas for the Argument Construction and Evaluation draft without generating full answers.",
+    skillsIntroduced: [],
+    skillsReinforced: ["toulmin-model", "counterarguments", "summarising", "synthesising", "paraphrasing", "apa-referencing", "critical-evaluation"],
+    assignmentsDue: ["ace-draft"],
+    assignmentsUpcoming: ["peer-evaluation", "ace-final", "ai-reflection"],
   },
   {
     id: 10,
@@ -466,6 +788,9 @@ export const weeks: WeekData[] = [
     ],
     aiPromptHint:
       "You help students refine structured arguments with AI support and articulate thoughtful reflections on their AI use.",
+    skillsIntroduced: ["ai-reflection"],
+    skillsReinforced: ["ai-editing", "ai-ethics", "toulmin-model", "counterarguments"],
+    assignmentsUpcoming: ["peer-evaluation", "ace-final", "ai-reflection"],
   },
   {
     id: 11,
@@ -506,6 +831,9 @@ export const weeks: WeekData[] = [
     ],
     aiPromptHint:
       "You support students in giving and receiving constructive peer feedback focused on argument quality.",
+    skillsIntroduced: ["peer-feedback"],
+    skillsReinforced: ["critical-evaluation", "toulmin-model", "counterarguments"],
+    assignmentsUpcoming: ["peer-evaluation", "ace-final", "ai-reflection", "craa", "reflective-portfolio"],
   },
   {
     id: 12,
@@ -546,6 +874,10 @@ export const weeks: WeekData[] = [
     ],
     aiPromptHint:
       "You help students refine their drafts through peer feedback and prepare confident spoken responses to academic arguments.",
+    skillsIntroduced: ["spoken-response"],
+    skillsReinforced: ["peer-feedback", "critical-evaluation", "counterarguments", "summarising"],
+    assignmentsDue: ["peer-evaluation"],
+    assignmentsUpcoming: ["ace-final", "ai-reflection", "craa", "reflective-portfolio"],
   },
   {
     id: 13,
@@ -554,7 +886,7 @@ export const weeks: WeekData[] = [
     overview:
       "Complete the in-class CRAA test and finalise all outstanding submissions.",
     inClassActivities: [
-      "In-class Critical Response to Academic Arguments (CRAA) Test",
+      "In-class Critical Response to Academic Arguments (CRAA) Test (20%)",
       "Venue: To be confirmed",
     ],
     learningOutcomes: [
@@ -585,7 +917,22 @@ export const weeks: WeekData[] = [
     ],
     aiPromptHint:
       "You support students in final exam preparation and help them review their work for clarity, coherence, and proper referencing.",
+    skillsIntroduced: [],
+    skillsReinforced: ["spoken-response", "summarising", "counterarguments", "critical-evaluation", "ai-reflection", "toulmin-model"],
+    assignmentsDue: ["craa", "ace-final", "ai-reflection"],
+    assignmentsUpcoming: ["reflective-portfolio"],
   },
 ];
 
 export const getWeekById = (id: number) => weeks.find((week) => week.id === id);
+export const getSkillById = (id: string) => courseSkills.find((skill) => skill.id === id);
+export const getAssignmentById = (id: string) => courseAssignments.find((a) => a.id === id);
+export const getAssignmentsByWeek = (weekId: number) => courseAssignments.filter((a) => a.dueWeek === weekId);
+export const getSkillsForWeek = (weekId: number) => {
+  const week = getWeekById(weekId);
+  if (!week) return { introduced: [], reinforced: [] };
+  return {
+    introduced: week.skillsIntroduced.map(getSkillById).filter(Boolean) as Skill[],
+    reinforced: week.skillsReinforced.map(getSkillById).filter(Boolean) as Skill[],
+  };
+};
