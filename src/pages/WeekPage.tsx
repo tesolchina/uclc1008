@@ -1,5 +1,5 @@
 import { useParams, Navigate } from "react-router-dom";
-import { getWeekById, getWeekMetaById } from "@/data/uclc1008-weeks";
+import { getWeekById, getWeekMetaById, getSkillsForWeek, getAssignmentById, courseAssignments, Skill, Assignment } from "@/data/uclc1008-weeks";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,16 +12,96 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { LessonAiTutor } from "@/components/LessonAiTutor";
+import { BookOpen, Lightbulb, Target, Clock, FileText, AlertCircle, CheckCircle2 } from "lucide-react";
+
+const skillCategoryColors: Record<string, string> = {
+  "reading": "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
+  "writing": "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20",
+  "critical-thinking": "bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/20",
+  "ai-literacy": "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20",
+  "speaking": "bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/20",
+};
+
+const SkillBadge = ({ skill }: { skill: Skill }) => (
+  <span
+    className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${skillCategoryColors[skill.category]}`}
+    title={skill.description}
+  >
+    {skill.name}
+  </span>
+);
+
+const AssignmentCard = ({ assignment, isDue }: { assignment: Assignment; isDue: boolean }) => (
+  <div className={`rounded-xl border p-4 ${isDue ? 'border-destructive/50 bg-destructive/5' : 'border-border bg-muted/30'}`}>
+    <div className="flex items-start justify-between gap-3">
+      <div className="flex-1 space-y-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <h4 className="font-semibold text-sm">{assignment.title}</h4>
+          <Badge variant={isDue ? "destructive" : "secondary"} className="text-[10px]">
+            {assignment.weight}
+          </Badge>
+          <Badge variant="outline" className="text-[10px] uppercase">
+            {assignment.type}
+          </Badge>
+          {assignment.duration && (
+            <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+              <Clock className="h-3 w-3" />
+              {assignment.duration}
+            </span>
+          )}
+        </div>
+        <p className="text-xs text-muted-foreground">{assignment.description}</p>
+        <div className="space-y-1.5">
+          <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Requirements:</p>
+          <ul className="space-y-1">
+            {assignment.requirements.map((req, i) => (
+              <li key={i} className="flex items-start gap-1.5 text-xs text-muted-foreground">
+                <CheckCircle2 className="h-3 w-3 mt-0.5 text-primary/60 shrink-0" />
+                <span>{req}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        {assignment.resources && assignment.resources.length > 0 && (
+          <div className="pt-2 space-y-1">
+            <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Resources:</p>
+            <div className="flex flex-wrap gap-2">
+              {assignment.resources.map((res, i) => (
+                res.url ? (
+                  <a
+                    key={i}
+                    href={res.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-primary hover:underline"
+                  >
+                    {res.title} →
+                  </a>
+                ) : (
+                  <span key={i} className="text-xs text-muted-foreground">{res.title}</span>
+                )
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+);
 
 export const WeekPage = () => {
   const params = useParams();
   const id = Number(params.weekId);
   const week = Number.isNaN(id) ? undefined : getWeekById(id);
   const meta = Number.isNaN(id) ? undefined : getWeekMetaById(id);
+  const skills = Number.isNaN(id) ? { introduced: [], reinforced: [] } : getSkillsForWeek(id);
 
   if (!week) {
     return <Navigate to="/" replace />;
   }
+
+  const assignmentsDue = week.assignmentsDue?.map(getAssignmentById).filter(Boolean) as Assignment[] || [];
+  const assignmentsUpcoming = week.assignmentsUpcoming?.map(getAssignmentById).filter(Boolean) as Assignment[] || [];
 
   return (
     <div className="space-y-6">
@@ -43,6 +123,83 @@ export const WeekPage = () => {
       </section>
 
       <section className="space-y-4">
+        {/* Skills Section */}
+        {(skills.introduced.length > 0 || skills.reinforced.length > 0) && (
+          <Card className="card-elevated border-accent/30 bg-accent/5">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Lightbulb className="h-4 w-4 text-accent" />
+                Skills this week
+              </CardTitle>
+              <CardDescription>Track your skill development throughout the course.</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-0 space-y-4">
+              {skills.introduced.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                    <Target className="h-3 w-3" />
+                    New skills introduced
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {skills.introduced.map((skill) => (
+                      <SkillBadge key={skill.id} skill={skill} />
+                    ))}
+                  </div>
+                </div>
+              )}
+              {skills.reinforced.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                    <BookOpen className="h-3 w-3" />
+                    Skills reinforced from previous weeks
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {skills.reinforced.map((skill) => (
+                      <SkillBadge key={skill.id} skill={skill} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Assignments Due This Week */}
+        {assignmentsDue.length > 0 && (
+          <Card className="card-elevated border-destructive/30 bg-destructive/5">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 text-destructive" />
+                Assignments due this week
+              </CardTitle>
+              <CardDescription>Complete these assessments during or by the end of this week.</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-0 space-y-3">
+              {assignmentsDue.map((assignment) => (
+                <AssignmentCard key={assignment.id} assignment={assignment} isDue={true} />
+              ))}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Upcoming Assignments */}
+        {assignmentsUpcoming.length > 0 && (
+          <Card className="card-elevated">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <FileText className="h-4 w-4 text-muted-foreground" />
+                Upcoming assignments
+              </CardTitle>
+              <CardDescription>Start preparing for these assessments.</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-0 space-y-3">
+              {assignmentsUpcoming.map((assignment) => (
+                <AssignmentCard key={assignment.id} assignment={assignment} isDue={false} />
+              ))}
+            </CardContent>
+          </Card>
+        )}
+
         <Card className="card-elevated">
           <CardHeader className="pb-3">
             <CardTitle className="text-base">AI tutor for this week</CardTitle>
