@@ -56,7 +56,7 @@ export function AppSidebar() {
   const isActive = (path: string) => currentPath === path;
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-sidebar-border bg-sidebar text-sidebar-foreground">
+    <Sidebar collapsible="offcanvas" className="border-r border-sidebar-border bg-sidebar text-sidebar-foreground">
       <SidebarContent className="flex flex-col gap-4 px-2 py-3">
         <SidebarGroup>
           <SidebarGroupLabel className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-sidebar-foreground/60">
