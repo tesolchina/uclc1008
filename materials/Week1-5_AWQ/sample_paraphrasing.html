@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 4: Paraphrasing Strategies - Interactive Practice</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .objectives {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .objectives h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .objectives ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .objectives li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .objectives li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .warm-up-badge {
+            display: inline-block;
+            background: #ffc107;
+            color: #333;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .question {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .question h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .options {
+            list-style: none;
+        }
+
+        .options li {
+            padding: 10px;
+            margin: 8px 0;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .options li:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .options li.selected {
+            border-color: #667eea;
+            background: #e7edff;
+        }
+
+        .options li.correct {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .options li.incorrect {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+        }
+
+        .feedback.incorrect {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+        }
+
+        .short-answer-task {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .short-answer-task h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .original-text {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            font-style: italic;
+        }
+
+        .writing-area {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .writing-area textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .writing-area textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .word-count {
+            margin-top: 10px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .ai-feedback {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .ai-feedback.show {
+            display: block;
+        }
+
+        .ai-feedback.loading {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+        }
+
+        .ai-feedback-content {
+            margin-top: 10px;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+            margin: 5px;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: #5568d3;
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background: #218838;
+        }
+
+        .progress-bar {
+            background: #e0e0e0;
+            height: 10px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: #667eea;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .summary-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .summary-section h2 {
+            color: white;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .report-section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .report-section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .report-preview {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 15px 0;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .concept-hint {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 12px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-size: 0.95em;
+        }
+
+        .concept-hint strong {
+            color: #2196F3;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            header h1 {
+                font-size: 1.5em;
+            }
+
+            .summary-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Week 4: Paraphrasing Strategies</h1>
+            <p>Interactive Practice Module</p>
+        </header>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress"></div>
+        </div>
+
+        <div class="objectives">
+            <h2>Learning Objectives</h2>
+            <ul>
+                <li>Understand four main paraphrasing strategies through guided practice</li>
+                <li>Practice paraphrasing using different techniques</li>
+                <li>Learn to avoid plagiarism while maintaining meaning</li>
+                <li>Receive AI-assisted feedback on your paraphrasing attempts</li>
+                <li>Generate a summary report of your progress</li>
+            </ul>
+        </div>
+
+        <!-- Section 1: Warm-up MC Questions -->
+        <div class="section">
+            <h2>1. Warm-up: Understanding Paraphrasing Concepts <span class="warm-up-badge">WARM-UP</span></h2>
+            <p style="margin-bottom: 20px; color: #666;">Let's start with some multiple-choice questions to gently introduce key concepts about paraphrasing.</p>
+
+            <div class="question" id="warmup1">
+                <h3>Question 1: What is the main purpose of paraphrasing?</h3>
+                <ul class="options">
+                    <li onclick="selectOption(this, 'warmup1', 'incorrect')">A) To copy the original text exactly</li>
+                    <li onclick="selectOption(this, 'warmup1', 'correct')">B) To restate ideas in your own words while maintaining the original meaning</li>
+                    <li onclick="selectOption(this, 'warmup1', 'incorrect')">C) To change the meaning of the original text</li>
+                    <li onclick="selectOption(this, 'warmup1', 'incorrect')">D) To make the text shorter</li>
+                </ul>
+                <div class="feedback" id="feedback-warmup1"></div>
+            </div>
+
+            <div class="question" id="warmup2">
+                <h3>Question 2: Which paraphrasing strategy involves replacing words with similar meanings?</h3>
+                <ul class="options">
+                    <li onclick="selectOption(this, 'warmup2', 'correct')">A) Using synonyms</li>
+                    <li onclick="selectOption(this, 'warmup2', 'incorrect')">B) Changing word forms</li>
+                    <li onclick="selectOption(this, 'warmup2', 'incorrect')">C) Changing voice</li>
+                    <li onclick="selectOption(this, 'warmup2', 'incorrect')">D) Changing sentence patterns</li>
+                </ul>
+                <div class="feedback" id="feedback-warmup2"></div>
+            </div>
+
+            <div class="question" id="warmup3">
+                <h3>Question 3: Which example demonstrates changing from active to passive voice?</h3>
+                <p><strong>Original:</strong> The students completed the assignment successfully.</p>
+                <ul class="options">
+                    <li onclick="selectOption(this, 'warmup3', 'correct')">A) The assignment was completed successfully by the students.</li>
+                    <li onclick="selectOption(this, 'warmup3', 'incorrect')">B) The pupils finished the task successfully.</li>
+                    <li onclick="selectOption(this, 'warmup3', 'incorrect')">C) Students successfully completed assignments.</li>
+                    <li onclick="selectOption(this, 'warmup3', 'incorrect')">D) The assignment completion was successful by students.</li>
+                </ul>
+                <div class="feedback" id="feedback-warmup3"></div>
+            </div>
+
+            <div class="question" id="warmup4">
+                <h3>Question 4: What should you always do after paraphrasing someone else's work?</h3>
+                <ul class="options">
+                    <li onclick="selectOption(this, 'warmup4', 'incorrect')">A) Nothing - paraphrasing means you don't need to cite</li>
+                    <li onclick="selectOption(this, 'warmup4', 'correct')">B) Cite the original source</li>
+                    <li onclick="selectOption(this, 'warmup4', 'incorrect')">C) Change more words</li>
+                    <li onclick="selectOption(this, 'warmup4', 'incorrect')">D) Make it longer</li>
+                </ul>
+                <div class="feedback" id="feedback-warmup4"></div>
+            </div>
+
+            <div class="question" id="warmup5">
+                <h3>Question 5: Which is the best paraphrase of this sentence?</h3>
+                <p><strong>Original:</strong> Many educators believe that technology enhances learning outcomes.</p>
+                <ul class="options">
+                    <li onclick="selectOption(this, 'warmup5', 'incorrect')">A) Many educators believe that technology enhances learning outcomes.</li>
+                    <li onclick="selectOption(this, 'warmup5', 'correct')">B) Numerous teachers think that technology improves educational results.</li>
+                    <li onclick="selectOption(this, 'warmup5', 'incorrect')">C) Technology enhances learning outcomes, many educators believe.</li>
+                    <li onclick="selectOption(this, 'warmup5', 'incorrect')">D) Many educators believe technology enhances learning outcomes.</li>
+                </ul>
+                <div class="feedback" id="feedback-warmup5"></div>
+            </div>
+
+            <div class="concept-hint">
+                <strong>Key Concept:</strong> Paraphrasing involves restating ideas in your own words while maintaining the original meaning. It's not just about changing a few words - you need to understand the concept and express it differently.
+            </div>
+        </div>
+
+        <!-- Section 2: Short Answer Tasks (Try Before Learning) -->
+        <div class="section">
+            <h2>2. Try It Yourself: Short Answer Practice</h2>
+            <p style="margin-bottom: 20px; color: #666;">Now try paraphrasing these sentences on your own. Don't worry if you're not sure - just give it your best attempt! You'll receive AI feedback to help you improve.</p>
+
+            <div class="short-answer-task" id="task1">
+                <h3>Task 1: Paraphrase using synonyms</h3>
+                <div class="original-text">
+                    <strong>Original:</strong> The research demonstrates that technology significantly impacts education.
+                </div>
+                <div class="writing-area">
+                    <textarea id="answer1" placeholder="Write your paraphrase here... Try using different words with similar meanings."></textarea>
+                    <div class="word-count">Words: <span id="wordCount1">0</span></div>
+                    <button class="btn" onclick="getAIFeedback('answer1', 'feedback1', 'The research demonstrates that technology significantly impacts education.', 'Try using synonyms to replace key words while maintaining the meaning.')">Get AI Feedback</button>
+                    <div class="ai-feedback" id="feedback1"></div>
+                </div>
+            </div>
+
+            <div class="short-answer-task" id="task2">
+                <h3>Task 2: Paraphrase by changing word forms</h3>
+                <div class="original-text">
+                    <strong>Original:</strong> The implementation of new policies requires careful consideration.
+                </div>
+                <div class="writing-area">
+                    <textarea id="answer2" placeholder="Write your paraphrase here... Try changing nouns to verbs, adjectives to adverbs, etc."></textarea>
+                    <div class="word-count">Words: <span id="wordCount2">0</span></div>
+                    <button class="btn" onclick="getAIFeedback('answer2', 'feedback2', 'The implementation of new policies requires careful consideration.', 'Try changing word forms - nouns to verbs, adjectives to adverbs, etc.')">Get AI Feedback</button>
+                    <div class="ai-feedback" id="feedback2"></div>
+                </div>
+            </div>
+
+            <div class="short-answer-task" id="task3">
+                <h3>Task 3: Paraphrase by changing voice (active to passive)</h3>
+                <div class="original-text">
+                    <strong>Original:</strong> Researchers conducted extensive studies on this topic.
+                </div>
+                <div class="writing-area">
+                    <textarea id="answer3" placeholder="Write your paraphrase here... Try changing from active voice to passive voice."></textarea>
+                    <div class="word-count">Words: <span id="wordCount3">0</span></div>
+                    <button class="btn" onclick="getAIFeedback('answer3', 'feedback3', 'Researchers conducted extensive studies on this topic.', 'Try changing from active voice to passive voice.')">Get AI Feedback</button>
+                    <div class="ai-feedback" id="feedback3"></div>
+                </div>
+            </div>
+
+            <div class="short-answer-task" id="task4">
+                <h3>Task 4: Paraphrase by changing sentence patterns</h3>
+                <div class="original-text">
+                    <strong>Original:</strong> Although the results were promising, further research is needed.
+                </div>
+                <div class="writing-area">
+                    <textarea id="answer4" placeholder="Write your paraphrase here... Try restructuring the sentence using different patterns and clauses."></textarea>
+                    <div class="word-count">Words: <span id="wordCount4">0</span></div>
+                    <button class="btn" onclick="getAIFeedback('answer4', 'feedback4', 'Although the results were promising, further research is needed.', 'Try restructuring the sentence using different patterns and clauses.')">Get AI Feedback</button>
+                    <div class="ai-feedback" id="feedback4"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Advanced Practice (Multiple Skills) -->
+        <div class="section">
+            <h2>3. Advanced Practice: Combining Multiple Strategies</h2>
+            <p style="margin-bottom: 20px; color: #666;">Now try paraphrasing longer sentences using multiple strategies at once.</p>
+
+            <div class="short-answer-task" id="task5">
+                <h3>Task 5: Paraphrase using multiple strategies</h3>
+                <div class="original-text">
+                    <strong>Original:</strong> The investigation revealed significant findings about student performance that educators should consider when developing new teaching methods.
+                </div>
+                <div class="writing-area">
+                    <textarea id="answer5" placeholder="Write your paraphrase here... Try combining synonyms, word form changes, voice changes, and sentence restructuring."></textarea>
+                    <div class="word-count">Words: <span id="wordCount5">0</span></div>
+                    <button class="btn" onclick="getAIFeedback('answer5', 'feedback5', 'The investigation revealed significant findings about student performance that educators should consider when developing new teaching methods.', 'Try combining multiple strategies: synonyms, word forms, voice changes, and sentence restructuring.')">Get AI Feedback</button>
+                    <div class="ai-feedback" id="feedback5"></div>
+                </div>
+            </div>
+
+            <div class="short-answer-task" id="task6">
+                <h3>Task 6: Paraphrase a complex sentence</h3>
+                <div class="original-text">
+                    <strong>Original:</strong> Many universities have implemented online learning platforms because they recognize that digital education can provide flexible learning opportunities for students who have various scheduling constraints.
+                </div>
+                <div class="writing-area">
+                    <textarea id="answer6" placeholder="Write your paraphrase here... This is a longer sentence - try using multiple strategies."></textarea>
+                    <div class="word-count">Words: <span id="wordCount6">0</span></div>
+                    <button class="btn" onclick="getAIFeedback('answer6', 'feedback6', 'Many universities have implemented online learning platforms because they recognize that digital education can provide flexible learning opportunities for students who have various scheduling constraints.', 'This is a complex sentence. Try using multiple paraphrasing strategies together.')">Get AI Feedback</button>
+                    <div class="ai-feedback" id="feedback6"></div>
+                </div>
+            </div>
+
+            <div class="short-answer-task" id="task7">
+                <h3>Task 7: Paraphrase an academic statement</h3>
+                <div class="original-text">
+                    <strong>Original:</strong> Recent studies indicate that collaborative learning approaches enhance critical thinking skills and improve academic performance among university students.
+                </div>
+                <div class="writing-area">
+                    <textarea id="answer7" placeholder="Write your paraphrase here... Maintain the academic tone while using different words and structures."></textarea>
+                    <div class="word-count">Words: <span id="wordCount7">0</span></div>
+                    <button class="btn" onclick="getAIFeedback('answer7', 'feedback7', 'Recent studies indicate that collaborative learning approaches enhance critical thinking skills and improve academic performance among university students.', 'Maintain academic tone while using multiple paraphrasing strategies.')">Get AI Feedback</button>
+                    <div class="ai-feedback" id="feedback7"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="summary-section" id="summarySection" style="display: none;">
+            <h2>Your Progress Summary</h2>
+            <div class="summary-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="statWarmup">0</div>
+                    <div class="stat-label">Warm-up Questions Completed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statTasks">0</div>
+                    <div class="stat-label">Practice Tasks Completed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statFeedback">0</div>
+                    <div class="stat-label">AI Feedback Received</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statProgress">0%</div>
+                    <div class="stat-label">Overall Progress</div>
+                </div>
+            </div>
+            <div id="summaryDetails" style="margin-top: 20px;"></div>
+        </div>
+
+        <!-- Report Generation Section -->
+        <div class="report-section" id="reportSection" style="display: none;">
+            <h2>Generate Report for Moodle</h2>
+            <p style="margin-bottom: 15px;">Click the button below to generate an HTML report that you can copy and paste into a Moodle forum post.</p>
+            <button class="btn btn-success" onclick="generateReport()">Generate HTML Report</button>
+            <div class="report-preview" id="reportPreview" style="display: none;"></div>
+            <button class="btn btn-secondary" onclick="copyReport()" id="copyBtn" style="display: none; margin-top: 10px;">Copy Report to Clipboard</button>
+        </div>
+
+        <!-- Navigation -->
+        <div class="navigation">
+            <button class="btn btn-secondary" onclick="showSummary()">View Summary</button>
+            <button class="btn" onclick="saveProgress()">Save Progress</button>
+            <button class="btn btn-secondary" onclick="loadProgress()">Load Progress</button>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const HKBU_API_KEY = '05aac124-b5ea-466f-8add-5ac18e658cd4';
+        const HKBU_API_URL = 'https://genai.hkbu.edu.hk/api/v0/rest/deployments/gpt-4.1-mini/chat/completions';
+        
+        // State tracking
+        let progress = 0;
+        let completed = new Set();
+        let studentData = {
+            warmupAnswers: {},
+            taskAnswers: {},
+            aiFeedback: {},
+            timestamps: {}
+        };
+
+        // Word count tracking
+        for (let i = 1; i <= 7; i++) {
+            const textarea = document.getElementById(`answer${i}`);
+            if (textarea) {
+                textarea.addEventListener('input', function() {
+                    const count = this.value.trim().split(/\s+/).filter(Boolean).length;
+                    document.getElementById(`wordCount${i}`).textContent = count;
+                });
+            }
+        }
+
+        // Multiple choice selection
+        function selectOption(element, questionId, result) {
+            const question = document.getElementById(questionId);
+            const options = question.querySelectorAll('.options li');
+            const feedback = document.getElementById('feedback-' + questionId);
+            
+            // Remove previous selections
+            options.forEach(opt => {
+                opt.classList.remove('selected', 'correct', 'incorrect');
+            });
+            
+            // Mark selected
+            element.classList.add('selected', result);
+            
+            // Store answer
+            studentData.warmupAnswers[questionId] = {
+                selected: element.textContent.trim(),
+                correct: result === 'correct',
+                timestamp: new Date().toISOString()
+            };
+            
+            // Show feedback
+            feedback.classList.add('show', result);
+            if (result === 'correct') {
+                feedback.textContent = '✓ Correct! Well done.';
+                completed.add(questionId);
+            } else {
+                feedback.textContent = '✗ Incorrect. The correct answer is: ' + 
+                    Array.from(options).find(opt => opt.classList.contains('correct') || 
+                    opt.onclick.toString().includes("'correct'")).textContent.trim();
+            }
+            
+            updateProgress();
+        }
+
+        // AI Feedback function
+        async function getAIFeedback(textareaId, feedbackId, originalText, strategyHint) {
+            const text = document.getElementById(textareaId).value.trim();
+            if (!text) {
+                alert('Please write a paraphrase first!');
+                return;
+            }
+            
+            const feedback = document.getElementById(feedbackId);
+            feedback.classList.add('show', 'loading');
+            feedback.innerHTML = '<strong>AI is analyzing your paraphrase...</strong>';
+
+            // Store answer
+            const taskId = textareaId.replace('answer', 'task');
+            studentData.taskAnswers[taskId] = {
+                original: originalText,
+                paraphrase: text,
+                timestamp: new Date().toISOString()
+            };
+
+            try {
+                const prompt = `You are an academic writing tutor helping a student with paraphrasing practice.
+
+Original text: "${originalText}"
+
+Student's paraphrase: "${text}"
+
+Strategy hint: ${strategyHint}
+
+Please provide constructive feedback on the student's paraphrase. Consider:
+1. Does the paraphrase maintain the original meaning?
+2. How well does it use the suggested strategy?
+3. What specific improvements could be made?
+4. Rate the paraphrase on a scale of 1-10.
+
+Format your response as:
+- **Meaning Preservation:** [comment]
+- **Strategy Use:** [comment]
+- **Suggestions:** [specific suggestions]
+- **Score:** [X/10]
+
+Be encouraging and specific in your feedback.`;
+
+                const response = await fetch(HKBU_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'api-key': HKBU_API_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        messages: [
+                            {
+                                role: 'system',
+                                content: 'You are a supportive academic writing tutor. Provide clear, constructive feedback on paraphrasing exercises.'
+                            },
+                            {
+                                role: 'user',
+                                content: prompt
+                            }
+                        ],
+                        max_tokens: 500,
+                        temperature: 0.7
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const aiResponse = data.choices[0].message.content;
+
+                // Store feedback
+                studentData.aiFeedback[taskId] = {
+                    feedback: aiResponse,
+                    timestamp: new Date().toISOString()
+                };
+
+                feedback.classList.remove('loading');
+                feedback.innerHTML = `
+                    <strong>AI Feedback:</strong>
+                    <div class="ai-feedback-content">${aiResponse.replace(/\n/g, '<br>')}</div>
+                `;
+
+                completed.add(taskId);
+                updateProgress();
+            } catch (error) {
+                console.error('AI Feedback Error:', error);
+                feedback.classList.remove('loading');
+                feedback.innerHTML = `
+                    <strong>Error:</strong> Unable to get AI feedback at this time. 
+                    Please try again later. Error: ${error.message}
+                `;
+            }
+        }
+
+        // Update progress
+        function updateProgress() {
+            const totalWarmup = 5;
+            const totalTasks = 7;
+            const total = totalWarmup + totalTasks;
+            
+            const warmupCompleted = Array.from(completed).filter(id => id.startsWith('warmup')).length;
+            const tasksCompleted = Array.from(completed).filter(id => id.startsWith('task')).length;
+            
+            progress = (completed.size / total) * 100;
+            document.getElementById('progress').style.width = progress + '%';
+            
+            // Update summary if visible
+            if (document.getElementById('summarySection').style.display !== 'none') {
+                updateSummary();
+            }
+        }
+
+        // Show summary
+        function showSummary() {
+            const summarySection = document.getElementById('summarySection');
+            const reportSection = document.getElementById('reportSection');
+            
+            summarySection.style.display = 'block';
+            reportSection.style.display = 'block';
+            updateSummary();
+            
+            // Scroll to summary
+            summarySection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Update summary display
+        function updateSummary() {
+            const warmupCompleted = Array.from(completed).filter(id => id.startsWith('warmup')).length;
+            const tasksCompleted = Array.from(completed).filter(id => id.startsWith('task')).length;
+            const feedbackCount = Object.keys(studentData.aiFeedback).length;
+            
+            document.getElementById('statWarmup').textContent = warmupCompleted;
+            document.getElementById('statTasks').textContent = tasksCompleted;
+            document.getElementById('statFeedback').textContent = feedbackCount;
+            document.getElementById('statProgress').textContent = Math.round(progress) + '%';
+            
+            // Generate summary details
+            let details = '<h3 style="margin-top: 20px;">Activity Details:</h3><ul style="list-style: none; padding: 0;">';
+            
+            // Warm-up summary
+            details += '<li style="margin: 10px 0;"><strong>Warm-up Questions:</strong> ' + warmupCompleted + '/5 completed</li>';
+            
+            // Tasks summary
+            details += '<li style="margin: 10px 0;"><strong>Practice Tasks:</strong> ' + tasksCompleted + '/7 completed</li>';
+            
+            // Feedback summary
+            if (feedbackCount > 0) {
+                details += '<li style="margin: 10px 0;"><strong>AI Feedback Received:</strong> ' + feedbackCount + ' tasks</li>';
+            }
+            
+            details += '</ul>';
+            document.getElementById('summaryDetails').innerHTML = details;
+        }
+
+        // Generate HTML report
+        function generateReport() {
+            const reportPreview = document.getElementById('reportPreview');
+            const copyBtn = document.getElementById('copyBtn');
+            
+            let reportHTML = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Paraphrasing Practice Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; }
+        h1 { color: #667eea; }
+        h2 { color: #764ba2; border-bottom: 2px solid #667eea; padding-bottom: 5px; }
+        .section { margin: 20px 0; }
+        .original { background: #fff3cd; padding: 10px; border-radius: 4px; margin: 10px 0; }
+        .paraphrase { background: #d1ecf1; padding: 10px; border-radius: 4px; margin: 10px 0; }
+        .feedback { background: #e7f3ff; padding: 10px; border-radius: 4px; margin: 10px 0; border-left: 4px solid #2196F3; }
+        .stat { display: inline-block; margin: 10px 20px 10px 0; }
+        .stat-number { font-size: 2em; font-weight: bold; color: #667eea; }
+    </style>
+</head>
+<body>
+    <h1>Paraphrasing Practice Report</h1>
+    <p><strong>Student:</strong> [Your Name]</p>
+    <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+    
+    <div class="section">
+        <h2>Summary Statistics</h2>
+        <div class="stat">
+            <div class="stat-number">${Array.from(completed).filter(id => id.startsWith('warmup')).length}</div>
+            <div>Warm-up Questions Completed</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number">${Array.from(completed).filter(id => id.startsWith('task')).length}</div>
+            <div>Practice Tasks Completed</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number">${Object.keys(studentData.aiFeedback).length}</div>
+            <div>AI Feedback Received</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number">${Math.round(progress)}%</div>
+            <div>Overall Progress</div>
+        </div>
+    </div>
+`;
+
+            // Add warm-up answers
+            if (Object.keys(studentData.warmupAnswers).length > 0) {
+                reportHTML += '<div class="section"><h2>Warm-up Questions</h2>';
+                for (const [questionId, answer] of Object.entries(studentData.warmupAnswers)) {
+                    reportHTML += `
+        <p><strong>${questionId}:</strong> ${answer.selected}</p>
+        <p>${answer.correct ? '✓ Correct' : '✗ Incorrect'}</p>
+`;
+                }
+                reportHTML += '</div>';
+            }
+
+            // Add task answers and feedback
+            if (Object.keys(studentData.taskAnswers).length > 0) {
+                reportHTML += '<div class="section"><h2>Practice Tasks</h2>';
+                for (const [taskId, task] of Object.entries(studentData.taskAnswers)) {
+                    reportHTML += `
+        <h3>${taskId}</h3>
+        <div class="original"><strong>Original:</strong> ${task.original}</div>
+        <div class="paraphrase"><strong>My Paraphrase:</strong> ${task.paraphrase}</div>
+`;
+                    if (studentData.aiFeedback[taskId]) {
+                        reportHTML += `
+        <div class="feedback"><strong>AI Feedback:</strong><br>${studentData.aiFeedback[taskId].feedback.replace(/\n/g, '<br>')}</div>
+`;
+                    }
+                }
+                reportHTML += '</div>';
+            }
+
+            reportHTML += `
+    <div class="section">
+        <h2>Reflection</h2>
+        <p>[Add your reflection on what you learned from this practice session]</p>
+    </div>
+</body>
+</html>
+`;
+
+            reportPreview.innerHTML = '<pre style="white-space: pre-wrap; word-wrap: break-word;">' + 
+                reportHTML.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</pre>';
+            reportPreview.style.display = 'block';
+            copyBtn.style.display = 'block';
+            
+            // Store report HTML for copying
+            window.reportHTML = reportHTML;
+        }
+
+        // Copy report to clipboard
+        function copyReport() {
+            if (window.reportHTML) {
+                navigator.clipboard.writeText(window.reportHTML).then(() => {
+                    alert('Report copied to clipboard! You can now paste it into Moodle.');
+                }).catch(err => {
+                    alert('Failed to copy. Please select and copy the text manually.');
+                });
+            }
+        }
+
+        // Save progress
+        function saveProgress() {
+            const data = {
+                completed: Array.from(completed),
+                progress: progress,
+                studentData: studentData,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('paraphrasingProgress', JSON.stringify(data));
+            alert('Progress saved!');
+        }
+
+        // Load progress
+        function loadProgress() {
+            const saved = localStorage.getItem('paraphrasingProgress');
+            if (saved) {
+                const data = JSON.parse(saved);
+                completed = new Set(data.completed);
+                studentData = data.studentData || studentData;
+                updateProgress();
+                alert('Progress loaded!');
+            } else {
+                alert('No saved progress found.');
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', function() {
+            loadProgress();
+        });
+    </script>
+</body>
+</html>
