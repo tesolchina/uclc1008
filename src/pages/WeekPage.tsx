@@ -1,5 +1,5 @@
 import { useParams, Navigate } from "react-router-dom";
-import { getWeekById, getWeekMetaById, getSkillsForWeek, getAssignmentById, courseAssignments, Skill, Assignment } from "@/data/uclc1008-weeks";
+import { getWeekById, getWeekMetaById, getSkillsForWeek, getAssignmentById, courseAssignments, Skill, Assignment } from "@/data";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

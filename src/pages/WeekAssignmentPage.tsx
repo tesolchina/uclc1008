@@ -1,5 +1,5 @@
 import { useParams, Navigate, Link } from "react-router-dom";
-import { getWeekById, getWeekMetaById, getAssignmentById, getSkillById } from "@/data/uclc1008-weeks";
+import { getWeekById, getWeekMetaById, getAssignmentById, getSkillById } from "@/data";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Clock, FileText, ExternalLink, ArrowLeft, BookOpen } from "lucide-react";
