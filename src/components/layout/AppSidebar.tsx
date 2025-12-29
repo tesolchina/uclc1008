@@ -1,6 +1,6 @@
 import { BookOpen, CalendarRange, MessageCircle, Sparkles, Target } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
-import { getWeekMetaById, getAssignmentById } from "@/data/uclc1008-weeks";
+import { getWeekMetaById, getAssignmentById } from "@/data";
 import { useLocation } from "react-router-dom";
 
 import {
