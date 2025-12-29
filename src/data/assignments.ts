@@ -4,21 +4,21 @@ export const courseAssignments: Assignment[] = [
   {
     id: "pre-course-writing",
     title: "Pre-course Writing",
-    weight: "2.5%",
+    weight: "2.5% (Class Participation)",
     dueWeek: 2,
     type: "take-home",
-    description: "This is a baseline assessment designed to evaluate your current academic writing abilities before formal instruction begins. The task will help your instructor understand your starting point in key academic writing skills, including summarising, paraphrasing, and maintaining an appropriate academic tone. This assessment is not graded harshly but serves as an important diagnostic tool to guide your learning throughout the course.",
+    description: "This pre-course writing consists of two tasks: Task 1 (summary writing) and Task 2 (argumentation). Submissions made before the deadline will be awarded 2.5% (out of 15%) from Class Participation. This task is also used as a baseline to help your instructor understand your starting point in key academic writing skills.",
     requirements: [
-      "Read the writing prompt carefully, which will be provided on Moodle",
-      "Complete the writing task following all instructions in the prompt",
-      "Write entirely in your own words - do not use AI writing tools (ChatGPT, Grammarly writing suggestions, or similar AI assistance)",
-      "Demonstrate your ability to summarise and paraphrase information from provided sources",
-      "Use appropriate academic tone and formal register throughout your writing",
-      "Ensure your work is original and reflects your current writing abilities",
-      "Review your draft before submission to check for clarity and completeness",
-      "Submit your completed work via Moodle by the specified deadline",
-      "Save your work in the required file format (typically .doc or .docx)",
-      "Include your name and student ID on your submission",
+      "Task 1: Write a summary of no more than 300 words on the excerpt in the appendix (no copying; no personal views)",
+      "Task 2: Write an essay of no more than 300 words on the given topic and show your position (no extra sources)",
+      "Do NOT search for additional online or offline sources (e.g., websites, magazines)",
+      "Use APA in-text citations (7th edition) to acknowledge ideas from the article where needed",
+      "Write in paragraph form: Introduction (background + thesis), Body paragraph(s) (topic sentences), Conclusion",
+      "Type Task 1 and Task 2 in the same Word file",
+      "Submissions made before the deadline will be awarded 2.5% (out of 15%) from Class Participation",
+      "Submit to Moodle (Individual Section) by 23 Jan 2026 (Fri), 6pm (no late submission)",
+      "AI-generated text or substantial copying may result in zero marks",
+      "Re-submit to Moodle if you have changed your section (the previous submission will be erased)",
     ],
     skillsAssessed: ["summarising", "paraphrasing", "academic-tone"],
     resources: [
@@ -26,7 +26,7 @@ export const courseAssignments: Assignment[] = [
       { title: "Review Module 2: Summarising, paraphrasing & synthesising skills before completing the task" },
     ],
     detailedInfo: {
-      exactDueDate: "23 January 2026, 6:00 PM",
+      exactDueDate: "23 Jan 2026 (Fri), 6:00 PM",
       submissionMethod: "Moodle (Individual Section)",
       format: "Word document (.doc or .docx)",
       wordLimit: "300 words per task (600 words total)",
@@ -45,14 +45,16 @@ export const courseAssignments: Assignment[] = [
         "Task 2 (Argumentation Essay): Write an essay of no more than 300 words showing your position on the topic. Include your own views and knowledge. Citing examples or ideas from the journal article is optional. Do NOT search for additional online or offline sources.",
         "Use APA in-text citations (7th edition) to acknowledge ideas from the article in your summary and essay.",
         "Write in paragraph form with: Introduction (background and thesis), Body paragraph(s) (with topic sentences), Conclusion.",
-        "Type both tasks in the same Word file and submit to Moodle.",
-        "NO LATE SUBMISSION ALLOWED"
+        "Type both tasks in the same Word file and submit to Moodle (Individual Section) by 23 Jan 2026 (Fri), 6pm.",
+        "Submissions made before the deadline will be awarded 2.5% (out of 15%) from Class Participation.",
+        "No late submission is allowed.",
+        "Re-submit to Moodle if you have changed your section, as the submission in the previous section will be erased automatically."
       ],
       aiPolicy: [
         "If AI detection tools indicate that your writing consists of AI-generated text, you will be awarded zero marks.",
         "If you directly copy a significant portion of the source text, you will be awarded zero marks."
       ],
-      latePolicy: "NO LATE SUBMISSION ALLOWED. Submissions after 23 January 2026, 6:00 PM will receive zero marks.",
+      latePolicy: "No late submission is allowed.",
       requiredMaterials: [
         "Appendix excerpt from Andrejevic & Selwyn (2020) 'Facial recognition technology in schools: critical questions and concerns'"
       ]

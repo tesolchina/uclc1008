@@ -13,7 +13,22 @@ import * as pdfjsLib from "pdfjs-dist";
 import pdfjsWorker from "pdfjs-dist/build/pdf.worker.min?url";
 import mammoth from "mammoth";
 
-(pdfjsLib as any).GlobalWorkerOptions.workerSrc = pdfjsWorker;
+type PdfTextItem = { str?: string; string?: string };
+type PdfTextContent = { items?: PdfTextItem[] };
+type PdfPageProxy = { getTextContent: () => Promise<PdfTextContent> };
+type PdfDocumentProxy = { numPages: number; getPage: (pageNumber: number) => Promise<PdfPageProxy> };
+type PdfjsModule = typeof pdfjsLib & {
+  GlobalWorkerOptions: { workerSrc: string };
+  getDocument: (src: { data: ArrayBuffer }) => { promise: Promise<PdfDocumentProxy> };
+};
+type MammothModule = {
+  extractRawText: (options: { arrayBuffer: ArrayBuffer }) => Promise<{ value?: string }>;
+};
+
+const pdfjs = pdfjsLib as unknown as PdfjsModule;
+const mammothModule = mammoth as unknown as MammothModule;
+
+pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 const STAFF_PASSWORD = "ue2026";
 
@@ -349,14 +364,15 @@ const StaffSpace = () => {
 
       if (extension === "pdf") {
         const arrayBuffer = await file.arrayBuffer();
-        const pdf = await (pdfjsLib as any).getDocument({ data: arrayBuffer }).promise;
+        const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
         let combined = "";
 
         for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
           const page = await pdf.getPage(pageNumber);
           const content = await page.getTextContent();
           const pageText = (content.items ?? [])
-            .map((item: any) => (typeof item.str === "string" ? item.str : (item.string as string | undefined) ?? ""))
+            .map((item) => ("str" in item && typeof item.str === "string" ? item.str : ""))
+            .filter((chunk) => chunk.length > 0)
             .join(" ");
           combined += pageText + "\n\n";
         }
@@ -364,8 +380,8 @@ const StaffSpace = () => {
         text = combined.trim();
       } else if (extension === "docx" || extension === "doc") {
         const arrayBuffer = await file.arrayBuffer();
-        const result = await (mammoth as any).extractRawText({ arrayBuffer });
-        text = (result?.value as string | undefined)?.trim() ?? "";
+        const result = await mammothModule.extractRawText({ arrayBuffer });
+        text = result.value?.trim() ?? "";
       } else {
         text = (await file.text()).trim();
       }
