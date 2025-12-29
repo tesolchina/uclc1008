@@ -117,6 +117,10 @@
     @apply border-border;
   }
 
+  html {
+    font-size: 17px;
+  }
+
   body {
     min-height: 100vh;
     @apply bg-background text-foreground antialiased;
