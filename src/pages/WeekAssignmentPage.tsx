@@ -3,6 +3,7 @@ import { getWeekById, getWeekMetaById, getAssignmentById, getSkillById } from "@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Clock, FileText, ExternalLink, ArrowLeft, BookOpen } from "lucide-react";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 
 export const WeekAssignmentPage = () => {
   const params = useParams();
@@ -50,7 +51,11 @@ export const WeekAssignmentPage = () => {
                 {assignment.type}
               </Badge>
               <span className="hero-badge font-semibold">{assignment.weight}</span>
-              {meta?.dateRange && <span className="hero-badge">{meta.dateRange}</span>}
+              {assignment.detailedInfo?.exactDueDate ? (
+                <span className="hero-badge">{assignment.detailedInfo.exactDueDate}</span>
+              ) : (
+                meta?.dateRange && <span className="hero-badge">{meta.dateRange}</span>
+              )}
             </div>
             <h1 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
               {assignment.title}
@@ -168,6 +173,132 @@ export const WeekAssignmentPage = () => {
           </Card>
         </section>
       )}
+      {assignment.detailedInfo && (
+        <section aria-label="Detailed information">
+          <Card className="card-elevated">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <FileText className="h-4 w-4 text-primary" />
+                Detailed information
+              </CardTitle>
+              <CardDescription>
+                Additional submission, format and grading details for this assignment
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-0 space-y-3">
+              <Accordion type="single" collapsible defaultValue="general">
+                <AccordionItem value="general">
+                  <AccordionTrigger>General</AccordionTrigger>
+                  <AccordionContent>
+                    <div className="text-sm text-muted-foreground space-y-2">
+                      {assignment.detailedInfo.exactDueDate && (
+                        <div>Exact due date: <strong className="text-foreground">{assignment.detailedInfo.exactDueDate}</strong></div>
+                      )}
+                      {assignment.detailedInfo.submissionMethod && (
+                        <div>Submission method: <strong className="text-foreground">{assignment.detailedInfo.submissionMethod}</strong></div>
+                      )}
+                      {assignment.detailedInfo.format && (
+                        <div>Format: <strong className="text-foreground">{assignment.detailedInfo.format}</strong></div>
+                      )}
+                      {assignment.detailedInfo.wordLimit && (
+                        <div>Word limit: <strong className="text-foreground">{assignment.detailedInfo.wordLimit}</strong></div>
+                      )}
+                      {assignment.detailedInfo.timeLimit && (
+                        <div>Time limit: <strong className="text-foreground">{assignment.detailedInfo.timeLimit}</strong></div>
+                      )}
+
+                      {assignment.detailedInfo.latePolicy && (
+                        <div>Late policy: <strong className="text-foreground">{assignment.detailedInfo.latePolicy}</strong></div>
+                      )}
+
+                      {assignment.detailedInfo.requiredMaterials && (
+                        <div>
+                          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Required materials</p>
+                          <ul className="list-disc pl-5">
+                            {assignment.detailedInfo.requiredMaterials.map((m, i) => (
+                              <li key={i} className="text-sm text-muted-foreground">{m}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="grading">
+                  <AccordionTrigger>Grading criteria</AccordionTrigger>
+                  <AccordionContent>
+                    <div>
+                      {assignment.detailedInfo.gradingCriteria ? (
+                        <ul className="list-disc pl-5">
+                          {assignment.detailedInfo.gradingCriteria.map((g, i) => (
+                            <li key={i} className="text-sm text-muted-foreground">{g}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">No grading criteria provided.</p>
+                      )}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="instructions">
+                  <AccordionTrigger>Instructions</AccordionTrigger>
+                  <AccordionContent>
+                    <div>
+                      {assignment.detailedInfo.instructions ? (
+                        <ol className="list-decimal pl-5">
+                          {assignment.detailedInfo.instructions.map((ins, i) => (
+                            <li key={i} className="text-sm text-muted-foreground">{ins}</li>
+                          ))}
+                        </ol>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">No instructions provided.</p>
+                      )}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </CardContent>
+          </Card>
+        </section>
+      )}
+
+      {/* Additional resources (samples moved here) */}
+      {(assignment.detailedInfo?.sampleQuestions || assignment.detailedInfo?.sampleResponses) && (
+        <section aria-label="Additional resources">
+          <Card className="card-elevated">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <FileText className="h-4 w-4 text-primary" />
+                Additional resources
+              </CardTitle>
+              <CardDescription>Sample questions and example responses</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="text-sm text-muted-foreground space-y-2">
+                {assignment.detailedInfo?.sampleQuestions && (
+                  <div>
+                    <p className="font-medium">Sample questions</p>
+                    <ul className="list-disc pl-5">
+                      {assignment.detailedInfo.sampleQuestions.map((q, i) => (
+                        <li key={i}>{q}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {assignment.detailedInfo?.sampleResponses && (
+                  <div>
+                    <p className="font-medium">Sample responses (summaries)</p>
+                    <p className="text-sm text-muted-foreground">Example responses are available in the course materials.</p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+      )}
+
     </div>
   );
 };
