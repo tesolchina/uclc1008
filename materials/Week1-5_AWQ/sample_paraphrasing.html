@@ -215,7 +215,7 @@
             font-size: 14px;
         }
 
-        .ai-feedback {
+        .check-feedback {
             background: #e7f3ff;
             border-left: 4px solid #2196F3;
             padding: 15px;
@@ -224,17 +224,25 @@
             display: none;
         }
 
-        .ai-feedback.show {
+        .check-feedback.show {
             display: block;
         }
 
-        .ai-feedback.loading {
-            background: #fff3cd;
-            border-left-color: #ffc107;
+        .check-feedback-content {
+            margin-top: 10px;
         }
 
-        .ai-feedback-content {
-            margin-top: 10px;
+        .sample-answer {
+            background: #f8f9fa;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .sample-answer.show {
+            display: block;
         }
 
         .btn {
@@ -399,12 +407,39 @@
         <div class="objectives">
             <h2>Learning Objectives</h2>
             <ul>
-                <li>Understand four main paraphrasing strategies through guided practice</li>
-                <li>Practice paraphrasing using different techniques</li>
-                <li>Learn to avoid plagiarism while maintaining meaning</li>
-                <li>Receive AI-assisted feedback on your paraphrasing attempts</li>
-                <li>Generate a summary report of your progress</li>
+                <li>Paraphrase a sentence while keeping the original meaning</li>
+                <li>Change wording and structure (not just a few words)</li>
+                <li>Use at least two strategies (synonyms, word forms, voice, sentence patterns)</li>
+                <li>Reduce copying by checking overlap with the original</li>
+                <li>Record your practice and export a short report for Moodle</li>
             </ul>
+        </div>
+
+        <div class="section">
+            <h2>Before You Practise: What Good Paraphrasing Looks Like</h2>
+            <p style="margin-bottom: 16px; color: #666;">As an academic writer, you paraphrase to integrate sources smoothly while showing understanding. A strong paraphrase changes both <strong>language</strong> and <strong>structure</strong> without changing <strong>meaning</strong>, and it still needs a <strong>citation</strong>.</p>
+
+            <div class="concept-hint">
+                <strong>Behaviour goal:</strong> When you paraphrase, you read → identify key meaning → re-express in a new structure → check accuracy → cite.
+            </div>
+
+            <h3 style="margin: 18px 0 10px;">Four core strategies (use 2+ together)</h3>
+            <ul style="margin-left: 18px; color: #333;">
+                <li><strong>Synonyms:</strong> replace key words with accurate alternatives (not every word)</li>
+                <li><strong>Word forms:</strong> change noun ↔ verb, adjective ↔ noun, etc.</li>
+                <li><strong>Voice:</strong> active ↔ passive when appropriate</li>
+                <li><strong>Sentence patterns:</strong> split/merge clauses, change order, use different connectors</li>
+            </ul>
+
+            <h3 style="margin: 18px 0 10px;">Worked demo</h3>
+            <div class="original-text">
+                <strong>Original:</strong> The research demonstrates that technology significantly impacts education.
+            </div>
+            <div class="concept-hint">
+                <strong>Step 1 (meaning):</strong> Technology has a large effect on education, according to research.<br>
+                <strong>Step 2 (rewrite):</strong> Research suggests that educational outcomes are strongly influenced by technology.<br>
+                <strong>Step 3 (cite):</strong> Research suggests that educational outcomes are strongly influenced by technology (Author, Year).
+            </div>
         </div>
 
         <!-- Section 1: Warm-up MC Questions -->
@@ -421,6 +456,9 @@
                     <li onclick="selectOption(this, 'warmup1', 'incorrect')">D) To make the text shorter</li>
                 </ul>
                 <div class="feedback" id="feedback-warmup1"></div>
+                <div id="explanation-warmup1" style="display: none;">
+                    <strong>Explanation:</strong> Paraphrasing is about demonstrating understanding. Copying (A) is plagiarism. Changing meaning (C) creates inaccuracy. Making text shorter (D) is summarizing, which is different from paraphrasing.
+                </div>
             </div>
 
             <div class="question" id="warmup2">
@@ -432,6 +470,9 @@
                     <li onclick="selectOption(this, 'warmup2', 'incorrect')">D) Changing sentence patterns</li>
                 </ul>
                 <div class="feedback" id="feedback-warmup2"></div>
+                <div id="explanation-warmup2" style="display: none;">
+                    <strong>Explanation:</strong> Synonyms are different words with the same meaning (e.g., 'important' = 'significant'). Changing word forms (B) involves grammar (e.g., noun to verb). Voice (C) and sentence patterns (D) involve structural changes.
+                </div>
             </div>
 
             <div class="question" id="warmup3">
@@ -467,6 +508,9 @@
                     <li onclick="selectOption(this, 'warmup5', 'incorrect')">D) Many educators believe technology enhances learning outcomes.</li>
                 </ul>
                 <div class="feedback" id="feedback-warmup5"></div>
+                <div id="explanation-warmup5" style="display: none;">
+                    <strong>Explanation:</strong> Option B is best because it changes vocabulary ('educators' → 'teachers', 'enhances' → 'improves') and structure while keeping the exact meaning. Option A is a copy. Option C is awkward. Option D is too close to the original.
+                </div>
             </div>
 
             <div class="concept-hint">
@@ -479,6 +523,13 @@
             <h2>2. Try It Yourself: Short Answer Practice</h2>
             <p style="margin-bottom: 20px; color: #666;">Now try paraphrasing these sentences on your own. Don't worry if you're not sure - just give it your best attempt! You'll receive AI feedback to help you improve.</p>
 
+            <div class="concept-hint">
+                <strong>Strategy Focus: Synonyms</strong><br>
+                Replace words with others that have the same meaning in this context.<br>
+                <em>Example:</em> "The results were <strong>good</strong>." → "The results were <strong>positive</strong>."<br>
+                <small>Caution: Check that the synonym fits the academic style (e.g., avoid slang).</small>
+            </div>
+
             <div class="short-answer-task" id="task1">
                 <h3>Task 1: Paraphrase using synonyms</h3>
                 <div class="original-text">
@@ -487,9 +538,17 @@
                 <div class="writing-area">
                     <textarea id="answer1" placeholder="Write your paraphrase here... Try using different words with similar meanings."></textarea>
                     <div class="word-count">Words: <span id="wordCount1">0</span></div>
-                    <button class="btn" onclick="getAIFeedback('answer1', 'feedback1', 'The research demonstrates that technology significantly impacts education.', 'Try using synonyms to replace key words while maintaining the meaning.')">Get AI Feedback</button>
-                    <div class="ai-feedback" id="feedback1"></div>
+                    <button class="btn" onclick="checkParaphrase('answer1', 'feedback1', 'task1', 'The research demonstrates that technology significantly impacts education.')">Check my paraphrase</button>
+                    <button class="btn btn-secondary" onclick="toggleSample('sample1')">Show sample</button>
+                    <div class="check-feedback" id="feedback1"></div>
+                    <div class="sample-answer" id="sample1"><strong>Sample:</strong> Research suggests that technology has a substantial effect on education (Author, Year).</div>
                 </div>
+            </div>
+
+            <div class="concept-hint">
+                <strong>Strategy Focus: Word Forms</strong><br>
+                Change the part of speech (Noun ↔ Verb ↔ Adjective). This often forces you to change the sentence structure around the word.<br>
+                <em>Example:</em> "The <strong>creation</strong> of the policy..." (Noun) → "They <strong>created</strong> the policy..." (Verb)
             </div>
 
             <div class="short-answer-task" id="task2">
@@ -500,9 +559,18 @@
                 <div class="writing-area">
                     <textarea id="answer2" placeholder="Write your paraphrase here... Try changing nouns to verbs, adjectives to adverbs, etc."></textarea>
                     <div class="word-count">Words: <span id="wordCount2">0</span></div>
-                    <button class="btn" onclick="getAIFeedback('answer2', 'feedback2', 'The implementation of new policies requires careful consideration.', 'Try changing word forms - nouns to verbs, adjectives to adverbs, etc.')">Get AI Feedback</button>
-                    <div class="ai-feedback" id="feedback2"></div>
+                    <button class="btn" onclick="checkParaphrase('answer2', 'feedback2', 'task2', 'The implementation of new policies requires careful consideration.')">Check my paraphrase</button>
+                    <button class="btn btn-secondary" onclick="toggleSample('sample2')">Show sample</button>
+                    <div class="check-feedback" id="feedback2"></div>
+                    <div class="sample-answer" id="sample2"><strong>Sample:</strong> Introducing new policies requires decision-makers to consider the implications carefully (Author, Year).</div>
                 </div>
+            </div>
+
+            <div class="concept-hint">
+                <strong>Strategy Focus: Voice (Active ↔ Passive)</strong><br>
+                Switch between "Who did it" (Active) and "What was done" (Passive).<br>
+                <em>Active:</em> "<strong>The government</strong> passed the law."<br>
+                <em>Passive:</em> "<strong>The law</strong> was passed by the government."
             </div>
 
             <div class="short-answer-task" id="task3">
@@ -513,8 +581,10 @@
                 <div class="writing-area">
                     <textarea id="answer3" placeholder="Write your paraphrase here... Try changing from active voice to passive voice."></textarea>
                     <div class="word-count">Words: <span id="wordCount3">0</span></div>
-                    <button class="btn" onclick="getAIFeedback('answer3', 'feedback3', 'Researchers conducted extensive studies on this topic.', 'Try changing from active voice to passive voice.')">Get AI Feedback</button>
-                    <div class="ai-feedback" id="feedback3"></div>
+                    <button class="btn" onclick="checkParaphrase('answer3', 'feedback3', 'task3', 'Researchers conducted extensive studies on this topic.')">Check my paraphrase</button>
+                    <button class="btn btn-secondary" onclick="toggleSample('sample3')">Show sample</button>
+                    <div class="check-feedback" id="feedback3"></div>
+                    <div class="sample-answer" id="sample3"><strong>Sample:</strong> Extensive studies were carried out on this topic by researchers (Author, Year).</div>
                 </div>
             </div>
 
@@ -526,8 +596,10 @@
                 <div class="writing-area">
                     <textarea id="answer4" placeholder="Write your paraphrase here... Try restructuring the sentence using different patterns and clauses."></textarea>
                     <div class="word-count">Words: <span id="wordCount4">0</span></div>
-                    <button class="btn" onclick="getAIFeedback('answer4', 'feedback4', 'Although the results were promising, further research is needed.', 'Try restructuring the sentence using different patterns and clauses.')">Get AI Feedback</button>
-                    <div class="ai-feedback" id="feedback4"></div>
+                    <button class="btn" onclick="checkParaphrase('answer4', 'feedback4', 'task4', 'Although the results were promising, further research is needed.')">Check my paraphrase</button>
+                    <button class="btn btn-secondary" onclick="toggleSample('sample4')">Show sample</button>
+                    <div class="check-feedback" id="feedback4"></div>
+                    <div class="sample-answer" id="sample4"><strong>Sample:</strong> Further research is still necessary despite the encouraging results (Author, Year).</div>
                 </div>
             </div>
         </div>
@@ -545,9 +617,16 @@
                 <div class="writing-area">
                     <textarea id="answer5" placeholder="Write your paraphrase here... Try combining synonyms, word form changes, voice changes, and sentence restructuring."></textarea>
                     <div class="word-count">Words: <span id="wordCount5">0</span></div>
-                    <button class="btn" onclick="getAIFeedback('answer5', 'feedback5', 'The investigation revealed significant findings about student performance that educators should consider when developing new teaching methods.', 'Try combining multiple strategies: synonyms, word forms, voice changes, and sentence restructuring.')">Get AI Feedback</button>
-                    <div class="ai-feedback" id="feedback5"></div>
+                    <button class="btn" onclick="checkParaphrase('answer5', 'feedback5', 'task5', 'The investigation revealed significant findings about student performance that educators should consider when developing new teaching methods.')">Check my paraphrase</button>
+                    <button class="btn btn-secondary" onclick="toggleSample('sample5')">Show sample</button>
+                    <div class="check-feedback" id="feedback5"></div>
+                    <div class="sample-answer" id="sample5"><strong>Sample:</strong> The study identified important results on student performance, which educators should take into account when designing new teaching approaches (Author, Year).</div>
                 </div>
+            </div>
+
+            <div class="concept-hint">
+                <strong>Challenge: Complex Sentences</strong><br>
+                Long sentences often have multiple clauses. Break them down: identify the main idea first, then rewrite it simply, then add the details back in your own structure.
             </div>
 
             <div class="short-answer-task" id="task6">
@@ -558,23 +637,14 @@
                 <div class="writing-area">
                     <textarea id="answer6" placeholder="Write your paraphrase here... This is a longer sentence - try using multiple strategies."></textarea>
                     <div class="word-count">Words: <span id="wordCount6">0</span></div>
-                    <button class="btn" onclick="getAIFeedback('answer6', 'feedback6', 'Many universities have implemented online learning platforms because they recognize that digital education can provide flexible learning opportunities for students who have various scheduling constraints.', 'This is a complex sentence. Try using multiple paraphrasing strategies together.')">Get AI Feedback</button>
-                    <div class="ai-feedback" id="feedback6"></div>
+                    <button class="btn" onclick="checkParaphrase('answer6', 'feedback6', 'task6', 'Many universities have implemented online learning platforms because they recognize that digital education can provide flexible learning opportunities for students who have various scheduling constraints.')">Check my paraphrase</button>
+                    <button class="btn btn-secondary" onclick="toggleSample('sample6')">Show sample</button>
+                    <div class="check-feedback" id="feedback6"></div>
+                    <div class="sample-answer" id="sample6"><strong>Sample:</strong> Universities have adopted online platforms because they acknowledge that digital education can offer flexible options for students with different time constraints (Author, Year).</div>
                 </div>
             </div>
 
-            <div class="short-answer-task" id="task7">
-                <h3>Task 7: Paraphrase an academic statement</h3>
-                <div class="original-text">
-                    <strong>Original:</strong> Recent studies indicate that collaborative learning approaches enhance critical thinking skills and improve academic performance among university students.
-                </div>
-                <div class="writing-area">
-                    <textarea id="answer7" placeholder="Write your paraphrase here... Maintain the academic tone while using different words and structures."></textarea>
-                    <div class="word-count">Words: <span id="wordCount7">0</span></div>
-                    <button class="btn" onclick="getAIFeedback('answer7', 'feedback7', 'Recent studies indicate that collaborative learning approaches enhance critical thinking skills and improve academic performance among university students.', 'Maintain academic tone while using multiple paraphrasing strategies.')">Get AI Feedback</button>
-                    <div class="ai-feedback" id="feedback7"></div>
-                </div>
-            </div>
+
         </div>
 
         <!-- Summary Section -->
@@ -590,8 +660,8 @@
                     <div class="stat-label">Practice Tasks Completed</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number" id="statFeedback">0</div>
-                    <div class="stat-label">AI Feedback Received</div>
+                    <div class="stat-number" id="statChecks">0</div>
+                    <div class="stat-label">Self-checks Completed</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number" id="statProgress">0%</div>
@@ -604,7 +674,7 @@
         <!-- Report Generation Section -->
         <div class="report-section" id="reportSection" style="display: none;">
             <h2>Generate Report for Moodle</h2>
-            <p style="margin-bottom: 15px;">Click the button below to generate an HTML report that you can copy and paste into a Moodle forum post.</p>
+            <p style="margin-bottom: 15px;">Click the button below to generate an HTML report that you can copy and paste into Moodle.</p>
             <button class="btn btn-success" onclick="generateReport()">Generate HTML Report</button>
             <div class="report-preview" id="reportPreview" style="display: none;"></div>
             <button class="btn btn-secondary" onclick="copyReport()" id="copyBtn" style="display: none; margin-top: 10px;">Copy Report to Clipboard</button>
@@ -619,17 +689,13 @@
     </div>
 
     <script>
-        // Configuration
-        const HKBU_API_KEY = '05aac124-b5ea-466f-8add-5ac18e658cd4';
-        const HKBU_API_URL = 'https://genai.hkbu.edu.hk/api/v0/rest/deployments/gpt-4.1-mini/chat/completions';
-        
         // State tracking
         let progress = 0;
         let completed = new Set();
         let studentData = {
             warmupAnswers: {},
             taskAnswers: {},
-            aiFeedback: {},
+            selfChecks: {},
             timestamps: {}
         };
 
@@ -649,6 +715,7 @@
             const question = document.getElementById(questionId);
             const options = question.querySelectorAll('.options li');
             const feedback = document.getElementById('feedback-' + questionId);
+            const explanation = document.getElementById('explanation-' + questionId);
             
             // Remove previous selections
             options.forEach(opt => {
@@ -667,112 +734,110 @@
             
             // Show feedback
             feedback.classList.add('show', result);
+            
+            let feedbackHTML = '';
             if (result === 'correct') {
-                feedback.textContent = '✓ Correct! Well done.';
+                feedbackHTML = '<strong>✓ Correct!</strong>';
                 completed.add(questionId);
             } else {
-                feedback.textContent = '✗ Incorrect. The correct answer is: ' + 
-                    Array.from(options).find(opt => opt.classList.contains('correct') || 
-                    opt.onclick.toString().includes("'correct'")).textContent.trim();
+                feedbackHTML = '<strong>✗ Incorrect.</strong>';
             }
+            
+            // Add detailed explanation if available
+            if (explanation) {
+                feedbackHTML += '<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.1);">' + explanation.innerHTML + '</div>';
+            }
+            
+            feedback.innerHTML = feedbackHTML;
             
             updateProgress();
         }
 
-        // AI Feedback function
-        async function getAIFeedback(textareaId, feedbackId, originalText, strategyHint) {
+        function toggleSample(sampleId) {
+            const el = document.getElementById(sampleId);
+            if (!el) return;
+            el.classList.toggle('show');
+        }
+
+        function tokenize(text) {
+            return text
+                .toLowerCase()
+                .replace(/[^a-z0-9\s]/g, " ")
+                .split(/\s+/)
+                .filter(Boolean);
+        }
+
+        function significantWords(words) {
+            const stop = new Set([
+                "the","a","an","and","or","but","so","because","that","this","these","those","to","of","in","on","for","with","as","by","from","at","it","is","are","was","were","be","been","being","have","has","had","do","does","did","can","could","will","would","should","may","might","must","not","about","into","over","under","through","during","before","after","among","between","while","although","however","therefore"
+            ]);
+            return words.filter(w => w.length > 2 && !stop.has(w));
+        }
+
+        function overlapRatio(original, paraphrase) {
+            const o = new Set(significantWords(tokenize(original)));
+            const p = significantWords(tokenize(paraphrase));
+            if (p.length === 0) return 0;
+            let shared = 0;
+            for (const w of p) {
+                if (o.has(w)) shared += 1;
+            }
+            return shared / p.length;
+        }
+
+        function checkParaphrase(textareaId, feedbackId, taskId, originalText) {
             const text = document.getElementById(textareaId).value.trim();
             if (!text) {
-                alert('Please write a paraphrase first!');
+                alert("Please write a paraphrase first!");
                 return;
             }
-            
-            const feedback = document.getElementById(feedbackId);
-            feedback.classList.add('show', 'loading');
-            feedback.innerHTML = '<strong>AI is analyzing your paraphrase...</strong>';
 
-            // Store answer
-            const taskId = textareaId.replace('answer', 'task');
+            const feedback = document.getElementById(feedbackId);
+            const ratio = overlapRatio(originalText, text);
+            const wordCount = text.split(/\s+/).filter(Boolean).length;
+
             studentData.taskAnswers[taskId] = {
                 original: originalText,
                 paraphrase: text,
                 timestamp: new Date().toISOString()
             };
 
-            try {
-                const prompt = `You are an academic writing tutor helping a student with paraphrasing practice.
+            let level = "good";
+            let message = "";
 
-Original text: "${originalText}"
-
-Student's paraphrase: "${text}"
-
-Strategy hint: ${strategyHint}
-
-Please provide constructive feedback on the student's paraphrase. Consider:
-1. Does the paraphrase maintain the original meaning?
-2. How well does it use the suggested strategy?
-3. What specific improvements could be made?
-4. Rate the paraphrase on a scale of 1-10.
-
-Format your response as:
-- **Meaning Preservation:** [comment]
-- **Strategy Use:** [comment]
-- **Suggestions:** [specific suggestions]
-- **Score:** [X/10]
-
-Be encouraging and specific in your feedback.`;
-
-                const response = await fetch(HKBU_API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'api-key': HKBU_API_KEY,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        messages: [
-                            {
-                                role: 'system',
-                                content: 'You are a supportive academic writing tutor. Provide clear, constructive feedback on paraphrasing exercises.'
-                            },
-                            {
-                                role: 'user',
-                                content: prompt
-                            }
-                        ],
-                        max_tokens: 500,
-                        temperature: 0.7
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`API error: ${response.status}`);
-                }
-
-                const data = await response.json();
-                const aiResponse = data.choices[0].message.content;
-
-                // Store feedback
-                studentData.aiFeedback[taskId] = {
-                    feedback: aiResponse,
-                    timestamp: new Date().toISOString()
-                };
-
-                feedback.classList.remove('loading');
-                feedback.innerHTML = `
-                    <strong>AI Feedback:</strong>
-                    <div class="ai-feedback-content">${aiResponse.replace(/\n/g, '<br>')}</div>
-                `;
-
-                completed.add(taskId);
-                updateProgress();
-            } catch (error) {
-                console.error('AI Feedback Error:', error);
-                feedback.classList.remove('loading');
-                feedback.innerHTML = `
-                    <strong>Error:</strong> Unable to get AI feedback at this time. 
-                    Please try again later. Error: ${error.message}
-                `;
+            if (wordCount < 6) {
+                level = "needs-work";
+                message = "Your paraphrase is very short. Add more detail while keeping the meaning and academic tone.";
+            } else if (ratio >= 0.6) {
+                level = "needs-work";
+                message = "Your paraphrase is still very close to the original. Change sentence structure, switch word forms, and replace key phrases (not every word).";
+            } else if (ratio >= 0.4) {
+                level = "ok";
+                message = "This is a reasonable start, but some key wording is still similar. Try re-ordering information and changing word forms to reduce copying.";
+            } else {
+                message = "Good distance from the original. Now double-check that the meaning is accurate and add a citation in your assignment (e.g., Author, Year).";
             }
+
+            studentData.selfChecks[taskId] = {
+                overlapRatio: ratio,
+                wordCount: wordCount,
+                level: level,
+                timestamp: new Date().toISOString()
+            };
+
+            feedback.classList.add("show");
+            feedback.innerHTML = `
+                <strong>Self-check:</strong>
+                <div class="check-feedback-content">
+                    <p><strong>Word count:</strong> ${wordCount}</p>
+                    <p><strong>Copying risk (overlap):</strong> ${(ratio * 100).toFixed(0)}%</p>
+                    <p>${message}</p>
+                    <p><strong>Meaning check question:</strong> What is the single main idea of the original? Does your paraphrase still express it?</p>
+                </div>
+            `;
+
+            completed.add(taskId);
+            updateProgress();
         }
 
         // Update progress
@@ -810,11 +875,9 @@ Be encouraging and specific in your feedback.`;
         function updateSummary() {
             const warmupCompleted = Array.from(completed).filter(id => id.startsWith('warmup')).length;
             const tasksCompleted = Array.from(completed).filter(id => id.startsWith('task')).length;
-            const feedbackCount = Object.keys(studentData.aiFeedback).length;
-            
             document.getElementById('statWarmup').textContent = warmupCompleted;
             document.getElementById('statTasks').textContent = tasksCompleted;
-            document.getElementById('statFeedback').textContent = feedbackCount;
+            document.getElementById('statChecks').textContent = Object.keys(studentData.selfChecks).length;
             document.getElementById('statProgress').textContent = Math.round(progress) + '%';
             
             // Generate summary details
@@ -824,12 +887,7 @@ Be encouraging and specific in your feedback.`;
             details += '<li style="margin: 10px 0;"><strong>Warm-up Questions:</strong> ' + warmupCompleted + '/5 completed</li>';
             
             // Tasks summary
-            details += '<li style="margin: 10px 0;"><strong>Practice Tasks:</strong> ' + tasksCompleted + '/7 completed</li>';
-            
-            // Feedback summary
-            if (feedbackCount > 0) {
-                details += '<li style="margin: 10px 0;"><strong>AI Feedback Received:</strong> ' + feedbackCount + ' tasks</li>';
-            }
+            details += '<li style="margin: 10px 0;"><strong>Practice Tasks:</strong> ' + tasksCompleted + '/6 completed</li>';
             
             details += '</ul>';
             document.getElementById('summaryDetails').innerHTML = details;
@@ -853,7 +911,7 @@ Be encouraging and specific in your feedback.`;
         .section { margin: 20px 0; }
         .original { background: #fff3cd; padding: 10px; border-radius: 4px; margin: 10px 0; }
         .paraphrase { background: #d1ecf1; padding: 10px; border-radius: 4px; margin: 10px 0; }
-        .feedback { background: #e7f3ff; padding: 10px; border-radius: 4px; margin: 10px 0; border-left: 4px solid #2196F3; }
+        .check { background: #e7f3ff; padding: 10px; border-radius: 4px; margin: 10px 0; border-left: 4px solid #2196F3; }
         .stat { display: inline-block; margin: 10px 20px 10px 0; }
         .stat-number { font-size: 2em; font-weight: bold; color: #667eea; }
     </style>
@@ -874,8 +932,8 @@ Be encouraging and specific in your feedback.`;
             <div>Practice Tasks Completed</div>
         </div>
         <div class="stat">
-            <div class="stat-number">${Object.keys(studentData.aiFeedback).length}</div>
-            <div>AI Feedback Received</div>
+            <div class="stat-number">${Object.keys(studentData.selfChecks).length}</div>
+            <div>Self-checks Completed</div>
         </div>
         <div class="stat">
             <div class="stat-number">${Math.round(progress)}%</div>
@@ -905,9 +963,9 @@ Be encouraging and specific in your feedback.`;
         <div class="original"><strong>Original:</strong> ${task.original}</div>
         <div class="paraphrase"><strong>My Paraphrase:</strong> ${task.paraphrase}</div>
 `;
-                    if (studentData.aiFeedback[taskId]) {
+                    if (studentData.selfChecks[taskId]) {
                         reportHTML += `
-        <div class="feedback"><strong>AI Feedback:</strong><br>${studentData.aiFeedback[taskId].feedback.replace(/\n/g, '<br>')}</div>
+        <div class="check"><strong>Self-check:</strong> Overlap ${(studentData.selfChecks[taskId].overlapRatio * 100).toFixed(0)}%, Words ${studentData.selfChecks[taskId].wordCount}</div>
 `;
                     }
                 }
