@@ -44,7 +44,7 @@ const weeks: WeekNavItem[] = Array.from({ length: 13 }, (_, index) => {
 
 const overviewItems = [
   { title: "Course overview", url: "/", icon: BookOpen },
-  { title: "Assessment & goals", url: "/#assessment", icon: Target },
+  { title: "Assessment & goals", url: "/assessment", icon: Target },
 ];
 
 export function AppSidebar() {
