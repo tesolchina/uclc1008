@@ -12,7 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { LessonAiTutor } from "@/components/LessonAiTutor";
-import { BookOpen, Lightbulb, Target, Clock, FileText, AlertCircle, CheckCircle2, Bot, Users } from "lucide-react";
+import { BookOpen, Lightbulb, Target, Clock, FileText, AlertCircle, CheckCircle2, Bot, Users, ArrowRight } from "lucide-react";
 
 const skillCategoryColors: Record<string, string> = {
   "reading": "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
@@ -31,10 +31,13 @@ const SkillBadge = ({ skill }: { skill: Skill }) => (
   </span>
 );
 
-const AssignmentCard = ({ assignment, isDue }: { assignment: Assignment; isDue: boolean }) => (
-  <div className={`rounded-xl border p-4 ${isDue ? 'border-destructive/50 bg-destructive/5' : 'border-border bg-muted/30'}`}>
-    <div className="flex items-start justify-between gap-3">
-      <div className="flex-1 space-y-2">
+const AssignmentCard = ({ assignment, isDue, weekId }: { assignment: Assignment; isDue: boolean; weekId: number }) => (
+  <Link 
+    to={`/week/${weekId}/assignment/${assignment.id}`}
+    className={`block rounded-xl border p-4 transition-colors hover:border-primary/50 ${isDue ? 'border-destructive/50 bg-destructive/5' : 'border-border bg-muted/30'}`}
+  >
+    <div className="flex items-center justify-between gap-3">
+      <div className="flex-1 space-y-1.5">
         <div className="flex flex-wrap items-center gap-2">
           <h4 className="font-semibold text-sm">{assignment.title}</h4>
           <Badge variant={isDue ? "destructive" : "secondary"} className="text-[10px]">
@@ -50,43 +53,11 @@ const AssignmentCard = ({ assignment, isDue }: { assignment: Assignment; isDue: 
             </span>
           )}
         </div>
-        <p className="text-xs text-muted-foreground">{assignment.description}</p>
-        <div className="space-y-1.5">
-          <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Requirements:</p>
-          <ul className="space-y-1">
-            {assignment.requirements.map((req, i) => (
-              <li key={i} className="flex items-start gap-1.5 text-xs text-muted-foreground">
-                <CheckCircle2 className="h-3 w-3 mt-0.5 text-primary/60 shrink-0" />
-                <span>{req}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-        {assignment.resources && assignment.resources.length > 0 && (
-          <div className="pt-2 space-y-1">
-            <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Resources:</p>
-            <div className="flex flex-wrap gap-2">
-              {assignment.resources.map((res, i) => (
-                res.url ? (
-                  <a
-                    key={i}
-                    href={res.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-primary hover:underline"
-                  >
-                    {res.title} →
-                  </a>
-                ) : (
-                  <span key={i} className="text-xs text-muted-foreground">{res.title}</span>
-                )
-              ))}
-            </div>
-          </div>
-        )}
+        <p className="text-xs text-muted-foreground line-clamp-2">{assignment.description}</p>
       </div>
+      <ArrowRight className="h-4 w-4 text-muted-foreground shrink-0" />
     </div>
-  </div>
+  </Link>
 );
 
 export const WeekPage = () => {
@@ -200,7 +171,7 @@ export const WeekPage = () => {
           >
             <div className="space-y-3">
               {assignmentsDue.map((assignment) => (
-                <AssignmentCard key={assignment.id} assignment={assignment} isDue={true} />
+                <AssignmentCard key={assignment.id} assignment={assignment} isDue={true} weekId={week.id} />
               ))}
             </div>
           </CollapsibleSection>
@@ -215,7 +186,7 @@ export const WeekPage = () => {
           >
             <div className="space-y-3">
               {assignmentsUpcoming.map((assignment) => (
-                <AssignmentCard key={assignment.id} assignment={assignment} isDue={false} />
+                <AssignmentCard key={assignment.id} assignment={assignment} isDue={false} weekId={week.id} />
               ))}
             </div>
           </CollapsibleSection>
