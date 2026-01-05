@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { WeekPage } from "./pages/WeekPage";
 import { WeekAssignmentPage } from "./pages/WeekAssignmentPage";
+import AssessmentPage from "./pages/AssessmentPage";
 import { AppLayout } from "@/components/layout/AppLayout";
 import Staff from "./pages/Staff";
 
@@ -21,6 +22,7 @@ const App = () => (
         <Routes>
           <Route element={<AppLayout />}>
             <Route index element={<Index />} />
+            <Route path="assessment" element={<AssessmentPage />} />
             <Route path="week/:weekId" element={<WeekPage />} />
             <Route path="week/:weekId/assignment/:assignmentId" element={<WeekAssignmentPage />} />
             <Route path="staff" element={<Staff />} />
