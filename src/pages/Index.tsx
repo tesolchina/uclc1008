@@ -45,7 +45,7 @@ const Index = () => {
               UCLC 1008 · University English I
             </span>
             <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-              Self-access hub for independent, AI-supported English learning
+              AI-assisted hub for independent English learning
             </h1>
             <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
               Work through 13 weeks of short, focused lessons at your own pace. Use the AI tutor to check your
