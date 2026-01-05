@@ -10,6 +10,7 @@ import { WeekAssignmentPage } from "./pages/WeekAssignmentPage";
 import AssessmentPage from "./pages/AssessmentPage";
 import { AppLayout } from "@/components/layout/AppLayout";
 import Staff from "./pages/Staff";
+import LessonPage from "./pages/LessonPage";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="assessment" element={<AssessmentPage />} />
             <Route path="week/:weekId" element={<WeekPage />} />
             <Route path="week/:weekId/assignment/:assignmentId" element={<WeekAssignmentPage />} />
+            <Route path="week/:weekId/lesson/:lessonId" element={<LessonPage />} />
             <Route path="staff" element={<Staff />} />
           </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

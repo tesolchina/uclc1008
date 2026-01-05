@@ -1,4 +1,4 @@
-import { useParams, Navigate } from "react-router-dom";
+import { useParams, Navigate, Link } from "react-router-dom";
 import { getWeekById, getWeekMetaById, getSkillsForWeek, getAssignmentById, courseAssignments, Skill, Assignment } from "@/data";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -160,6 +160,37 @@ export const WeekPage = () => {
                   </div>
                 </div>
               )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Lessons */}
+        {week.lessons && week.lessons.length > 0 && (
+          <Card className="card-elevated">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <BookOpen className="h-4 w-4 text-primary" />
+                Weekly Lessons
+              </CardTitle>
+              <CardDescription>Complete these interactive lessons to build your skills.</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-0 space-y-3">
+              {week.lessons.map((lesson) => (
+                <div
+                  key={lesson.id}
+                  className="flex items-center justify-between rounded-xl bg-muted/60 px-3 py-2.5 text-sm"
+                >
+                  <div className="flex flex-col gap-1">
+                    <p className="font-medium text-foreground">Lesson {lesson.id}: {lesson.title}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {lesson.questions.length} practice questions
+                    </p>
+                  </div>
+                  <Button size="sm" asChild>
+                    <Link to={`/week/${week.id}/lesson/${lesson.id}`}>Start Lesson</Link>
+                  </Button>
+                </div>
+              ))}
             </CardContent>
           </Card>
         )}

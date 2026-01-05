@@ -26,6 +26,7 @@ export type Assignment = {
   resources?: { title: string; url?: string }[];
   detailedInfo?: {
     exactDueDate: string;
+    dueDate: string;
     submissionMethod: string;
     format: string;
     wordLimit?: string;
@@ -43,6 +44,20 @@ export type Assignment = {
   };
 };
 
+export type Lesson = {
+  id: number;
+  title: string;
+  examples: string[];
+  notes: string[];
+  questions: {
+    question: string;
+    type: "multiple-choice" | "short-answer" | "essay" | "true-false";
+    options?: string[];
+    answer?: string;
+    explanation?: string;
+  }[];
+};
+
 export type WeekData = {
   id: number;
   title: string;
@@ -57,6 +72,7 @@ export type WeekData = {
   skillsReinforced: string[];
   assignmentsDue?: string[];
   assignmentsUpcoming?: string[];
+  lessons: Lesson[];
 };
 
 export type WeekMeta = {
