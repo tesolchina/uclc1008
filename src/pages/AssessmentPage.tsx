@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
-import { Target, FileText, Calendar, ArrowRight, Clock } from "lucide-react";
+import { Target, FileText, Calendar, ArrowRight, Clock, AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { courseAssignments } from "@/data";
 
 const AssessmentPage = () => {
@@ -11,6 +12,8 @@ const AssessmentPage = () => {
     const weight = parseInt(a.weight.replace("%", ""));
     return sum + (isNaN(weight) ? 0 : weight);
   }, 0);
+
+  const weightDiscrepancy = totalWeight !== 100;
 
   return (
     <div className="space-y-8">
@@ -33,6 +36,24 @@ const AssessmentPage = () => {
         </div>
       </section>
 
+      {/* Teacher Note - only shown when there's an issue */}
+      {weightDiscrepancy && (
+        <Alert variant="destructive" className="border-amber-500/50 bg-amber-500/10 text-amber-900 dark:text-amber-200">
+          <AlertTriangle className="h-4 w-4 !text-amber-600" />
+          <AlertTitle className="text-amber-800 dark:text-amber-300">Teacher Action Required</AlertTitle>
+          <AlertDescription className="text-amber-700 dark:text-amber-400 space-y-2">
+            <p>
+              <strong>Weight discrepancy:</strong> Combined assessment weight is {totalWeight}%, not 100%. 
+              Please check the source rubric document and update the assignment weights accordingly.
+            </p>
+            <p>
+              <strong>Moodle links:</strong> Remember to add links to the official Moodle assessment pages 
+              for each assignment in the assignment data files.
+            </p>
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Assessment Summary */}
       <section className="grid gap-4 md:grid-cols-3">
         <Card className="card-elevated">
@@ -41,10 +62,14 @@ const AssessmentPage = () => {
             <CardDescription>Total Assessments</CardDescription>
           </CardHeader>
         </Card>
-        <Card className="card-elevated">
+        <Card className={`card-elevated ${weightDiscrepancy ? 'border-amber-500/50' : ''}`}>
           <CardHeader className="pb-2">
-            <CardTitle className="text-2xl font-bold text-primary">{totalWeight}%</CardTitle>
-            <CardDescription>Combined Weight</CardDescription>
+            <CardTitle className={`text-2xl font-bold ${weightDiscrepancy ? 'text-amber-600' : 'text-primary'}`}>
+              {totalWeight}%
+            </CardTitle>
+            <CardDescription>
+              Combined Weight {weightDiscrepancy && <span className="text-amber-600">(should be 100%)</span>}
+            </CardDescription>
           </CardHeader>
         </Card>
         <Card className="card-elevated">
