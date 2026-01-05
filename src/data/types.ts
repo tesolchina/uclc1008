@@ -26,7 +26,7 @@ export type Assignment = {
   resources?: { title: string; url?: string }[];
   detailedInfo?: {
     exactDueDate: string;
-    dueDate: string;
+    dueDate?: string;
     submissionMethod: string;
     format: string;
     wordLimit?: string;
