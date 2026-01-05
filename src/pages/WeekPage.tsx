@@ -115,7 +115,7 @@ export const WeekPage = () => {
               {meta?.dateRange && <span className="hero-badge">{meta.dateRange}</span>}
             </div>
             <h1 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-              Self-access lesson for {week.title}
+              AI-assisted lesson for {week.title}
             </h1>
             <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">{week.overview}</p>
           </div>
