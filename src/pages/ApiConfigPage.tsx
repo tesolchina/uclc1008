@@ -108,7 +108,7 @@ export default function ApiConfigPage() {
         toast.success(`${providerName} API key saved locally`);
       }
       setApiKey("");
-      checkApiStatus(accessToken);
+      await checkApiStatus(accessToken);
     } catch (err: any) {
       console.error("Failed to save API key:", err);
       toast.error(err.message || "Failed to save API key");
@@ -132,7 +132,7 @@ export default function ApiConfigPage() {
 
       const providerName = providers.find(p => p.id === provider)?.name;
       toast.success(`${providerName} API key revoked`);
-      checkApiStatus(accessToken);
+      await checkApiStatus(accessToken);
     } catch (err: any) {
       console.error("Failed to revoke API key:", err);
       toast.error(err.message || "Failed to revoke API key");
