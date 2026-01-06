@@ -1,4 +1,4 @@
-import { BookOpenCheck, Clock3, Compass, GraduationCap, Target, CheckCircle2, AlertTriangle, User } from "lucide-react";
+import { BookOpenCheck, Clock3, GraduationCap, Target, CheckCircle2, AlertTriangle, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -106,44 +106,6 @@ const Index = () => {
         </CardContent>
       </Card>
 
-      <section className="grid gap-4 md:grid-cols-3" aria-label="How to use this hub">
-        <Card className="card-elevated">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Compass className="h-4 w-4 text-primary" />
-              1. Choose your week
-            </CardTitle>
-            <CardDescription>Select the week that matches where you are in the course timetable.</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0 text-sm text-muted-foreground">
-            Each week has clear outcomes, core materials, and stretch tasks. You can always revisit previous weeks.
-          </CardContent>
-        </Card>
-        <Card className="card-elevated">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Target className="h-4 w-4 text-primary" />
-              2. Work through tasks
-            </CardTitle>
-            <CardDescription>Follow the suggested sequence, but pause where you need more time.</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0 text-sm text-muted-foreground">
-            Combine listening, reading, and practice activities. Check your understanding after each mini-step.
-          </CardContent>
-        </Card>
-        <Card className="card-elevated">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <BookOpenCheck className="h-4 w-4 text-primary" />
-              3. Ask the AI tutor
-            </CardTitle>
-            <CardDescription>Use the AI tutor in each week as your on-demand study partner.</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0 text-sm text-muted-foreground">
-            Paste your own sentences, summaries, or questions. Ask for feedback, not just answers, to develop your skills.
-          </CardContent>
-        </Card>
-      </section>
 
       {/* CILOs Section */}
       <section className="space-y-4">
