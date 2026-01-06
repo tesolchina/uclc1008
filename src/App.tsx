@@ -12,6 +12,7 @@ import AssessmentPage from "./pages/AssessmentPage";
 import { AppLayout } from "@/components/layout/AppLayout";
 import Staff from "./pages/Staff";
 import LessonPage from "./pages/LessonPage";
+import Lesson1Page from "./pages/Lesson1Page";
 import AuthPage from "./pages/AuthPage";
 import AuthCallback from "./pages/AuthCallback";
 
@@ -32,6 +33,7 @@ const App = () => (
               <Route path="assessment" element={<AssessmentPage />} />
               <Route path="week/:weekId" element={<WeekPage />} />
               <Route path="week/:weekId/assignment/:assignmentId" element={<WeekAssignmentPage />} />
+              <Route path="week/1/lesson/1" element={<Lesson1Page />} />
               <Route path="week/:weekId/lesson/:lessonId" element={<LessonPage />} />
               <Route path="staff" element={<Staff />} />
             </Route>
