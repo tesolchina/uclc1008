@@ -1,8 +1,8 @@
-import { useParams, Navigate } from "react-router-dom";
-import { getWeekById, getWeekMetaById, getSkillsForWeek, getAssignmentById, courseAssignments, Skill, Assignment } from "@/data";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useParams, Navigate, Link } from "react-router-dom";
+import { getWeekById, getWeekMetaById, getSkillsForWeek, getAssignmentById, Skill, Assignment } from "@/data";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { CollapsibleSection } from "@/components/CollapsibleSection";
 import {
   Dialog,
   DialogContent,
@@ -12,7 +12,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { LessonAiTutor } from "@/components/LessonAiTutor";
-import { BookOpen, Lightbulb, Target, Clock, FileText, AlertCircle, CheckCircle2 } from "lucide-react";
+import { LessonCard } from "@/components/lessons/LessonCard";
+import { useLessons } from "@/hooks/useLessons";
+import { BookOpen, Lightbulb, Target, Clock, FileText, AlertCircle, CheckCircle2, Bot, Users, ArrowRight, Loader2 } from "lucide-react";
 
 const skillCategoryColors: Record<string, string> = {
   "reading": "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
@@ -31,10 +33,13 @@ const SkillBadge = ({ skill }: { skill: Skill }) => (
   </span>
 );
 
-const AssignmentCard = ({ assignment, isDue }: { assignment: Assignment; isDue: boolean }) => (
-  <div className={`rounded-xl border p-4 ${isDue ? 'border-destructive/50 bg-destructive/5' : 'border-border bg-muted/30'}`}>
-    <div className="flex items-start justify-between gap-3">
-      <div className="flex-1 space-y-2">
+const AssignmentCard = ({ assignment, isDue, weekId }: { assignment: Assignment; isDue: boolean; weekId: number }) => (
+  <Link 
+    to={`/week/${weekId}/assignment/${assignment.id}`}
+    className={`block rounded-xl border p-4 transition-colors hover:border-primary/50 ${isDue ? 'border-destructive/50 bg-destructive/5' : 'border-border bg-muted/30'}`}
+  >
+    <div className="flex items-center justify-between gap-3">
+      <div className="flex-1 space-y-1.5">
         <div className="flex flex-wrap items-center gap-2">
           <h4 className="font-semibold text-sm">{assignment.title}</h4>
           <Badge variant={isDue ? "destructive" : "secondary"} className="text-[10px]">
@@ -50,43 +55,11 @@ const AssignmentCard = ({ assignment, isDue }: { assignment: Assignment; isDue: 
             </span>
           )}
         </div>
-        <p className="text-xs text-muted-foreground">{assignment.description}</p>
-        <div className="space-y-1.5">
-          <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Requirements:</p>
-          <ul className="space-y-1">
-            {assignment.requirements.map((req, i) => (
-              <li key={i} className="flex items-start gap-1.5 text-xs text-muted-foreground">
-                <CheckCircle2 className="h-3 w-3 mt-0.5 text-primary/60 shrink-0" />
-                <span>{req}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-        {assignment.resources && assignment.resources.length > 0 && (
-          <div className="pt-2 space-y-1">
-            <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Resources:</p>
-            <div className="flex flex-wrap gap-2">
-              {assignment.resources.map((res, i) => (
-                res.url ? (
-                  <a
-                    key={i}
-                    href={res.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-primary hover:underline"
-                  >
-                    {res.title} →
-                  </a>
-                ) : (
-                  <span key={i} className="text-xs text-muted-foreground">{res.title}</span>
-                )
-              ))}
-            </div>
-          </div>
-        )}
+        <p className="text-xs text-muted-foreground line-clamp-2">{assignment.description}</p>
       </div>
+      <ArrowRight className="h-4 w-4 text-muted-foreground shrink-0" />
     </div>
-  </div>
+  </Link>
 );
 
 export const WeekPage = () => {
@@ -95,6 +68,9 @@ export const WeekPage = () => {
   const week = Number.isNaN(id) ? undefined : getWeekById(id);
   const meta = Number.isNaN(id) ? undefined : getWeekMetaById(id);
   const skills = Number.isNaN(id) ? { introduced: [], reinforced: [] } : getSkillsForWeek(id);
+  
+  // Fetch lessons from database
+  const { data: dbLessons, isLoading: lessonsLoading } = useLessons(id);
 
   if (!week) {
     return <Navigate to="/" replace />;
@@ -104,7 +80,7 @@ export const WeekPage = () => {
   const assignmentsUpcoming = week.assignmentsUpcoming?.map(getAssignmentById).filter(Boolean) as Assignment[] || [];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <section className="hero-shell">
         <div className="hero-glow-orb" aria-hidden="true" />
         <div className="hero-inner">
@@ -115,25 +91,23 @@ export const WeekPage = () => {
               {meta?.dateRange && <span className="hero-badge">{meta.dateRange}</span>}
             </div>
             <h1 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-              Self-access lesson for {week.title}
+              AI-assisted lesson for {week.title}
             </h1>
             <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">{week.overview}</p>
           </div>
         </div>
       </section>
 
-      <section className="space-y-4">
+      <div className="space-y-3">
         {/* Skills Section */}
         {(skills.introduced.length > 0 || skills.reinforced.length > 0) && (
-          <Card className="card-elevated border-accent/30 bg-accent/5">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Lightbulb className="h-4 w-4 text-accent" />
-                Skills this week
-              </CardTitle>
-              <CardDescription>Track your skill development throughout the course.</CardDescription>
-            </CardHeader>
-            <CardContent className="pt-0 space-y-4">
+          <CollapsibleSection
+            title="Skills this week"
+            description="Track your skill development throughout the course."
+            icon={<Lightbulb className="h-4 w-4 text-accent" />}
+            className="border-accent/30 bg-accent/5"
+          >
+            <div className="space-y-4">
               {skills.introduced.length > 0 && (
                 <div className="space-y-2">
                   <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
@@ -160,119 +134,169 @@ export const WeekPage = () => {
                   </div>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </CollapsibleSection>
+        )}
+
+        {/* Database Lessons */}
+        {dbLessons && dbLessons.length > 0 && (
+          <CollapsibleSection
+            title="Interactive Lessons"
+            description="Complete these AI-powered lessons with instant feedback."
+            icon={<BookOpen className="h-4 w-4 text-primary" />}
+            defaultOpen={true}
+          >
+            {lessonsLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              </div>
+            ) : (
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {dbLessons.map((lesson) => (
+                  <LessonCard
+                    key={lesson.id}
+                    weekId={week.id}
+                    lessonId={lesson.id}
+                    lessonNumber={lesson.lesson_number}
+                    title={lesson.title}
+                    description={lesson.description || ''}
+                    objectives={lesson.objectives}
+                  />
+                ))}
+              </div>
+            )}
+          </CollapsibleSection>
+        )}
+
+        {/* Legacy Lessons (from static data) */}
+        {week.lessons && week.lessons.length > 0 && !dbLessons?.length && (
+          <CollapsibleSection
+            title="Weekly Lessons"
+            description="Complete these interactive lessons to build your skills."
+            icon={<BookOpen className="h-4 w-4 text-primary" />}
+          >
+            <div className="space-y-3">
+              {week.lessons.map((lesson) => (
+                <div
+                  key={lesson.id}
+                  className="flex items-center justify-between rounded-xl bg-muted/60 px-3 py-2.5 text-sm"
+                >
+                  <div className="flex flex-col gap-1">
+                    <p className="font-medium text-foreground">Lesson {lesson.id}: {lesson.title}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {lesson.questions.length} practice questions
+                    </p>
+                  </div>
+                  <Button size="sm" asChild>
+                    <Link to={`/week/${week.id}/lesson/${lesson.id}`}>Start Lesson</Link>
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </CollapsibleSection>
         )}
 
         {/* Assignments Due This Week */}
         {assignmentsDue.length > 0 && (
-          <Card className="card-elevated border-destructive/30 bg-destructive/5">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <AlertCircle className="h-4 w-4 text-destructive" />
-                Assignments due this week
-              </CardTitle>
-              <CardDescription>Complete these assessments during or by the end of this week.</CardDescription>
-            </CardHeader>
-            <CardContent className="pt-0 space-y-3">
+          <CollapsibleSection
+            title="Assignments due this week"
+            description="Complete these assessments during or by the end of this week."
+            icon={<AlertCircle className="h-4 w-4 text-destructive" />}
+            className="border-destructive/30 bg-destructive/5"
+          >
+            <div className="space-y-3">
               {assignmentsDue.map((assignment) => (
-                <AssignmentCard key={assignment.id} assignment={assignment} isDue={true} />
+                <AssignmentCard key={assignment.id} assignment={assignment} isDue={true} weekId={week.id} />
               ))}
-            </CardContent>
-          </Card>
+            </div>
+          </CollapsibleSection>
         )}
 
         {/* Upcoming Assignments */}
         {assignmentsUpcoming.length > 0 && (
-          <Card className="card-elevated">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <FileText className="h-4 w-4 text-muted-foreground" />
-                Upcoming assignments
-              </CardTitle>
-              <CardDescription>Start preparing for these assessments.</CardDescription>
-            </CardHeader>
-            <CardContent className="pt-0 space-y-3">
+          <CollapsibleSection
+            title="Upcoming assignments"
+            description="Start preparing for these assessments."
+            icon={<FileText className="h-4 w-4 text-muted-foreground" />}
+          >
+            <div className="space-y-3">
               {assignmentsUpcoming.map((assignment) => (
-                <AssignmentCard key={assignment.id} assignment={assignment} isDue={false} />
+                <AssignmentCard key={assignment.id} assignment={assignment} isDue={false} weekId={week.id} />
               ))}
-            </CardContent>
-          </Card>
+            </div>
+          </CollapsibleSection>
         )}
 
-        <Card className="card-elevated">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">AI tutor for this week</CardTitle>
-            <CardDescription>
-              Open a dedicated chat window to ask questions about this week&apos;s lesson and your own writing.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button size="sm">Open AI tutor</Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-3xl">
-                <DialogHeader>
-                  <DialogTitle>AI tutor for {week.title}</DialogTitle>
-                  <DialogDescription>
-                    Ask questions about the materials, your summaries, and your drafts for this week.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="mt-2">
-                  <LessonAiTutor
-                    weekTitle={week.title}
-                    theme={week.theme}
-                    aiPromptHint={week.aiPromptHint}
-                  />
-                </div>
-              </DialogContent>
-            </Dialog>
-          </CardContent>
-        </Card>
+        {/* AI Tutor */}
+        <CollapsibleSection
+          title="AI tutor for this week"
+          description="Open a dedicated chat window to ask questions about this week's lesson and your own writing."
+          icon={<Bot className="h-4 w-4 text-primary" />}
+        >
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button size="sm">Open AI tutor</Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-3xl">
+              <DialogHeader>
+                <DialogTitle>AI tutor for {week.title}</DialogTitle>
+                <DialogDescription>
+                  Ask questions about the materials, your summaries, and your drafts for this week.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="mt-2">
+                <LessonAiTutor
+                  weekTitle={week.title}
+                  theme={week.theme}
+                  aiPromptHint={week.aiPromptHint}
+                />
+              </div>
+            </DialogContent>
+          </Dialog>
+        </CollapsibleSection>
 
+        {/* In-class Activities */}
         {week.inClassActivities && week.inClassActivities.length > 0 && (
-          <Card className="card-elevated border-primary/20 bg-primary/5">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">In-class activities</CardTitle>
-              <CardDescription>What to expect during your classroom sessions this week.</CardDescription>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                {week.inClassActivities.map((activity) => (
-                  <li key={activity} className="flex gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 rounded-full bg-primary" aria-hidden="true" />
-                    <span>{activity}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        )}
-
-        <Card className="card-elevated">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">Learning outcomes</CardTitle>
-            <CardDescription>Focus on these outcomes as you work through the self-access tasks.</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
+          <CollapsibleSection
+            title="In-class activities"
+            description="What to expect during your classroom sessions this week."
+            icon={<Users className="h-4 w-4 text-primary" />}
+            className="border-primary/20 bg-primary/5"
+          >
             <ul className="space-y-2 text-sm text-muted-foreground">
-              {week.learningOutcomes.map((outcome) => (
-                <li key={outcome} className="flex gap-2">
-                  <span className="mt-1 h-1.5 w-1.5 rounded-full bg-primary/70" aria-hidden="true" />
-                  <span>{outcome}</span>
+              {week.inClassActivities.map((activity) => (
+                <li key={activity} className="flex gap-2">
+                  <span className="mt-1 h-1.5 w-1.5 rounded-full bg-primary" aria-hidden="true" />
+                  <span>{activity}</span>
                 </li>
               ))}
             </ul>
-          </CardContent>
-        </Card>
+          </CollapsibleSection>
+        )}
 
-        <Card className="card-elevated">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">Core materials</CardTitle>
-            <CardDescription>Complete these resources before moving on to independent practice.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3 pt-0">
+        {/* Learning Outcomes */}
+        <CollapsibleSection
+          title="Learning outcomes"
+          description="Focus on these outcomes as you work through the self-access tasks."
+          icon={<Target className="h-4 w-4 text-primary" />}
+        >
+          <ul className="space-y-2 text-sm text-muted-foreground">
+            {week.learningOutcomes.map((outcome) => (
+              <li key={outcome} className="flex gap-2">
+                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-primary/70" aria-hidden="true" />
+                <span>{outcome}</span>
+              </li>
+            ))}
+          </ul>
+        </CollapsibleSection>
+
+        {/* Core Materials */}
+        <CollapsibleSection
+          title="Core materials"
+          description="Complete these resources before moving on to independent practice."
+          icon={<BookOpen className="h-4 w-4 text-primary" />}
+        >
+          <div className="space-y-3">
             {week.resources.map((res) => (
               <div
                 key={res.title}
@@ -305,26 +329,25 @@ export const WeekPage = () => {
                 </div>
               </div>
             ))}
-          </CardContent>
-        </Card>
+          </div>
+        </CollapsibleSection>
 
-        <Card className="card-elevated">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">Independent practice</CardTitle>
-            <CardDescription>Use these tasks to stretch yourself after the core materials.</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <ol className="space-y-2 text-sm text-muted-foreground">
-              {week.practiceTasks.map((task, index) => (
-                <li key={task} className="flex gap-2">
-                  <span className="mt-0.5 text-xs font-semibold text-primary/80">{index + 1}.</span>
-                  <span>{task}</span>
-                </li>
-              ))}
-            </ol>
-          </CardContent>
-        </Card>
-      </section>
+        {/* Independent Practice */}
+        <CollapsibleSection
+          title="Independent practice"
+          description="Use these tasks to stretch yourself after the core materials."
+          icon={<CheckCircle2 className="h-4 w-4 text-primary" />}
+        >
+          <ol className="space-y-2 text-sm text-muted-foreground">
+            {week.practiceTasks.map((task, index) => (
+              <li key={task} className="flex gap-2">
+                <span className="mt-0.5 text-xs font-semibold text-primary/80">{index + 1}.</span>
+                <span>{task}</span>
+              </li>
+            ))}
+          </ol>
+        </CollapsibleSection>
+      </div>
     </div>
   );
 };

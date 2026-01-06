@@ -1,7 +1,8 @@
-import { BookOpen, CalendarRange, MessageCircle, Sparkles, Target } from "lucide-react";
+import { BookOpen, CalendarRange, MessageCircle, PanelLeftClose, PanelLeft, Sparkles, Target } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { getWeekMetaById, getAssignmentById } from "@/data";
 import { useLocation } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 import {
   Sidebar,
@@ -12,6 +13,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarHeader,
   useSidebar,
 } from "@/components/ui/sidebar";
 
@@ -44,7 +46,7 @@ const weeks: WeekNavItem[] = Array.from({ length: 13 }, (_, index) => {
 
 const overviewItems = [
   { title: "Course overview", url: "/", icon: BookOpen },
-  { title: "Assessment & goals", url: "/#assessment", icon: Target },
+  { title: "Assessment & goals", url: "/assessment", icon: Target },
 ];
 
 export function AppSidebar() {
@@ -55,8 +57,21 @@ export function AppSidebar() {
 
   const isActive = (path: string) => currentPath === path;
 
+  const { toggleSidebar } = useSidebar();
+
   return (
     <Sidebar collapsible="offcanvas" className="border-r border-sidebar-border bg-sidebar text-sidebar-foreground">
+      <SidebarHeader className="flex flex-row items-center justify-end px-2 py-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleSidebar}
+          className="h-7 w-7 text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/60"
+        >
+          <PanelLeftClose className="h-4 w-4" />
+          <span className="sr-only">Close sidebar</span>
+        </Button>
+      </SidebarHeader>
       <SidebarContent className="flex flex-col gap-4 px-2 py-3">
         <SidebarGroup>
           <SidebarGroupLabel className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-sidebar-foreground/60">
