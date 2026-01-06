@@ -2,7 +2,7 @@ import { useParams, Navigate, Link } from "react-router-dom";
 import { getWeekById, getWeekMetaById, getAssignmentById, getSkillById } from "@/data";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Clock, FileText, ExternalLink, ArrowLeft, BookOpen } from "lucide-react";
+import { CheckCircle2, Clock, FileText, ExternalLink, ArrowLeft, BookOpen, Target } from "lucide-react";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 
 export const WeekAssignmentPage = () => {
@@ -46,6 +46,13 @@ export const WeekAssignmentPage = () => {
               Back to {week.title}
             </Link>
             <div className="flex flex-wrap items-center gap-2">
+              <Link 
+                to="/assessment"
+                className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors mr-2"
+              >
+                <Target className="h-3 w-3" />
+                Assessment & Goals
+              </Link>
               <span className="week-pill">{week.title}</span>
               <Badge className={typeColors[assignment.type] || "bg-muted"}>
                 {assignment.type}
