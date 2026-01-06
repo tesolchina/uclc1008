@@ -18,7 +18,7 @@ export type Assignment = {
   title: string;
   weight: string;
   dueWeek: number;
-  type: "in-class" | "take-home" | "online";
+  type: "in-class" | "take-home" | "online" | "participation";
   duration?: string;
   description: string;
   requirements: string[];
@@ -28,18 +28,18 @@ export type Assignment = {
     exactDueDate: string;
     dueDate?: string;
     submissionMethod: string;
-    format: string;
+    format?: string;
     wordLimit?: string;
     timeLimit?: string;
     gradingCriteria: string[];
     sampleQuestions?: string[];
-    instructions: string[];
+    instructions?: string[];
     sampleResponses?: {
       highScore: { text: string; score: string; feedback: string };
       lowScore: { text: string; score: string; feedback: string };
     };
-    aiPolicy: string[];
-    latePolicy: string;
+    aiPolicy?: string[];
+    latePolicy?: string;
     requiredMaterials?: string[];
   };
 };
