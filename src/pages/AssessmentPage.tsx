@@ -9,7 +9,7 @@ import { courseAssignments } from "@/data";
 const AssessmentPage = () => {
   // Calculate total weight
   const totalWeight = courseAssignments.reduce((sum, a) => {
-    const weight = parseInt(a.weight.replace("%", ""));
+    const weight = parseFloat(a.weight.replace("%", ""));
     return sum + (isNaN(weight) ? 0 : weight);
   }, 0);
 
