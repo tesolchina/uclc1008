@@ -1,8 +1,9 @@
-import { BookOpenCheck, Clock3, Compass, GraduationCap, Target, CheckCircle2 } from "lucide-react";
+import { BookOpenCheck, Clock3, Compass, GraduationCap, Target, CheckCircle2, AlertTriangle, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 // CILOs - Course Intended Learning Outcomes
 const cilos = [
@@ -70,6 +71,40 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Disclaimer Section */}
+      <Alert variant="destructive" className="border-2 border-destructive/50 bg-destructive/5">
+        <AlertTriangle className="h-5 w-5" />
+        <AlertTitle className="text-base font-semibold">Important Notice for Students from Other Sections</AlertTitle>
+        <AlertDescription className="mt-2 space-y-2 text-sm">
+          <p>
+            This website is designed specifically for <strong>Section 53 (Spring 2026)</strong>. Students from other sections 
+            are welcome to access these materials for independent study purposes.
+          </p>
+          <p className="font-medium text-destructive">
+            However, you must consult your own section teacher about course requirements, assessment criteria, and 
+            how to do well in this course. The materials and guidance here may differ from what your teacher expects.
+          </p>
+        </AlertDescription>
+      </Alert>
+
+      {/* Creator Info */}
+      <Card className="card-elevated border-primary/20 bg-primary/5">
+        <CardContent className="flex items-start gap-4 py-4">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
+            <User className="h-5 w-5 text-primary" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-sm font-semibold">Created by Dr Simon Wang</h3>
+            <p className="text-xs text-muted-foreground">
+              Lecturer in English & Innovation Officer, Language Centre, Hong Kong Baptist University
+            </p>
+            <p className="text-xs text-muted-foreground">
+              This AI-assisted learning hub will be used to teach Section 53 in Spring 2026.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
 
       <section className="grid gap-4 md:grid-cols-3" aria-label="How to use this hub">
         <Card className="card-elevated">
