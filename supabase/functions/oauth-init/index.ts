@@ -30,7 +30,7 @@ serve(async (req) => {
     }));
     
     const redirectUri = `${supabaseUrl}/functions/v1/oauth-callback`;
-    const authUrl = `https://auth.hkbu.tech/auth-provider/login?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}`;
+    const authUrl = `https://auth.hkbu.tech/auth-provider/login?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${encodeURIComponent(state)}`;
 
     return new Response(null, {
       status: 302,
