@@ -198,6 +198,7 @@ Deno.serve(async (req) => {
     const sessionData = JSON.stringify({
       sessionId: session.id,
       profileId: profile.id,
+      accessToken: tokenData.access_token,
       expiresAt: expiresAt.toISOString(),
     })
 

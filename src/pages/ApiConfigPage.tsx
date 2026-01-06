@@ -97,8 +97,11 @@ export default function ApiConfigPage() {
           description: "Your key is now stored on the remote platform and synced across devices.",
         });
       } else {
+        const needsReauth = isAuthenticated && !accessToken;
         toast.success(`${providerName} API key saved locally`, {
-          description: "Key stored locally. Sign in with HKBU to sync across devices.",
+          description: needsReauth
+            ? "You're signed in, but your session needs a refresh. Please sign out and sign in again to enable syncing."
+            : "Key stored locally. Sign in with HKBU to sync across devices.",
         });
       }
       setApiKey("");
