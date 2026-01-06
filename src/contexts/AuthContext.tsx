@@ -22,9 +22,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const HKBU_AUTH_URL = 'https://auth.hkbu.tech/auth-provider/login';
-const CLIENT_ID = import.meta.env.VITE_HKBU_CLIENT_ID || '';
-const REDIRECT_URI = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/oauth-callback`;
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -75,11 +73,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [refreshProfile]);
 
   const login = useCallback(() => {
-    const state = Math.random().toString(36).substring(7);
-    localStorage.setItem('oauth_state', state);
-    
-    const authUrl = `${HKBU_AUTH_URL}?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&state=${state}`;
-    window.location.href = authUrl;
+    const returnUrl = window.location.pathname;
+    window.location.href = `${SUPABASE_URL}/functions/v1/oauth-init?return_url=${encodeURIComponent(returnUrl)}`;
   }, []);
 
   const logout = useCallback(() => {
