@@ -3,7 +3,7 @@ import { Assignment } from "../types";
 export const preCourseWriting: Assignment = {
   id: "pre-course-writing",
   title: "Pre-course Writing",
-  weight: "2.5% (Class Participation)",
+  weight: "2.5%",
   dueWeek: 2,
   type: "take-home",
   description:

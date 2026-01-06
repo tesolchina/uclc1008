@@ -9,28 +9,28 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 const cilos = [
   {
     id: 1,
-    title: "Critical Reading & Analysis",
-    description: "Critically read and analyse academic texts to identify key arguments, evidence, and rhetorical strategies.",
+    title: "Examine Academic Discourse",
+    description: "Examine academic discourse, including how arguments are constructed using various models and their rhetorical purposes, pattern of development, and style.",
   },
   {
     id: 2,
-    title: "Academic Writing",
-    description: "Produce coherent academic writing that demonstrates appropriate use of sources, citations, and academic conventions.",
+    title: "Evaluate Arguments in Academic Texts",
+    description: "Evaluate arguments in academic texts, as well as summarise and synthesise source materials by using appropriate academic conventions and specific citation and referencing styles (e.g. APA), and understand the rhetorical functions of citations.",
   },
   {
     id: 3,
-    title: "Synthesis & Evaluation",
-    description: "Synthesise information from multiple sources and evaluate the validity of arguments and evidence.",
+    title: "Construct Well-Supported Arguments",
+    description: "Construct well-supported and logical arguments by engaging in the recursive process of reading, inventing, drafting, reviewing, reflecting, rewriting, revising, and editing.",
   },
   {
     id: 4,
-    title: "Academic Communication",
-    description: "Communicate ideas effectively in academic contexts, including seminars, presentations, and written assignments.",
+    title: "Formulate Critical Spoken Responses",
+    description: "Formulate critical spoken responses to arguments presented in audio texts, utilising various argumentation models to strengthen the responses.",
   },
   {
     id: 5,
-    title: "AI Literacy",
-    description: "Demonstrate critical awareness of AI tools in academic work, including appropriate and ethical use.",
+    title: "Use AI as Learning Partner",
+    description: "Use AI, as a learning partner, and appropriate self-access multimedia resources to foster independent learning in reading, listening, speaking and writing skills.",
   },
 ];
 
@@ -46,11 +46,10 @@ const Index = () => {
               UCLC 1008 · University English I
             </span>
             <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-              AI-assisted hub for independent English learning
+              University English I (UE1) - Critical Academic Skills
             </h1>
             <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
-              Work through 13 weeks of short, focused lessons at your own pace. Use the AI tutor to check your
-              understanding, improve your writing, and design extra practice.
+              This course aims to enhance students' English language skills in critical reading, listening, academic writing, as well as speaking. Work through 13 weeks of focused lessons on academic discourse analysis, argumentation, and AI-assisted learning.
             </p>
             <div className="flex flex-wrap gap-3">
               <Button asChild>
@@ -78,7 +77,7 @@ const Index = () => {
         <AlertTitle className="text-base font-semibold">Important Notice for Students from Other Sections</AlertTitle>
         <AlertDescription className="mt-2 space-y-2 text-sm">
           <p>
-            This website is designed specifically for <strong>Section 53 (Spring 2026)</strong>. Students from other sections 
+            This website is designed specifically for <strong>Semester 2, 2025-26 (UE1)</strong>. Students from other sections
             are welcome to access these materials for independent study purposes.
           </p>
           <p className="font-medium text-destructive">
@@ -95,12 +94,12 @@ const Index = () => {
             <User className="h-5 w-5 text-primary" />
           </div>
           <div className="space-y-1">
-            <h3 className="text-sm font-semibold">Created by Dr Simon Wang</h3>
+            <h3 className="text-sm font-semibold">Course Coordinator: Leo Yu</h3>
             <p className="text-xs text-muted-foreground">
-              Lecturer in English & Innovation Officer, Language Centre, Hong Kong Baptist University
+              Language Centre, Hong Kong Baptist University
             </p>
             <p className="text-xs text-muted-foreground">
-              This AI-assisted learning hub will be used to teach Section 53 in Spring 2026.
+              This AI-assisted learning hub supports students in developing critical academic English skills for University English I.
             </p>
           </div>
         </CardContent>

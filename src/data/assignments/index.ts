@@ -8,6 +8,7 @@ import { peerEvaluation } from "./peerEvaluation";
 import { preCourseWriting } from "./preCourseWriting";
 import { referencingQuiz } from "./referencingQuiz";
 import { reflectivePortfolio } from "./reflectivePortfolio";
+import { classParticipation } from "./classParticipation";
 
 export const courseAssignments: Assignment[] = [
   preCourseWriting,
@@ -19,6 +20,7 @@ export const courseAssignments: Assignment[] = [
   aiReflection,
   craa,
   reflectivePortfolio,
+  classParticipation,
 ];
 
 export const getAssignmentById = (id: string) => courseAssignments.find((a) => a.id === id);

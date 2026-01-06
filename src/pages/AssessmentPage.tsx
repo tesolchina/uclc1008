@@ -148,9 +148,11 @@ const AssessmentPage = () => {
               <CardTitle className="text-sm">What you will be able to do</CardTitle>
             </CardHeader>
             <CardContent className="pt-0 text-sm text-muted-foreground space-y-1.5">
-              <p>• Communicate appropriately in common university situations (email, tutorials, group work).</p>
-              <p>• Understand and summarise short academic texts and talks.</p>
-              <p>• Plan, draft, and refine short academic paragraphs and presentations.</p>
+              <p>• Examine academic discourse, including how arguments are constructed using various models.</p>
+              <p>• Evaluate arguments in academic texts using appropriate academic conventions.</p>
+              <p>• Construct well-supported and logical arguments through the recursive writing process.</p>
+              <p>• Formulate critical spoken responses to arguments presented in audio texts.</p>
+              <p>• Use AI as a learning partner for independent learning in academic skills.</p>
             </CardContent>
           </Card>
           <Card className="card-elevated">
@@ -158,9 +160,11 @@ const AssessmentPage = () => {
               <CardTitle className="text-sm">How to use this hub strategically</CardTitle>
             </CardHeader>
             <CardContent className="pt-0 text-sm text-muted-foreground space-y-1.5">
-              <p>• Focus on weeks that connect directly to upcoming assignments.</p>
-              <p>• Use the AI tutor to rehearse explanations and practice feedback before submitting work.</p>
-              <p>• Record useful phrases and strategies in your own words.</p>
+              <p>• Preview the reading passages and complete all the homework tasks.</p>
+              <p>• Focus on developing skills in summarising, paraphrasing, and synthesising.</p>
+              <p>• Practice argumentation models (Toulmin, Rogerian) for ACE assignments.</p>
+              <p>• Use AI tools ethically while maintaining academic integrity.</p>
+              <p>• Engage actively in peer evaluations and reflective learning.</p>
             </CardContent>
           </Card>
         </div>
