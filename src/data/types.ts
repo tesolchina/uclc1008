@@ -44,10 +44,15 @@ export type Assignment = {
   };
 };
 
+export type LessonExample = {
+  title: string;
+  text: string;
+};
+
 export type Lesson = {
   id: number;
   title: string;
-  examples: string[];
+  examples: (string | LessonExample)[];
   notes: string[];
   questions: {
     question: string;

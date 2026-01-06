@@ -1,4 +1,5 @@
 import { WeekData, WeekMeta } from "../types";
+import { lesson3_1, lesson3_2 } from "../lessons";
 
 export const week3: WeekData = {
   id: 3,
@@ -40,58 +41,7 @@ export const week3: WeekData = {
   skillsReinforced: ["paraphrasing", "citation-recognition"],
   assignmentsDue: ["referencing-quiz"],
   assignmentsUpcoming: [],
-  lessons: [
-    {
-      id: 1,
-      title: "The Art of Summarising",
-      notes: [
-        "Summarising means condensing a larger piece of writing into a shorter version while capturing main ideas.",
-        "Steps: 1) Read thoroughly, 2) Identify key points, 3) Eliminate extraneous info, 4) Use your own words, 5) Maintain original tone.",
-        "When summarising an article, focus on sections like Abstract, Intro, and Conclusion.",
-        "Summaries must be objective – do not add your own views or interpretation.",
-        "Proportionality: Devote more space to central claims than to supporting examples."
-      ],
-      questions: [
-        {
-          question: "A good summary should be roughly what length compared to the original?",
-          type: "multiple-choice",
-          options: [
-            "Exactly the same length",
-            "Significantly shorter (e.g., 1/3 or 1/4)",
-            "Slightly longer for clarity",
-            "It doesn't matter"
-          ],
-          answer: "Significantly shorter (e.g., 1/3 or 1/4)",
-          explanation: "Summaries focus on main points and omit detail, naturally leading to a shorter text."
-        }
-      ]
-    },
-    {
-      id: 2,
-      title: "APA 7th Reference List",
-      notes: [
-        "The reference list provides full details: Who, When, What, Where.",
-        "Journal Article: Author last name, initials. (Year). Title. Journal, Vol(Issue), Pages. https://doi.org...",
-        "Reference lists must be in alphabetical order by first author's last name.",
-        "Use a hanging indent (0.5 inch / 1.27cm) for all lines after the first in each entry.",
-        "If using a secondary source, only include the source you actually read in your reference list."
-      ],
-      questions: [
-        {
-          question: "Which of the following is the correct format for an APA journal article title in a reference list?",
-          type: "multiple-choice",
-          options: [
-            "Everything in Title Case (Capitalize All Words)",
-            "sentence case (only capitalize first word and proper nouns)",
-            "ALL CAPS",
-            "Italicized words"
-          ],
-          answer: "sentence case (only capitalize first word and proper nouns)",
-          explanation: "APA style uses sentence case for article titles and book titles in the reference list."
-        }
-      ]
-    }
-  ]
+  lessons: [lesson3_1, lesson3_2],
 };
 
 export const week3Meta: WeekMeta = {

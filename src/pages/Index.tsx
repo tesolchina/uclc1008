@@ -72,7 +72,7 @@ const Index = () => {
       </section>
 
       {/* Disclaimer Section */}
-      <Alert variant="info" className="border-2 border-primary/50 bg-primary/5">
+      <Alert className="border-2 border-primary/50 bg-primary/5">
         <AlertTriangle className="h-5 w-5" />
         <AlertTitle className="text-base font-semibold">Important Notice for UE1 Students</AlertTitle>
         <AlertDescription className="mt-2 space-y-2 text-sm text-foreground">
