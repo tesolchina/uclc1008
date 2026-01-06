@@ -9,8 +9,15 @@ This document maps website routes to their corresponding source code files.
 | Route | Page Component | Data Source |
 |-------|---------------|-------------|
 | `/` | `src/pages/Index.tsx` | - |
+| `/auth` | `src/pages/AuthPage.tsx` | - |
+| `/auth/callback` | `src/pages/AuthCallback.tsx` | - |
+| `/assessment` | `src/pages/AssessmentPage.tsx` | - |
+| `/week/1` | `src/pages/Week1Page.tsx` | `src/data/weeks/week1.ts` |
 | `/week/:weekId` | `src/pages/WeekPage.tsx` | `src/data/weeks/` |
-| `/week/:weekId/assignment/:assignmentId` | `src/pages/WeekAssignmentPage.tsx` | `src/data/assignments.ts` |
+| `/week/2/assignment/pre-course-writing` | `src/pages/PreCourseWritingPage.tsx` | `src/data/assignments/preCourseWriting.ts` |
+| `/week/:weekId/assignment/:assignmentId` | `src/pages/WeekAssignmentPage.tsx` | `src/data/assignments/` |
+| `/week/1/lesson/1` | `src/pages/Lesson1Page.tsx` | - |
+| `/week/:weekId/lesson/:lessonId` | `src/pages/LessonPage.tsx` | Supabase database |
 | `/staff` | `src/pages/Staff.tsx` | Supabase database |
 | `*` (404) | `src/pages/NotFound.tsx` | - |
 
