@@ -8,3 +8,18 @@ verify_jwt = false
 
 [functions.staff-agent]
 verify_jwt = false
+
+[functions.oauth-init]
+verify_jwt = false
+
+[functions.oauth-callback]
+verify_jwt = false
+
+[functions.check-api-status]
+verify_jwt = false
+
+[functions.save-api-key]
+verify_jwt = false
+
+[functions.revoke-api-key]
+verify_jwt = false
