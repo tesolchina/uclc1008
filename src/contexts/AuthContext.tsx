@@ -12,7 +12,7 @@ interface Profile {
 
 interface Session {
   profileId: string;
-  accessToken: string;
+  accessToken?: string;
   expiresAt: string;
 }
 
@@ -57,8 +57,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Store the access token
-      setAccessToken(session.accessToken);
+      // Store the access token (older sessions may not include it)
+      setAccessToken(session.accessToken ?? null);
 
       // Fetch profile from database
       const { data, error } = await supabase
