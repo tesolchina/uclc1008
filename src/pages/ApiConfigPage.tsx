@@ -244,8 +244,9 @@ export default function ApiConfigPage() {
         </CardContent>
       </Card>
 
-      {/* API Key Configuration */}
-      <Card>
+      {/* API Key Configuration - Only show when authenticated */}
+      {isAuthenticated && (
+        <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Key className="h-5 w-5" />
@@ -371,6 +372,30 @@ export default function ApiConfigPage() {
           </Tabs>
         </CardContent>
       </Card>
+      )}
+
+      {/* Sign in prompt when not authenticated */}
+      {!isAuthenticated && (
+        <Card className="border-dashed">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Key className="h-5 w-5" />
+              Configure API Keys
+            </CardTitle>
+            <CardDescription>
+              Sign in with your HKBU account to configure API keys
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
+              API key configuration requires authentication. Please sign in to add or manage your AI service API keys.
+            </p>
+            <Button asChild>
+              <a href="/auth">Sign In with HKBU</a>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="mt-4 text-center">
         <Button variant="outline" size="sm" onClick={() => checkApiStatus(accessToken)} disabled={checking}>
