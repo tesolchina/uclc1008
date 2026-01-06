@@ -29,6 +29,7 @@ interface ApiStatus {
   available: boolean;
   name: string;
   source?: string;
+  maskedKey?: string;
 }
 
 interface ChatMessage {
@@ -269,7 +270,7 @@ export default function ApiConfigPage() {
           <CardContent>
             <div className="flex items-center gap-3 p-4 rounded-lg border border-green-500/30 bg-green-500/5">
               <CheckCircle2 className="h-6 w-6 text-green-500 shrink-0" />
-              <div className="flex-1">
+            <div className="flex-1 min-w-0">
                 <p className="font-medium text-foreground">{configuredProvider.name}</p>
                 <p className="text-sm text-muted-foreground">
                   {configuredProvider.source === "hkbu_platform" 
@@ -277,6 +278,11 @@ export default function ApiConfigPage() {
                     : "Stored locally"
                   }
                 </p>
+                {configuredProvider.maskedKey && (
+                  <p className="text-xs font-mono text-muted-foreground mt-1 bg-muted/50 rounded px-2 py-1 inline-block">
+                    Key: {configuredProvider.maskedKey}
+                  </p>
+                )}
               </div>
               {isAuthenticated && (
                 <AlertDialog>

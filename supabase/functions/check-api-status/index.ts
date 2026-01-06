@@ -36,6 +36,12 @@ async function logProcess(entry: {
   }
 }
 
+// Mask API key: show first 2 and last 4 characters
+function maskApiKey(key: string | undefined): string | null {
+  if (!key || key.length < 8) return key ? "••••••" : null;
+  return `${key.slice(0, 2)}${"•".repeat(Math.min(key.length - 6, 10))}${key.slice(-4)}`;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -179,6 +185,7 @@ serve(async (req) => {
       available: !!hkbuKey,
       name: "HKBU GenAI",
       source: hkbuPlatformKeys.hkbu ? "hkbu_platform" : (localKeyMap.get("hkbu") ? "local" : null),
+      maskedKey: maskApiKey(hkbuKey),
     });
 
     // Check OpenRouter
@@ -188,6 +195,7 @@ serve(async (req) => {
       available: !!openrouterKey,
       name: "OpenRouter",
       source: hkbuPlatformKeys.openrouter ? "hkbu_platform" : (localKeyMap.get("openrouter") ? "local" : null),
+      maskedKey: maskApiKey(openrouterKey),
     });
 
     // Check Bolatu
@@ -197,6 +205,7 @@ serve(async (req) => {
       available: !!bolatuKey,
       name: "Bolatu (BLT)",
       source: hkbuPlatformKeys.bolatu ? "hkbu_platform" : (localKeyMap.get("bolatu") ? "local" : null),
+      maskedKey: maskApiKey(bolatuKey),
     });
 
     // Check Kimi
@@ -206,6 +215,7 @@ serve(async (req) => {
       available: !!kimiKey,
       name: "Kimi",
       source: hkbuPlatformKeys.kimi ? "hkbu_platform" : (localKeyMap.get("kimi") ? "local" : null),
+      maskedKey: maskApiKey(kimiKey),
     });
 
     const availableCount = statuses.filter(s => s.available).length;
