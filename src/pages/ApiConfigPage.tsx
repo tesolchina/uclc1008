@@ -131,7 +131,17 @@ export default function ApiConfigPage() {
       }
 
       const providerName = providers.find(p => p.id === provider)?.name;
-      toast.success(`${providerName} API key revoked`);
+      
+      // Check if there was a warning about remote revoke failing
+      if (data?.warning) {
+        toast.warning(`${providerName} key partially revoked`, {
+          description: data.warning,
+          duration: 8000,
+        });
+      } else {
+        toast.success(`${providerName} API key revoked`);
+      }
+      
       await checkApiStatus(accessToken);
     } catch (err: any) {
       console.error("Failed to revoke API key:", err);
