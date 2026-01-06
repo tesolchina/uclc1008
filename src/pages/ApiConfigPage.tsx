@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CheckCircle2, XCircle, Loader2, Key, ExternalLink, LogOut, Trash2, User } from "lucide-react";
+import { CheckCircle2, XCircle, Loader2, Key, ExternalLink, LogOut, Trash2, Send, MessageSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
@@ -21,6 +20,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { ProcessLogPanel } from "@/components/ProcessLogPanel";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 type ApiProvider = "hkbu" | "openrouter" | "bolatu" | "kimi";
 
@@ -31,14 +31,24 @@ interface ApiStatus {
   source?: string;
 }
 
+interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
 export default function ApiConfigPage() {
   const { accessToken, isAuthenticated, isLoading: authLoading, profile, logout } = useAuth();
   const [checking, setChecking] = useState(true);
   const [apiStatuses, setApiStatuses] = useState<ApiStatus[]>([]);
-  const [activeProvider, setActiveProvider] = useState<ApiProvider>("hkbu");
+  const [selectedProvider, setSelectedProvider] = useState<ApiProvider>("hkbu");
   const [apiKey, setApiKey] = useState("");
   const [saving, setSaving] = useState(false);
   const [revoking, setRevoking] = useState(false);
+  
+  // Chat test state
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatInput, setChatInput] = useState("");
+  const [chatLoading, setChatLoading] = useState(false);
   
   // Generate a unique session ID for log filtering
   const sessionId = useMemo(() => crypto.randomUUID(), []);
@@ -68,7 +78,6 @@ export default function ApiConfigPage() {
   };
 
   useEffect(() => {
-    // Wait for auth to finish loading before checking API status
     if (authLoading) return;
     checkApiStatus(accessToken);
   }, [accessToken, isAuthenticated, authLoading]);
@@ -82,30 +91,20 @@ export default function ApiConfigPage() {
     setSaving(true);
     try {
       const { data, error } = await supabase.functions.invoke("save-api-key", {
-        body: { provider: activeProvider, apiKey: apiKey.trim(), accessToken, sessionId },
+        body: { provider: selectedProvider, apiKey: apiKey.trim(), accessToken, sessionId },
       });
 
-      if (error) {
-        throw new Error(error.message || "Failed to save API key");
-      }
-
+      if (error) throw new Error(error.message || "Failed to save API key");
       if (data?.error) {
         toast.error(data.error);
         return;
       }
 
-      const providerName = providers.find(p => p.id === activeProvider)?.name;
+      const providerName = providers.find(p => p.id === selectedProvider)?.name;
       if (data?.savedToHkbu) {
-        toast.success(`${providerName} API key saved to HKBU platform ✓`, {
-          description: "Your key is now stored on the remote platform and synced across devices.",
-        });
+        toast.success(`${providerName} API key saved to HKBU platform ✓`);
       } else {
-        const needsReauth = isAuthenticated && !accessToken;
-        toast.success(`${providerName} API key saved locally`, {
-          description: needsReauth
-            ? "You're signed in, but your session needs a refresh. Please sign out and sign in again to enable syncing."
-            : "Key stored locally. Sign in with HKBU to sync across devices.",
-        });
+        toast.success(`${providerName} API key saved locally`);
       }
       setApiKey("");
       checkApiStatus(accessToken);
@@ -124,21 +123,14 @@ export default function ApiConfigPage() {
         body: { provider, accessToken, sessionId },
       });
 
-      if (error) {
-        throw new Error(error.message || "Failed to revoke API key");
-      }
-
+      if (error) throw new Error(error.message || "Failed to revoke API key");
       if (data?.error) {
         toast.error(data.error);
         return;
       }
 
       const providerName = providers.find(p => p.id === provider)?.name;
-      toast.success(`${providerName} API key revoked`, {
-        description: data?.revokedFromHkbu 
-          ? "Key removed from HKBU platform" 
-          : "Key removed from local storage",
-      });
+      toast.success(`${providerName} API key revoked`);
       checkApiStatus(accessToken);
     } catch (err: any) {
       console.error("Failed to revoke API key:", err);
@@ -148,13 +140,80 @@ export default function ApiConfigPage() {
     }
   };
 
+  const handleSendTestMessage = async () => {
+    if (!chatInput.trim() || chatLoading) return;
+
+    const userMessage: ChatMessage = { role: "user", content: chatInput.trim() };
+    setChatMessages(prev => [...prev, userMessage]);
+    setChatInput("");
+    setChatLoading(true);
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
+          messages: [...chatMessages, userMessage].map(m => ({ role: m.role, content: m.content })),
+          accessToken,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Error: ${response.status}`);
+      }
+
+      // Handle streaming response
+      const reader = response.body?.getReader();
+      if (!reader) throw new Error("No response body");
+
+      const decoder = new TextDecoder();
+      let assistantContent = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split("\n");
+
+        for (const line of lines) {
+          if (line.startsWith("data: ") && line !== "data: [DONE]") {
+            try {
+              const json = JSON.parse(line.slice(6));
+              const content = json.choices?.[0]?.delta?.content;
+              if (content) {
+                assistantContent += content;
+                setChatMessages(prev => {
+                  const last = prev[prev.length - 1];
+                  if (last?.role === "assistant") {
+                    return [...prev.slice(0, -1), { role: "assistant", content: assistantContent }];
+                  }
+                  return [...prev, { role: "assistant", content: assistantContent }];
+                });
+              }
+            } catch {}
+          }
+        }
+      }
+    } catch (err: any) {
+      console.error("Chat error:", err);
+      setChatMessages(prev => [...prev, { role: "assistant", content: `Error: ${err.message}` }]);
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
   const getStatusForProvider = (providerId: ApiProvider) => {
     return apiStatuses.find(s => s.provider === providerId);
   };
 
-  const hasAnyActiveApi = apiStatuses.some(s => s.available);
-  const activeProviderStatus = getStatusForProvider(activeProvider);
-  const isActiveProviderConfigured = activeProviderStatus?.available || false;
+  // Find the first configured provider
+  const configuredProvider = apiStatuses.find(s => s.available);
+  const hasAnyActiveApi = !!configuredProvider;
 
   return (
     <div className="container max-w-4xl py-8">
@@ -180,11 +239,11 @@ export default function ApiConfigPage() {
         )}
       </div>
 
-      {/* Status Overview */}
+      {/* Status Overview - Simplified */}
       <Card className="mb-6">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            AI Services Status
+            AI Service Status
             {checking ? (
               <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
             ) : hasAnyActiveApi ? (
@@ -195,203 +254,219 @@ export default function ApiConfigPage() {
             ) : (
               <Badge variant="destructive" className="bg-red-500/20 text-red-600 border-red-500/30">
                 <XCircle className="h-3 w-3 mr-1" />
-                No API Configured
+                Not Configured
               </Badge>
             )}
           </CardTitle>
           <CardDescription>
             {hasAnyActiveApi 
-              ? "AI features are enabled with the following providers"
-              : "Configure at least one API provider to enable AI features"
+              ? `Using ${configuredProvider?.name} for AI features`
+              : "Configure an API provider to enable AI features"
             }
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {providers.map((provider) => {
-              const status = getStatusForProvider(provider.id);
-              const isAvailable = status?.available || false;
-              
-              return (
-                <div
-                  key={provider.id}
-                  className={`flex items-center gap-3 rounded-lg border p-3 ${
-                    isAvailable 
-                      ? "border-green-500/30 bg-green-500/5" 
-                      : "border-border bg-muted/30"
-                  }`}
-                >
-                  {isAvailable ? (
-                    <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />
-                  ) : (
-                    <XCircle className="h-5 w-5 text-muted-foreground shrink-0" />
-                  )}
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium text-sm truncate">{provider.name}</p>
-                    <p className="text-xs text-muted-foreground truncate">
-                      {isAvailable && status?.source === "hkbu_platform" 
-                        ? "Synced from HKBU" 
-                        : isAvailable && status?.source === "local"
-                        ? "Stored locally"
-                        : provider.description
-                      }
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
+        {hasAnyActiveApi && configuredProvider && (
+          <CardContent>
+            <div className="flex items-center gap-3 p-4 rounded-lg border border-green-500/30 bg-green-500/5">
+              <CheckCircle2 className="h-6 w-6 text-green-500 shrink-0" />
+              <div className="flex-1">
+                <p className="font-medium text-foreground">{configuredProvider.name}</p>
+                <p className="text-sm text-muted-foreground">
+                  {configuredProvider.source === "hkbu_platform" 
+                    ? "Synced from HKBU platform" 
+                    : "Stored locally"
+                  }
+                </p>
+              </div>
+              {isAuthenticated && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" size="sm" className="gap-2">
+                      <Trash2 className="h-4 w-4" />
+                      Revoke
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Revoke {configuredProvider.name} API Key?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will remove your API key. You'll need to configure a new key to use AI features.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction 
+                        onClick={() => handleRevokeApiKey(configuredProvider.provider)}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        {revoking ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                        Revoke Key
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+            </div>
+          </CardContent>
+        )}
       </Card>
 
-      {/* API Key Configuration - Only show when authenticated */}
-      {isAuthenticated && (
-        <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Key className="h-5 w-5" />
-            Configure API Keys
-          </CardTitle>
-          <CardDescription>
-            Add or update API keys for different AI providers
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs value={activeProvider} onValueChange={(v) => { setActiveProvider(v as ApiProvider); setApiKey(""); }}>
-            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
-              {providers.map((provider) => {
-                const status = getStatusForProvider(provider.id);
-                return (
-                  <TabsTrigger key={provider.id} value={provider.id} className="text-xs px-2 py-1.5 gap-1">
-                    {provider.name.split(" ")[0]}
-                    {status?.available && <CheckCircle2 className="h-3 w-3 text-green-500" />}
-                  </TabsTrigger>
-                );
-              })}
-            </TabsList>
-
-            {providers.map((provider) => {
-              const status = getStatusForProvider(provider.id);
-              const isConfigured = status?.available || false;
-
-              return (
-                <TabsContent key={provider.id} value={provider.id} className="mt-4 space-y-4">
-                  {isConfigured ? (
-                    // Configured state - show revoke option
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-3 p-4 rounded-lg border border-green-500/30 bg-green-500/5">
-                        <CheckCircle2 className="h-6 w-6 text-green-500 shrink-0" />
-                        <div className="flex-1">
-                          <p className="font-medium text-foreground">{provider.name} is configured</p>
-                          <p className="text-sm text-muted-foreground">
-                            {status?.source === "hkbu_platform" 
-                              ? "API key is stored on the HKBU platform and synced across devices" 
-                              : status?.source === "local"
-                              ? "API key is stored locally on this device"
-                              : "API key is active"
-                            }
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-3">
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="destructive" size="sm" className="gap-2">
-                              <Trash2 className="h-4 w-4" />
-                              Revoke API Key
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Revoke {provider.name} API Key?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                This will remove your {provider.name} API key. You'll need to enter a new key to use this service again.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction 
-                                onClick={() => handleRevokeApiKey(provider.id)}
-                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                              >
-                                {revoking ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                                Revoke Key
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-
-                        {provider.docUrl && (
-                          <a
-                            href={provider.docUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs text-primary hover:underline flex items-center gap-1"
-                          >
-                            View Platform <ExternalLink className="h-3 w-3" />
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    // Not configured state - show input
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor={`${provider.id}-key`}>{provider.name} API Key</Label>
-                          {provider.docUrl && (
-                            <a
-                              href={provider.docUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs text-primary hover:underline flex items-center gap-1"
-                            >
-                              Get API Key <ExternalLink className="h-3 w-3" />
-                            </a>
-                          )}
-                        </div>
-                        <Input
-                          id={`${provider.id}-key`}
-                          type="password"
-                          placeholder={`Enter your ${provider.name} API key`}
-                          value={apiKey}
-                          onChange={(e) => setApiKey(e.target.value)}
-                        />
-                        <p className="text-xs text-muted-foreground">{provider.description}</p>
-                      </div>
-                      <Button onClick={handleSaveApiKey} disabled={saving || !apiKey.trim()}>
-                        {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                        {saving ? "Validating..." : "Validate & Save API Key"}
-                      </Button>
-                    </div>
-                  )}
-                </TabsContent>
-              );
-            })}
-          </Tabs>
-        </CardContent>
-      </Card>
-      )}
-
-      {/* Sign in prompt when not authenticated */}
-      {!isAuthenticated && (
-        <Card className="border-dashed">
+      {/* API Key Configuration - Only show when authenticated AND no API configured */}
+      {isAuthenticated && !hasAnyActiveApi && (
+        <Card className="mb-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Key className="h-5 w-5" />
-              Configure API Keys
+              Configure API Key
             </CardTitle>
             <CardDescription>
-              Sign in with your HKBU account to configure API keys
+              Select a provider and enter your API key (only one provider can be active)
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Provider Selection */}
+            <div className="space-y-2">
+              <Label>Select Provider</Label>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {providers.map((provider) => (
+                  <Button
+                    key={provider.id}
+                    variant={selectedProvider === provider.id ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSelectedProvider(provider.id)}
+                    className="justify-start"
+                  >
+                    {provider.name.split(" ")[0]}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* API Key Input */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="api-key">
+                  {providers.find(p => p.id === selectedProvider)?.name} API Key
+                </Label>
+                {providers.find(p => p.id === selectedProvider)?.docUrl && (
+                  <a
+                    href={providers.find(p => p.id === selectedProvider)?.docUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-primary hover:underline flex items-center gap-1"
+                  >
+                    Get API Key <ExternalLink className="h-3 w-3" />
+                  </a>
+                )}
+              </div>
+              <Input
+                id="api-key"
+                type="password"
+                placeholder={`Enter your ${providers.find(p => p.id === selectedProvider)?.name} API key`}
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                {providers.find(p => p.id === selectedProvider)?.description}
+              </p>
+            </div>
+
+            <Button onClick={handleSaveApiKey} disabled={saving || !apiKey.trim()}>
+              {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {saving ? "Validating..." : "Validate & Save API Key"}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Sign in prompt when not authenticated */}
+      {!isAuthenticated && !hasAnyActiveApi && (
+        <Card className="mb-6 border-dashed">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Key className="h-5 w-5" />
+              Configure API Key
+            </CardTitle>
+            <CardDescription>
+              Sign in with your HKBU account to configure an API key
             </CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              API key configuration requires authentication. Please sign in to add or manage your AI service API keys.
+              API key configuration requires authentication. Please sign in to add or manage your AI service API key.
             </p>
             <Button asChild>
               <a href="/auth">Sign In with HKBU</a>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Test Chat UI - Only show when API is configured */}
+      {hasAnyActiveApi && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MessageSquare className="h-5 w-5" />
+              Test AI Chat
+            </CardTitle>
+            <CardDescription>
+              Send a test message to verify your API configuration is working
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <ScrollArea className="h-[200px] rounded-lg border bg-muted/30 p-4">
+              {chatMessages.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-8">
+                  Send a message to test the AI connection
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {chatMessages.map((msg, i) => (
+                    <div
+                      key={i}
+                      className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                    >
+                      <div
+                        className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${
+                          msg.role === "user"
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted"
+                        }`}
+                      >
+                        {msg.content}
+                      </div>
+                    </div>
+                  ))}
+                  {chatLoading && (
+                    <div className="flex justify-start">
+                      <div className="bg-muted rounded-lg px-3 py-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </ScrollArea>
+            <div className="flex gap-2">
+              <Input
+                placeholder="Type a test message..."
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSendTestMessage()}
+                disabled={chatLoading}
+              />
+              <Button onClick={handleSendTestMessage} disabled={chatLoading || !chatInput.trim()}>
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setChatMessages([])}
+              disabled={chatMessages.length === 0}
+            >
+              Clear Chat
             </Button>
           </CardContent>
         </Card>
