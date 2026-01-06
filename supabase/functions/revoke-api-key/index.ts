@@ -8,6 +8,12 @@ const corsHeaders = {
 
 const HKBU_PLATFORM_URL = "https://auth.hkbu.tech";
 
+// Map internal provider names to HKBU platform key types
+function toHkbuKeyType(provider: string): string {
+  if (provider === "bolatu") return "blt";
+  return provider;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -32,33 +38,49 @@ serve(async (req) => {
     }
 
     let revokedFromHkbu = false;
+    let hkbuError = null;
 
     // If we have an access token, try to revoke from HKBU platform
     if (accessToken) {
-      console.log(`Revoking API key for ${provider} from HKBU platform...`);
+      const keyType = toHkbuKeyType(provider);
+      console.log(`Revoking API key for ${provider} (keyType: ${keyType}) from HKBU platform...`);
       
       try {
-        // The HKBU platform uses POST with empty apiKey to revoke
-        const response = await fetch(`${HKBU_PLATFORM_URL}/api/user/api-keys`, {
-          method: "POST",
+        // Try DELETE method first
+        let response = await fetch(`${HKBU_PLATFORM_URL}/api/user/api-keys/${keyType}`, {
+          method: "DELETE",
           headers: {
             "Authorization": `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            keyType: provider,
-            apiKey: "", // Empty string to revoke
-          }),
         });
+
+        if (!response.ok) {
+          // Fallback: try POST with empty apiKey
+          console.log(`DELETE failed (${response.status}), trying POST with empty key...`);
+          response = await fetch(`${HKBU_PLATFORM_URL}/api/user/api-keys`, {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${accessToken}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              keyType: keyType,
+              apiKey: "",
+            }),
+          });
+        }
 
         if (response.ok) {
           revokedFromHkbu = true;
           console.log(`API key revoked from HKBU platform for ${provider}`);
         } else {
-          console.log(`Could not revoke from HKBU platform: ${response.status}`);
+          const errorText = await response.text();
+          hkbuError = `HKBU platform returned ${response.status}: ${errorText}`;
+          console.log(`Could not revoke from HKBU platform: ${response.status} - ${errorText}`);
         }
       } catch (err) {
-        console.error("Error calling HKBU platform:", err);
+        hkbuError = `Error calling HKBU platform: ${err}`;
+        console.error(hkbuError);
       }
     }
 
@@ -78,10 +100,26 @@ serve(async (req) => {
       console.log(`API key deleted from local database for ${provider}`);
     }
 
+    // If HKBU revoke failed but we have an access token, warn the user
+    if (accessToken && !revokedFromHkbu && hkbuError) {
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          revokedFromHkbu: false,
+          revokedFromLocal: !error,
+          warning: "Could not remove key from HKBU platform. The key may still be synced from your HKBU account.",
+          hkbuError,
+          message: `Local API key revoked for ${provider}, but remote key may still exist` 
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     return new Response(
       JSON.stringify({ 
         success: true, 
         revokedFromHkbu,
+        revokedFromLocal: !error,
         message: `API key revoked for ${provider}` 
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
