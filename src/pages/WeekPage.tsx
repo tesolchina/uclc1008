@@ -12,7 +12,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { LessonAiTutor } from "@/components/LessonAiTutor";
-import { BookOpen, Lightbulb, Target, Clock, FileText, AlertCircle, CheckCircle2, Bot, Users, ArrowRight } from "lucide-react";
+import { LessonCard } from "@/components/lessons/LessonCard";
+import { useLessons } from "@/hooks/useLessons";
+import { BookOpen, Lightbulb, Target, Clock, FileText, AlertCircle, CheckCircle2, Bot, Users, ArrowRight, Loader2 } from "lucide-react";
 
 const skillCategoryColors: Record<string, string> = {
   "reading": "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
@@ -66,6 +68,9 @@ export const WeekPage = () => {
   const week = Number.isNaN(id) ? undefined : getWeekById(id);
   const meta = Number.isNaN(id) ? undefined : getWeekMetaById(id);
   const skills = Number.isNaN(id) ? { introduced: [], reinforced: [] } : getSkillsForWeek(id);
+  
+  // Fetch lessons from database
+  const { data: dbLessons, isLoading: lessonsLoading } = useLessons(id);
 
   if (!week) {
     return <Navigate to="/" replace />;
@@ -133,8 +138,38 @@ export const WeekPage = () => {
           </CollapsibleSection>
         )}
 
-        {/* Lessons */}
-        {week.lessons && week.lessons.length > 0 && (
+        {/* Database Lessons */}
+        {dbLessons && dbLessons.length > 0 && (
+          <CollapsibleSection
+            title="Interactive Lessons"
+            description="Complete these AI-powered lessons with instant feedback."
+            icon={<BookOpen className="h-4 w-4 text-primary" />}
+            defaultOpen={true}
+          >
+            {lessonsLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              </div>
+            ) : (
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {dbLessons.map((lesson) => (
+                  <LessonCard
+                    key={lesson.id}
+                    weekId={week.id}
+                    lessonId={lesson.id}
+                    lessonNumber={lesson.lesson_number}
+                    title={lesson.title}
+                    description={lesson.description || ''}
+                    objectives={lesson.objectives}
+                  />
+                ))}
+              </div>
+            )}
+          </CollapsibleSection>
+        )}
+
+        {/* Legacy Lessons (from static data) */}
+        {week.lessons && week.lessons.length > 0 && !dbLessons?.length && (
           <CollapsibleSection
             title="Weekly Lessons"
             description="Complete these interactive lessons to build your skills."
