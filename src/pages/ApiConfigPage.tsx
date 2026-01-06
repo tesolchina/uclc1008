@@ -61,18 +61,25 @@ export default function ApiConfigPage() {
 
     setSaving(true);
     try {
-      const { error } = await supabase.functions.invoke("save-api-key", {
+      const { data, error } = await supabase.functions.invoke("save-api-key", {
         body: { provider: activeProvider, apiKey: apiKey.trim() },
       });
 
-      if (error) throw error;
+      if (error) {
+        throw new Error(error.message || "Failed to save API key");
+      }
 
-      toast.success(`${providers.find(p => p.id === activeProvider)?.name} API key saved`);
+      if (data?.error) {
+        toast.error(data.error);
+        return;
+      }
+
+      toast.success(data?.message || `${providers.find(p => p.id === activeProvider)?.name} API key validated and saved!`);
       setApiKey("");
       checkApiStatus();
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to save API key:", err);
-      toast.error("Failed to save API key");
+      toast.error(err.message || "Failed to save API key");
     } finally {
       setSaving(false);
     }
@@ -198,7 +205,7 @@ export default function ApiConfigPage() {
                 </div>
                 <Button onClick={handleSaveApiKey} disabled={saving || !apiKey.trim()}>
                   {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                  Save API Key
+                  {saving ? "Validating..." : "Validate & Save API Key"}
                 </Button>
               </TabsContent>
             ))}
