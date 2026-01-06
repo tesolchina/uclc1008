@@ -12,12 +12,11 @@ interface TokenResponse {
 }
 
 interface JWTPayload {
-  sub: string
-  aud: string
+  userId: string      // from HKBU token
+  email: string       // from HKBU token
+  aud: string         // client_id
+  iat: number
   exp: number
-  email?: string
-  name?: string
-  role?: string
 }
 
 function parseJWT(token: string): JWTPayload | null {
@@ -88,16 +87,16 @@ Deno.serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Determine role from JWT claims
-    const role = jwtPayload.role === 'teacher' ? 'teacher' : 'student'
+    // Default role to student (HKBU token doesn't include role)
+    const role = 'student'
 
     // Upsert profile
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .upsert({
-        hkbu_user_id: jwtPayload.sub,
+        hkbu_user_id: jwtPayload.userId,
         email: jwtPayload.email || null,
-        display_name: jwtPayload.name || null,
+        display_name: jwtPayload.email?.split('@')[0] || null,
         role: role,
       }, {
         onConflict: 'hkbu_user_id',
