@@ -40,26 +40,40 @@ async function getUserApiKey(accessToken: string | undefined): Promise<{ key: st
 
       if (response.ok) {
         const data = await response.json();
-        const keys = data.api_keys || {};
+        const rawKeys = data.api_keys || {};
         
-        // Check in priority order
+        // Normalize key names (blt -> bolatu)
+        const keys: Record<string, string> = {};
+        for (const [key, value] of Object.entries(rawKeys)) {
+          const normalizedKey = key === "blt" ? "bolatu" : key;
+          keys[normalizedKey] = value as string;
+        }
+        
+        // Check in priority order: HKBU, OpenRouter, Bolatu, Kimi
         if (keys.hkbu) {
           return { 
-            key: keys.hkbu.replace(/^hkbu_/, ''), // Remove prefix if present
+            key: keys.hkbu,
             provider: "hkbu", 
             endpoint: "https://genai.hkbu.edu.hk/api/v0/rest/deployments/gpt-4.1/chat/completions"
           };
         }
         if (keys.openrouter) {
           return { 
-            key: keys.openrouter.replace(/^openrouter_/, ''),
+            key: keys.openrouter,
             provider: "openrouter", 
             endpoint: "https://openrouter.ai/api/v1/chat/completions"
           };
         }
+        if (keys.bolatu) {
+          return { 
+            key: keys.bolatu,
+            provider: "bolatu", 
+            endpoint: "https://api.bolatu.com/v1/chat/completions"
+          };
+        }
         if (keys.kimi) {
           return { 
-            key: keys.kimi.replace(/^kimi_/, ''),
+            key: keys.kimi,
             provider: "kimi", 
             endpoint: "https://api.moonshot.cn/v1/chat/completions"
           };
@@ -90,6 +104,13 @@ async function getUserApiKey(accessToken: string | undefined): Promise<{ key: st
           key: row.api_key, 
           provider: "openrouter",
           endpoint: "https://openrouter.ai/api/v1/chat/completions"
+        };
+      }
+      if (row.provider === "bolatu" && row.api_key) {
+        return { 
+          key: row.api_key, 
+          provider: "bolatu",
+          endpoint: "https://api.bolatu.com/v1/chat/completions"
         };
       }
       if (row.provider === "kimi" && row.api_key) {
@@ -125,96 +146,81 @@ serve(async (req) => {
         "Give clear, concise explanations, focus on language development, and avoid writing whole assignments for the student.",
     };
 
-    // Try to get user's configured API key first
+    // Get user's configured API key
     const userApiConfig = await getUserApiKey(accessToken);
     
-    if (userApiConfig) {
-      console.log(`Using user's ${userApiConfig.provider} API key`);
-      
-      let headers: Record<string, string>;
-      let body: any;
-      
-      if (userApiConfig.provider === "hkbu") {
-        headers = {
-          "api-key": userApiConfig.key,
-          "Content-Type": "application/json",
-        };
-        body = {
-          messages: [systemMessage, ...messages],
-          stream: true,
-        };
-      } else {
-        // OpenRouter, Kimi use Bearer auth
-        headers = {
-          "Authorization": `Bearer ${userApiConfig.key}`,
-          "Content-Type": "application/json",
-        };
-        body = {
-          model: userApiConfig.provider === "openrouter" ? "openai/gpt-4o-mini" : "moonshot-v1-8k",
-          messages: [systemMessage, ...messages],
-          stream: true,
-        };
-      }
-
-      const response = await fetch(userApiConfig.endpoint, {
-        method: "POST",
-        headers,
-        body: JSON.stringify(body),
-      });
-
-      if (response.ok) {
-        return new Response(response.body, {
-          headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
-        });
-      } else {
-        console.error(`${userApiConfig.provider} API error:`, response.status);
-        // Fall through to Lovable AI
-      }
-    }
-
-    // Fallback to Lovable AI
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
+    if (!userApiConfig) {
       return new Response(
-        JSON.stringify({ error: "No AI service configured. Please configure an API key in Settings." }),
+        JSON.stringify({ error: "No AI service configured. Please configure an API key in API Settings." }),
         { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    console.log("Using Lovable AI as fallback");
-
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+    console.log(`Using user's ${userApiConfig.provider} API key`);
+    
+    let headers: Record<string, string>;
+    let body: any;
+    
+    if (userApiConfig.provider === "hkbu") {
+      // HKBU uses api-key header
+      headers = {
+        "api-key": userApiConfig.key,
         "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+      };
+      body = {
         messages: [systemMessage, ...messages],
         stream: true,
-      }),
+      };
+    } else {
+      // OpenRouter, Bolatu, Kimi use Bearer auth
+      headers = {
+        "Authorization": `Bearer ${userApiConfig.key}`,
+        "Content-Type": "application/json",
+      };
+      
+      let model = "gpt-4o-mini"; // default
+      if (userApiConfig.provider === "openrouter") {
+        model = "openai/gpt-4o-mini";
+      } else if (userApiConfig.provider === "bolatu") {
+        model = "gpt-4o-mini";
+      } else if (userApiConfig.provider === "kimi") {
+        model = "moonshot-v1-8k";
+      }
+      
+      body = {
+        model,
+        messages: [systemMessage, ...messages],
+        stream: true,
+      };
+    }
+
+    const response = await fetch(userApiConfig.endpoint, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limits exceeded, please try again later." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (response.status === 402) {
+      const errorText = await response.text();
+      console.error(`${userApiConfig.provider} API error:`, response.status, errorText);
+      
+      if (response.status === 401 || response.status === 403) {
         return new Response(
-          JSON.stringify({ error: "Payment required, please add funds to your Lovable AI workspace." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          JSON.stringify({ error: `Invalid or expired ${userApiConfig.provider} API key. Please update your API key in Settings.` }),
+          { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      const t = await response.text();
-      console.error("AI gateway error:", response.status, t);
-      return new Response(JSON.stringify({ error: "AI gateway error" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      if (response.status === 429) {
+        return new Response(
+          JSON.stringify({ error: "Rate limit exceeded. Please try again later." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      
+      return new Response(
+        JSON.stringify({ error: `AI service error (${response.status}). Please try again.` }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     return new Response(response.body, {
