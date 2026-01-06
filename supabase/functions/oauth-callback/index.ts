@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
     
     if (!code) {
       // Redirect to frontend with error
-      const frontendUrl = Deno.env.get('FRONTEND_URL') || 'https://sjkrxhqkwpmobdkdlefd.lovableproject.com'
+      const frontendUrl = Deno.env.get('FRONTEND_URL') || 'https://ue1.hkbu.tech'
       return Response.redirect(`${frontendUrl}/auth?error=no_code`, 302)
     }
 
@@ -52,7 +52,7 @@ Deno.serve(async (req) => {
 
     if (!clientId || !clientSecret) {
       console.error('Missing OAuth credentials')
-      const frontendUrl = Deno.env.get('FRONTEND_URL') || 'https://sjkrxhqkwpmobdkdlefd.lovableproject.com'
+      const frontendUrl = Deno.env.get('FRONTEND_URL') || 'https://ue1.hkbu.tech'
       return Response.redirect(`${frontendUrl}/auth?error=config_error`, 302)
     }
 
@@ -71,7 +71,7 @@ Deno.serve(async (req) => {
 
     if (!tokenResponse.ok) {
       console.error('Token exchange failed:', await tokenResponse.text())
-      const frontendUrl = Deno.env.get('FRONTEND_URL') || 'https://sjkrxhqkwpmobdkdlefd.lovableproject.com'
+      const frontendUrl = Deno.env.get('FRONTEND_URL') || 'https://ue1.hkbu.tech'
       return Response.redirect(`${frontendUrl}/auth?error=token_exchange_failed`, 302)
     }
 
@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
     const jwtPayload = parseJWT(tokenData.access_token)
 
     if (!jwtPayload) {
-      const frontendUrl = Deno.env.get('FRONTEND_URL') || 'https://sjkrxhqkwpmobdkdlefd.lovableproject.com'
+      const frontendUrl = Deno.env.get('FRONTEND_URL') || 'https://ue1.hkbu.tech'
       return Response.redirect(`${frontendUrl}/auth?error=invalid_token`, 302)
     }
 
@@ -107,7 +107,7 @@ Deno.serve(async (req) => {
 
     if (profileError) {
       console.error('Profile upsert error:', profileError)
-      const frontendUrl = Deno.env.get('FRONTEND_URL') || 'https://sjkrxhqkwpmobdkdlefd.lovableproject.com'
+      const frontendUrl = Deno.env.get('FRONTEND_URL') || 'https://ue1.hkbu.tech'
       return Response.redirect(`${frontendUrl}/auth?error=profile_error`, 302)
     }
 
@@ -143,12 +143,12 @@ Deno.serve(async (req) => {
 
     if (sessionError) {
       console.error('Session insert error:', sessionError)
-      const frontendUrl = Deno.env.get('FRONTEND_URL') || 'https://sjkrxhqkwpmobdkdlefd.lovableproject.com'
+      const frontendUrl = Deno.env.get('FRONTEND_URL') || 'https://ue1.hkbu.tech'
       return Response.redirect(`${frontendUrl}/auth?error=session_error`, 302)
     }
 
     // Redirect to frontend with session token
-    const frontendUrl = Deno.env.get('FRONTEND_URL') || 'https://sjkrxhqkwpmobdkdlefd.lovableproject.com'
+    const frontendUrl = Deno.env.get('FRONTEND_URL') || 'https://ue1.hkbu.tech'
     const sessionData = JSON.stringify({
       sessionId: session.id,
       profileId: profile.id,
@@ -160,7 +160,7 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error('OAuth callback error:', error)
-    const frontendUrl = Deno.env.get('FRONTEND_URL') || 'https://sjkrxhqkwpmobdkdlefd.lovableproject.com'
+    const frontendUrl = Deno.env.get('FRONTEND_URL') || 'https://ue1.hkbu.tech'
     return Response.redirect(`${frontendUrl}/auth?error=server_error`, 302)
   }
 })
