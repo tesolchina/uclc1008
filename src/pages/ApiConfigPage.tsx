@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CheckCircle2, XCircle, Loader2, Key, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 type ApiProvider = "lovable" | "hkbu" | "openrouter" | "bolatu" | "kimi";
 
@@ -18,6 +19,7 @@ interface ApiStatus {
 }
 
 export default function ApiConfigPage() {
+  const { accessToken, isAuthenticated } = useAuth();
   const [checking, setChecking] = useState(true);
   const [apiStatuses, setApiStatuses] = useState<ApiStatus[]>([]);
   const [activeProvider, setActiveProvider] = useState<ApiProvider>("hkbu");
@@ -39,8 +41,9 @@ export default function ApiConfigPage() {
   const checkApiStatus = async () => {
     setChecking(true);
     try {
-      const { data, error } = await supabase.functions.invoke("check-api-status");
-      
+      const { data, error } = await supabase.functions.invoke("check-api-status", {
+        body: { accessToken },
+      });
       if (error) throw error;
       
       setApiStatuses(data?.statuses || []);
@@ -62,7 +65,7 @@ export default function ApiConfigPage() {
     setSaving(true);
     try {
       const { data, error } = await supabase.functions.invoke("save-api-key", {
-        body: { provider: activeProvider, apiKey: apiKey.trim() },
+        body: { provider: activeProvider, apiKey: apiKey.trim(), accessToken },
       });
 
       if (error) {

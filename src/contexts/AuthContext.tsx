@@ -10,8 +10,15 @@ interface Profile {
   created_at: string;
 }
 
+interface Session {
+  profileId: string;
+  accessToken: string;
+  expiresAt: string;
+}
+
 interface AuthContextType {
   profile: Profile | null;
+  accessToken: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
   isTeacher: boolean;
@@ -26,26 +33,32 @@ const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const refreshProfile = useCallback(async () => {
     const sessionData = localStorage.getItem('hkbu_session');
     if (!sessionData) {
       setProfile(null);
+      setAccessToken(null);
       setIsLoading(false);
       return;
     }
 
     try {
-      const session = JSON.parse(atob(sessionData));
+      const session: Session = JSON.parse(atob(sessionData));
       
       // Check if session is expired
       if (new Date(session.expiresAt) < new Date()) {
         localStorage.removeItem('hkbu_session');
         setProfile(null);
+        setAccessToken(null);
         setIsLoading(false);
         return;
       }
+
+      // Store the access token
+      setAccessToken(session.accessToken);
 
       // Fetch profile from database
       const { data, error } = await supabase
@@ -57,12 +70,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (error || !data) {
         localStorage.removeItem('hkbu_session');
         setProfile(null);
+        setAccessToken(null);
       } else {
         setProfile(data as Profile);
       }
     } catch {
       localStorage.removeItem('hkbu_session');
       setProfile(null);
+      setAccessToken(null);
     }
     
     setIsLoading(false);
@@ -81,10 +96,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('hkbu_session');
     localStorage.removeItem('oauth_state');
     setProfile(null);
+    setAccessToken(null);
   }, []);
 
   const value: AuthContextType = {
     profile,
+    accessToken,
     isLoading,
     isAuthenticated: !!profile,
     isTeacher: profile?.role === 'teacher',
