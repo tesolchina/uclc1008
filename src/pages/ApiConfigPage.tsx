@@ -47,17 +47,11 @@ export default function ApiConfigPage() {
     { id: "kimi", name: "Kimi", description: "Moonshot AI's Kimi", docUrl: "https://kimi.moonshot.cn" },
   ];
 
-  useEffect(() => {
-    // Wait for auth to finish loading before checking API status
-    if (authLoading) return;
-    checkApiStatus();
-  }, [accessToken, isAuthenticated, authLoading]);
-
-  const checkApiStatus = async () => {
+  const checkApiStatus = async (token: string | null) => {
     setChecking(true);
     try {
       const { data, error } = await supabase.functions.invoke("check-api-status", {
-        body: { accessToken },
+        body: { accessToken: token },
       });
       if (error) throw error;
       
@@ -69,6 +63,12 @@ export default function ApiConfigPage() {
       setChecking(false);
     }
   };
+
+  useEffect(() => {
+    // Wait for auth to finish loading before checking API status
+    if (authLoading) return;
+    checkApiStatus(accessToken);
+  }, [accessToken, isAuthenticated, authLoading]);
 
   const handleSaveApiKey = async () => {
     if (!apiKey.trim()) {
@@ -102,7 +102,7 @@ export default function ApiConfigPage() {
         });
       }
       setApiKey("");
-      checkApiStatus();
+      checkApiStatus(accessToken);
     } catch (err: any) {
       console.error("Failed to save API key:", err);
       toast.error(err.message || "Failed to save API key");
@@ -133,7 +133,7 @@ export default function ApiConfigPage() {
           ? "Key removed from HKBU platform" 
           : "Key removed from local storage",
       });
-      checkApiStatus();
+      checkApiStatus(accessToken);
     } catch (err: any) {
       console.error("Failed to revoke API key:", err);
       toast.error(err.message || "Failed to revoke API key");
@@ -367,7 +367,7 @@ export default function ApiConfigPage() {
       </Card>
 
       <div className="mt-4 text-center">
-        <Button variant="outline" size="sm" onClick={checkApiStatus} disabled={checking}>
+        <Button variant="outline" size="sm" onClick={() => checkApiStatus(accessToken)} disabled={checking}>
           {checking && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
           Refresh Status
         </Button>
