@@ -1,8 +1,10 @@
-import { BookOpen, CalendarRange, MessageCircle, PanelLeftClose, PanelLeft, Sparkles, Target } from "lucide-react";
+import { BookOpen, CalendarRange, MessageCircle, PanelLeftClose, PanelLeft, Sparkles, Target, Settings, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { getWeekMetaById, getAssignmentById } from "@/data";
 import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 import {
   Sidebar,
@@ -47,17 +49,31 @@ const weeks: WeekNavItem[] = Array.from({ length: 13 }, (_, index) => {
 const overviewItems = [
   { title: "Course overview", url: "/", icon: BookOpen },
   { title: "Assessment & goals", url: "/assessment", icon: Target },
+  { title: "API Configuration", url: "/api-config", icon: Settings },
 ];
 
 export function AppSidebar() {
-  const { state } = useSidebar();
+  const { state, toggleSidebar } = useSidebar();
   const location = useLocation();
   const collapsed = state === "collapsed";
   const currentPath = location.pathname;
+  
+  const [aiStatus, setAiStatus] = useState<"checking" | "active" | "inactive">("checking");
+
+  useEffect(() => {
+    const checkStatus = async () => {
+      try {
+        const { data } = await supabase.functions.invoke("check-api-status");
+        const hasActive = data?.statuses?.some((s: { available: boolean }) => s.available);
+        setAiStatus(hasActive ? "active" : "inactive");
+      } catch {
+        setAiStatus("inactive");
+      }
+    };
+    checkStatus();
+  }, []);
 
   const isActive = (path: string) => currentPath === path;
-
-  const { toggleSidebar } = useSidebar();
 
   return (
     <Sidebar collapsible="offcanvas" className="border-r border-sidebar-border bg-sidebar text-sidebar-foreground">
@@ -91,6 +107,17 @@ export function AppSidebar() {
                     >
                       <item.icon className="h-3.5 w-3.5" />
                       {!collapsed && <span>{item.title}</span>}
+                      {item.url === "/api-config" && !collapsed && (
+                        <span className="ml-auto">
+                          {aiStatus === "checking" ? (
+                            <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+                          ) : aiStatus === "active" ? (
+                            <CheckCircle2 className="h-3 w-3 text-green-500" />
+                          ) : (
+                            <XCircle className="h-3 w-3 text-muted-foreground" />
+                          )}
+                        </span>
+                      )}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
