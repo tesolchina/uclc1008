@@ -77,7 +77,16 @@ export default function ApiConfigPage() {
         return;
       }
 
-      toast.success(data?.message || `${providers.find(p => p.id === activeProvider)?.name} API key validated and saved!`);
+      const providerName = providers.find(p => p.id === activeProvider)?.name;
+      if (data?.savedToHkbu) {
+        toast.success(`${providerName} API key saved to HKBU platform ✓`, {
+          description: "Your key is now stored on the remote platform and synced across devices.",
+        });
+      } else {
+        toast.success(`${providerName} API key saved locally`, {
+          description: "Key stored locally. Sign in with HKBU to sync across devices.",
+        });
+      }
       setApiKey("");
       checkApiStatus();
     } catch (err: any) {
