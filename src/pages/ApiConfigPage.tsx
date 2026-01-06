@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ProcessLogPanel } from "@/components/ProcessLogPanel";
 
-type ApiProvider = "lovable" | "hkbu" | "openrouter" | "bolatu" | "kimi";
+type ApiProvider = "hkbu" | "openrouter" | "bolatu" | "kimi";
 
 interface ApiStatus {
   provider: ApiProvider;
@@ -44,7 +44,6 @@ export default function ApiConfigPage() {
   const sessionId = useMemo(() => crypto.randomUUID(), []);
 
   const providers: { id: ApiProvider; name: string; description: string; docUrl?: string }[] = [
-    { id: "lovable", name: "Lovable AI", description: "Built-in AI service (auto-configured)" },
     { id: "hkbu", name: "HKBU GenAI", description: "HKBU's GenAI Platform API", docUrl: "https://genai.hkbu.edu.hk" },
     { id: "openrouter", name: "OpenRouter", description: "Access to multiple AI models", docUrl: "https://openrouter.ai" },
     { id: "bolatu", name: "Bolatu (BLT)", description: "Bolatu AI services", docUrl: "https://bolatu.com" },
@@ -62,7 +61,7 @@ export default function ApiConfigPage() {
       setApiStatuses(data?.statuses || []);
     } catch (err) {
       console.error("Failed to check API status:", err);
-      setApiStatuses([{ provider: "lovable", available: true, name: "Lovable AI" }]);
+      setApiStatuses([]);
     } finally {
       setChecking(false);
     }
@@ -258,8 +257,8 @@ export default function ApiConfigPage() {
         </CardHeader>
         <CardContent>
           <Tabs value={activeProvider} onValueChange={(v) => { setActiveProvider(v as ApiProvider); setApiKey(""); }}>
-            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 h-auto">
-              {providers.filter(p => p.id !== "lovable").map((provider) => {
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
+              {providers.map((provider) => {
                 const status = getStatusForProvider(provider.id);
                 return (
                   <TabsTrigger key={provider.id} value={provider.id} className="text-xs px-2 py-1.5 gap-1">
@@ -270,7 +269,7 @@ export default function ApiConfigPage() {
               })}
             </TabsList>
 
-            {providers.filter(p => p.id !== "lovable").map((provider) => {
+            {providers.map((provider) => {
               const status = getStatusForProvider(provider.id);
               const isConfigured = status?.available || false;
 

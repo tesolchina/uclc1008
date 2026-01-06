@@ -56,7 +56,7 @@ serve(async (req) => {
 
     const statuses = [];
 
-    // If not authenticated, show all services as unavailable (except checking env vars)
+    // If not authenticated, show all services as unavailable
     if (!accessToken) {
       await logProcess({
         operation,
@@ -66,15 +66,6 @@ serve(async (req) => {
         sessionId,
       });
       
-      // Only check env vars for Lovable AI (system-level)
-      const lovableKey = Deno.env.get("LOVABLE_API_KEY");
-      statuses.push({
-        provider: "lovable",
-        available: !!lovableKey,
-        name: "Lovable AI",
-        source: lovableKey ? "env" : null,
-      });
-
       // All user-configured providers show as unavailable without auth
       statuses.push({ provider: "hkbu", available: false, name: "HKBU GenAI", source: null });
       statuses.push({ provider: "openrouter", available: false, name: "OpenRouter", source: null });
@@ -180,15 +171,6 @@ serve(async (req) => {
     }
 
     const localKeyMap = new Map(storedKeys?.map(k => [k.provider, k.api_key]) || []);
-
-    // Check Lovable AI (from env - always available)
-    const lovableKey = Deno.env.get("LOVABLE_API_KEY");
-    statuses.push({
-      provider: "lovable",
-      available: !!lovableKey,
-      name: "Lovable AI",
-      source: lovableKey ? "env" : null,
-    });
 
     // Check HKBU GenAI
     const hkbuKey = hkbuPlatformKeys.hkbu || localKeyMap.get("hkbu");
