@@ -72,17 +72,21 @@ const Index = () => {
       </section>
 
       {/* Disclaimer Section */}
-      <Alert variant="destructive" className="border-2 border-destructive/50 bg-destructive/5">
+      <Alert variant="info" className="border-2 border-primary/50 bg-primary/5">
         <AlertTriangle className="h-5 w-5" />
-        <AlertTitle className="text-base font-semibold">Important Notice for Students from Other Sections</AlertTitle>
-        <AlertDescription className="mt-2 space-y-2 text-sm">
+        <AlertTitle className="text-base font-semibold">Important Notice for UE1 Students</AlertTitle>
+        <AlertDescription className="mt-2 space-y-2 text-sm text-foreground">
           <p>
-            This website is designed specifically for <strong>Semester 2, 2025-26 (UE1)</strong>. Students from other sections
-            are welcome to access these materials for independent study purposes.
+            These materials were created by <strong>Dr Simon Wang</strong> and the UE1 team for all students taking 
+            University English I (UCLC 1008) in <strong>Spring 2026</strong>.
+          </p>
+          <p>
+            This website will be used in <strong>Section 53</strong> as a pilot for AI-assisted independent learning. 
+            Students from other sections are welcome to use the materials here as <strong>reference only</strong>.
           </p>
           <p className="font-medium text-destructive">
-            However, you must consult your own section teacher about course requirements, assessment criteria, and 
-            how to do well in this course. The materials and guidance here may differ from what your teacher expects.
+            Crucially, students from other sections must consult their own teachers regarding specific course 
+            requirements and assessment expectations for their own classes.
           </p>
         </AlertDescription>
       </Alert>
