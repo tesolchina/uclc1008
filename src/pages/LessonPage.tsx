@@ -168,21 +168,33 @@ const lessonContentData: Record<string, {
 const LessonPage = () => {
   const params = useParams();
   const navigate = useNavigate();
-  const { isAuthenticated, login } = useAuth();
+  const { isAuthenticated, login, accessToken } = useAuth();
   const weekId = Number(params.weekId);
   const lessonIdParam = params.lessonId;
   
-  // Check if it's a UUID (database lesson) or a number (legacy lesson)
-  const isDbLesson = lessonIdParam && lessonIdParam.includes('-');
+  // Parse lesson ID - can be "1-1", "1.1", UUID, or just a number
+  const isDbLesson = lessonIdParam && (lessonIdParam.includes('-') || lessonIdParam.includes('.'));
+  
+  // Parse lesson number from "1-1" or "1.1" format
+  let lessonNumber: number | null = null;
+  if (isDbLesson && lessonIdParam) {
+    const parts = lessonIdParam.split(/[-.]/).map(Number);
+    if (parts.length === 2 && !isNaN(parts[1])) {
+      lessonNumber = parts[1];
+    }
+  }
   
   const week = Number.isNaN(weekId) ? undefined : getWeekById(weekId);
   const legacyLessonId = !isDbLesson ? Number(lessonIdParam) : null;
   const legacyLesson = legacyLessonId ? week?.lessons?.find(l => l.id === legacyLessonId) : null;
   
-  // Fetch database lesson
-  const { data: dbLesson, isLoading: lessonLoading } = useLesson(isDbLesson ? lessonIdParam! : '');
-  const { data: progress } = useLessonProgress(isDbLesson ? lessonIdParam! : '');
-  const saveMutation = useSaveLessonProgress(isDbLesson ? lessonIdParam! : '');
+  // For database lessons, use weekId and lessonNumber to find the lesson
+  const lessonQueryId = isDbLesson && lessonNumber ? `${weekId}-${lessonNumber}` : '';
+  
+  // Fetch database lesson by week and lesson number
+  const { data: dbLesson, isLoading: lessonLoading } = useLesson(lessonQueryId);
+  const { data: progress } = useLessonProgress(dbLesson?.id || '');
+  const saveMutation = useSaveLessonProgress(dbLesson?.id || '');
 
   const [questionStates, setQuestionStates] = useState(
     legacyLesson?.questions.map(() => ({ submitted: false, userAnswer: "", isCorrect: false })) || []
@@ -266,8 +278,8 @@ const LessonPage = () => {
               </Button>
               {dbLesson.lesson_number < 3 && (
                 <Button onClick={() => {
-                  // Navigate to next lesson - would need to fetch next lesson ID
-                  navigate(`/week/${weekId}`);
+                  const nextLessonNumber = dbLesson.lesson_number + 1;
+                  navigate(`/week/${weekId}/lesson/${weekId}-${nextLessonNumber}`);
                 }}>
                   Next Lesson
                   <ArrowRight className="h-4 w-4 ml-2" />
@@ -375,7 +387,7 @@ const LessonPage = () => {
               <Button onClick={() => {
                 const nextLessonId = legacyLesson.id + 1;
                 if (nextLessonId <= 3) {
-                  navigate(`/week/${weekId}/lesson/${nextLessonId}`);
+                  navigate(`/week/${weekId}/lesson/${weekId}-${nextLessonId}`);
                 } else {
                   navigate(`/week/${weekId}`);
                 }

@@ -25,8 +25,11 @@ export function LessonCard({
   progress = 0,
   isCompleted = false,
 }: LessonCardProps) {
+  // Use weekId-lessonNumber format for cleaner URLs
+  const lessonPath = `/week/${weekId}/lesson/${weekId}-${lessonNumber}`;
+  
   return (
-    <Link to={`/week/${weekId}/lesson/${lessonId}`}>
+    <Link to={lessonPath}>
       <Card className="transition-all hover:border-primary/50 hover:shadow-md">
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between gap-2">
