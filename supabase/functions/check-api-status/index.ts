@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -11,9 +12,24 @@ serve(async (req) => {
   }
 
   try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Fetch all stored API keys from database
+    const { data: storedKeys, error } = await supabase
+      .from("api_keys")
+      .select("provider, api_key");
+
+    if (error) {
+      console.error("Error fetching API keys:", error);
+    }
+
+    const keyMap = new Map(storedKeys?.map(k => [k.provider, k.api_key]) || []);
+
     const statuses = [];
 
-    // Check Lovable AI (always available in Cloud projects)
+    // Check Lovable AI (from env)
     const lovableKey = Deno.env.get("LOVABLE_API_KEY");
     statuses.push({
       provider: "lovable",
@@ -21,8 +37,8 @@ serve(async (req) => {
       name: "Lovable AI",
     });
 
-    // Check HKBU GenAI
-    const hkbuKey = Deno.env.get("HKBU_API_KEY");
+    // Check HKBU GenAI (from database or env)
+    const hkbuKey = keyMap.get("hkbu") || Deno.env.get("HKBU_API_KEY");
     statuses.push({
       provider: "hkbu",
       available: !!hkbuKey,
@@ -30,7 +46,7 @@ serve(async (req) => {
     });
 
     // Check OpenRouter
-    const openrouterKey = Deno.env.get("OPENROUTER_API_KEY");
+    const openrouterKey = keyMap.get("openrouter") || Deno.env.get("OPENROUTER_API_KEY");
     statuses.push({
       provider: "openrouter",
       available: !!openrouterKey,
@@ -38,7 +54,7 @@ serve(async (req) => {
     });
 
     // Check Bolatu
-    const bolatuKey = Deno.env.get("BOLATU_API_KEY");
+    const bolatuKey = keyMap.get("bolatu") || Deno.env.get("BOLATU_API_KEY");
     statuses.push({
       provider: "bolatu",
       available: !!bolatuKey,
@@ -46,7 +62,7 @@ serve(async (req) => {
     });
 
     // Check Kimi
-    const kimiKey = Deno.env.get("KIMI_API_KEY");
+    const kimiKey = keyMap.get("kimi") || Deno.env.get("KIMI_API_KEY");
     statuses.push({
       provider: "kimi",
       available: !!kimiKey,

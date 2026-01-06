@@ -1,14 +1,10 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
-
-// Note: This edge function provides an interface for API key management.
-// In production, API keys should be managed through the Lovable Cloud secrets.
-// This function logs the request but doesn't actually store keys in env vars
-// (env vars are read-only at runtime).
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -33,28 +29,30 @@ serve(async (req) => {
       );
     }
 
-    // Map provider to secret name
-    const secretNames: Record<string, string> = {
-      hkbu: "HKBU_API_KEY",
-      openrouter: "OPENROUTER_API_KEY",
-      bolatu: "BOLATU_API_KEY",
-      kimi: "KIMI_API_KEY",
-    };
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const secretName = secretNames[provider];
-    
-    // Log the configuration request
-    // In a real scenario, you'd need to use Supabase Management API or
-    // direct the user to configure secrets through Lovable Cloud settings
-    console.log(`API key configuration requested for ${secretName}`);
-    
-    // Return instructions for manual configuration
+    // Upsert the API key in the database
+    const { error } = await supabase
+      .from("api_keys")
+      .upsert(
+        { provider, api_key: apiKey, updated_at: new Date().toISOString() },
+        { onConflict: "provider" }
+      );
+
+    if (error) {
+      console.error("Error saving API key:", error);
+      return new Response(
+        JSON.stringify({ error: "Failed to save API key" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    console.log(`API key saved for provider: ${provider}`);
+
     return new Response(
-      JSON.stringify({
-        success: true,
-        message: `To configure ${secretName}, please add it through Lovable Cloud secrets.`,
-        secretName,
-      }),
+      JSON.stringify({ success: true, message: `API key saved for ${provider}` }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
