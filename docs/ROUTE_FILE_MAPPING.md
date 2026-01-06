@@ -67,6 +67,7 @@ This document maps website routes to their corresponding source code files.
 | `src/data/skills.ts` | Course skills data and getSkillById() |
 | `src/data/assignments.ts` | Course assignments data and getAssignmentById() |
 | `src/data/weeks/index.ts` | Week aggregation, getWeekById(), getWeekMetaById() |
+| `src/data/lessons/index.ts` | Lesson aggregation, getLessonById(), getLessonsForWeek() |
 
 ### Individual Week Files
 | File | Purpose |
@@ -76,6 +77,23 @@ This document maps website routes to their corresponding source code files.
 | `src/data/weeks/week3.ts` | Week 3 data and metadata |
 | ... | ... |
 | `src/data/weeks/week13.ts` | Week 13 data and metadata |
+
+### Individual Lesson Files (Week.Lesson numbering)
+| File | Lesson ID | Purpose |
+|------|-----------|---------|
+| `src/data/lessons/lesson1-1.ts` | 1.1 | Empirical vs. Conceptual Articles |
+| `src/data/lessons/lesson1-2.ts` | 1.2 | Analyzing Titles and Abstracts |
+| `src/data/lessons/lesson1-3.ts` | 1.3 | Citations and Academic Integrity |
+| `src/data/lessons/lesson2-1.ts` | 2.1 | Reading Signposts: Topic and Concluding Sentences |
+| `src/data/lessons/lesson2-2.ts` | 2.2 | Effective Paraphrasing |
+| `src/data/lessons/lesson3-1.ts` | 3.1 | The Art of Summarising |
+| `src/data/lessons/lesson3-2.ts` | 3.2 | APA 7th Reference List |
+| `src/data/lessons/lesson4-1.ts` | 4.1 | Synthesising Multiple Sources |
+| `src/data/lessons/lesson4-2.ts` | 4.2 | AI Workshop: Precision and Ethics |
+| `src/data/lessons/lesson5-1.ts` | 5.1 | Analyzing Journal Excerpts for AWQ |
+| `src/data/lessons/lesson5-2.ts` | 5.2 | Structuring the Synthetic Summary |
+| `src/data/lessons/lesson6-1.ts` | 6.1 | The ACE Framework: Claim, Evidence, Warrant |
+| `src/data/lessons/lesson6-2.ts` | 6.2 | AWQ Post-Assessment Reflection |
 
 ### Layout Components
 | File | Purpose |
