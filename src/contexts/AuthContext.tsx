@@ -12,6 +12,7 @@ interface Profile {
 
 interface Session {
   profileId: string;
+  sessionId?: string;
   accessToken?: string;
   expiresAt: string;
 }
@@ -37,8 +38,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   const refreshProfile = useCallback(async () => {
-    const sessionData = localStorage.getItem('hkbu_session');
-    if (!sessionData) {
+    const storedToken = localStorage.getItem('hkbu_session');
+    if (!storedToken) {
       setProfile(null);
       setAccessToken(null);
       setIsLoading(false);
@@ -46,10 +47,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      const session: Session = JSON.parse(atob(sessionData));
-      
-      // Check if session is expired
-      if (new Date(session.expiresAt) < new Date()) {
+      const rawSession = JSON.parse(atob(storedToken)) as Session;
+
+      // Check if session is expired (based on the session token payload)
+      if (new Date(rawSession.expiresAt) < new Date()) {
         localStorage.removeItem('hkbu_session');
         setProfile(null);
         setAccessToken(null);
@@ -57,29 +58,49 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Store the access token (older sessions may not include it)
-      setAccessToken(session.accessToken ?? null);
+      // Ensure we have an HKBU access token.
+      // Older sessions may not include it; if missing, recover it from the backend using sessionId+profileId.
+      let token: string | null = rawSession.accessToken ?? null;
+
+      if (!token && rawSession.sessionId) {
+        const { data } = await supabase.functions.invoke('get-session-access-token', {
+          body: {
+            sessionId: rawSession.sessionId,
+            profileId: rawSession.profileId,
+          },
+        });
+
+        if (data?.accessToken) {
+          token = data.accessToken as string;
+
+          // Persist the recovered token so subsequent requests can sync keys.
+          const updated = { ...rawSession, accessToken: token };
+          localStorage.setItem('hkbu_session', btoa(JSON.stringify(updated)));
+        }
+      }
+
+      setAccessToken(token);
 
       // Fetch profile from database
-      const { data, error } = await supabase
+      const { data: profileData, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', session.profileId)
+        .eq('id', rawSession.profileId)
         .single();
 
-      if (error || !data) {
+      if (error || !profileData) {
         localStorage.removeItem('hkbu_session');
         setProfile(null);
         setAccessToken(null);
       } else {
-        setProfile(data as Profile);
+        setProfile(profileData as Profile);
       }
     } catch {
       localStorage.removeItem('hkbu_session');
       setProfile(null);
       setAccessToken(null);
     }
-    
+
     setIsLoading(false);
   }, []);
 

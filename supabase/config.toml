@@ -23,3 +23,6 @@ verify_jwt = false
 
 [functions.revoke-api-key]
 verify_jwt = false
+
+[functions.get-session-access-token]
+verify_jwt = false
