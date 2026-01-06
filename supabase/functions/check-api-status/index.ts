@@ -106,7 +106,13 @@ serve(async (req) => {
 
       if (response.ok) {
         const data = await response.json();
-        hkbuPlatformKeys = data.api_keys || {};
+        const rawKeys = data.api_keys || {};
+        // Normalize key names (blt -> bolatu)
+        hkbuPlatformKeys = {};
+        for (const [key, value] of Object.entries(rawKeys)) {
+          const normalizedKey = key === "blt" ? "bolatu" : key;
+          hkbuPlatformKeys[normalizedKey] = value as string;
+        }
         const foundKeys = Object.keys(hkbuPlatformKeys);
         
         await logProcess({
