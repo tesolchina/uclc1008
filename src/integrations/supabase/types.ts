@@ -14,6 +14,135 @@ export type Database = {
   }
   public: {
     Tables: {
+      lesson_progress: {
+        Row: {
+          ai_feedback: Json | null
+          completed_at: string | null
+          created_at: string
+          fill_blank_answers: Json | null
+          id: string
+          lesson_id: string
+          mc_answers: Json | null
+          notes: string | null
+          open_ended_responses: Json | null
+          profile_id: string
+          reflection: string | null
+          section_completed: Json | null
+          updated_at: string
+        }
+        Insert: {
+          ai_feedback?: Json | null
+          completed_at?: string | null
+          created_at?: string
+          fill_blank_answers?: Json | null
+          id?: string
+          lesson_id: string
+          mc_answers?: Json | null
+          notes?: string | null
+          open_ended_responses?: Json | null
+          profile_id: string
+          reflection?: string | null
+          section_completed?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          ai_feedback?: Json | null
+          completed_at?: string | null
+          created_at?: string
+          fill_blank_answers?: Json | null
+          id?: string
+          lesson_id?: string
+          mc_answers?: Json | null
+          notes?: string | null
+          open_ended_responses?: Json | null
+          profile_id?: string
+          reflection?: string | null
+          section_completed?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_progress_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lesson_progress_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lessons: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          key_concepts: Json | null
+          lesson_number: number
+          objectives: Json | null
+          title: string
+          updated_at: string
+          week_id: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          key_concepts?: Json | null
+          lesson_number: number
+          objectives?: Json | null
+          title: string
+          updated_at?: string
+          week_id: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          key_concepts?: Json | null
+          lesson_number?: number
+          objectives?: Json | null
+          title?: string
+          updated_at?: string
+          week_id?: number
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          email: string | null
+          hkbu_user_id: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          hkbu_user_id: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          hkbu_user_id?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       staff_comments: {
         Row: {
           author_name: string | null
@@ -197,15 +326,82 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          profile_id: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          profile_id: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          profile_id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_sessions: {
+        Row: {
+          access_token: string
+          created_at: string
+          expires_at: string
+          id: string
+          profile_id: string
+        }
+        Insert: {
+          access_token: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          profile_id: string
+        }
+        Update: {
+          access_token?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_sessions_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _profile_id: string
+          _role: Database["public"]["Enums"]["app_role"]
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "teacher" | "student"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -332,6 +528,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["teacher", "student"],
+    },
   },
 } as const
