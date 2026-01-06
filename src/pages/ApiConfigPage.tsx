@@ -31,7 +31,7 @@ interface ApiStatus {
 }
 
 export default function ApiConfigPage() {
-  const { accessToken, isAuthenticated, profile, logout } = useAuth();
+  const { accessToken, isAuthenticated, isLoading: authLoading, profile, logout } = useAuth();
   const [checking, setChecking] = useState(true);
   const [apiStatuses, setApiStatuses] = useState<ApiStatus[]>([]);
   const [activeProvider, setActiveProvider] = useState<ApiProvider>("hkbu");
@@ -48,11 +48,10 @@ export default function ApiConfigPage() {
   ];
 
   useEffect(() => {
-    // Re-check API status when authentication state changes
-    if (!isAuthenticated || accessToken) {
-      checkApiStatus();
-    }
-  }, [accessToken, isAuthenticated]);
+    // Wait for auth to finish loading before checking API status
+    if (authLoading) return;
+    checkApiStatus();
+  }, [accessToken, isAuthenticated, authLoading]);
 
   const checkApiStatus = async () => {
     setChecking(true);
