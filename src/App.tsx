@@ -17,6 +17,7 @@ import AuthPage from "./pages/AuthPage";
 import AuthCallback from "./pages/AuthCallback";
 import Week1Page from "./pages/Week1Page";
 import PreCourseWritingPage from "./pages/PreCourseWritingPage";
+import ApiConfigPage from "./pages/ApiConfigPage";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +41,7 @@ const App = () => (
               <Route path="week/1/lesson/1" element={<Lesson1Page />} />
               <Route path="week/:weekId/lesson/:lessonId" element={<LessonPage />} />
               <Route path="staff" element={<Staff />} />
+              <Route path="api-config" element={<ApiConfigPage />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
