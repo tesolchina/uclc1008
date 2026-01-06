@@ -17,31 +17,54 @@ serve(async (req) => {
     const { accessToken } = await req.json().catch(() => ({}));
     
     const statuses = [];
-    let hkbuPlatformKeys: Record<string, string> = {};
 
-    // If we have an access token, fetch keys from HKBU platform
-    if (accessToken) {
-      try {
-        console.log("Fetching API keys from HKBU platform...");
-        const response = await fetch(`${HKBU_PLATFORM_URL}/api/user/api-keys`, {
-          headers: {
-            "Authorization": `Bearer ${accessToken}`,
-          },
-        });
+    // If not authenticated, show all services as unavailable (except checking env vars)
+    if (!accessToken) {
+      console.log("No access token provided - showing limited status");
+      
+      // Only check env vars for Lovable AI (system-level)
+      const lovableKey = Deno.env.get("LOVABLE_API_KEY");
+      statuses.push({
+        provider: "lovable",
+        available: !!lovableKey,
+        name: "Lovable AI",
+        source: lovableKey ? "env" : null,
+      });
 
-        if (response.ok) {
-          const data = await response.json();
-          hkbuPlatformKeys = data.api_keys || {};
-          console.log("HKBU platform keys found:", Object.keys(hkbuPlatformKeys));
-        } else {
-          console.log("Could not fetch from HKBU platform:", response.status);
-        }
-      } catch (err) {
-        console.error("Error fetching from HKBU platform:", err);
-      }
+      // All user-configured providers show as unavailable without auth
+      statuses.push({ provider: "hkbu", available: false, name: "HKBU GenAI", source: null });
+      statuses.push({ provider: "openrouter", available: false, name: "OpenRouter", source: null });
+      statuses.push({ provider: "bolatu", available: false, name: "Bolatu (BLT)", source: null });
+      statuses.push({ provider: "kimi", available: false, name: "Kimi", source: null });
+
+      return new Response(JSON.stringify({ statuses, authenticated: false }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    // Also check local database
+    let hkbuPlatformKeys: Record<string, string> = {};
+
+    // Fetch keys from HKBU platform
+    try {
+      console.log("Fetching API keys from HKBU platform...");
+      const response = await fetch(`${HKBU_PLATFORM_URL}/api/user/api-keys`, {
+        headers: {
+          "Authorization": `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        hkbuPlatformKeys = data.api_keys || {};
+        console.log("HKBU platform keys found:", Object.keys(hkbuPlatformKeys));
+      } else {
+        console.log("Could not fetch from HKBU platform:", response.status);
+      }
+    } catch (err) {
+      console.error("Error fetching from HKBU platform:", err);
+    }
+
+    // Also check local database as fallback
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
@@ -56,7 +79,7 @@ serve(async (req) => {
 
     const localKeyMap = new Map(storedKeys?.map(k => [k.provider, k.api_key]) || []);
 
-    // Check Lovable AI (from env)
+    // Check Lovable AI (from env - always available)
     const lovableKey = Deno.env.get("LOVABLE_API_KEY");
     statuses.push({
       provider: "lovable",
@@ -66,16 +89,16 @@ serve(async (req) => {
     });
 
     // Check HKBU GenAI
-    const hkbuKey = hkbuPlatformKeys.hkbu || localKeyMap.get("hkbu") || Deno.env.get("HKBU_API_KEY");
+    const hkbuKey = hkbuPlatformKeys.hkbu || localKeyMap.get("hkbu");
     statuses.push({
       provider: "hkbu",
       available: !!hkbuKey,
       name: "HKBU GenAI",
-      source: hkbuPlatformKeys.hkbu ? "hkbu_platform" : (localKeyMap.get("hkbu") ? "local" : (Deno.env.get("HKBU_API_KEY") ? "env" : null)),
+      source: hkbuPlatformKeys.hkbu ? "hkbu_platform" : (localKeyMap.get("hkbu") ? "local" : null),
     });
 
     // Check OpenRouter
-    const openrouterKey = hkbuPlatformKeys.openrouter || localKeyMap.get("openrouter") || Deno.env.get("OPENROUTER_API_KEY");
+    const openrouterKey = hkbuPlatformKeys.openrouter || localKeyMap.get("openrouter");
     statuses.push({
       provider: "openrouter",
       available: !!openrouterKey,
@@ -84,7 +107,7 @@ serve(async (req) => {
     });
 
     // Check Bolatu
-    const bolatuKey = hkbuPlatformKeys.bolatu || localKeyMap.get("bolatu") || Deno.env.get("BOLATU_API_KEY");
+    const bolatuKey = hkbuPlatformKeys.bolatu || localKeyMap.get("bolatu");
     statuses.push({
       provider: "bolatu",
       available: !!bolatuKey,
@@ -93,7 +116,7 @@ serve(async (req) => {
     });
 
     // Check Kimi
-    const kimiKey = hkbuPlatformKeys.kimi || localKeyMap.get("kimi") || Deno.env.get("KIMI_API_KEY");
+    const kimiKey = hkbuPlatformKeys.kimi || localKeyMap.get("kimi");
     statuses.push({
       provider: "kimi",
       available: !!kimiKey,
@@ -101,7 +124,7 @@ serve(async (req) => {
       source: hkbuPlatformKeys.kimi ? "hkbu_platform" : (localKeyMap.get("kimi") ? "local" : null),
     });
 
-    return new Response(JSON.stringify({ statuses }), {
+    return new Response(JSON.stringify({ statuses, authenticated: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {

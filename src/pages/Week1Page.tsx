@@ -186,7 +186,7 @@ const Week1Page = () => {
                     </p>
                   </div>
                   <Button size="sm" asChild>
-                    <Link to={`/week/1/lesson/${lesson.id}`}>Start Lesson</Link>
+                    <Link to={`/week/1/lesson/1-${lesson.id}`}>Start Lesson</Link>
                   </Button>
                 </div>
               ))}

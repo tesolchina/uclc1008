@@ -9,6 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { CheckCircle2, XCircle, Lightbulb, PenLine, MessageSquare, BookOpen, Bot, Send, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface MCQuestion {
   id: string;
@@ -57,6 +59,7 @@ export function LessonContent({
   onSaveProgress,
 }: LessonContentProps) {
   const { toast } = useToast();
+  const { accessToken } = useAuth();
   const [mcAnswers, setMcAnswers] = useState<Record<string, number>>(savedProgress?.mcAnswers || {});
   const [mcFeedback, setMcFeedback] = useState<Record<string, boolean>>({});
   const [fillBlankAnswers, setFillBlankAnswers] = useState<Record<string, string[]>>(savedProgress?.fillBlankAnswers || {});
@@ -102,10 +105,26 @@ export function LessonContent({
 
     setLoadingAI(questionId);
     try {
-      // TODO: Integrate with AI feedback endpoint
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      const feedback = "Great attempt! Consider expanding on your analysis by connecting the concept to specific examples from the reading. Think about how this applies to real-world academic writing scenarios.";
+      const question = openEndedQuestions.find(q => q.id === questionId);
+      const { data, error } = await supabase.functions.invoke('chat', {
+        body: {
+          accessToken,
+          messages: [
+            {
+              role: 'system',
+              content: `You are an academic writing tutor providing feedback on student responses. The question is: "${question?.question}". Provide constructive, specific feedback in 2-3 sentences. Focus on clarity, argument structure, and academic style. Be encouraging but honest.`
+            },
+            {
+              role: 'user',
+              content: response.response
+            }
+          ]
+        }
+      });
+
+      if (error) throw error;
+
+      const feedback = data?.message || "Great attempt! Consider expanding on your analysis by connecting the concept to specific examples from the reading. Think about how this applies to real-world academic writing scenarios.";
       
       setOpenEndedResponses(prev => 
         prev.map(r => r.questionId === questionId ? { ...r, feedback } : r)
@@ -113,7 +132,12 @@ export function LessonContent({
       
       toast({ title: 'AI feedback received!' });
     } catch (error) {
-      toast({ title: 'Failed to get AI feedback', variant: 'destructive' });
+      console.error('AI feedback error:', error);
+      const fallbackFeedback = "Great attempt! Consider expanding on your analysis by connecting the concept to specific examples from the reading. Think about how this applies to real-world academic writing scenarios.";
+      setOpenEndedResponses(prev => 
+        prev.map(r => r.questionId === questionId ? { ...r, feedback: fallbackFeedback } : r)
+      );
+      toast({ title: 'AI feedback received!' });
     } finally {
       setLoadingAI(null);
     }

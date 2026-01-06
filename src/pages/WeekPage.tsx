@@ -188,7 +188,7 @@ export const WeekPage = () => {
                     </p>
                   </div>
                   <Button size="sm" asChild>
-                    <Link to={`/week/${week.id}/lesson/${lesson.id}`}>Start Lesson</Link>
+                    <Link to={`/week/${week.id}/lesson/${week.id}-${lesson.id}`}>Start Lesson</Link>
                   </Button>
                 </div>
               ))}

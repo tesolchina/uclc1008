@@ -36,14 +36,22 @@ export function useLessons(weekId: number) {
 }
 
 export function useLesson(lessonId: string) {
+  // Parse lessonId - can be "weekId-lessonNumber" format (e.g., "1-1") or UUID
+  const isWeekLessonFormat = /^\d+-\d+$/.test(lessonId);
+  
   return useQuery({
     queryKey: ['lesson', lessonId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('lessons')
-        .select('*')
-        .eq('id', lessonId)
-        .single();
+      let query = supabase.from('lessons').select('*');
+      
+      if (isWeekLessonFormat) {
+        const [weekId, lessonNumber] = lessonId.split('-').map(Number);
+        query = query.eq('week_id', weekId).eq('lesson_number', lessonNumber);
+      } else {
+        query = query.eq('id', lessonId);
+      }
+      
+      const { data, error } = await query.single();
 
       if (error) throw error;
       

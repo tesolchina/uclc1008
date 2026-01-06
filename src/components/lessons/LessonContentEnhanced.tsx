@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface MCQuestion {
   id: string;
@@ -71,6 +72,7 @@ export function LessonContentEnhanced({
   onSaveProgress,
 }: LessonContentEnhancedProps) {
   const { toast } = useToast();
+  const { accessToken } = useAuth();
   
   // Section state
   const [activeSection, setActiveSection] = useState<'notes' | 'mc' | 'writing' | 'reflection'>('notes');
@@ -131,6 +133,7 @@ export function LessonContentEnhanced({
     try {
       const { data, error } = await supabase.functions.invoke('chat', {
         body: {
+          accessToken,
           messages: [
             {
               role: 'system',
