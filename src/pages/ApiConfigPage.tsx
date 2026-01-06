@@ -48,8 +48,11 @@ export default function ApiConfigPage() {
   ];
 
   useEffect(() => {
-    checkApiStatus();
-  }, [accessToken]);
+    // Re-check API status when authentication state changes
+    if (!isAuthenticated || accessToken) {
+      checkApiStatus();
+    }
+  }, [accessToken, isAuthenticated]);
 
   const checkApiStatus = async () => {
     setChecking(true);
