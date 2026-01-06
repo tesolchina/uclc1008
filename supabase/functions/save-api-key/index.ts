@@ -8,15 +8,61 @@ const corsHeaders = {
 
 const HKBU_PLATFORM_URL = "https://auth.hkbu.tech";
 
+// Inline logger
+async function logProcess(entry: {
+  operation: string;
+  step: string;
+  status: "info" | "success" | "warning" | "error";
+  message: string;
+  details?: Record<string, unknown>;
+  sessionId?: string;
+}) {
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!supabaseUrl || !supabaseServiceKey) return;
+
+  const supabase = createClient(supabaseUrl, supabaseServiceKey);
+  try {
+    await supabase.from("process_logs").insert({
+      operation: entry.operation,
+      step: entry.step,
+      status: entry.status,
+      message: entry.message,
+      details: entry.details || {},
+      session_id: entry.sessionId || null,
+    });
+  } catch (err) {
+    console.error("Failed to write process log:", err);
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const operation = "save-api-key";
+
   try {
-    const { provider, apiKey, accessToken } = await req.json();
+    const { provider, apiKey, accessToken, sessionId } = await req.json();
+
+    await logProcess({
+      operation,
+      step: "start",
+      status: "info",
+      message: `Saving API key for ${provider}`,
+      details: { provider, hasAccessToken: !!accessToken },
+      sessionId,
+    });
 
     if (!provider || !apiKey) {
+      await logProcess({
+        operation,
+        step: "validation-error",
+        status: "error",
+        message: "Provider and API key are required",
+        sessionId,
+      });
       return new Response(
         JSON.stringify({ error: "Provider and API key are required" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -25,6 +71,13 @@ serve(async (req) => {
 
     const validProviders = ["hkbu", "openrouter", "bolatu", "kimi"];
     if (!validProviders.includes(provider)) {
+      await logProcess({
+        operation,
+        step: "validation-error",
+        status: "error",
+        message: `Invalid provider: ${provider}`,
+        sessionId,
+      });
       return new Response(
         JSON.stringify({ error: "Invalid provider" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -33,7 +86,13 @@ serve(async (req) => {
 
     // If we have an access token, save to HKBU platform
     if (accessToken) {
-      console.log(`Saving API key for ${provider} to HKBU platform...`);
+      await logProcess({
+        operation,
+        step: "save-remote",
+        status: "info",
+        message: `Saving ${provider} key to HKBU platform...`,
+        sessionId,
+      });
       
       try {
         const response = await fetch(`${HKBU_PLATFORM_URL}/api/user/api-keys`, {
@@ -50,7 +109,14 @@ serve(async (req) => {
 
         if (!response.ok) {
           const errorText = await response.text();
-          console.error(`HKBU platform error: ${response.status}`, errorText);
+          await logProcess({
+            operation,
+            step: "remote-error",
+            status: "error",
+            message: `HKBU platform error: ${response.status}`,
+            details: { status: response.status, error: errorText },
+            sessionId,
+          });
           return new Response(
             JSON.stringify({ 
               error: `Failed to save to HKBU platform: ${response.status}`,
@@ -60,8 +126,13 @@ serve(async (req) => {
           );
         }
 
-        const result = await response.json();
-        console.log(`API key saved to HKBU platform for ${provider}`);
+        await logProcess({
+          operation,
+          step: "remote-success",
+          status: "success",
+          message: `API key saved to HKBU platform for ${provider}`,
+          sessionId,
+        });
 
         return new Response(
           JSON.stringify({ 
@@ -73,7 +144,13 @@ serve(async (req) => {
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       } catch (err) {
-        console.error("Error calling HKBU platform:", err);
+        await logProcess({
+          operation,
+          step: "remote-exception",
+          status: "error",
+          message: `Failed to connect to HKBU platform: ${err}`,
+          sessionId,
+        });
         return new Response(
           JSON.stringify({ error: "Failed to connect to HKBU platform" }),
           { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -82,7 +159,13 @@ serve(async (req) => {
     }
 
     // Fallback: save locally to database if no access token
-    console.log(`No access token provided, saving ${provider} key to local database...`);
+    await logProcess({
+      operation,
+      step: "save-local",
+      status: "warning",
+      message: `No access token provided, saving ${provider} key to local database...`,
+      sessionId,
+    });
     
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -96,12 +179,26 @@ serve(async (req) => {
       );
 
     if (error) {
-      console.error("Error saving API key:", error);
+      await logProcess({
+        operation,
+        step: "local-error",
+        status: "error",
+        message: `Failed to save API key locally: ${error.message}`,
+        sessionId,
+      });
       return new Response(
         JSON.stringify({ error: "Failed to save API key" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    await logProcess({
+      operation,
+      step: "local-success",
+      status: "success",
+      message: `API key saved locally for ${provider}`,
+      sessionId,
+    });
 
     return new Response(
       JSON.stringify({ 
@@ -113,7 +210,12 @@ serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
-    console.error("Error saving API key:", error);
+    await logProcess({
+      operation,
+      step: "exception",
+      status: "error",
+      message: `Unhandled error: ${error}`,
+    });
     return new Response(
       JSON.stringify({ error: "Failed to save API key" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }

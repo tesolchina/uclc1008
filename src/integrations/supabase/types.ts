@@ -137,6 +137,39 @@ export type Database = {
         }
         Relationships: []
       }
+      process_logs: {
+        Row: {
+          created_at: string
+          details: Json | null
+          id: string
+          message: string
+          operation: string
+          session_id: string | null
+          status: string
+          step: string
+        }
+        Insert: {
+          created_at?: string
+          details?: Json | null
+          id?: string
+          message: string
+          operation: string
+          session_id?: string | null
+          status?: string
+          step: string
+        }
+        Update: {
+          created_at?: string
+          details?: Json | null
+          id?: string
+          message?: string
+          operation?: string
+          session_id?: string | null
+          status?: string
+          step?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

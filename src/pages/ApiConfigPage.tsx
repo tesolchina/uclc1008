@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { ProcessLogPanel } from "@/components/ProcessLogPanel";
 
 type ApiProvider = "lovable" | "hkbu" | "openrouter" | "bolatu" | "kimi";
 
@@ -38,6 +39,9 @@ export default function ApiConfigPage() {
   const [apiKey, setApiKey] = useState("");
   const [saving, setSaving] = useState(false);
   const [revoking, setRevoking] = useState(false);
+  
+  // Generate a unique session ID for log filtering
+  const sessionId = useMemo(() => crypto.randomUUID(), []);
 
   const providers: { id: ApiProvider; name: string; description: string; docUrl?: string }[] = [
     { id: "lovable", name: "Lovable AI", description: "Built-in AI service (auto-configured)" },
@@ -51,7 +55,7 @@ export default function ApiConfigPage() {
     setChecking(true);
     try {
       const { data, error } = await supabase.functions.invoke("check-api-status", {
-        body: { accessToken: token },
+        body: { accessToken: token, sessionId },
       });
       if (error) throw error;
       
@@ -79,7 +83,7 @@ export default function ApiConfigPage() {
     setSaving(true);
     try {
       const { data, error } = await supabase.functions.invoke("save-api-key", {
-        body: { provider: activeProvider, apiKey: apiKey.trim(), accessToken },
+        body: { provider: activeProvider, apiKey: apiKey.trim(), accessToken, sessionId },
       });
 
       if (error) {
@@ -118,7 +122,7 @@ export default function ApiConfigPage() {
     setRevoking(true);
     try {
       const { data, error } = await supabase.functions.invoke("revoke-api-key", {
-        body: { provider, accessToken },
+        body: { provider, accessToken, sessionId },
       });
 
       if (error) {
@@ -375,6 +379,9 @@ export default function ApiConfigPage() {
           Refresh Status
         </Button>
       </div>
+
+      {/* Real-time Process Log Panel */}
+      <ProcessLogPanel sessionId={sessionId} />
     </div>
   );
 }
