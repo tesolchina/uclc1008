@@ -71,22 +71,21 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Disclaimer Section */}
+      {/* Important Notice */}
       <Alert className="border-2 border-primary/50 bg-primary/5">
         <AlertTriangle className="h-5 w-5" />
         <AlertTitle className="text-base font-semibold">Important Notice for UE1 Students</AlertTitle>
         <AlertDescription className="mt-2 space-y-2 text-sm text-foreground">
           <p>
-            These materials were created by <strong>Dr Simon Wang</strong> and the UE1 team for all students taking 
-            University English I (UCLC 1008) in <strong>Spring 2026</strong>.
+            This <strong>AI-powered learning platform</strong> was developed by <strong>Dr Simon Wang</strong> and the UE1 team 
+            for students taking University English I (UCLC 1008) in <strong>Spring 2026</strong>.
           </p>
           <p>
-            This website will be used in <strong>Section 53</strong> as a pilot for AI-assisted independent learning. 
-            Students from other sections are welcome to use the materials here as <strong>reference only</strong>.
+            <strong>AI is integrated throughout this platform</strong> to provide personalized feedback, instant explanations, 
+            and adaptive learning support. You are encouraged to engage with the AI tutor to enhance your learning experience.
           </p>
-          <p className="font-medium text-destructive">
-            Crucially, students from other sections must consult their own teachers regarding specific course 
-            requirements and assessment expectations for their own classes.
+          <p className="font-medium text-primary">
+            Note: Please consult your own teachers regarding specific course requirements and assessment expectations for your classes.
           </p>
         </AlertDescription>
       </Alert>
@@ -98,12 +97,12 @@ const Index = () => {
             <User className="h-5 w-5 text-primary" />
           </div>
           <div className="space-y-1">
-            <h3 className="text-sm font-semibold">Course Coordinator: Leo Yu</h3>
+            <h3 className="text-sm font-semibold">Created by Dr Simon Wang</h3>
             <p className="text-xs text-muted-foreground">
               Language Centre, Hong Kong Baptist University
             </p>
             <p className="text-xs text-muted-foreground">
-              This AI-assisted learning hub supports students in developing critical academic English skills for University English I.
+              This AI-assisted learning hub leverages artificial intelligence to help students develop critical academic English skills.
             </p>
           </div>
         </CardContent>
