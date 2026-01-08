@@ -10,10 +10,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { LogIn, LogOut, User, GraduationCap, BookOpen } from 'lucide-react';
+import { LogIn, LogOut, GraduationCap, BookOpen } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export function UserMenu() {
-  const { profile, isAuthenticated, isTeacher, login, logout, isLoading } = useAuth();
+  const { user, profile, isAuthenticated, isTeacher, signOut, isLoading } = useAuth();
+  const navigate = useNavigate();
 
   if (isLoading) {
     return (
@@ -23,19 +25,25 @@ export function UserMenu() {
 
   if (!isAuthenticated) {
     return (
-      <Button variant="outline" size="sm" onClick={login}>
+      <Button variant="outline" size="sm" onClick={() => navigate('/auth')}>
         <LogIn className="h-4 w-4 mr-2" />
         Sign In
       </Button>
     );
   }
 
-  const initials = profile?.display_name
+  const displayName = profile?.display_name || user?.user_metadata?.display_name || user?.email;
+  const initials = displayName
     ?.split(' ')
-    .map(n => n[0])
+    .map((n: string) => n[0])
     .join('')
     .toUpperCase()
-    .slice(0, 2) || profile?.email?.[0]?.toUpperCase() || 'U';
+    .slice(0, 2) || user?.email?.[0]?.toUpperCase() || 'U';
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
 
   return (
     <DropdownMenu>
@@ -52,10 +60,10 @@ export function UserMenu() {
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">
-              {profile?.display_name || 'User'}
+              {displayName || 'User'}
             </p>
             <p className="text-xs leading-none text-muted-foreground">
-              {profile?.email}
+              {user?.email}
             </p>
             <Badge 
               variant="outline" 
@@ -76,7 +84,7 @@ export function UserMenu() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={logout} className="text-red-600 focus:text-red-600">
+        <DropdownMenuItem onClick={handleSignOut} className="text-red-600 focus:text-red-600">
           <LogOut className="h-4 w-4 mr-2" />
           Sign Out
         </DropdownMenuItem>
