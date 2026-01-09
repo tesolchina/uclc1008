@@ -1,5 +1,5 @@
 import { useParams, Navigate, useNavigate, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getWeekById } from "@/data";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,8 +12,9 @@ import { useLessonProgress, useSaveLessonProgress } from "@/hooks/useLessonProgr
 import { LessonContent } from "@/components/lessons/LessonContent";
 import { TeacherSessionPanel } from "@/components/lessons/TeacherSessionPanel";
 import { StudentSessionBar } from "@/components/lessons/StudentSessionBar";
+import { LiveTaskView } from "@/components/lessons/LiveTaskView";
 import { useAuth } from "@/contexts/AuthContext";
-import { LiveSession } from "@/hooks/useLiveSession";
+import { LiveSession, SessionResponse } from "@/hooks/useLiveSession";
 
 // Helper to get student identifier
 const getStudentIdentifier = (): string => {
@@ -289,6 +290,7 @@ const LessonPage = () => {
             lessonId={lessonIdParam || ''}
             sections={['notes', 'mc', 'writing', 'reflection']}
             questionCounts={{ mc: content.mcQuestions.length, writing: content.openEndedQuestions.length }}
+            content={content}
           />
         ) : (
           <StudentSessionBar
@@ -297,9 +299,11 @@ const LessonPage = () => {
             onSessionChange={setActiveSession}
             pendingJoin={pendingJoin}
             onPendingJoinHandled={() => setPendingJoin(null)}
+            content={content}
           />
         )}
 
+        {/* Show login prompt only when not in locked live session */}
         {!isAuthenticated && !activeSession && (
           <Alert>
             <LogIn className="h-4 w-4" />
@@ -312,26 +316,29 @@ const LessonPage = () => {
           </Alert>
         )}
 
-        <LessonContent
-          lessonId={dbLesson.id}
-          notes={content.notes}
-          keyConcepts={content.keyConcepts}
-          mcQuestions={content.mcQuestions}
-          fillBlankQuestions={content.fillBlankQuestions}
-          openEndedQuestions={content.openEndedQuestions}
-          savedProgress={progress ? {
-            mcAnswers: progress.mc_answers,
-            fillBlankAnswers: progress.fill_blank_answers,
-            openEndedResponses: progress.open_ended_responses,
-            reflection: progress.reflection || '',
-          } : undefined}
-          onSaveProgress={(progressData) => {
-            if (isAuthenticated) {
-              saveMutation.mutate(progressData);
-            }
-          }}
-          onSectionChange={setCurrentSection}
-        />
+        {/* Show full lesson content when NOT in a locked live session */}
+        {(!activeSession || activeSession.allow_ahead) && (
+          <LessonContent
+            lessonId={dbLesson.id}
+            notes={content.notes}
+            keyConcepts={content.keyConcepts}
+            mcQuestions={content.mcQuestions}
+            fillBlankQuestions={content.fillBlankQuestions}
+            openEndedQuestions={content.openEndedQuestions}
+            savedProgress={progress ? {
+              mcAnswers: progress.mc_answers,
+              fillBlankAnswers: progress.fill_blank_answers,
+              openEndedResponses: progress.open_ended_responses,
+              reflection: progress.reflection || '',
+            } : undefined}
+            onSaveProgress={(progressData) => {
+              if (isAuthenticated) {
+                saveMutation.mutate(progressData);
+              }
+            }}
+            onSectionChange={setCurrentSection}
+          />
+        )}
 
         <Card className="card-elevated">
           <CardContent className="pt-6">

@@ -8,6 +8,7 @@ import {
   Clock, MessageSquare, Bell
 } from 'lucide-react';
 import { useStudentSession, LiveSession } from '@/hooks/useLiveSession';
+import { LiveTaskView } from './LiveTaskView';
 import {
   Dialog,
   DialogContent,
@@ -22,12 +23,32 @@ import {
   AlertTitle,
 } from '@/components/ui/alert';
 
+interface MCQuestion {
+  id: string;
+  question: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
+}
+
+interface OpenEndedQuestion {
+  id: string;
+  question: string;
+  hints?: string[];
+}
+
 interface StudentSessionBarProps {
   studentIdentifier: string;
   currentSection: string;
   onSessionChange?: (session: LiveSession | null) => void;
   pendingJoin?: { code: string; name?: string } | null;
   onPendingJoinHandled?: () => void;
+  content?: {
+    notes: string[];
+    keyConcepts: string[];
+    mcQuestions: MCQuestion[];
+    openEndedQuestions: OpenEndedQuestion[];
+  };
 }
 
 export function StudentSessionBar({ 
@@ -35,7 +56,8 @@ export function StudentSessionBar({
   currentSection,
   onSessionChange,
   pendingJoin,
-  onPendingJoinHandled
+  onPendingJoinHandled,
+  content
 }: StudentSessionBarProps) {
   const [sessionCode, setSessionCode] = useState('');
   const [displayName, setDisplayName] = useState('');
@@ -51,6 +73,8 @@ export function StudentSessionBar({
     leaveSession,
     updateSection,
     dismissPrompt,
+    submitResponse,
+    responses,
   } = useStudentSession(studentIdentifier);
 
   // Update section when it changes
@@ -162,7 +186,9 @@ export function StudentSessionBar({
     );
   }
 
-  // In a session - show session bar
+  // In a locked session - show session bar + LiveTaskView
+  const isLockedSession = session && !session.allow_ahead && session.status !== 'ended';
+  
   return (
     <>
       {/* Prompt Alert */}
@@ -208,10 +234,10 @@ export function StudentSessionBar({
           {session.status === 'paused' && (
             <Badge variant="secondary">Paused</Badge>
           )}
-          {!session.allow_ahead && session.current_section && (
-            <Badge variant="outline" className="gap-1">
+          {!session.allow_ahead && (
+            <Badge variant="default" className="gap-1 bg-primary">
               <Bell className="h-3 w-3" />
-              Teacher: {session.current_section}
+              Teacher Controlled
             </Badge>
           )}
         </div>
@@ -220,6 +246,21 @@ export function StudentSessionBar({
           Leave
         </Button>
       </Card>
+      
+      {/* Live Task View - shows only when in locked session with content */}
+      {isLockedSession && content && (
+        <LiveTaskView
+          session={session}
+          mcQuestions={content.mcQuestions}
+          openEndedQuestions={content.openEndedQuestions}
+          notes={content.notes}
+          keyConcepts={content.keyConcepts}
+          onSubmitResponse={(questionType, questionIndex, response, isCorrect) => {
+            submitResponse(questionType, questionIndex, response, isCorrect);
+          }}
+          existingResponses={responses}
+        />
+      )}
     </>
   );
 }

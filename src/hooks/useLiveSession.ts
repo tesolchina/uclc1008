@@ -231,6 +231,7 @@ export function useStudentSession(studentIdentifier: string) {
   const [participant, setParticipant] = useState<SessionParticipant | null>(null);
   const [prompts, setPrompts] = useState<SessionPrompt[]>([]);
   const [latestPrompt, setLatestPrompt] = useState<SessionPrompt | null>(null);
+  const [responses, setResponses] = useState<SessionResponse[]>([]);
   const [isJoining, setIsJoining] = useState(false);
   const { toast } = useToast();
 
@@ -378,6 +379,7 @@ export function useStudentSession(studentIdentifier: string) {
     participant,
     prompts,
     latestPrompt,
+    responses,
     isJoining,
     joinSession,
     leaveSession,
