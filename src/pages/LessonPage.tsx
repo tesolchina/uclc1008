@@ -1,5 +1,5 @@
 import { useParams, Navigate, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getWeekById } from "@/data";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,24 @@ import { CheckCircle, XCircle, HelpCircle, ArrowLeft, ArrowRight, Loader2, LogIn
 import { useLesson } from "@/hooks/useLessons";
 import { useLessonProgress, useSaveLessonProgress } from "@/hooks/useLessonProgress";
 import { LessonContent } from "@/components/lessons/LessonContent";
+import { TeacherSessionPanel } from "@/components/lessons/TeacherSessionPanel";
+import { StudentSessionBar } from "@/components/lessons/StudentSessionBar";
 import { useAuth } from "@/contexts/AuthContext";
+import { LiveSession } from "@/hooks/useLiveSession";
+
+// Helper to get student identifier
+const getStudentIdentifier = (): string => {
+  const stored = localStorage.getItem('ue-student-id');
+  if (stored) return stored;
+  
+  // Fall back to browser session ID
+  let sessionId = sessionStorage.getItem('browser-session-id');
+  if (!sessionId) {
+    sessionId = `anon-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+    sessionStorage.setItem('browser-session-id', sessionId);
+  }
+  return sessionId;
+};
 
 // Sample lesson content data - in production this would come from a database
 const lessonContentData: Record<string, {
@@ -168,9 +185,15 @@ const lessonContentData: Record<string, {
 const LessonPage = () => {
   const params = useParams();
   const navigate = useNavigate();
-  const { isAuthenticated, login, accessToken } = useAuth();
+  const { isAuthenticated, login, isTeacher, isAdmin } = useAuth();
   const weekId = Number(params.weekId);
   const lessonIdParam = params.lessonId;
+  
+  // Live session state
+  const [activeSession, setActiveSession] = useState<LiveSession | null>(null);
+  const [currentSection, setCurrentSection] = useState('notes');
+  const studentIdentifier = getStudentIdentifier();
+  const isInstructor = isTeacher || isAdmin;
   
   // Parse lesson ID - can be "1-1", "1.1", UUID, or just a number
   const isDbLesson = lessonIdParam && (lessonIdParam.includes('-') || lessonIdParam.includes('.'));
@@ -237,7 +260,22 @@ const LessonPage = () => {
           </div>
         </section>
 
-        {!isAuthenticated && (
+        {/* Live Session UI */}
+        {isInstructor ? (
+          <TeacherSessionPanel
+            lessonId={lessonIdParam || ''}
+            sections={['notes', 'mc', 'writing', 'reflection']}
+            questionCounts={{ mc: content.mcQuestions.length, writing: content.openEndedQuestions.length }}
+          />
+        ) : (
+          <StudentSessionBar
+            studentIdentifier={studentIdentifier}
+            currentSection={currentSection}
+            onSessionChange={setActiveSession}
+          />
+        )}
+
+        {!isAuthenticated && !activeSession && (
           <Alert>
             <LogIn className="h-4 w-4" />
             <AlertDescription className="flex items-center justify-between">
@@ -267,6 +305,7 @@ const LessonPage = () => {
               saveMutation.mutate(progressData);
             }
           }}
+          onSectionChange={setCurrentSection}
         />
 
         <Card className="card-elevated">
