@@ -7,7 +7,7 @@ interface Profile {
   hkbu_user_id: string;
   email: string | null;
   display_name: string | null;
-  role: 'teacher' | 'student';
+  role: 'teacher' | 'student' | 'admin';
   created_at: string;
 }
 
@@ -19,6 +19,7 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   isTeacher: boolean;
+  isAdmin: boolean;
   signUp: (email: string, password: string, displayName: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
@@ -36,6 +37,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [userRoles, setUserRoles] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchProfile = useCallback(async (userId: string) => {
@@ -52,14 +54,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return data as Profile;
   }, []);
 
-  const fetchUserRole = useCallback(async (profileId: string): Promise<'teacher' | 'student'> => {
+  const fetchUserRoles = useCallback(async (profileId: string): Promise<string[]> => {
     const { data } = await supabase
       .from('user_roles')
       .select('role')
-      .eq('profile_id', profileId)
-      .single();
+      .eq('profile_id', profileId);
 
-    return (data?.role as 'teacher' | 'student') || 'student';
+    return data?.map(r => r.role) || ['student'];
   }, []);
 
   const refreshProfile = useCallback(async () => {
@@ -67,11 +68,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (currentSession?.user) {
       const profileData = await fetchProfile(currentSession.user.id);
       if (profileData) {
-        const role = await fetchUserRole(profileData.id);
-        setProfile({ ...profileData, role });
+        const roles = await fetchUserRoles(profileData.id);
+        setUserRoles(roles);
+        const primaryRole = roles.includes('admin') ? 'admin' : roles.includes('teacher') ? 'teacher' : 'student';
+        setProfile({ ...profileData, role: primaryRole });
       }
     }
-  }, [fetchProfile, fetchUserRole]);
+  }, [fetchProfile, fetchUserRoles]);
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -85,13 +88,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setTimeout(async () => {
             const profileData = await fetchProfile(currentSession.user.id);
             if (profileData) {
-              const role = await fetchUserRole(profileData.id);
-              setProfile({ ...profileData, role });
+              const roles = await fetchUserRoles(profileData.id);
+              setUserRoles(roles);
+              const primaryRole = roles.includes('admin') ? 'admin' : roles.includes('teacher') ? 'teacher' : 'student';
+              setProfile({ ...profileData, role: primaryRole });
             }
             setIsLoading(false);
           }, 0);
         } else {
           setProfile(null);
+          setUserRoles([]);
           setIsLoading(false);
         }
       }
@@ -105,15 +111,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (currentSession?.user) {
         const profileData = await fetchProfile(currentSession.user.id);
         if (profileData) {
-          const role = await fetchUserRole(profileData.id);
-          setProfile({ ...profileData, role });
+          const roles = await fetchUserRoles(profileData.id);
+          setUserRoles(roles);
+          const primaryRole = roles.includes('admin') ? 'admin' : roles.includes('teacher') ? 'teacher' : 'student';
+          setProfile({ ...profileData, role: primaryRole });
         }
       }
       setIsLoading(false);
     });
 
     return () => subscription.unsubscribe();
-  }, [fetchProfile, fetchUserRole]);
+  }, [fetchProfile, fetchUserRoles]);
 
   const signUp = async (email: string, password: string, displayName: string) => {
     const redirectUrl = `${window.location.origin}/`;
@@ -168,7 +176,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     accessToken: session?.access_token ?? null,
     isLoading,
     isAuthenticated: !!user,
-    isTeacher: profile?.role === 'teacher',
+    isTeacher: userRoles.includes('teacher') || userRoles.includes('admin'),
+    isAdmin: userRoles.includes('admin'),
     signUp,
     signIn,
     signOut,
