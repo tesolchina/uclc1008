@@ -46,6 +46,7 @@ interface LessonContentProps {
     reflection: string;
   };
   onSaveProgress: (progress: any) => void;
+  onSectionChange?: (section: string) => void;
 }
 
 export function LessonContent({
@@ -57,6 +58,7 @@ export function LessonContent({
   openEndedQuestions,
   savedProgress,
   onSaveProgress,
+  onSectionChange,
 }: LessonContentProps) {
   const { toast } = useToast();
   const { accessToken } = useAuth();

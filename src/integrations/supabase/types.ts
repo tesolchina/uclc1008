@@ -137,6 +137,65 @@ export type Database = {
         }
         Relationships: []
       }
+      live_sessions: {
+        Row: {
+          allow_ahead: boolean | null
+          created_at: string
+          current_question_index: number | null
+          current_section: string | null
+          ended_at: string | null
+          id: string
+          lesson_id: string
+          session_code: string
+          settings: Json | null
+          started_at: string | null
+          status: string
+          teacher_id: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          allow_ahead?: boolean | null
+          created_at?: string
+          current_question_index?: number | null
+          current_section?: string | null
+          ended_at?: string | null
+          id?: string
+          lesson_id: string
+          session_code: string
+          settings?: Json | null
+          started_at?: string | null
+          status?: string
+          teacher_id: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          allow_ahead?: boolean | null
+          created_at?: string
+          current_question_index?: number | null
+          current_section?: string | null
+          ended_at?: string | null
+          id?: string
+          lesson_id?: string
+          session_code?: string
+          settings?: Json | null
+          started_at?: string | null
+          status?: string
+          teacher_id?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "live_sessions_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       process_logs: {
         Row: {
           created_at: string
@@ -199,6 +258,133 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      session_participants: {
+        Row: {
+          current_section: string | null
+          display_name: string | null
+          id: string
+          is_online: boolean | null
+          joined_at: string
+          last_seen_at: string | null
+          session_id: string
+          student_identifier: string
+        }
+        Insert: {
+          current_section?: string | null
+          display_name?: string | null
+          id?: string
+          is_online?: boolean | null
+          joined_at?: string
+          last_seen_at?: string | null
+          session_id: string
+          student_identifier: string
+        }
+        Update: {
+          current_section?: string | null
+          display_name?: string | null
+          id?: string
+          is_online?: boolean | null
+          joined_at?: string
+          last_seen_at?: string | null
+          session_id?: string
+          student_identifier?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_participants_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "live_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      session_prompts: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          prompt_type: string
+          session_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          prompt_type?: string
+          session_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          prompt_type?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_prompts_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "live_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      session_responses: {
+        Row: {
+          ai_feedback: string | null
+          id: string
+          is_correct: boolean | null
+          participant_id: string
+          question_index: number
+          question_type: string
+          response: Json
+          session_id: string
+          submitted_at: string
+        }
+        Insert: {
+          ai_feedback?: string | null
+          id?: string
+          is_correct?: boolean | null
+          participant_id: string
+          question_index: number
+          question_type: string
+          response: Json
+          session_id: string
+          submitted_at?: string
+        }
+        Update: {
+          ai_feedback?: string | null
+          id?: string
+          is_correct?: boolean | null
+          participant_id?: string
+          question_index?: number
+          question_type?: string
+          response?: Json
+          session_id?: string
+          submitted_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_responses_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "session_participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_responses_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "live_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       staff_comments: {
         Row: {
@@ -666,6 +852,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_session_code: { Args: never; Returns: string }
       has_role: {
         Args: {
           _profile_id: string
