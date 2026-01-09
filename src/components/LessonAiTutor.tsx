@@ -1,22 +1,40 @@
-import { useState } from "react";
-import { MessageCircle, Sparkles } from "lucide-react";
+import { useState, useEffect } from "react";
+import { MessageCircle, Sparkles, Info } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
 
 type Msg = { role: "user" | "assistant"; content: string };
 
+// Generate or get browser session ID for anonymous usage tracking
+function getBrowserSessionId(): string {
+  let id = localStorage.getItem("browser_session_id");
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem("browser_session_id", id);
+  }
+  return id;
+}
+
 async function streamChat({
   messages,
   meta,
+  accessToken,
+  studentId,
   onDelta,
+  onMeta,
 }: {
   messages: Msg[];
   meta: { weekTitle: string; theme: string; aiPromptHint: string };
+  accessToken?: string;
+  studentId?: string;
   onDelta: (deltaText: string) => void;
+  onMeta?: (source: string, used?: number, limit?: number) => void;
 }) {
   const resp = await fetch(CHAT_URL, {
     method: "POST",
@@ -24,13 +42,31 @@ async function streamChat({
       "Content-Type": "application/json",
       Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
     },
-    body: JSON.stringify({ messages, meta }),
+    body: JSON.stringify({ messages, meta, accessToken, studentId }),
   });
+
+  // Extract metadata from headers
+  const apiSource = resp.headers.get("X-Api-Source") || "user";
+  const usageUsed = resp.headers.get("X-Usage-Used");
+  const usageLimit = resp.headers.get("X-Usage-Limit");
+  
+  if (onMeta) {
+    onMeta(
+      apiSource,
+      usageUsed ? parseInt(usageUsed) : undefined,
+      usageLimit ? parseInt(usageLimit) : undefined
+    );
+  }
 
   if (resp.status === 402) {
     throw new Error("PAYMENT_REQUIRED");
   }
   if (resp.status === 429) {
+    // Check if it's our daily limit
+    const errorData = await resp.json().catch(() => ({}));
+    if (errorData.limitReached) {
+      throw new Error("DAILY_LIMIT_REACHED");
+    }
     throw new Error("RATE_LIMITED");
   }
   if (!resp.ok || !resp.body) {
@@ -100,9 +136,16 @@ interface LessonAiTutorProps {
 
 export const LessonAiTutor = ({ weekTitle, theme, aiPromptHint }: LessonAiTutorProps) => {
   const { toast } = useToast();
+  const { accessToken, profile } = useAuth();
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Msg[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  
+  // API source tracking
+  const [apiSource, setApiSource] = useState<"user" | "shared" | null>(null);
+  const [usageInfo, setUsageInfo] = useState<{ used: number; limit: number } | null>(null);
+
+  const studentId = profile?.hkbu_user_id || getBrowserSessionId();
 
   const handleAsk = async () => {
     if (!input.trim() || isLoading) return;
@@ -121,6 +164,8 @@ export const LessonAiTutor = ({ weekTitle, theme, aiPromptHint }: LessonAiTutorP
       await streamChat({
         messages: [...messages, userMsg],
         meta: { weekTitle, theme, aiPromptHint },
+        accessToken: accessToken || undefined,
+        studentId,
         onDelta: (chunk) => {
           assistantSoFar += chunk;
           setMessages((prev) => {
@@ -131,10 +176,22 @@ export const LessonAiTutor = ({ weekTitle, theme, aiPromptHint }: LessonAiTutorP
             return [...prev, { role: "assistant", content: assistantSoFar }];
           });
         },
+        onMeta: (source, used, limit) => {
+          setApiSource(source as "user" | "shared");
+          if (used !== undefined && limit !== undefined) {
+            setUsageInfo({ used, limit });
+          }
+        },
       });
     } catch (e) {
       const message = e instanceof Error ? e.message : "UNKNOWN";
-      if (message === "PAYMENT_REQUIRED") {
+      if (message === "DAILY_LIMIT_REACHED") {
+        toast({
+          title: "Daily AI limit reached",
+          description: "Add your HKBU API key in Settings for unlimited access.",
+          variant: "destructive",
+        });
+      } else if (message === "PAYMENT_REQUIRED") {
         toast({
           title: "AI usage limit reached",
           description: "Please contact your instructor or workspace owner to top up Lovable AI credits.",
@@ -168,6 +225,11 @@ export const LessonAiTutor = ({ weekTitle, theme, aiPromptHint }: LessonAiTutorP
                 <Sparkles className="h-3.5 w-3.5" />
               </span>
               AI tutor for this week
+              {apiSource && (
+                <Badge variant={apiSource === "user" ? "default" : "secondary"} className="ml-2 text-[10px]">
+                  {apiSource === "user" ? "Your API" : "Shared"}
+                </Badge>
+              )}
             </CardTitle>
             <CardDescription className="text-xs">
               Ask for explanations, feedback on your sentences, or ideas for extra practice related to this week.
@@ -175,6 +237,16 @@ export const LessonAiTutor = ({ weekTitle, theme, aiPromptHint }: LessonAiTutorP
           </div>
         </CardHeader>
         <CardContent className="space-y-3 pt-0">
+          {/* Usage indicator for shared API */}
+          {apiSource === "shared" && usageInfo && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 rounded-md px-3 py-2">
+              <Info className="h-3.5 w-3.5" />
+              <span>
+                {usageInfo.limit - usageInfo.used} of {usageInfo.limit} daily requests remaining
+              </span>
+            </div>
+          )}
+          
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}

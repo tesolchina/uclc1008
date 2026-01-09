@@ -1,10 +1,11 @@
-import { BookOpen, CalendarRange, MessageCircle, PanelLeftClose, PanelLeft, Sparkles, Target, Settings, CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { BookOpen, CalendarRange, MessageCircle, PanelLeftClose, Sparkles, Target, Settings, CheckCircle2, XCircle, Loader2, Shield, Key } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { getWeekMetaById, getAssignmentById } from "@/data";
 import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 import {
   Sidebar,
@@ -46,15 +47,10 @@ const weeks: WeekNavItem[] = Array.from({ length: 13 }, (_, index) => {
   };
 });
 
-const overviewItems = [
-  { title: "Course overview", url: "/", icon: BookOpen },
-  { title: "Assessment & goals", url: "/assessment", icon: Target },
-  { title: "API Configuration", url: "/api-config", icon: Settings },
-];
-
 export function AppSidebar() {
   const { state, toggleSidebar } = useSidebar();
   const location = useLocation();
+  const { isTeacher, isAdmin } = useAuth();
   const collapsed = state === "collapsed";
   const currentPath = location.pathname;
   
@@ -74,6 +70,19 @@ export function AppSidebar() {
   }, []);
 
   const isActive = (path: string) => currentPath === path;
+
+  // Build navigation items based on role
+  const overviewItems = [
+    { title: "Course overview", url: "/", icon: BookOpen },
+    { title: "Assessment & goals", url: "/assessment", icon: Target },
+    { title: "API Settings", url: "/api-settings", icon: Key, showStatus: true },
+  ];
+
+  // Add admin dashboard for teachers/admins
+  if (isTeacher || isAdmin) {
+    overviewItems.push({ title: "Admin Dashboard", url: "/admin", icon: Shield, showStatus: false });
+    overviewItems.push({ title: "Staff Space", url: "/staff", icon: Settings, showStatus: false });
+  }
 
   return (
     <Sidebar collapsible="offcanvas" className="border-r border-sidebar-border bg-sidebar text-sidebar-foreground">
@@ -107,7 +116,7 @@ export function AppSidebar() {
                     >
                       <item.icon className="h-3.5 w-3.5" />
                       {!collapsed && <span>{item.title}</span>}
-                      {item.url === "/api-config" && !collapsed && (
+                      {item.showStatus && !collapsed && (
                         <span className="ml-auto">
                           {aiStatus === "checking" ? (
                             <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
