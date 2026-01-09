@@ -49,6 +49,7 @@ export function TeacherSessionPanel({ lessonId, sections, questionCounts, conten
     participants,
     responses,
     isLoading,
+    isReconnecting,
     createSession,
     startSession,
     togglePause,
@@ -139,6 +140,18 @@ export function TeacherSessionPanel({ lessonId, sections, questionCounts, conten
     if (currentQuestionType === 'notes') return null;
     return getResponseStats(currentQuestionType === 'mc' ? 'mc' : 'open_ended', currentQuestionIndex);
   }, [currentQuestionType, currentQuestionIndex, getResponseStats]);
+
+  // Show reconnecting state
+  if (isReconnecting) {
+    return (
+      <Card className="border-dashed">
+        <CardContent className="flex items-center justify-center py-8">
+          <Loader2 className="h-5 w-5 animate-spin mr-2 text-primary" />
+          <span className="text-muted-foreground">Reconnecting to session...</span>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (!session) {
     return (

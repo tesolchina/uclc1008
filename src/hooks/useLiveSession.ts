@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { saveSessionState, loadSessionState, clearSessionState, PersistedSessionState } from './useSessionPersistence';
 
 export interface LiveSession {
   id: string;
@@ -56,7 +57,49 @@ export function useTeacherSession(lessonId: string) {
   const [participants, setParticipants] = useState<SessionParticipant[]>([]);
   const [responses, setResponses] = useState<SessionResponse[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isReconnecting, setIsReconnecting] = useState(false);
   const { toast } = useToast();
+
+  // Auto-reconnect to existing session on mount
+  useEffect(() => {
+    const reconnectSession = async () => {
+      const savedState = loadSessionState();
+      if (savedState && savedState.lessonId === lessonId && savedState.role === 'teacher') {
+        setIsReconnecting(true);
+        console.log('[TeacherSession] Attempting to reconnect to session:', savedState.sessionCode);
+        
+        try {
+          const { data, error } = await supabase
+            .from('live_sessions')
+            .select('*')
+            .eq('id', savedState.sessionId)
+            .neq('status', 'ended')
+            .single();
+
+          if (data && !error) {
+            console.log('[TeacherSession] Successfully reconnected to session:', data.session_code);
+            setSession({
+              ...data,
+              current_question_index: data.current_question_index ?? 0,
+              allow_ahead: data.allow_ahead ?? true,
+              settings: (data.settings as Record<string, unknown>) || {},
+            } as LiveSession);
+            toast({ title: 'Session restored', description: `Reconnected to ${data.session_code}` });
+          } else {
+            console.log('[TeacherSession] Session no longer active, clearing saved state');
+            clearSessionState();
+          }
+        } catch (error) {
+          console.error('[TeacherSession] Error reconnecting:', error);
+          clearSessionState();
+        } finally {
+          setIsReconnecting(false);
+        }
+      }
+    };
+
+    reconnectSession();
+  }, [lessonId, toast]);
 
   // Create a new session
   const createSession = useCallback(async (title?: string) => {
@@ -78,6 +121,16 @@ export function useTeacherSession(lessonId: string) {
 
       if (error) throw error;
       setSession(data as LiveSession);
+      
+      // Save session state for persistence
+      saveSessionState({
+        sessionId: data.id,
+        sessionCode: data.session_code,
+        lessonId: lessonId,
+        role: 'teacher',
+        joinedAt: new Date().toISOString(),
+      });
+      
       toast({ title: 'Session created', description: `Code: ${data.session_code}` });
       return data as LiveSession;
     } catch (error) {
@@ -125,7 +178,12 @@ export function useTeacherSession(lessonId: string) {
       .from('live_sessions')
       .update({ status: 'ended', ended_at: new Date().toISOString() })
       .eq('id', session.id);
-    if (error) console.error('Error ending session:', error);
+    if (error) {
+      console.error('Error ending session:', error);
+    } else {
+      // Clear persisted session state when ending
+      clearSessionState();
+    }
   }, [session]);
 
   // Update current section/question - CRITICAL for sync
@@ -262,6 +320,7 @@ export function useTeacherSession(lessonId: string) {
     participants,
     responses,
     isLoading,
+    isReconnecting,
     createSession,
     startSession,
     togglePause,
@@ -280,7 +339,80 @@ export function useStudentSession(studentIdentifier: string) {
   const [latestPrompt, setLatestPrompt] = useState<SessionPrompt | null>(null);
   const [responses, setResponses] = useState<SessionResponse[]>([]);
   const [isJoining, setIsJoining] = useState(false);
+  const [isReconnecting, setIsReconnecting] = useState(false);
   const { toast } = useToast();
+
+  // Auto-reconnect to existing session on mount
+  useEffect(() => {
+    const reconnectSession = async () => {
+      const savedState = loadSessionState();
+      if (savedState && savedState.role === 'student' && savedState.studentIdentifier === studentIdentifier) {
+        setIsReconnecting(true);
+        console.log('[StudentSession] Attempting to reconnect to session:', savedState.sessionCode);
+        
+        try {
+          // Check if session is still active
+          const { data: sessionData, error: sessionError } = await supabase
+            .from('live_sessions')
+            .select('*')
+            .eq('id', savedState.sessionId)
+            .neq('status', 'ended')
+            .single();
+
+          if (!sessionData || sessionError) {
+            console.log('[StudentSession] Session no longer active, clearing saved state');
+            clearSessionState();
+            setIsReconnecting(false);
+            return;
+          }
+
+          // Reconnect as participant
+          const { data: participantData, error: participantError } = await supabase
+            .from('session_participants')
+            .upsert({
+              session_id: sessionData.id,
+              student_identifier: studentIdentifier,
+              display_name: savedState.displayName || null,
+              is_online: true,
+              last_seen_at: new Date().toISOString(),
+            }, { onConflict: 'session_id,student_identifier' })
+            .select()
+            .single();
+
+          if (participantError) throw participantError;
+
+          // Fetch existing responses
+          const { data: existingResponses } = await supabase
+            .from('session_responses')
+            .select('*')
+            .eq('session_id', sessionData.id)
+            .eq('participant_id', participantData.id);
+
+          if (existingResponses) {
+            setResponses(existingResponses as SessionResponse[]);
+          }
+
+          setSession({
+            ...sessionData,
+            current_question_index: sessionData.current_question_index ?? 0,
+            allow_ahead: sessionData.allow_ahead ?? true,
+            settings: (sessionData.settings as Record<string, unknown>) || {},
+          } as LiveSession);
+          setParticipant(participantData as SessionParticipant);
+          
+          console.log('[StudentSession] Successfully reconnected to session:', sessionData.session_code);
+          toast({ title: 'Session restored', description: `Reconnected to ${sessionData.session_code}` });
+        } catch (error) {
+          console.error('[StudentSession] Error reconnecting:', error);
+          clearSessionState();
+        } finally {
+          setIsReconnecting(false);
+        }
+      }
+    };
+
+    reconnectSession();
+  }, [studentIdentifier, toast]);
 
   // Join a session by code
   const joinSession = useCallback(async (sessionCode: string, displayName?: string) => {
@@ -332,6 +464,19 @@ export function useStudentSession(studentIdentifier: string) {
         settings: (sessionData.settings as Record<string, unknown>) || {},
       } as LiveSession);
       setParticipant(participantData as SessionParticipant);
+      
+      // Save session state for persistence
+      saveSessionState({
+        sessionId: sessionData.id,
+        sessionCode: sessionData.session_code,
+        lessonId: sessionData.lesson_id,
+        role: 'student',
+        participantId: participantData.id,
+        displayName: displayName,
+        studentIdentifier: studentIdentifier,
+        joinedAt: new Date().toISOString(),
+      });
+      
       toast({ title: 'Joined session!', description: sessionData.title || `Session ${sessionCode}` });
       return true;
     } catch (error) {
@@ -350,6 +495,10 @@ export function useStudentSession(studentIdentifier: string) {
       .from('session_participants')
       .update({ is_online: false })
       .eq('id', participant.id);
+    
+    // Clear persisted session state when leaving
+    clearSessionState();
+    
     setSession(null);
     setParticipant(null);
     setPrompts([]);
@@ -427,6 +576,13 @@ export function useStudentSession(studentIdentifier: string) {
       }, (payload) => {
         console.log('[StudentSession] Session update received:', payload.new);
         const newSession = payload.new;
+        
+        // If session ended, clear persisted state
+        if (newSession.status === 'ended') {
+          console.log('[StudentSession] Session ended, clearing persisted state');
+          clearSessionState();
+        }
+        
         setSession(prev => prev ? {
           ...prev,
           status: newSession.status as LiveSession['status'],
@@ -470,6 +626,12 @@ export function useStudentSession(studentIdentifier: string) {
           .single();
         
         if (freshSession) {
+          // If session ended, clear persisted state
+          if (freshSession.status === 'ended') {
+            console.log('[StudentSession] Session ended (via heartbeat), clearing persisted state');
+            clearSessionState();
+          }
+          
           setSession(prev => prev ? {
             ...prev,
             status: freshSession.status as LiveSession['status'],
@@ -502,6 +664,7 @@ export function useStudentSession(studentIdentifier: string) {
     latestPrompt,
     responses,
     isJoining,
+    isReconnecting,
     joinSession,
     leaveSession,
     submitResponse,
