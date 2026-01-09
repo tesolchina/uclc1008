@@ -217,24 +217,24 @@ export default function SettingsPage() {
         </p>
       </header>
 
-      {/* Student ID Section */}
+      {/* Unique ID Section */}
       <Card>
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
             <User className="h-4 w-4" />
-            Student Profile
+            Your Unique ID
           </CardTitle>
           <CardDescription>
-            Enter your student ID to track your progress across sessions.
+            This is <strong>not</strong> your student ID. Enter the unique anonymized ID assigned to you by your instructor, or create your own memorable code.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="studentId">Student ID</Label>
+            <Label htmlFor="studentId">Unique ID</Label>
             <div className="flex gap-2">
               <Input
                 id="studentId"
-                placeholder="e.g. 21012345"
+                placeholder="e.g. bluefox42 or your assigned code"
                 value={studentId}
                 onChange={(e) => setStudentId(e.target.value)}
                 className="max-w-xs"
@@ -247,9 +247,12 @@ export default function SettingsPage() {
                 {isSavingId ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Save'}
               </Button>
             </div>
+            <p className="text-xs text-muted-foreground">
+              Your progress and AI usage will be tracked under this ID. Keep it private and memorable.
+            </p>
             {savedStudentId && (
               <p className="text-xs text-muted-foreground">
-                Current ID: <span className="font-mono">{savedStudentId}</span>
+                Current ID: <span className="font-mono font-medium">{savedStudentId}</span>
               </p>
             )}
           </div>
