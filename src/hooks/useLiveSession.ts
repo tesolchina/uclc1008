@@ -319,6 +319,19 @@ export function useTeacherSession(lessonId: string) {
     };
   }, [session?.id]);
 
+  // Manual refresh for responses
+  const refreshResponses = useCallback(async () => {
+    if (!session) return;
+    console.log('[TeacherSession] Manually refreshing responses');
+    const { data } = await supabase
+      .from('session_responses')
+      .select('*')
+      .eq('session_id', session.id);
+    if (data) {
+      setResponses(data as SessionResponse[]);
+    }
+  }, [session]);
+
   return {
     session,
     participants,
@@ -332,6 +345,7 @@ export function useTeacherSession(lessonId: string) {
     updatePosition,
     sendPrompt,
     toggleAllowAhead,
+    refreshResponses,
   };
 }
 

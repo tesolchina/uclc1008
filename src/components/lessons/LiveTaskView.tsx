@@ -241,22 +241,16 @@ export function LiveTaskView({
             {question.options.map((option, i) => {
               const count = answerCounts[i];
               const percentage = totalResponses > 0 ? (count / totalResponses) * 100 : 0;
-              const isCorrect = i === question.correctIndex;
               
               return (
                 <div key={i} className="space-y-1">
                   <div className="flex items-center justify-between text-sm">
-                    <span className={`flex items-center gap-2 ${isCorrect ? 'text-green-600 font-medium' : ''}`}>
-                      {isCorrect && <CheckCircle2 className="h-4 w-4" />}
-                      {option}
-                    </span>
+                    <span>{option}</span>
                     <span className="font-mono text-xs">{count} ({percentage.toFixed(0)}%)</span>
                   </div>
                   <div className="h-3 bg-muted rounded-full overflow-hidden">
                     <div 
-                      className={`h-full transition-all duration-500 ${
-                        isCorrect ? 'bg-green-500' : 'bg-primary/60'
-                      }`}
+                      className="h-full transition-all duration-500 bg-primary/60"
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
