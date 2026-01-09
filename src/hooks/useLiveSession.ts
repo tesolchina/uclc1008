@@ -353,6 +353,7 @@ export function useTeacherSession(lessonId: string) {
 export function useStudentSession(studentIdentifier: string) {
   const [session, setSession] = useState<LiveSession | null>(null);
   const [participant, setParticipant] = useState<SessionParticipant | null>(null);
+  const [participants, setParticipants] = useState<SessionParticipant[]>([]);
   const [prompts, setPrompts] = useState<SessionPrompt[]>([]);
   const [latestPrompt, setLatestPrompt] = useState<SessionPrompt | null>(null);
   const [responses, setResponses] = useState<SessionResponse[]>([]);
@@ -410,6 +411,15 @@ export function useStudentSession(studentIdentifier: string) {
             setResponses(existingResponses as SessionResponse[]);
           }
 
+          // Fetch other participants
+          const { data: participantsData } = await supabase
+            .from('session_participants')
+            .select('*')
+            .eq('session_id', sessionData.id);
+          
+          if (participantsData) {
+            setParticipants(participantsData as SessionParticipant[]);
+          }
           setSession({
             ...sessionData,
             current_question_index: sessionData.current_question_index ?? 0,
@@ -475,6 +485,15 @@ export function useStudentSession(studentIdentifier: string) {
         setResponses(existingResponses as SessionResponse[]);
       }
 
+      // Fetch other participants
+      const { data: participantsData } = await supabase
+        .from('session_participants')
+        .select('*')
+        .eq('session_id', sessionData.id);
+      
+      if (participantsData) {
+        setParticipants(participantsData as SessionParticipant[]);
+      }
       setSession({
         ...sessionData,
         current_question_index: sessionData.current_question_index ?? 0,
@@ -519,6 +538,7 @@ export function useStudentSession(studentIdentifier: string) {
     
     setSession(null);
     setParticipant(null);
+    setParticipants([]);
     setPrompts([]);
     setLatestPrompt(null);
     setResponses([]);
@@ -623,6 +643,22 @@ export function useStudentSession(studentIdentifier: string) {
         setPrompts(prev => [...prev, newPrompt]);
         setLatestPrompt(newPrompt);
       })
+      // Listen for participant changes (new joins)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'session_participants',
+        filter: `session_id=eq.${session.id}`,
+      }, async () => {
+        // Re-fetch all participants
+        const { data: participantsData } = await supabase
+          .from('session_participants')
+          .select('*')
+          .eq('session_id', session.id);
+        if (participantsData) {
+          setParticipants(participantsData as SessionParticipant[]);
+        }
+      })
       .subscribe((status) => {
         console.log('[StudentSession] Subscription status:', status);
       });
@@ -635,6 +671,15 @@ export function useStudentSession(studentIdentifier: string) {
           .from('session_participants')
           .update({ last_seen_at: new Date().toISOString(), is_online: true })
           .eq('id', participant.id);
+        
+        // Re-fetch participants count
+        const { data: participantsData } = await supabase
+          .from('session_participants')
+          .select('*')
+          .eq('session_id', session.id);
+        if (participantsData) {
+          setParticipants(participantsData as SessionParticipant[]);
+        }
         
         // Also re-fetch session to ensure sync (backup for missed realtime events)
         const { data: freshSession } = await supabase
@@ -678,6 +723,7 @@ export function useStudentSession(studentIdentifier: string) {
   return {
     session,
     participant,
+    participants,
     prompts,
     latestPrompt,
     responses,
