@@ -19,6 +19,7 @@ import Week1Page from "./pages/Week1Page";
 import PreCourseWritingPage from "./pages/PreCourseWritingPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import SettingsPage from "./pages/SettingsPage";
+import JoinSessionPage from "./pages/JoinSessionPage";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,8 @@ const App = () => (
               <Route path="staff" element={<Staff />} />
               <Route path="admin" element={<AdminDashboard />} />
               <Route path="settings" element={<SettingsPage />} />
+              <Route path="join" element={<JoinSessionPage />} />
+              <Route path="join/:code" element={<JoinSessionPage />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

@@ -26,12 +26,16 @@ interface StudentSessionBarProps {
   studentIdentifier: string;
   currentSection: string;
   onSessionChange?: (session: LiveSession | null) => void;
+  pendingJoin?: { code: string; name?: string } | null;
+  onPendingJoinHandled?: () => void;
 }
 
 export function StudentSessionBar({ 
   studentIdentifier, 
   currentSection,
-  onSessionChange 
+  onSessionChange,
+  pendingJoin,
+  onPendingJoinHandled
 }: StudentSessionBarProps) {
   const [sessionCode, setSessionCode] = useState('');
   const [displayName, setDisplayName] = useState('');
@@ -75,6 +79,15 @@ export function StudentSessionBar({
       }
     }
   }, [latestPrompt, dismissPrompt]);
+
+  // Handle pending join from /join page
+  useEffect(() => {
+    if (pendingJoin && !session) {
+      joinSession(pendingJoin.code, pendingJoin.name).then(() => {
+        onPendingJoinHandled?.();
+      });
+    }
+  }, [pendingJoin, session, joinSession, onPendingJoinHandled]);
 
   const handleJoin = async () => {
     const success = await joinSession(sessionCode, displayName || undefined);
