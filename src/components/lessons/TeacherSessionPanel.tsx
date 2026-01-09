@@ -11,18 +11,39 @@ import {
   MessageSquare, Loader2, Target, ChevronLeft, ChevronRight,
   BarChart2
 } from 'lucide-react';
-import { useTeacherSession, SessionParticipant, SessionResponse } from '@/hooks/useLiveSession';
+import { useTeacherSession, SessionParticipant, SessionResponse, LiveSession } from '@/hooks/useLiveSession';
 import { useToast } from '@/hooks/use-toast';
 import { SessionQRCode } from './SessionQRCode';
+import { LiveTaskView } from './LiveTaskView';
 import { Progress } from '@/components/ui/progress';
+
+interface MCQuestion {
+  id: string;
+  question: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
+}
+
+interface OpenEndedQuestion {
+  id: string;
+  question: string;
+  hints?: string[];
+}
 
 interface TeacherSessionPanelProps {
   lessonId: string;
   sections: string[];
   questionCounts: { mc: number; writing: number };
+  content?: {
+    notes: string[];
+    keyConcepts: string[];
+    mcQuestions: MCQuestion[];
+    openEndedQuestions: OpenEndedQuestion[];
+  };
 }
 
-export function TeacherSessionPanel({ lessonId, sections, questionCounts }: TeacherSessionPanelProps) {
+export function TeacherSessionPanel({ lessonId, sections, questionCounts, content }: TeacherSessionPanelProps) {
   const {
     session,
     participants,
@@ -142,6 +163,7 @@ export function TeacherSessionPanel({ lessonId, sections, questionCounts }: Teac
   }
 
   return (
+    <>
     <Card className="border-primary/20">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
@@ -384,6 +406,22 @@ export function TeacherSessionPanel({ lessonId, sections, questionCounts }: Teac
         </Tabs>
       </CardContent>
     </Card>
+    
+    {/* Live Task View for Teacher - shows current task with response stats */}
+    {session.status === 'active' && content && (
+      <LiveTaskView
+        session={session}
+        mcQuestions={content.mcQuestions}
+        openEndedQuestions={content.openEndedQuestions}
+        notes={content.notes}
+        keyConcepts={content.keyConcepts}
+        onSubmitResponse={() => {}}
+        isTeacher={true}
+        participantCount={participants.length}
+        responses={responses}
+      />
+    )}
+    </>
   );
 }
 
