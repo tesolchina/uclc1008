@@ -92,9 +92,15 @@ export function useTeacherSession(lessonId: string) {
   // Start the session
   const startSession = useCallback(async () => {
     if (!session) return;
+    console.log('[TeacherSession] Starting session:', session.id);
     const { error } = await supabase
       .from('live_sessions')
-      .update({ status: 'active', started_at: new Date().toISOString() })
+      .update({ 
+        status: 'active', 
+        started_at: new Date().toISOString(),
+        current_section: 'notes',
+        current_question_index: 0,
+      })
       .eq('id', session.id);
     if (error) console.error('Error starting session:', error);
   }, [session]);
@@ -103,6 +109,7 @@ export function useTeacherSession(lessonId: string) {
   const togglePause = useCallback(async () => {
     if (!session) return;
     const newStatus = session.status === 'paused' ? 'active' : 'paused';
+    console.log('[TeacherSession] Toggling pause to:', newStatus);
     const { error } = await supabase
       .from('live_sessions')
       .update({ status: newStatus })
@@ -113,6 +120,7 @@ export function useTeacherSession(lessonId: string) {
   // End the session
   const endSession = useCallback(async () => {
     if (!session) return;
+    console.log('[TeacherSession] Ending session:', session.id);
     const { error } = await supabase
       .from('live_sessions')
       .update({ status: 'ended', ended_at: new Date().toISOString() })
@@ -120,12 +128,16 @@ export function useTeacherSession(lessonId: string) {
     if (error) console.error('Error ending session:', error);
   }, [session]);
 
-  // Update current section/question
+  // Update current section/question - CRITICAL for sync
   const updatePosition = useCallback(async (section: string, questionIndex: number) => {
     if (!session) return;
+    console.log('[TeacherSession] Updating position:', { section, questionIndex });
     const { error } = await supabase
       .from('live_sessions')
-      .update({ current_section: section, current_question_index: questionIndex })
+      .update({ 
+        current_section: section, 
+        current_question_index: questionIndex 
+      })
       .eq('id', session.id);
     if (error) console.error('Error updating position:', error);
   }, [session]);
@@ -147,6 +159,7 @@ export function useTeacherSession(lessonId: string) {
   // Toggle allow_ahead setting
   const toggleAllowAhead = useCallback(async () => {
     if (!session) return;
+    console.log('[TeacherSession] Toggling allow_ahead to:', !session.allow_ahead);
     const { error } = await supabase
       .from('live_sessions')
       .update({ allow_ahead: !session.allow_ahead })
@@ -158,8 +171,10 @@ export function useTeacherSession(lessonId: string) {
   useEffect(() => {
     if (!session) return;
 
+    console.log('[TeacherSession] Subscribing to session updates for:', session.id);
+
     const channel = supabase
-      .channel(`teacher-session-${session.id}`)
+      .channel(`teacher-session-${session.id}-${Date.now()}`)
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
@@ -167,7 +182,18 @@ export function useTeacherSession(lessonId: string) {
         filter: `id=eq.${session.id}`,
       }, (payload) => {
         if (payload.eventType === 'UPDATE') {
-          setSession(payload.new as LiveSession);
+          console.log('[TeacherSession] Session update:', payload.new);
+          const newData = payload.new;
+          setSession(prev => prev ? {
+            ...prev,
+            status: newData.status as LiveSession['status'],
+            current_section: newData.current_section,
+            current_question_index: newData.current_question_index ?? 0,
+            allow_ahead: newData.allow_ahead ?? true,
+            settings: (newData.settings as Record<string, unknown>) || {},
+            started_at: newData.started_at,
+            ended_at: newData.ended_at,
+          } : null);
         }
       })
       .on('postgres_changes', {
@@ -176,6 +202,7 @@ export function useTeacherSession(lessonId: string) {
         table: 'session_participants',
         filter: `session_id=eq.${session.id}`,
       }, (payload) => {
+        console.log('[TeacherSession] Participant update:', payload.eventType);
         if (payload.eventType === 'INSERT') {
           setParticipants(prev => [...prev, payload.new as SessionParticipant]);
         } else if (payload.eventType === 'UPDATE') {
@@ -185,14 +212,21 @@ export function useTeacherSession(lessonId: string) {
         }
       })
       .on('postgres_changes', {
-        event: 'INSERT',
+        event: '*',
         schema: 'public',
         table: 'session_responses',
         filter: `session_id=eq.${session.id}`,
       }, (payload) => {
-        setResponses(prev => [...prev, payload.new as SessionResponse]);
+        console.log('[TeacherSession] Response update:', payload.eventType);
+        if (payload.eventType === 'INSERT') {
+          setResponses(prev => [...prev, payload.new as SessionResponse]);
+        } else if (payload.eventType === 'UPDATE') {
+          setResponses(prev => prev.map(r => r.id === payload.new.id ? payload.new as SessionResponse : r));
+        }
       })
-      .subscribe();
+      .subscribe((status) => {
+        console.log('[TeacherSession] Subscription status:', status);
+      });
 
     // Fetch initial participants and responses
     const fetchData = async () => {
@@ -205,8 +239,21 @@ export function useTeacherSession(lessonId: string) {
     };
     fetchData();
 
+    // Periodic refresh for participants (to catch stale online status)
+    const refreshInterval = setInterval(async () => {
+      const { data } = await supabase
+        .from('session_participants')
+        .select('*')
+        .eq('session_id', session.id);
+      if (data) {
+        setParticipants(data as SessionParticipant[]);
+      }
+    }, 10000);
+
     return () => {
+      console.log('[TeacherSession] Cleaning up subscription');
       supabase.removeChannel(channel);
+      clearInterval(refreshInterval);
     };
   }, [session?.id]);
 
@@ -267,7 +314,23 @@ export function useStudentSession(studentIdentifier: string) {
 
       if (participantError) throw participantError;
 
-      setSession(sessionData as LiveSession);
+      // Fetch existing responses for this participant
+      const { data: existingResponses } = await supabase
+        .from('session_responses')
+        .select('*')
+        .eq('session_id', sessionData.id)
+        .eq('participant_id', participantData.id);
+      
+      if (existingResponses) {
+        setResponses(existingResponses as SessionResponse[]);
+      }
+
+      setSession({
+        ...sessionData,
+        current_question_index: sessionData.current_question_index ?? 0,
+        allow_ahead: sessionData.allow_ahead ?? true,
+        settings: (sessionData.settings as Record<string, unknown>) || {},
+      } as LiveSession);
       setParticipant(participantData as SessionParticipant);
       toast({ title: 'Joined session!', description: sessionData.title || `Session ${sessionCode}` });
       return true;
@@ -291,6 +354,7 @@ export function useStudentSession(studentIdentifier: string) {
     setParticipant(null);
     setPrompts([]);
     setLatestPrompt(null);
+    setResponses([]);
   }, [participant]);
 
   // Submit a response
@@ -301,7 +365,8 @@ export function useStudentSession(studentIdentifier: string) {
     isCorrect?: boolean
   ) => {
     if (!session || !participant) return;
-    const { error } = await supabase
+    
+    const { data, error } = await supabase
       .from('session_responses')
       .upsert({
         session_id: session.id,
@@ -310,8 +375,26 @@ export function useStudentSession(studentIdentifier: string) {
         question_index: questionIndex,
         response,
         is_correct: isCorrect ?? null,
-      } as any, { onConflict: 'session_id,participant_id,question_type,question_index' });
-    if (error) console.error('Error submitting response:', error);
+      } as any, { onConflict: 'session_id,participant_id,question_type,question_index' })
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error submitting response:', error);
+    } else if (data) {
+      // Update local responses state
+      setResponses(prev => {
+        const existing = prev.findIndex(r => 
+          r.question_type === questionType && r.question_index === questionIndex
+        );
+        if (existing >= 0) {
+          const updated = [...prev];
+          updated[existing] = data as SessionResponse;
+          return updated;
+        }
+        return [...prev, data as SessionResponse];
+      });
+    }
   }, [session, participant]);
 
   // Update current section (heartbeat)
@@ -327,43 +410,81 @@ export function useStudentSession(studentIdentifier: string) {
       .eq('id', participant.id);
   }, [participant]);
 
-  // Subscribe to realtime updates
+  // Subscribe to realtime updates - CRITICAL for sync
   useEffect(() => {
     if (!session) return;
 
+    console.log('[StudentSession] Subscribing to session updates for:', session.id);
+
     const channel = supabase
-      .channel(`student-session-${session.id}`)
+      .channel(`student-session-${session.id}-${Date.now()}`)
+      // Listen for session updates (teacher position changes, pause/resume, etc.)
       .on('postgres_changes', {
         event: 'UPDATE',
         schema: 'public',
         table: 'live_sessions',
         filter: `id=eq.${session.id}`,
       }, (payload) => {
-        setSession(payload.new as LiveSession);
+        console.log('[StudentSession] Session update received:', payload.new);
+        const newSession = payload.new;
+        setSession(prev => prev ? {
+          ...prev,
+          status: newSession.status as LiveSession['status'],
+          current_section: newSession.current_section,
+          current_question_index: newSession.current_question_index ?? 0,
+          allow_ahead: newSession.allow_ahead ?? true,
+          settings: (newSession.settings as Record<string, unknown>) || {},
+          ended_at: newSession.ended_at,
+        } : null);
       })
+      // Listen for new prompts from teacher
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
         table: 'session_prompts',
         filter: `session_id=eq.${session.id}`,
       }, (payload) => {
+        console.log('[StudentSession] New prompt received:', payload.new);
         const newPrompt = payload.new as SessionPrompt;
         setPrompts(prev => [...prev, newPrompt]);
         setLatestPrompt(newPrompt);
       })
-      .subscribe();
+      .subscribe((status) => {
+        console.log('[StudentSession] Subscription status:', status);
+      });
 
-    // Heartbeat to keep online status
-    const heartbeat = setInterval(() => {
+    // Heartbeat to keep online status and re-fetch session state
+    const heartbeat = setInterval(async () => {
       if (participant) {
-        supabase
+        // Update participant last_seen
+        await supabase
           .from('session_participants')
           .update({ last_seen_at: new Date().toISOString(), is_online: true })
           .eq('id', participant.id);
+        
+        // Also re-fetch session to ensure sync (backup for missed realtime events)
+        const { data: freshSession } = await supabase
+          .from('live_sessions')
+          .select('*')
+          .eq('id', session.id)
+          .single();
+        
+        if (freshSession) {
+          setSession(prev => prev ? {
+            ...prev,
+            status: freshSession.status as LiveSession['status'],
+            current_section: freshSession.current_section,
+            current_question_index: freshSession.current_question_index ?? 0,
+            allow_ahead: freshSession.allow_ahead ?? true,
+            settings: (freshSession.settings as Record<string, unknown>) || {},
+            ended_at: freshSession.ended_at,
+          } : null);
+        }
       }
-    }, 30000);
+    }, 5000); // More frequent heartbeat for better sync
 
     return () => {
+      console.log('[StudentSession] Cleaning up subscription');
       supabase.removeChannel(channel);
       clearInterval(heartbeat);
     };
