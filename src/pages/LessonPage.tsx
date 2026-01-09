@@ -1,4 +1,4 @@
-import { useParams, Navigate, useNavigate } from "react-router-dom";
+import { useParams, Navigate, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getWeekById } from "@/data";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -185,9 +185,14 @@ const lessonContentData: Record<string, {
 const LessonPage = () => {
   const params = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { isAuthenticated, login, isTeacher, isAdmin } = useAuth();
   const weekId = Number(params.weekId);
   const lessonIdParam = params.lessonId;
+  
+  // Check for pending session join from /join page
+  const locationState = location.state as { joinSession?: boolean; sessionCode?: string; displayName?: string } | null;
+  const [pendingJoin, setPendingJoin] = useState<{ code: string; name?: string } | null>(null);
   
   // Live session state
   const [activeSession, setActiveSession] = useState<LiveSession | null>(null);
@@ -222,6 +227,24 @@ const LessonPage = () => {
   const [questionStates, setQuestionStates] = useState(
     legacyLesson?.questions.map(() => ({ submitted: false, userAnswer: "", isCorrect: false })) || []
   );
+
+  // Handle auto-join from /join page
+  useEffect(() => {
+    if (locationState?.joinSession && locationState.sessionCode) {
+      setPendingJoin({ code: locationState.sessionCode, name: locationState.displayName });
+      // Clear the location state to prevent re-triggering
+      window.history.replaceState({}, document.title);
+    } else {
+      // Check sessionStorage for pending join
+      const pendingCode = sessionStorage.getItem('pendingSessionCode');
+      const pendingName = sessionStorage.getItem('pendingDisplayName');
+      if (pendingCode) {
+        setPendingJoin({ code: pendingCode, name: pendingName || undefined });
+        sessionStorage.removeItem('pendingSessionCode');
+        sessionStorage.removeItem('pendingDisplayName');
+      }
+    }
+  }, [locationState]);
 
   if (!week) {
     return <Navigate to="/" replace />;
@@ -272,6 +295,8 @@ const LessonPage = () => {
             studentIdentifier={studentIdentifier}
             currentSection={currentSection}
             onSessionChange={setActiveSession}
+            pendingJoin={pendingJoin}
+            onPendingJoinHandled={() => setPendingJoin(null)}
           />
         )}
 
