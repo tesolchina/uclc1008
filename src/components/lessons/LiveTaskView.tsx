@@ -40,6 +40,28 @@ interface LiveTaskViewProps {
   responses?: SessionResponse[];
 }
 
+// Calculate total pages and current page number
+function usePageNumbers(
+  currentType: string, 
+  currentIndex: number, 
+  mcCount: number, 
+  writingCount: number
+) {
+  // Total pages = 1 (notes) + MC questions + writing tasks
+  const totalPages = 1 + mcCount + writingCount;
+  
+  let currentPage = 1;
+  if (currentType === 'notes') {
+    currentPage = 1;
+  } else if (currentType === 'mc') {
+    currentPage = 2 + currentIndex; // 1 (notes) + 1 (base) + index
+  } else if (currentType === 'writing') {
+    currentPage = 2 + mcCount + currentIndex; // 1 (notes) + MC count + 1 (base) + index
+  }
+  
+  return { currentPage, totalPages };
+}
+
 export function LiveTaskView({
   session,
   mcQuestions,
@@ -60,6 +82,14 @@ export function LiveTaskView({
   
   const currentType = session.current_section || 'notes';
   const currentIndex = session.current_question_index || 0;
+  
+  // Get page numbers
+  const { currentPage, totalPages } = usePageNumbers(
+    currentType, 
+    currentIndex, 
+    mcQuestions.length, 
+    openEndedQuestions.length
+  );
   
   // Check if already submitted for this question
   const existingResponse = existingResponses.find(
@@ -125,10 +155,15 @@ export function LiveTaskView({
               <BookOpen className="h-5 w-5 text-primary" />
               Issues & Key Concepts
             </CardTitle>
-            <Badge variant="secondary" className="gap-1">
-              <RadioIcon className="h-3 w-3 animate-pulse" />
-              Live
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="font-mono">
+                Page {currentPage} of {totalPages}
+              </Badge>
+              <Badge variant="secondary" className="gap-1">
+                <RadioIcon className="h-3 w-3 animate-pulse" />
+                Live
+              </Badge>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -188,8 +223,13 @@ export function LiveTaskView({
       return (
         <Card className="border-blue-500/30 bg-gradient-to-br from-blue-50/50 to-background dark:from-blue-950/20">
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <Badge className="bg-blue-600">MC Question {currentIndex + 1}/{mcQuestions.length}</Badge>
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <Badge className="bg-blue-600">MC Question {currentIndex + 1}/{mcQuestions.length}</Badge>
+                <Badge variant="outline" className="font-mono">
+                  Page {currentPage} of {totalPages}
+                </Badge>
+              </div>
               <Badge variant="outline" className="gap-1">
                 <Users className="h-3 w-3" />
                 {totalResponses}/{participantCount} responded
@@ -241,8 +281,13 @@ export function LiveTaskView({
     return (
       <Card className="border-blue-500/30 bg-gradient-to-br from-blue-50/50 to-background dark:from-blue-950/20">
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <Badge className="bg-blue-600">MC Question {currentIndex + 1}</Badge>
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-2">
+              <Badge className="bg-blue-600">MC Question {currentIndex + 1}/{mcQuestions.length}</Badge>
+              <Badge variant="outline" className="font-mono">
+                Page {currentPage} of {totalPages}
+              </Badge>
+            </div>
             <Badge variant="secondary" className="gap-1">
               <RadioIcon className="h-3 w-3 animate-pulse" />
               Live Task
@@ -345,8 +390,13 @@ export function LiveTaskView({
       return (
         <Card className="border-green-500/30 bg-gradient-to-br from-green-50/50 to-background dark:from-green-950/20">
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <Badge className="bg-green-600">Writing Task {currentIndex + 1}/{openEndedQuestions.length}</Badge>
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <Badge className="bg-green-600">Writing Task {currentIndex + 1}/{openEndedQuestions.length}</Badge>
+                <Badge variant="outline" className="font-mono">
+                  Page {currentPage} of {totalPages}
+                </Badge>
+              </div>
               <Badge variant="outline" className="gap-1">
                 <Users className="h-3 w-3" />
                 {taskResponses.length}/{participantCount} submitted
@@ -390,8 +440,13 @@ export function LiveTaskView({
     return (
       <Card className="border-green-500/30 bg-gradient-to-br from-green-50/50 to-background dark:from-green-950/20">
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <Badge className="bg-green-600">Writing Task {currentIndex + 1}</Badge>
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-2">
+              <Badge className="bg-green-600">Writing Task {currentIndex + 1}/{openEndedQuestions.length}</Badge>
+              <Badge variant="outline" className="font-mono">
+                Page {currentPage} of {totalPages}
+              </Badge>
+            </div>
             <Badge variant="secondary" className="gap-1">
               <PenLine className="h-3 w-3" />
               Live Task
