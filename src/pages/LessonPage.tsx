@@ -316,29 +316,28 @@ const LessonPage = () => {
           </Alert>
         )}
 
-        {/* Show full lesson content when NOT in a locked live session */}
-        {(!activeSession || activeSession.allow_ahead) && (
-          <LessonContent
-            lessonId={dbLesson.id}
-            notes={content.notes}
-            keyConcepts={content.keyConcepts}
-            mcQuestions={content.mcQuestions}
-            fillBlankQuestions={content.fillBlankQuestions}
-            openEndedQuestions={content.openEndedQuestions}
-            savedProgress={progress ? {
-              mcAnswers: progress.mc_answers,
-              fillBlankAnswers: progress.fill_blank_answers,
-              openEndedResponses: progress.open_ended_responses,
-              reflection: progress.reflection || '',
-            } : undefined}
-            onSaveProgress={(progressData) => {
-              if (isAuthenticated) {
-                saveMutation.mutate(progressData);
-              }
-            }}
-            onSectionChange={setCurrentSection}
-          />
-        )}
+        {/* Show lesson content - read-only when in locked live session as student */}
+        <LessonContent
+          lessonId={dbLesson.id}
+          notes={content.notes}
+          keyConcepts={content.keyConcepts}
+          mcQuestions={content.mcQuestions}
+          fillBlankQuestions={content.fillBlankQuestions}
+          openEndedQuestions={content.openEndedQuestions}
+          savedProgress={progress ? {
+            mcAnswers: progress.mc_answers,
+            fillBlankAnswers: progress.fill_blank_answers,
+            openEndedResponses: progress.open_ended_responses,
+            reflection: progress.reflection || '',
+          } : undefined}
+          onSaveProgress={(progressData) => {
+            if (isAuthenticated) {
+              saveMutation.mutate(progressData);
+            }
+          }}
+          onSectionChange={setCurrentSection}
+          isReadOnly={!isInstructor && !!activeSession && !activeSession.allow_ahead}
+        />
 
         <Card className="card-elevated">
           <CardContent className="pt-6">
