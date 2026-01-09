@@ -420,7 +420,7 @@ export function TeacherSessionPanel({ lessonId, sections, questionCounts, conten
       </CardContent>
     </Card>
     
-    {/* Live Task View for Teacher - shows current task with response stats */}
+    {/* Current Task - Prominent view (same as what students see) */}
     {session.status === 'active' && content && (
       <LiveTaskView
         session={session}
@@ -432,6 +432,19 @@ export function TeacherSessionPanel({ lessonId, sections, questionCounts, conten
         isTeacher={true}
         participantCount={participants.length}
         responses={responses}
+      />
+    )}
+    
+    {/* All Tasks Reference - Collapsed overview for teacher */}
+    {session.status === 'active' && content && (
+      <TaskReferenceList
+        mcQuestions={content.mcQuestions}
+        openEndedQuestions={content.openEndedQuestions}
+        currentType={currentQuestionType}
+        currentIndex={currentQuestionIndex}
+        responses={responses}
+        participantCount={participants.length}
+        onNavigate={(type, index) => updatePosition(type, index)}
       />
     )}
     </>
@@ -555,5 +568,121 @@ function ParticipantRow({ participant, responses }: { participant: SessionPartic
         )}
       </div>
     </div>
+  );
+}
+
+// Task Reference List - Shows all tasks for teacher reference
+interface TaskReferenceListProps {
+  mcQuestions: MCQuestion[];
+  openEndedQuestions: OpenEndedQuestion[];
+  currentType: string;
+  currentIndex: number;
+  responses: SessionResponse[];
+  participantCount: number;
+  onNavigate: (type: string, index: number) => void;
+}
+
+function TaskReferenceList({
+  mcQuestions,
+  openEndedQuestions,
+  currentType,
+  currentIndex,
+  responses,
+  participantCount,
+  onNavigate,
+}: TaskReferenceListProps) {
+  const getResponseCount = (type: string, index: number) => {
+    const questionType = type === 'writing' ? 'open_ended' : type;
+    return responses.filter(r => r.question_type === questionType && r.question_index === index).length;
+  };
+
+  const getCorrectCount = (index: number) => {
+    return responses.filter(r => r.question_type === 'mc' && r.question_index === index && r.is_correct === true).length;
+  };
+
+  return (
+    <Card className="border-dashed">
+      <CardHeader className="py-3">
+        <CardTitle className="text-sm flex items-center gap-2">
+          <Eye className="h-4 w-4" />
+          All Tasks Reference
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {/* MC Questions */}
+        {mcQuestions.length > 0 && (
+          <div>
+            <h4 className="text-xs font-medium text-muted-foreground mb-2">MC Questions</h4>
+            <div className="space-y-1">
+              {mcQuestions.map((q, i) => {
+                const isCurrent = currentType === 'mc' && currentIndex === i;
+                const responseCount = getResponseCount('mc', i);
+                const correctCount = getCorrectCount(i);
+                
+                return (
+                  <div 
+                    key={q.id}
+                    onClick={() => onNavigate('mc', i)}
+                    className={`p-2 rounded-lg border cursor-pointer transition-all text-sm ${
+                      isCurrent 
+                        ? 'border-primary bg-primary/10' 
+                        : 'border-transparent hover:bg-muted/50'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium truncate flex-1 mr-2">Q{i + 1}: {q.question.slice(0, 50)}...</span>
+                      <div className="flex items-center gap-2 text-xs shrink-0">
+                        {participantCount > 0 && (
+                          <>
+                            <span className="text-green-600">✓{correctCount}</span>
+                            <span className="text-muted-foreground">{responseCount}/{participantCount}</span>
+                          </>
+                        )}
+                        {isCurrent && <Badge variant="default" className="text-[10px]">Current</Badge>}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Writing Tasks */}
+        {openEndedQuestions.length > 0 && (
+          <div>
+            <h4 className="text-xs font-medium text-muted-foreground mb-2">Writing Tasks</h4>
+            <div className="space-y-1">
+              {openEndedQuestions.map((q, i) => {
+                const isCurrent = currentType === 'writing' && currentIndex === i;
+                const responseCount = getResponseCount('writing', i);
+                
+                return (
+                  <div 
+                    key={q.id}
+                    onClick={() => onNavigate('writing', i)}
+                    className={`p-2 rounded-lg border cursor-pointer transition-all text-sm ${
+                      isCurrent 
+                        ? 'border-primary bg-primary/10' 
+                        : 'border-transparent hover:bg-muted/50'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium truncate flex-1 mr-2">T{i + 1}: {q.question.slice(0, 50)}...</span>
+                      <div className="flex items-center gap-2 text-xs shrink-0">
+                        {participantCount > 0 && (
+                          <span className="text-muted-foreground">{responseCount}/{participantCount}</span>
+                        )}
+                        {isCurrent && <Badge variant="default" className="text-[10px]">Current</Badge>}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
