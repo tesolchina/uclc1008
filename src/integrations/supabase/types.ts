@@ -383,6 +383,33 @@ export type Database = {
         }
         Relationships: []
       }
+      student_api_usage: {
+        Row: {
+          created_at: string
+          id: string
+          request_count: number
+          student_id: string
+          updated_at: string
+          usage_date: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          request_count?: number
+          student_id: string
+          updated_at?: string
+          usage_date?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          request_count?: number
+          student_id?: string
+          updated_at?: string
+          usage_date?: string
+        }
+        Relationships: []
+      }
       student_id_merges: {
         Row: {
           created_at: string
@@ -504,6 +531,30 @@ export type Database = {
           student_id?: string
           student_number?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      system_settings: {
+        Row: {
+          created_at: string
+          id: string
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          updated_at?: string
+          value: Json
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: Json
         }
         Relationships: []
       }
