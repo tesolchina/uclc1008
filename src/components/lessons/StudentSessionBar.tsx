@@ -69,6 +69,7 @@ export function StudentSessionBar({
     participant,
     latestPrompt,
     isJoining,
+    isReconnecting,
     joinSession,
     leaveSession,
     updateSection,
@@ -129,6 +130,16 @@ export function StudentSessionBar({
     setShowPromptAlert(false);
     dismissPrompt();
   };
+
+  // Show reconnecting state
+  if (isReconnecting) {
+    return (
+      <Card className="flex items-center justify-center px-4 py-3 bg-muted/50 border-dashed">
+        <Loader2 className="h-4 w-4 animate-spin mr-2 text-muted-foreground" />
+        <span className="text-sm text-muted-foreground">Reconnecting to session...</span>
+      </Card>
+    );
+  }
 
   // Not in a session - show join button
   if (!session) {
