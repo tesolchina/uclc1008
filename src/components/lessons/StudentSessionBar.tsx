@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 import { 
   Users, LogOut, Radio, Loader2, X, AlertCircle, 
   Clock, MessageSquare, Bell
@@ -200,6 +201,43 @@ export function StudentSessionBar({
   // In a locked session - show session bar + LiveTaskView
   const isLockedSession = session && !session.allow_ahead && session.status !== 'ended';
   
+  // Calculate page progress for the progress bar
+  const getCurrentProgress = () => {
+    if (!content) return 0;
+    const totalPages = 1 + content.mcQuestions.length + content.openEndedQuestions.length;
+    const currentType = session.current_section || 'notes';
+    const currentIndex = session.current_question_index || 0;
+    
+    let currentPage = 1;
+    if (currentType === 'notes') {
+      currentPage = 1;
+    } else if (currentType === 'mc') {
+      currentPage = 2 + currentIndex;
+    } else if (currentType === 'writing') {
+      currentPage = 2 + content.mcQuestions.length + currentIndex;
+    }
+    
+    return (currentPage / totalPages) * 100;
+  };
+  
+  const getCurrentPageInfo = () => {
+    if (!content) return '';
+    const totalPages = 1 + content.mcQuestions.length + content.openEndedQuestions.length;
+    const currentType = session.current_section || 'notes';
+    const currentIndex = session.current_question_index || 0;
+    
+    let currentPage = 1;
+    if (currentType === 'notes') {
+      currentPage = 1;
+    } else if (currentType === 'mc') {
+      currentPage = 2 + currentIndex;
+    } else if (currentType === 'writing') {
+      currentPage = 2 + content.mcQuestions.length + currentIndex;
+    }
+    
+    return `${currentPage}/${totalPages}`;
+  };
+  
   return (
     <>
       {/* Prompt Alert */}
@@ -234,28 +272,43 @@ export function StudentSessionBar({
         </div>
       )}
 
-      {/* Session Bar */}
-      <Card className="flex items-center justify-between px-4 py-2 bg-primary/5 border-primary/20">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <Radio className="h-4 w-4 text-primary animate-pulse" />
-            <span className="text-sm font-medium">Live Session</span>
+      {/* Session Bar with Progress */}
+      <Card className="px-4 py-3 bg-primary/5 border-primary/20 space-y-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-2">
+              <Radio className="h-4 w-4 text-primary animate-pulse" />
+              <span className="text-sm font-medium">Live Session</span>
+            </div>
+            <Badge variant="outline" className="font-mono">{session.session_code}</Badge>
+            {session.status === 'paused' && (
+              <Badge variant="secondary">Paused</Badge>
+            )}
+            {!session.allow_ahead && (
+              <Badge variant="default" className="gap-1 bg-primary">
+                <Bell className="h-3 w-3" />
+                Teacher Controlled
+              </Badge>
+            )}
           </div>
-          <Badge variant="outline" className="font-mono">{session.session_code}</Badge>
-          {session.status === 'paused' && (
-            <Badge variant="secondary">Paused</Badge>
-          )}
-          {!session.allow_ahead && (
-            <Badge variant="default" className="gap-1 bg-primary">
-              <Bell className="h-3 w-3" />
-              Teacher Controlled
-            </Badge>
-          )}
+          <Button variant="ghost" size="sm" onClick={handleLeave} className="text-muted-foreground">
+            <LogOut className="h-4 w-4 mr-1" />
+            Leave
+          </Button>
         </div>
-        <Button variant="ghost" size="sm" onClick={handleLeave} className="text-muted-foreground">
-          <LogOut className="h-4 w-4 mr-1" />
-          Leave
-        </Button>
+        
+        {/* Progress indicator when in controlled session */}
+        {!session.allow_ahead && content && (
+          <div className="flex items-center gap-3">
+            <Progress 
+              value={getCurrentProgress()} 
+              className="h-2 flex-1"
+            />
+            <span className="text-xs text-muted-foreground font-mono whitespace-nowrap">
+              {getCurrentPageInfo()}
+            </span>
+          </div>
+        )}
       </Card>
       
       {/* Live Task View - shows only when in locked session with content */}
