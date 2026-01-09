@@ -8,15 +8,43 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import { SharedApiUsageIndicator } from '@/components/api/SharedApiUsageIndicator';
-import { Loader2, Key, CheckCircle2, XCircle, ExternalLink } from 'lucide-react';
+import { Loader2, Settings, CheckCircle2, XCircle, ExternalLink, User, Key } from 'lucide-react';
 
-export default function StudentApiPage() {
+// Get or create browser session ID for anonymous tracking
+function getBrowserSessionId(): string {
+  let id = localStorage.getItem('browser_session_id');
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem('browser_session_id', id);
+  }
+  return id;
+}
+
+// Get/set student ID from localStorage
+function getStoredStudentId(): string {
+  return localStorage.getItem('student_id') || '';
+}
+
+function setStoredStudentId(id: string): void {
+  if (id.trim()) {
+    localStorage.setItem('student_id', id.trim());
+  } else {
+    localStorage.removeItem('student_id');
+  }
+}
+
+export default function SettingsPage() {
   const { toast } = useToast();
   const { isAuthenticated, profile, accessToken, loginWithHkbu } = useAuth();
   
   const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
+  const [isSavingKey, setIsSavingKey] = useState(false);
+  const [isSavingId, setIsSavingId] = useState(false);
   const [isRevoking, setIsRevoking] = useState(false);
+  
+  // Student ID
+  const [studentId, setStudentId] = useState('');
+  const [savedStudentId, setSavedStudentId] = useState('');
   
   // API status
   const [hasHkbuKey, setHasHkbuKey] = useState(false);
@@ -33,6 +61,11 @@ export default function StudentApiPage() {
   const loadStatus = async () => {
     setIsLoading(true);
     try {
+      // Load stored student ID
+      const storedId = getStoredStudentId();
+      setStudentId(storedId);
+      setSavedStudentId(storedId);
+      
       // Check API status
       const { data: apiData } = await supabase.functions.invoke('check-api-status', {
         body: { accessToken },
@@ -60,14 +93,14 @@ export default function StudentApiPage() {
         }
       }
 
-      // Load user's usage today (use browser session or student ID)
-      const studentId = profile?.hkbu_user_id || localStorage.getItem('browser_session_id') || 'anonymous';
+      // Load user's usage today
+      const effectiveStudentId = storedId || profile?.hkbu_user_id || getBrowserSessionId();
       const today = new Date().toISOString().split('T')[0];
       
       const { data: usageData } = await supabase
         .from('student_api_usage')
         .select('request_count')
-        .eq('student_id', studentId)
+        .eq('student_id', effectiveStudentId)
         .eq('usage_date', today)
         .maybeSingle();
 
@@ -83,6 +116,19 @@ export default function StudentApiPage() {
     loadStatus();
   }, [accessToken, profile]);
 
+  const handleSaveStudentId = () => {
+    setIsSavingId(true);
+    try {
+      setStoredStudentId(studentId);
+      setSavedStudentId(studentId);
+      toast({ title: 'Student ID saved' });
+    } catch (error) {
+      toast({ variant: 'destructive', title: 'Failed to save Student ID' });
+    } finally {
+      setIsSavingId(false);
+    }
+  };
+
   const handleSaveKey = async () => {
     if (!apiKey.trim()) {
       toast({
@@ -92,7 +138,7 @@ export default function StudentApiPage() {
       return;
     }
 
-    setIsSaving(true);
+    setIsSavingKey(true);
     try {
       const { error } = await supabase.functions.invoke('save-api-key', {
         body: {
@@ -114,7 +160,7 @@ export default function StudentApiPage() {
         title: 'Failed to save API key',
       });
     } finally {
-      setIsSaving(false);
+      setIsSavingKey(false);
     }
   };
 
@@ -154,25 +200,69 @@ export default function StudentApiPage() {
     );
   }
 
+  const studentIdChanged = studentId !== savedStudentId;
+
   return (
     <div className="space-y-6">
       <header className="space-y-2">
         <div className="flex items-center gap-2">
-          <Key className="h-5 w-5 text-primary" />
+          <Settings className="h-5 w-5 text-primary" />
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            API Settings
+            Settings
           </p>
         </div>
-        <h1 className="text-2xl font-semibold tracking-tight">AI Tutor Configuration</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Your Settings</h1>
         <p className="text-sm text-muted-foreground">
-          Configure your HKBU API key to use the AI tutor in lessons.
+          Configure your student profile and AI tutor access.
         </p>
       </header>
 
-      {/* Current Status */}
+      {/* Student ID Section */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Your AI Status</CardTitle>
+          <CardTitle className="text-base flex items-center gap-2">
+            <User className="h-4 w-4" />
+            Student Profile
+          </CardTitle>
+          <CardDescription>
+            Enter your student ID to track your progress across sessions.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="studentId">Student ID</Label>
+            <div className="flex gap-2">
+              <Input
+                id="studentId"
+                placeholder="e.g. 21012345"
+                value={studentId}
+                onChange={(e) => setStudentId(e.target.value)}
+                className="max-w-xs"
+              />
+              <Button 
+                onClick={handleSaveStudentId} 
+                disabled={isSavingId || !studentIdChanged}
+                variant={studentIdChanged ? "default" : "outline"}
+              >
+                {isSavingId ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Save'}
+              </Button>
+            </div>
+            {savedStudentId && (
+              <p className="text-xs text-muted-foreground">
+                Current ID: <span className="font-mono">{savedStudentId}</span>
+              </p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* AI Status Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Key className="h-4 w-4" />
+            AI Tutor Status
+          </CardTitle>
           <CardDescription>
             {hasHkbuKey 
               ? 'You have your own HKBU API key configured for unlimited access.'
@@ -257,21 +347,21 @@ export default function StudentApiPage() {
               </p>
             </div>
 
-            <Button onClick={handleSaveKey} disabled={isSaving || !apiKey.trim()}>
-              {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Button onClick={handleSaveKey} disabled={isSavingKey || !apiKey.trim()}>
+              {isSavingKey && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Save API Key
             </Button>
           </CardContent>
         </Card>
       )}
 
-      {/* Sign in prompt for additional features */}
+      {/* Sign in prompt */}
       {!isAuthenticated && (
         <Card className="border-dashed">
           <CardContent className="pt-6">
             <div className="text-center space-y-3">
               <p className="text-sm text-muted-foreground">
-                Sign in with your HKBU account to sync your API key across devices.
+                Sign in with your HKBU account to sync settings across devices.
               </p>
               <Button variant="outline" onClick={loginWithHkbu}>
                 Sign in with HKBU
