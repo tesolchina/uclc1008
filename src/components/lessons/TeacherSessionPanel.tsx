@@ -10,7 +10,7 @@ import {
   Play, Pause, Square, Users, Send, Copy, 
   CheckCircle, XCircle, Clock, Eye, SkipForward,
   MessageSquare, Loader2, Target, ChevronLeft, ChevronRight,
-  BarChart2, LogIn
+  BarChart2, LogIn, RefreshCw
 } from 'lucide-react';
 import { useTeacherSession, SessionParticipant, SessionResponse, LiveSession } from '@/hooks/useLiveSession';
 import { useToast } from '@/hooks/use-toast';
@@ -60,10 +60,19 @@ export function TeacherSessionPanel({ lessonId, sections, questionCounts, conten
     updatePosition,
     sendPrompt,
     toggleAllowAhead,
+    refreshResponses,
   } = useTeacherSession(lessonId);
 
   const [promptMessage, setPromptMessage] = useState('');
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const { toast } = useToast();
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await refreshResponses();
+    setIsRefreshing(false);
+    toast({ title: 'Refreshed', description: 'Response data updated' });
+  };
 
   const copyCode = () => {
     if (session?.session_code) {
@@ -228,12 +237,17 @@ export function TeacherSessionPanel({ lessonId, sections, questionCounts, conten
               <SessionQRCode sessionCode={session.session_code} />
             </CardDescription>
           </div>
+        <div className="flex items-center gap-2">
           <div className="flex items-center gap-2">
             <Badge variant="outline" className="gap-1">
               <Users className="h-3 w-3" />
               {onlineCount} online
             </Badge>
+            <Button variant="ghost" size="sm" onClick={handleRefresh} disabled={isRefreshing}>
+              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            </Button>
           </div>
+        </div>
         </div>
       </CardHeader>
 
