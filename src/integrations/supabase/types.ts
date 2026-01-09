@@ -383,6 +383,172 @@ export type Database = {
         }
         Relationships: []
       }
+      student_id_merges: {
+        Row: {
+          created_at: string
+          id: string
+          merged_by: string
+          merged_student_id: string
+          primary_student_id: string
+          reason: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          merged_by: string
+          merged_student_id: string
+          primary_student_id: string
+          reason?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          merged_by?: string
+          merged_student_id?: string
+          primary_student_id?: string
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_id_merges_merged_by_fkey"
+            columns: ["merged_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_sessions: {
+        Row: {
+          activity_data: Json
+          ai_interactions: Json
+          ai_report: Json | null
+          browser_session_id: string
+          completed_at: string | null
+          created_at: string
+          id: string
+          is_completed: boolean
+          lesson_id: string | null
+          module_name: string | null
+          report_code: string | null
+          student_id: string | null
+        }
+        Insert: {
+          activity_data?: Json
+          ai_interactions?: Json
+          ai_report?: Json | null
+          browser_session_id: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          is_completed?: boolean
+          lesson_id?: string | null
+          module_name?: string | null
+          report_code?: string | null
+          student_id?: string | null
+        }
+        Update: {
+          activity_data?: Json
+          ai_interactions?: Json
+          ai_report?: Json | null
+          browser_session_id?: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          is_completed?: boolean
+          lesson_id?: string | null
+          module_name?: string | null
+          report_code?: string | null
+          student_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_sessions_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["student_id"]
+          },
+        ]
+      }
+      students: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+          is_active: boolean
+          notes: string | null
+          student_id: string
+          student_number: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          student_id: string
+          student_number?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          student_id?: string
+          student_number?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      teacher_comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          session_id: string
+          teacher_id: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          session_id: string
+          teacher_id: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          session_id?: string
+          teacher_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teacher_comments_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "student_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "teacher_comments_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -458,7 +624,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "teacher" | "student"
+      app_role: "teacher" | "student" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -586,7 +752,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["teacher", "student"],
+      app_role: ["teacher", "student", "admin"],
     },
   },
 } as const
