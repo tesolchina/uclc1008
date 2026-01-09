@@ -183,6 +183,10 @@ export function useTeacherSession(lessonId: string) {
     } else {
       // Clear persisted session state when ending
       clearSessionState();
+      // Reset local state to allow creating a new session
+      setSession(null);
+      setParticipants([]);
+      setResponses([]);
     }
   }, [session]);
 
