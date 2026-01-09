@@ -47,6 +47,7 @@ interface LessonContentProps {
   };
   onSaveProgress: (progress: any) => void;
   onSectionChange?: (section: string) => void;
+  isReadOnly?: boolean;
 }
 
 export function LessonContent({
@@ -59,6 +60,7 @@ export function LessonContent({
   savedProgress,
   onSaveProgress,
   onSectionChange,
+  isReadOnly = false,
 }: LessonContentProps) {
   const { toast } = useToast();
   const { accessToken } = useAuth();
@@ -72,6 +74,7 @@ export function LessonContent({
   const [loadingAI, setLoadingAI] = useState<string | null>(null);
 
   const handleMCAnswer = (questionId: string, answerIndex: number) => {
+    if (isReadOnly) return;
     setMcAnswers(prev => ({ ...prev, [questionId]: answerIndex }));
     const question = mcQuestions.find(q => q.id === questionId);
     if (question) {
@@ -80,6 +83,7 @@ export function LessonContent({
   };
 
   const handleFillBlankChange = (questionId: string, blankIndex: number, value: string) => {
+    if (isReadOnly) return;
     setFillBlankAnswers(prev => {
       const current = prev[questionId] || [];
       const updated = [...current];
@@ -89,6 +93,7 @@ export function LessonContent({
   };
 
   const handleOpenEndedChange = (questionId: string, response: string) => {
+    if (isReadOnly) return;
     setOpenEndedResponses(prev => {
       const existing = prev.find(r => r.questionId === questionId);
       if (existing) {
@@ -218,6 +223,7 @@ export function LessonContent({
                     <RadioGroup
                       value={mcAnswers[q.id]?.toString()}
                       onValueChange={(value) => handleMCAnswer(q.id, parseInt(value))}
+                      disabled={isReadOnly}
                     >
                       {q.options.map((option, i) => (
                         <div key={i} className="flex items-center space-x-2">
@@ -271,6 +277,7 @@ export function LessonContent({
                               value={fillBlankAnswers[q.id]?.[i] || ''}
                               onChange={(e) => handleFillBlankChange(q.id, i, e.target.value)}
                               placeholder={`Blank ${i + 1}`}
+                              disabled={isReadOnly}
                             />
                           )}
                         </span>
@@ -309,16 +316,17 @@ export function LessonContent({
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <Textarea
-                        placeholder="Write your response here..."
+                        placeholder={isReadOnly ? "Live session in progress - use session interface above" : "Write your response here..."}
                         value={response?.response || ''}
                         onChange={(e) => handleOpenEndedChange(q.id, e.target.value)}
                         className="min-h-24"
+                        disabled={isReadOnly}
                       />
                       <div className="flex justify-end">
                         <Button
                           size="sm"
                           onClick={() => getAIFeedback(q.id)}
-                          disabled={loadingAI === q.id}
+                          disabled={loadingAI === q.id || isReadOnly}
                         >
                           {loadingAI === q.id ? (
                             <Loader2 className="h-4 w-4 mr-1 animate-spin" />
@@ -359,23 +367,26 @@ export function LessonContent({
                 Take a moment to reflect on what you've learned. What are the key takeaways? What questions do you still have?
               </p>
               <Textarea
-                placeholder="Write your reflections here..."
+                placeholder={isReadOnly ? "Live session in progress - use session interface above" : "Write your reflections here..."}
                 value={reflection}
-                onChange={(e) => setReflection(e.target.value)}
+                onChange={(e) => !isReadOnly && setReflection(e.target.value)}
                 className="min-h-32"
+                disabled={isReadOnly}
               />
             </div>
           </AccordionContent>
         </AccordionItem>
       </Accordion>
 
-      {/* Save Progress Button */}
-      <div className="flex justify-end">
-        <Button onClick={saveAllProgress}>
-          <CheckCircle2 className="h-4 w-4 mr-2" />
-          Save Progress
-        </Button>
-      </div>
+      {/* Save Progress Button - hidden in read-only mode */}
+      {!isReadOnly && (
+        <div className="flex justify-end">
+          <Button onClick={saveAllProgress}>
+            <CheckCircle2 className="h-4 w-4 mr-2" />
+            Save Progress
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

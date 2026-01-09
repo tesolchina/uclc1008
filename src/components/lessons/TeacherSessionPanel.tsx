@@ -424,11 +424,12 @@ export function TeacherSessionPanel({ lessonId, sections, questionCounts, conten
                 </p>
               ) : (
                 <div className="space-y-1">
-                  {participants.map((p) => (
+                  {participants.map((p, index) => (
                     <ParticipantRow 
                       key={p.id} 
                       participant={p}
                       responses={responses.filter(r => r.participant_id === p.id)}
+                      index={index}
                     />
                   ))}
                 </div>
@@ -572,8 +573,8 @@ function ResponseDashboard({
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-medium">
-                      {participant?.display_name || participant?.student_identifier?.slice(0, 8) || 'Unknown'}
+                    <span className="text-xs font-medium text-muted-foreground">
+                      Student {currentResponses.indexOf(r) + 1}
                     </span>
                     {currentType === 'mc' && (
                       r.is_correct 
@@ -594,13 +595,13 @@ function ResponseDashboard({
   );
 }
 
-function ParticipantRow({ participant, responses }: { participant: SessionParticipant; responses: SessionResponse[] }) {
+function ParticipantRow({ participant, responses, index }: { participant: SessionParticipant; responses: SessionResponse[]; index: number }) {
   return (
     <div className="flex items-center justify-between p-2 rounded-md bg-muted/50">
       <div className="flex items-center gap-2">
         <div className={`h-2 w-2 rounded-full ${participant.is_online ? 'bg-green-500' : 'bg-gray-300'}`} />
-        <span className="text-sm font-mono">
-          {participant.display_name || participant.student_identifier?.slice(0, 12)}
+        <span className="text-sm text-muted-foreground">
+          Student {index + 1}
         </span>
       </div>
       <div className="flex items-center gap-2">
