@@ -75,7 +75,7 @@ export function AppSidebar() {
   const overviewItems = [
     { title: "Course overview", url: "/", icon: BookOpen },
     { title: "Assessment & goals", url: "/assessment", icon: Target },
-    { title: "API Settings", url: "/api-settings", icon: Key, showStatus: true },
+    { title: "Settings", url: "/settings", icon: Settings, showStatus: true },
   ];
 
   // Add admin dashboard for teachers/admins
