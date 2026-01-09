@@ -5,14 +5,16 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   Play, Pause, Square, Users, Send, Copy, 
   CheckCircle, XCircle, Clock, Eye, SkipForward,
   MessageSquare, Loader2, Target, ChevronLeft, ChevronRight,
-  BarChart2
+  BarChart2, LogIn
 } from 'lucide-react';
 import { useTeacherSession, SessionParticipant, SessionResponse, LiveSession } from '@/hooks/useLiveSession';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 import { SessionQRCode } from './SessionQRCode';
 import { LiveTaskView } from './LiveTaskView';
 import { Progress } from '@/components/ui/progress';
@@ -44,6 +46,7 @@ interface TeacherSessionPanelProps {
 }
 
 export function TeacherSessionPanel({ lessonId, sections, questionCounts, content }: TeacherSessionPanelProps) {
+  const { user, isAuthenticated } = useAuth();
   const {
     session,
     participants,
@@ -154,6 +157,35 @@ export function TeacherSessionPanel({ lessonId, sections, questionCounts, conten
   }
 
   if (!session) {
+    // Show auth warning if not signed in
+    if (!isAuthenticated) {
+      return (
+        <Card className="border-dashed">
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              Live Session
+            </CardTitle>
+            <CardDescription>
+              Create a live session for students to join and follow along in real-time.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Alert className="mb-4">
+              <LogIn className="h-4 w-4" />
+              <AlertDescription>
+                Please sign in to create a live session. Teachers must be authenticated to manage sessions.
+              </AlertDescription>
+            </Alert>
+            <Button variant="outline" onClick={() => window.location.href = '/auth'}>
+              <LogIn className="h-4 w-4 mr-2" />
+              Sign In
+            </Button>
+          </CardContent>
+        </Card>
+      );
+    }
+
     return (
       <Card className="border-dashed">
         <CardHeader>
