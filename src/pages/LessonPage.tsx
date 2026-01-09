@@ -342,20 +342,11 @@ const LessonPage = () => {
 
         <Card className="card-elevated">
           <CardContent className="pt-6">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-center">
               <Button variant="outline" onClick={() => navigate(`/week/${weekId}`)}>
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Week
               </Button>
-              {dbLesson.lesson_number < 3 && (
-                <Button onClick={() => {
-                  const nextLessonNumber = dbLesson.lesson_number + 1;
-                  navigate(`/week/${weekId}/lesson/${weekId}-${nextLessonNumber}`);
-                }}>
-                  Next Lesson
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
-              )}
             </div>
           </CardContent>
         </Card>
