@@ -40,13 +40,12 @@ export const week2: WeekData = {
     "You help students practice paraphrasing by evaluating their drafts against original texts to ensure they are not too close (avoiding 'patchwriting').",
   skillsIntroduced: ["paraphrasing", "topic-sentences", "ai-authenticity"],
   skillsReinforced: ["journal-structure", "citation-recognition"],
-  assignmentsDue: ["pre-course-writing"],
   assignmentsUpcoming: ["referencing-quiz"],
   lessons: [lesson2_1, lesson2_2],
 };
 
 export const week2Meta: WeekMeta = {
   dateRange: "19-23 Jan 2026",
-  assignmentTagline: "Pre-course Writing (2.5%) due 23 Jan, 6pm",
-  assignmentIds: ["pre-course-writing"],
+  assignmentTagline: "Focus on paraphrasing and summarising skills",
+  assignmentIds: [],
 };
