@@ -15,9 +15,10 @@ import {
 import { LessonAiTutor } from "@/components/LessonAiTutor";
 import { LessonCard } from "@/components/lessons/LessonCard";
 import { useLessons } from "@/hooks/useLessons";
-import { UnitCard } from "@/components/units/UnitCard";
-import { week1Hour1Units } from "@/data/units";
-import { BookOpen, Lightbulb, Target, Clock, FileText, AlertCircle, CheckCircle2, Bot, Users, ArrowRight, Loader2, CalendarClock, PlayCircle } from "lucide-react";
+import { InlineUnitViewer } from "@/components/units/InlineUnitViewer";
+import { ArticleExcerptDisplay } from "@/components/units/ArticleExcerptDisplay";
+import { week1Hour1Units, articleExcerpt } from "@/data/units";
+import { BookOpen, Lightbulb, Target, Clock, FileText, AlertCircle, Bot, Users, ArrowRight, Loader2, CalendarClock, PlayCircle, GraduationCap } from "lucide-react";
 
 const skillCategoryColors: Record<string, string> = {
   "reading": "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
@@ -111,6 +112,22 @@ const Week1Page = () => {
       </section>
 
       <div className="space-y-3">
+        {/* The Article Excerpt - Always Visible */}
+        <CollapsibleSection
+          title="📖 Article Excerpt: Facial Recognition in Schools"
+          description="This is the article you'll analyze and use for your Pre-course Writing assignment"
+          icon={<FileText className="h-4 w-4 text-primary" />}
+          defaultOpen={true}
+          className="border-primary/30 bg-gradient-to-r from-primary/5 to-transparent"
+        >
+          <ArticleExcerptDisplay
+            title={articleExcerpt.title}
+            authors={articleExcerpt.authors}
+            source={articleExcerpt.source}
+            paragraphs={articleExcerpt.paragraphs}
+          />
+        </CollapsibleSection>
+
         {/* Learning Units by Hour */}
         {classHours.map((classHour) => (
           <CollapsibleSection
@@ -119,29 +136,25 @@ const Week1Page = () => {
             description={classHour.theme}
             icon={<PlayCircle className="h-4 w-4 text-primary" />}
             defaultOpen={classHour.hour === 1}
-            className="border-primary/30 bg-gradient-to-r from-primary/5 to-transparent"
+            className="border-accent/30 bg-gradient-to-r from-accent/5 to-transparent"
           >
-            <div className="space-y-4">
-              {/* Unit Cards Grid */}
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {classHour.units.map((unit, idx) => (
-                  <UnitCard
-                    key={unit.id}
-                    unit={unit}
-                    weekId={1}
-                    hourNumber={classHour.hour}
-                    unitIndex={idx}
-                  />
-                ))}
-              </div>
+            <div className="space-y-3">
+              {/* All Units Inline */}
+              {classHour.units.map((unit, idx) => (
+                <InlineUnitViewer
+                  key={unit.id}
+                  unit={unit}
+                  defaultOpen={idx === 0}
+                />
+              ))}
               
               {/* Assignment Link */}
               {classHour.assignmentLink && (
-                <div className="pt-2 border-t">
-                  <Button size="sm" variant="outline" asChild>
+                <div className="pt-3 border-t">
+                  <Button size="sm" variant="default" asChild>
                     <Link to={classHour.assignmentLink} className="gap-2">
-                      <FileText className="h-3.5 w-3.5" />
-                      View Related Assignment
+                      <GraduationCap className="h-3.5 w-3.5" />
+                      Start Pre-course Writing Assignment
                       <ArrowRight className="h-3.5 w-3.5" />
                     </Link>
                   </Button>
@@ -150,59 +163,6 @@ const Week1Page = () => {
             </div>
           </CollapsibleSection>
         ))}
-        {/* Class Rundown - First Meeting */}
-        {week.classRundown && week.classRundown.length > 0 && (
-          <CollapsibleSection
-            title="Class Rundown - First Meeting"
-            description="Hour-by-hour breakdown of your first class session"
-            icon={<CalendarClock className="h-4 w-4 text-primary" />}
-            defaultOpen={true}
-            className="border-primary/30 bg-primary/5"
-          >
-            <div className="space-y-4">
-              {week.classRundown.map((item, idx) => (
-                <div 
-                  key={idx} 
-                  className="relative rounded-xl border border-border bg-card p-4 shadow-sm"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                      <Clock className="h-5 w-5" />
-                    </div>
-                    <div className="flex-1 space-y-2">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-semibold">
-                          {item.time}
-                        </Badge>
-                        <h4 className="font-semibold text-foreground">{item.title}</h4>
-                      </div>
-                      <p className="text-sm text-muted-foreground">{item.description}</p>
-                      <ul className="space-y-1.5 pt-2">
-                        {item.activities.map((activity, actIdx) => (
-                          <li key={actIdx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                            <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary/60 shrink-0" />
-                            <span>{activity}</span>
-                          </li>
-                        ))}
-                      </ul>
-                      {item.assignmentLink && (
-                        <div className="pt-2">
-                          <Button size="sm" variant="outline" asChild>
-                            <Link to={item.assignmentLink} className="gap-2">
-                              <FileText className="h-3.5 w-3.5" />
-                              View Assignment Details
-                              <ArrowRight className="h-3.5 w-3.5" />
-                            </Link>
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CollapsibleSection>
-        )}
 
         {/* Skills Section */}
         {(skillsIntroduced.length > 0 || skillsReinforced.length > 0) && (
@@ -249,7 +209,7 @@ const Week1Page = () => {
             title="Interactive Lessons"
             description="Complete these AI-powered lessons with instant feedback."
             icon={<BookOpen className="h-4 w-4 text-primary" />}
-            defaultOpen={true}
+            defaultOpen={false}
           >
             {lessonsLoading ? (
               <div className="flex items-center justify-center py-8">
@@ -270,34 +230,6 @@ const Week1Page = () => {
                 ))}
               </div>
             )}
-          </CollapsibleSection>
-        )}
-
-        {/* Legacy Lessons (from static data) */}
-        {week.lessons && week.lessons.length > 0 && !dbLessons?.length && (
-          <CollapsibleSection
-            title="Weekly Lessons"
-            description="Complete these interactive lessons to build your skills."
-            icon={<BookOpen className="h-4 w-4 text-primary" />}
-          >
-            <div className="space-y-3">
-              {week.lessons.map((lesson) => (
-                <div
-                  key={lesson.id}
-                  className="flex items-center justify-between rounded-xl bg-muted/60 px-3 py-2.5 text-sm"
-                >
-                  <div className="flex flex-col gap-1">
-                    <p className="font-medium text-foreground">Lesson {lesson.id}: {lesson.title}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {lesson.questions.length} practice questions
-                    </p>
-                  </div>
-                  <Button size="sm" asChild>
-                    <Link to={`/week/1/lesson/1-${lesson.id}`}>Start Lesson</Link>
-                  </Button>
-                </div>
-              ))}
-            </div>
           </CollapsibleSection>
         )}
 
@@ -418,40 +350,69 @@ const Week1Page = () => {
                       {res.title}
                     </a>
                   ) : (
-                    <p className="font-medium text-foreground">{res.title}</p>
+                    <span className="font-medium text-foreground">{res.title}</span>
                   )}
-                  {res.description ? (
-                    <p className="text-xs text-muted-foreground">{res.description}</p>
-                  ) : null}
-                </div>
-                <div className="flex flex-col items-end gap-1 text-right">
-                  <Badge variant="outline" className="text-[10px] uppercase tracking-[0.16em]">
+                  <span className="text-xs text-muted-foreground capitalize">
                     {res.type}
-                  </Badge>
-                  {res.duration ? (
-                    <span className="text-[11px] text-muted-foreground">{res.duration}</span>
-                  ) : null}
+                  </span>
                 </div>
               </div>
             ))}
           </div>
         </CollapsibleSection>
 
-        {/* Independent Practice */}
-        <CollapsibleSection
-          title="Independent practice"
-          description="Use these tasks to stretch yourself after the core materials."
-          icon={<CheckCircle2 className="h-4 w-4 text-primary" />}
-        >
-          <ol className="space-y-2 text-sm text-muted-foreground">
-            {week.practiceTasks.map((task, index) => (
-              <li key={task} className="flex gap-2">
-                <span className="mt-0.5 text-xs font-semibold text-primary/80">{index + 1}.</span>
-                <span>{task}</span>
-              </li>
-            ))}
-          </ol>
-        </CollapsibleSection>
+        {/* Class Rundown - First Meeting */}
+        {week.classRundown && week.classRundown.length > 0 && (
+          <CollapsibleSection
+            title="Class Rundown - First Meeting"
+            description="Hour-by-hour breakdown of your first class session"
+            icon={<CalendarClock className="h-4 w-4 text-primary" />}
+            defaultOpen={false}
+          >
+            <div className="space-y-4">
+              {week.classRundown.map((item, idx) => (
+                <div 
+                  key={idx} 
+                  className="relative rounded-xl border border-border bg-card p-4 shadow-sm"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                      <Clock className="h-5 w-5" />
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-semibold">
+                          {item.time}
+                        </Badge>
+                        <h4 className="font-semibold text-foreground">{item.title}</h4>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{item.description}</p>
+                      <ul className="space-y-1.5 pt-2">
+                        {item.activities.map((activity, actIdx) => (
+                          <li key={actIdx} className="flex items-start gap-2 text-sm text-muted-foreground">
+                            <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary/60 shrink-0" />
+                            <span>{activity}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      {item.assignmentLink && (
+                        <div className="pt-2">
+                          <Button size="sm" variant="outline" asChild>
+                            <Link to={item.assignmentLink} className="gap-2">
+                              <FileText className="h-3.5 w-3.5" />
+                              View Assignment Details
+                              <ArrowRight className="h-3.5 w-3.5" />
+                            </Link>
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CollapsibleSection>
+        )}
       </div>
     </div>
   );
