@@ -5,12 +5,14 @@ import { week1, week1Meta } from "@/data/weeks/week1";
 import { getSkillById } from "@/data";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Clock, FileText, ExternalLink, ArrowLeft, BookOpen, ScrollText, Quote } from "lucide-react";
+import { CheckCircle2, Clock, FileText, ExternalLink, ArrowLeft, BookOpen, ScrollText, Quote, AlertTriangle, ShieldAlert } from "lucide-react";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { CollapsibleSection } from "@/components/CollapsibleSection";
+import { useAuth } from "@/contexts/AuthContext";
 
 const PreCourseWritingPage = () => {
   const location = useLocation();
+  const { profile } = useAuth();
   const assignment = preCourseWriting;
   
   // Determine if user came from week 1 or week 2
@@ -18,6 +20,9 @@ const PreCourseWritingPage = () => {
   const week = isFromWeek1 ? week1 : week2;
   const meta = isFromWeek1 ? week1Meta : week2Meta;
   const backLink = isFromWeek1 ? "/week/1" : "/week/2";
+
+  // Check if user is a teacher for showing teacher-only resources
+  const isTeacher = profile?.role === 'teacher' || profile?.role === 'admin';
 
   const skillsAssessed = assignment.skillsAssessed
     ?.map((sid) => getSkillById(sid))
@@ -71,7 +76,7 @@ const PreCourseWritingPage = () => {
         </div>
       )}
 
-      {/* Source Article - NEW SECTION */}
+      {/* Source Article */}
       <CollapsibleSection
         title="Source Article"
         description="Read this excerpt before completing your tasks"
@@ -85,31 +90,14 @@ const PreCourseWritingPage = () => {
             <p className="text-sm italic text-foreground">{preCourseWritingArticle.fullCitation}</p>
           </div>
           
-          <Accordion type="single" collapsible defaultValue="section-0" className="space-y-2">
-            {preCourseWritingArticle.sections.map((section, idx) => (
-              <AccordionItem 
-                key={idx} 
-                value={`section-${idx}`}
-                className="border rounded-lg bg-card px-4"
-              >
-                <AccordionTrigger className="text-sm font-medium hover:no-underline">
-                  <span className="flex items-center gap-2">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-                      {idx + 1}
-                    </span>
-                    {section.heading}
-                  </span>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="prose prose-sm dark:prose-invert max-w-none">
-                    <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                      {section.content}
-                    </p>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
+          <div className="rounded-lg border border-border bg-card p-6">
+            <h3 className="text-base font-semibold text-foreground mb-4">Facial recognition technologies in education</h3>
+            <div className="prose prose-sm dark:prose-invert max-w-none">
+              <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                {preCourseWritingArticle.content}
+              </p>
+            </div>
+          </div>
 
           <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 p-4">
             <div className="flex items-start gap-3">
@@ -126,6 +114,41 @@ const PreCourseWritingPage = () => {
           </div>
         </div>
       </CollapsibleSection>
+
+      {/* Essay Topic */}
+      <Card className="card-elevated border-primary/30 bg-primary/5">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <FileText className="h-4 w-4 text-primary" />
+            Essay Topic (Task 2)
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <blockquote className="border-l-4 border-primary pl-4 italic text-foreground">
+            "Is it advisable for schools to adopt facial recognition technologies on campus? Why or why not?"
+          </blockquote>
+        </CardContent>
+      </Card>
+
+      {/* AI Policy Warning */}
+      <Card className="card-elevated border-destructive/30 bg-destructive/5">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base text-destructive">
+            <ShieldAlert className="h-4 w-4" />
+            AI Policy & Plagiarism Warning
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <ul className="space-y-2">
+            {assignment.detailedInfo?.aiPolicy?.map((policy, idx) => (
+              <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
+                <AlertTriangle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+                <span>{policy}</span>
+              </li>
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
 
       <section aria-label="Requirements">
         <Card className="card-elevated">
@@ -204,23 +227,29 @@ const PreCourseWritingPage = () => {
             </CardHeader>
             <CardContent className="pt-0">
               <ul className="space-y-2">
-                {assignment.resources.map((resource, idx) => (
-                  <li key={idx}>
-                    {resource.url ? (
-                      <a
-                        href={resource.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-sm text-primary hover:underline"
-                      >
-                        <ExternalLink className="h-3.5 w-3.5" />
-                        {resource.title}
-                      </a>
-                    ) : (
-                      <span className="text-sm">{resource.title}</span>
-                    )}
-                  </li>
-                ))}
+                {assignment.resources.map((resource, idx) => {
+                  // Hide teacher-only resources from students
+                  if (resource.title.includes("Teacher Folder") && !isTeacher) {
+                    return null;
+                  }
+                  return (
+                    <li key={idx}>
+                      {resource.url ? (
+                        <a
+                          href={resource.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 text-sm text-primary hover:underline"
+                        >
+                          <ExternalLink className="h-3.5 w-3.5" />
+                          {resource.title}
+                        </a>
+                      ) : (
+                        <span className="text-sm">{resource.title}</span>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </CardContent>
           </Card>
@@ -233,10 +262,10 @@ const PreCourseWritingPage = () => {
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base">
                 <FileText className="h-4 w-4 text-primary" />
-                Detailed information
+                Detailed Information
               </CardTitle>
               <CardDescription>
-                Additional submission, format and grading details for this assignment
+                Submission, format and grading details
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-0 space-y-3">
@@ -257,57 +286,32 @@ const PreCourseWritingPage = () => {
                       {assignment.detailedInfo.wordLimit && (
                         <div>Word limit: <strong className="text-foreground">{assignment.detailedInfo.wordLimit}</strong></div>
                       )}
-                      {assignment.detailedInfo.timeLimit && (
-                        <div>Time limit: <strong className="text-foreground">{assignment.detailedInfo.timeLimit}</strong></div>
-                      )}
                       {assignment.detailedInfo.latePolicy && (
                         <div>Late policy: <strong className="text-foreground">{assignment.detailedInfo.latePolicy}</strong></div>
-                      )}
-                      {assignment.detailedInfo.requiredMaterials && (
-                        <div>
-                          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Required materials</p>
-                          <ul className="list-disc pl-5">
-                            {assignment.detailedInfo.requiredMaterials.map((m, i) => (
-                              <li key={i} className="text-sm text-muted-foreground">{m}</li>
-                            ))}
-                          </ul>
-                        </div>
                       )}
                     </div>
                   </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value="grading">
-                  <AccordionTrigger>Grading criteria</AccordionTrigger>
+                  <AccordionTrigger>Grading Criteria</AccordionTrigger>
                   <AccordionContent>
-                    <div>
-                      {assignment.detailedInfo.gradingCriteria ? (
-                        <ul className="list-disc pl-5">
-                          {assignment.detailedInfo.gradingCriteria.map((g, i) => (
-                            <li key={i} className="text-sm text-muted-foreground">{g}</li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="text-sm text-muted-foreground">No grading criteria provided.</p>
-                      )}
-                    </div>
+                    <ul className="list-disc pl-5">
+                      {assignment.detailedInfo.gradingCriteria?.map((g, i) => (
+                        <li key={i} className="text-sm text-muted-foreground">{g}</li>
+                      ))}
+                    </ul>
                   </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value="instructions">
-                  <AccordionTrigger>Instructions</AccordionTrigger>
+                  <AccordionTrigger>Step-by-Step Instructions</AccordionTrigger>
                   <AccordionContent>
-                    <div>
-                      {assignment.detailedInfo.instructions ? (
-                        <ol className="list-decimal pl-5">
-                          {assignment.detailedInfo.instructions.map((ins, i) => (
-                            <li key={i} className="text-sm text-muted-foreground">{ins}</li>
-                          ))}
-                        </ol>
-                      ) : (
-                        <p className="text-sm text-muted-foreground">No instructions provided.</p>
-                      )}
-                    </div>
+                    <ol className="list-decimal pl-5 space-y-1">
+                      {assignment.detailedInfo.instructions?.map((ins, i) => (
+                        <li key={i} className="text-sm text-muted-foreground">{ins}</li>
+                      ))}
+                    </ol>
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
@@ -316,36 +320,24 @@ const PreCourseWritingPage = () => {
         </section>
       )}
 
-      {/* Additional resources (samples) */}
-      {(assignment.detailedInfo?.sampleQuestions || assignment.detailedInfo?.sampleResponses) && (
-        <section aria-label="Additional resources">
+      {/* Task Summary */}
+      {assignment.detailedInfo?.sampleQuestions && (
+        <section aria-label="Task Summary">
           <Card className="card-elevated">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base">
                 <FileText className="h-4 w-4 text-primary" />
-                Additional resources
+                Task Summary
               </CardTitle>
-              <CardDescription>Sample questions and example responses</CardDescription>
             </CardHeader>
             <CardContent className="pt-0">
-              <div className="text-sm text-muted-foreground space-y-2">
-                {assignment.detailedInfo?.sampleQuestions && (
-                  <div>
-                    <p className="font-medium">Sample questions</p>
-                    <ul className="list-disc pl-5">
-                      {assignment.detailedInfo.sampleQuestions.map((q, i) => (
-                        <li key={i}>{q}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {assignment.detailedInfo?.sampleResponses && (
-                  <div>
-                    <p className="font-medium">Sample responses (summaries)</p>
-                    <p className="text-sm text-muted-foreground">Example responses are available in the course materials.</p>
-                  </div>
-                )}
-              </div>
+              <ul className="space-y-3">
+                {assignment.detailedInfo.sampleQuestions.map((q, i) => (
+                  <li key={i} className="rounded-lg bg-muted/50 p-3">
+                    <p className="text-sm font-medium text-foreground">{q}</p>
+                  </li>
+                ))}
+              </ul>
             </CardContent>
           </Card>
         </section>
