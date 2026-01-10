@@ -1,4 +1,4 @@
-import { LearningUnit } from "../types";
+import { LearningUnit, NumberedParagraph } from "../types";
 
 // The article excerpt for Week 1 analysis
 export const articleExcerpt = {
@@ -56,173 +56,308 @@ export const articleExcerpt = {
   ]
 };
 
-// Unit 1.1: Recognizing Academic Paper Features
+// =============================================================================
+// UNIT 1.1: Discovering Academic Features (Socratic, Task-Based)
+// =============================================================================
 export const unit1_1: LearningUnit = {
   id: "w1-1-1",
-  title: "Exploring Academic Article Structure",
-  subtitle: "Recognize features of academic papers: citations, structure, key points",
-  duration: "15 min",
+  title: "Discovering Academic Text Features",
+  subtitle: "Explore the article and identify patterns in academic writing",
+  duration: "20 min",
   objectives: [
-    "Identify in-text citations in an academic article",
-    "Recognize the overall structure of an academic excerpt",
-    "Locate topic sentences in each paragraph"
+    "Discover what makes academic writing different from everyday writing",
+    "Identify recurring patterns in the text through observation",
+    "Understand the purpose of these features"
   ],
   slides: [
-    {
-      emoji: "📄",
-      heading: "Welcome to Academic Reading",
-      subheading: "Your Pre-course Writing uses an excerpt from this article",
-      points: [
-        "Today we'll read the **same article** you'll summarise for Task 1",
-        "We'll learn to spot **citations** - how authors reference other work",
-        "We'll identify **key points** in each paragraph",
-        "This will help you write a better summary!"
-      ],
-      tip: "Understanding the structure helps you identify what's important to include in your summary."
-    },
-    {
-      emoji: "📚",
-      heading: "The Article: Facial Recognition in Schools",
-      subheading: "Andrejevic & Selwyn (2020)",
-      points: [
-        "**Title:** Facial recognition technology in schools: critical questions and concerns",
-        "**Authors:** Mark Andrejevic & Neil Selwyn",
-        "**Published:** Learning, Media and Technology, 2020",
-        "**Type:** Conceptual article (argues a position based on existing research)"
-      ],
-      tip: "Notice the title signals a CRITICAL stance - the authors have concerns about FRT."
-    },
+    // TASK 1: Notice something unusual
     {
       emoji: "🔍",
-      heading: "What is an In-Text Citation?",
-      subheading: "How authors acknowledge sources",
+      heading: "Look Closely at Paragraph 2",
+      subheading: "Read carefully and notice any unusual patterns",
+      numberedText: [articleExcerpt.paragraphs[1]],
+    },
+    // TASK 2: What are those bracket things?
+    {
+      emoji: "❓",
+      heading: "What Do You Notice?",
+      subheading: "Answer the question below",
+    },
+    // TASK 3: Count them
+    {
+      emoji: "🔢",
+      heading: "Let's Count",
+      subheading: "How many times do you see this pattern?",
+      numberedText: [articleExcerpt.paragraphs[1]],
+    },
+    // TASK 4: Why do authors use them?
+    {
+      emoji: "🤔",
+      heading: "Why Do Authors Use These?",
+      subheading: "Think about the purpose",
+    },
+    // Now read Paragraph 3
+    {
+      emoji: "📖",
+      heading: "Now Read Paragraph 3",
+      subheading: "Look for the same pattern",
+      numberedText: [articleExcerpt.paragraphs[2]],
+    },
+    // TASK 5: Find them in Para 3
+    {
+      emoji: "🎯",
+      heading: "Apply Your Knowledge",
+      subheading: "Find the pattern in Paragraph 3",
+    },
+    // Reveal: These are Citations
+    {
+      emoji: "💡",
+      heading: "Discovery: In-Text Citations",
+      subheading: "What you found are called 'in-text citations'",
       points: [
-        "Citations show where information comes from",
-        "**Format:** (Author, Year) or Author (Year)",
-        "Example: *\"...spend $2.7 billion on-campus security products\" **(Doffman, 2018)**",
-        "Multiple authors: **(Andrejevic & Selwyn, 2020)** or **et al.** for 3+"
+        "**Citations** show where information comes from",
+        "Format: **(Author, Year)** or **Author (Year)**",
+        "They prove the writer isn't making things up",
+        "More citations = more evidence = stronger argument"
       ],
       examples: [
-        { title: "Information-prominent", text: "Schools spend billions on security (Doffman, 2018)." },
-        { title: "Author-prominent", text: "Harwell (2018) reports that vendors pitch FRT as 'an all-seeing shield'." }
+        { title: "Info-prominent", text: "Schools spend $2.7 billion (Doffman, 2018)." },
+        { title: "Author-prominent", text: "Harwell (2018) reports that vendors pitch FRT..." }
       ],
-      tip: "Count the citations in a paragraph - more citations = more supported claims!"
+      tip: "When summarising, you don't copy citations - you describe the IDEAS they support."
     },
+    // TASK 6: Compare paragraphs
     {
-      emoji: "📖",
-      heading: "Let's Read Paragraph 1",
-      subheading: "Introduction to the topic",
+      emoji: "⚖️",
+      heading: "Compare: Paragraph 1 vs Paragraph 2",
+      subheading: "Read both and spot the difference",
       numberedText: [articleExcerpt.paragraphs[0]],
-      tip: "This paragraph sets the CONTEXT. Notice there are no citations yet - the authors are framing the issue."
     },
+    // TASK 7: Why no citations in Para 1?
     {
-      emoji: "📖",
-      heading: "Let's Read Paragraph 2",
-      subheading: "First application: Campus Security",
-      numberedText: [articleExcerpt.paragraphs[1]],
-      tip: "Topic Sentence: Sentence 1 tells you what the paragraph is about. The rest provides evidence."
+      emoji: "🧠",
+      heading: "Think Deeper",
+      subheading: "Why does Paragraph 1 have no citations?",
     },
+    // TASK 8: First sentence pattern
     {
-      emoji: "📖",
-      heading: "Let's Read Paragraph 3",
-      subheading: "Second application: Attendance Monitoring",
-      numberedText: [articleExcerpt.paragraphs[2]],
-      tip: "Notice the transition word 'Another' - it signals a new main point."
+      emoji: "🎬",
+      heading: "First Sentences Are Special",
+      subheading: "Look at how each paragraph begins",
+      points: [
+        "**Para 2:** \"One prominent educational application... is campus security.\"",
+        "**Para 3:** \"Another application... is attendance monitoring.\"",
+        "**Para 4:** \"Beyond campus-based security... virtual learning contexts.\"",
+        "**Para 5:** \"Finally, there is a growing interest in... engagement.\""
+      ],
+    },
+    // TASK 9: What do first sentences do?
+    {
+      emoji: "🏷️",
+      heading: "What's the Pattern?",
+      subheading: "What do these first sentences have in common?",
+    },
+    // Reveal: Topic Sentences
+    {
+      emoji: "💡",
+      heading: "Discovery: Topic Sentences",
+      subheading: "The first sentence usually tells you what the paragraph is about",
+      points: [
+        "**Topic Sentence** = Main idea of the paragraph",
+        "Usually the **first sentence** (sometimes second)",
+        "Contains the **topic** + **controlling idea**",
+        "Everything else in the paragraph SUPPORTS this sentence"
+      ],
+      examples: [
+        { title: "Topic", text: "facial recognition for campus security" },
+        { title: "Controlling Idea", text: "it's a prominent application" }
+      ],
+      tip: "When writing a summary, focus on topic sentences - they contain the main ideas!"
+    },
+    // TASK 10: Identify topic sentence
+    {
+      emoji: "🎯",
+      heading: "Apply Your Knowledge",
+      subheading: "Find the topic sentence in Paragraph 4",
+      numberedText: [articleExcerpt.paragraphs[3]],
     }
   ],
   tasks: [
     {
       id: "w1-1-1-t1",
       type: "mc",
-      question: "How many in-text citations are in Paragraph 2?",
-      context: "Count all references in the format (Author, Year) in paragraph 2.",
-      options: ["2 citations", "3 citations", "4 citations", "5 citations"],
-      correctAnswer: 2,
-      explanation: "There are 4 citations: (Doffman, 2018), (Harwell, 2018) appears twice, and (SAFR, 2019)."
+      question: "Look at Paragraph 2. What unusual pattern do you notice that appears multiple times?",
+      context: "Read carefully and look for anything that stands out from normal writing.",
+      options: [
+        "Words in quotation marks",
+        "Names with years in brackets like (Doffman, 2018)",
+        "Numbers and statistics",
+        "Words in italics"
+      ],
+      correctAnswer: 1,
+      explanation: "You noticed the (Author, Year) pattern! These appear 4 times in this paragraph. Let's explore what they are..."
     },
     {
       id: "w1-1-1-t2",
       type: "mc",
-      question: "What is the main point of Paragraph 2?",
-      options: [
-        "Schools spend too much money on security",
-        "Facial recognition is used for campus security",
-        "School shootings are increasing in the US",
-        "SAFR is the best security system"
-      ],
-      correctAnswer: 1,
-      explanation: "The topic sentence clearly states: 'One prominent educational application of facial recognition technology is campus security.'"
+      question: "Count: How many times does the (Author, Year) pattern appear in Paragraph 2?",
+      context: "Look for: (Doffman, 2018), (Harwell, 2018), etc.",
+      options: ["2 times", "3 times", "4 times", "5 times"],
+      correctAnswer: 2,
+      explanation: "There are 4 citations: (Doffman, 2018), (Harwell, 2018) twice, and (SAFR, 2019). These are called 'in-text citations'."
     },
     {
       id: "w1-1-1-t3",
       type: "mc",
-      question: "Which sentence in Paragraph 3 is the topic sentence?",
+      question: "Why do you think authors include (Author, Year) after certain information?",
       options: [
-        "Sentence 1 - introduces attendance monitoring",
-        "Sentence 2 - mentions UK and Australia",
-        "Sentence 3 - gives the Loop-Learn example",
-        "Sentence 4 - discusses fake attendance"
+        "To make the writing look more academic",
+        "To show where the information comes from",
+        "To fill up the word count",
+        "To confuse the reader"
       ],
-      correctAnswer: 0,
-      explanation: "Sentence 1 introduces the main idea (attendance monitoring) that the rest of the paragraph develops."
+      correctAnswer: 1,
+      explanation: "Citations show the SOURCE of information. This proves the author isn't making things up - the facts come from published research."
     },
     {
       id: "w1-1-1-t4",
-      type: "highlight",
-      question: "In Paragraph 2, which sentences provide EVIDENCE (supporting details)?",
-      context: "Select all sentences that contain citations or specific examples.",
-      targetParagraph: 2,
-      targetSentences: [2, 3, 4, 6],
-      correctAnswer: ["2", "3", "4", "6"],
-      explanation: "Sentences 2, 3, 4, and 6 all contain citations that support the main claim about campus security."
+      type: "mc",
+      question: "How many citations can you find in Paragraph 3?",
+      options: ["1 citation", "2 citations", "3 citations", "4 citations"],
+      correctAnswer: 1,
+      explanation: "There are 2 citations: (Puthea et al., 2017) and (Wagh et al., 2015). Note: 'et al.' means 'and others' - used when there are 3+ authors."
+    },
+    {
+      id: "w1-1-1-t5",
+      type: "mc",
+      question: "Paragraph 1 has NO citations, but Paragraph 2 has 4 citations. Why might this be?",
+      options: [
+        "The author forgot to add citations to Paragraph 1",
+        "Paragraph 1 is the introduction, setting context; Paragraph 2 presents evidence",
+        "Citations are only needed every other paragraph",
+        "Paragraph 1 is opinion, Paragraph 2 is fact"
+      ],
+      correctAnswer: 1,
+      explanation: "Paragraph 1 introduces the TOPIC and sets CONTEXT - it doesn't need citations. Paragraph 2 makes CLAIMS that need evidence, so it uses citations."
+    },
+    {
+      id: "w1-1-1-t6",
+      type: "mc",
+      question: "What do the first sentences of Paragraphs 2, 3, 4, and 5 have in common?",
+      options: [
+        "They all have citations",
+        "They all introduce a main point about FRT applications",
+        "They all use similar length",
+        "They all mention schools"
+      ],
+      correctAnswer: 1,
+      explanation: "Each first sentence introduces a DIFFERENT APPLICATION of facial recognition: security, attendance, virtual learning, and engagement detection."
+    },
+    {
+      id: "w1-1-1-t7",
+      type: "mc",
+      question: "Which sentence is the topic sentence in Paragraph 4?",
+      context: "Remember: The topic sentence states what the whole paragraph is about.",
+      options: [
+        "Sentence 1 - introduces virtual learning applications",
+        "Sentence 2 - gives an example about online courses",
+        "Sentence 3 - explains access control",
+        "Sentence 4 - discusses e-assessment"
+      ],
+      correctAnswer: 0,
+      explanation: "Sentence 1 introduces the MAIN IDEA (FRT in virtual learning). Sentences 2-4 give EXAMPLES and DETAILS that support this main idea."
+    },
+    {
+      id: "w1-1-1-t8",
+      type: "fill-blank",
+      question: "Complete: The first sentence of a paragraph that states the main idea is called a ______ sentence.",
+      correctAnswer: "topic",
+      explanation: "The TOPIC SENTENCE tells readers what the paragraph will be about. It's usually the first sentence."
     }
   ],
-  moduleRef: "Pre-course Writing + Module 1"
+  moduleRef: "Pre-course Writing"
 };
 
-// Unit 1.2: Paragraph-Level Analysis
+// =============================================================================
+// UNIT 1.2: Understanding Paragraph Structure (Socratic, Task-Based)
+// =============================================================================
 export const unit1_2: LearningUnit = {
   id: "w1-1-2",
   title: "How Paragraphs Work",
-  subtitle: "Explore sentence connections and distinguish main points from details",
-  duration: "15 min",
+  subtitle: "Discover how sentences connect to build an argument",
+  duration: "20 min",
   objectives: [
-    "Understand how sentences connect within a paragraph",
     "Distinguish between main points and supporting details",
+    "Understand how evidence supports claims",
     "Identify transition signals between ideas"
   ],
   slides: [
+    // TASK 1: Read and categorise
     {
-      emoji: "🔗",
-      heading: "Paragraph Building Blocks",
-      subheading: "How academic paragraphs are structured",
-      points: [
-        "**Topic Sentence:** States the main idea (usually first)",
-        "**Supporting Details:** Evidence, examples, citations",
-        "**Concluding/Linking Sentence:** Wraps up or transitions",
-        "Each sentence has a **job** in the paragraph"
-      ],
-      tip: "When summarising, focus on TOPIC SENTENCES - they contain the main ideas."
-    },
-    {
-      emoji: "🎯",
+      emoji: "📊",
       heading: "Main Points vs. Supporting Details",
-      subheading: "What to include in your summary",
+      subheading: "Not all sentences are equally important",
+      numberedText: [articleExcerpt.paragraphs[1]],
+    },
+    // TASK 2: Which is which?
+    {
+      emoji: "⚖️",
+      heading: "Sort the Sentences",
+      subheading: "Which sentences make claims? Which provide evidence?",
+    },
+    // Reveal: The pattern
+    {
+      emoji: "💡",
+      heading: "Discovery: The Claim-Evidence Pattern",
+      subheading: "Academic paragraphs follow a predictable structure",
       points: [
-        "**Main Point:** The key argument or claim (INCLUDE in summary)",
-        "**Supporting Detail:** Evidence that backs it up (usually SKIP in summary)",
-        "**Example:** Statistics, quotes, case studies (usually SKIP)"
+        "**Main Point (Claim):** What the author ARGUES",
+        "**Supporting Detail:** EVIDENCE that backs it up",
+        "**Example:** Specific cases, statistics, quotes",
+        "Sentences with citations are usually SUPPORTING DETAILS"
       ],
       examples: [
-        { title: "Main Point", text: "Facial recognition is used for campus security." },
-        { title: "Supporting Detail", text: "Schools spend $2.7 billion annually (Doffman, 2018)." }
+        { title: "Main Point", text: "FRT is used for campus security (no citation needed)" },
+        { title: "Supporting Detail", text: "Schools spend $2.7 billion (Doffman, 2018)" }
       ],
-      tip: "Your summary should capture MAIN POINTS, not every detail. That's how you fit 5 paragraphs into 300 words!"
+      tip: "For summaries: Include MAIN POINTS, skip most DETAILS. That's how you condense 5 paragraphs into 300 words!"
     },
+    // TASK 3: Apply to new paragraph
     {
-      emoji: "↔️",
-      heading: "Transition Signals",
-      subheading: "How authors connect ideas",
+      emoji: "🎯",
+      heading: "Practice: Paragraph 5",
+      subheading: "Identify main point vs. supporting details",
+      numberedText: [articleExcerpt.paragraphs[4]],
+    },
+    // TASK 4: Identify details
+    {
+      emoji: "🔍",
+      heading: "Which Are Supporting Details?",
+      subheading: "Select all the sentences that provide evidence/examples",
+    },
+    // Transition words intro
+    {
+      emoji: "🔗",
+      heading: "How Do Paragraphs Connect?",
+      subheading: "Notice the first words of each paragraph",
+      points: [
+        "Para 2: \"**One** prominent application...\"",
+        "Para 3: \"**Another** application...\"",
+        "Para 4: \"**Beyond** campus-based security...\"",
+        "Para 5: \"**Finally**, there is growing interest...\""
+      ],
+    },
+    // TASK 5: What do these words do?
+    {
+      emoji: "🤔",
+      heading: "What's the Pattern?",
+      subheading: "What do 'One', 'Another', 'Beyond', and 'Finally' tell us?",
+    },
+    // Reveal: Transition signals
+    {
+      emoji: "💡",
+      heading: "Discovery: Transition Signals",
+      subheading: "These words show how ideas are organised",
       points: [
         "**Adding:** Another, Also, Furthermore, In addition",
         "**Contrasting:** However, While, Although, On the other hand",
@@ -230,228 +365,333 @@ export const unit1_2: LearningUnit = {
         "**Concluding:** Finally, In conclusion, All told"
       ],
       examples: [
-        { title: "From the article", text: "'Another application...' signals a NEW main point" },
-        { title: "From the article", text: "'For example...' signals SUPPORTING DETAIL" }
-      ]
+        { title: "From the article", text: "'Another application...' = adding a new point" },
+        { title: "From the article", text: "'For example...' = here comes evidence" }
+      ],
+      tip: "Transition words are signposts - they tell you what kind of information is coming next."
     },
+    // TASK 6: The article structure
     {
-      emoji: "📖",
-      heading: "Analysing Paragraph 4",
-      subheading: "Virtual Learning Applications",
-      numberedText: [articleExcerpt.paragraphs[3]],
-      tip: "Notice 'Beyond' signals a shift from physical to virtual contexts."
+      emoji: "🏗️",
+      heading: "The Big Picture",
+      subheading: "Now you can see the whole structure",
     },
+    // Summary structure
     {
-      emoji: "📖",
-      heading: "Analysing Paragraph 5",
-      subheading: "Engagement and Learning Detection",
-      numberedText: [articleExcerpt.paragraphs[4]],
-      tip: "Notice 'Finally' signals the last main application being discussed."
-    },
-    {
-      emoji: "📊",
-      heading: "The Article's Structure",
+      emoji: "📋",
+      heading: "The Article's Blueprint",
       subheading: "4 Applications of FRT in Education",
       points: [
-        "**Para 1:** Introduction - sets the context",
-        "**Para 2:** Application 1 - Campus Security",
-        "**Para 3:** Application 2 - Attendance Monitoring",
-        "**Para 4:** Application 3 - Virtual Learning/Online Exams",
-        "**Para 5:** Application 4 - Engagement Detection"
+        "**Paragraph 1:** Introduction - sets the context",
+        "**Paragraph 2:** Application 1 - Campus Security",
+        "**Paragraph 3:** Application 2 - Attendance Monitoring",
+        "**Paragraph 4:** Application 3 - Virtual Learning/Online Exams",
+        "**Paragraph 5:** Application 4 - Engagement Detection"
       ],
-      tip: "For your summary: Capture each APPLICATION as a main point, skip the specific statistics."
+      tip: "This is what you need for your summary: ONE sentence per application!"
     }
   ],
   tasks: [
     {
       id: "w1-1-2-t1",
       type: "mc",
-      question: "In Paragraph 4, what transition word signals a new context?",
-      options: ["Another", "Beyond", "For example", "Similarly"],
-      correctAnswer: 1,
-      explanation: "'Beyond' indicates moving from physical campus security to virtual/online contexts."
+      question: "In Paragraph 2, which sentence is the MAIN POINT (claim)?",
+      context: "The main point is what the author is arguing - not evidence or examples.",
+      options: [
+        "Sentence 1: 'One prominent application... is campus security.'",
+        "Sentence 2: 'This form... spend $2.7 billion' (Doffman, 2018)",
+        "Sentence 3: 'Facial recognition systems sold to thousands of schools' (Harwell, 2018)",
+        "Sentence 6: 'SAFR system reasons...' (SAFR, 2019)"
+      ],
+      correctAnswer: 0,
+      explanation: "Sentence 1 is the CLAIM - it states the main point. Sentences 2-6 provide EVIDENCE (with citations) to support this claim."
     },
     {
       id: "w1-1-2-t2",
       type: "mc",
-      question: "Which of these from Paragraph 5 is a SUPPORTING DETAIL, not a main point?",
+      question: "Sentence 2 says schools 'annually spend $2.7 billion' on security. Is this a main point or supporting detail?",
       options: [
-        "There is growing interest in facial detection for engagement",
-        "Detecting facial actions can indicate boredom or confusion",
-        "Brow-raising and mouth dimpling indicate learning",
-        "The face shows the learner's state of mind"
+        "Main Point - it's an important fact",
+        "Supporting Detail - it's evidence for the main point",
+        "Neither - it's just background information",
+        "Both - facts are always main points"
       ],
-      correctAnswer: 2,
-      explanation: "The specific facial actions (brow-raising, etc.) are examples that support the main point about detecting engagement."
+      correctAnswer: 1,
+      explanation: "The $2.7 billion statistic is EVIDENCE (supporting detail) that proves the main point about FRT being used for security. Notice the citation!"
     },
     {
       id: "w1-1-2-t3",
-      type: "short-answer",
-      question: "In ONE sentence, what is the main idea of Paragraph 4?",
-      hints: ["Start with 'Facial recognition is also used for...'", "Focus on the virtual/online context"],
-      wordLimit: 30,
-      explanation: "Sample answer: 'Facial recognition is also used in virtual learning to verify student identity in online courses and exams.'"
+      type: "mc",
+      question: "In Paragraph 5, which is the main point and which is a supporting detail?",
+      context: "Main Point: 'Interest in facial detection for student engagement.' Detail: 'Brow-raising and mouth dimpling indicate learning.'",
+      options: [
+        "Both are main points",
+        "First is main point, second is supporting detail",
+        "First is supporting detail, second is main point",
+        "Both are supporting details"
+      ],
+      correctAnswer: 1,
+      explanation: "The general claim (interest in engagement detection) is the MAIN POINT. The specific facial actions (brow-raising, etc.) are EXAMPLES that support it."
     },
     {
       id: "w1-1-2-t4",
       type: "mc",
-      question: "What are the FOUR main applications of FRT discussed in the article?",
+      question: "What does the transition word 'Another' in Paragraph 3 tell you?",
       options: [
-        "Security, Attendance, Online Learning, Engagement Detection",
-        "Security, Discipline, Grading, Attendance",
-        "Attendance, Online Exams, Security, Student Monitoring",
-        "Virtual Learning, Physical Security, Emotion Analysis, Grading"
+        "The author is contradicting the previous paragraph",
+        "The author is adding a second example of the same point",
+        "The author is introducing a new application of FRT",
+        "The author is concluding the argument"
       ],
-      correctAnswer: 0,
-      explanation: "The four applications are: (1) Campus Security, (2) Attendance Monitoring, (3) Virtual Learning/Online Verification, (4) Engagement/Learning Detection."
+      correctAnswer: 2,
+      explanation: "'Another application' signals the author is adding a NEW main point - a different application of FRT (attendance monitoring)."
+    },
+    {
+      id: "w1-1-2-t5",
+      type: "mc",
+      question: "What does the word 'Finally' in Paragraph 5 signal?",
+      options: [
+        "The author is about to give the most important point",
+        "The author is presenting the last application in the list",
+        "The author is disagreeing with previous points",
+        "The author is starting a new topic"
+      ],
+      correctAnswer: 1,
+      explanation: "'Finally' signals the LAST item in a list. After 'One', 'Another', and 'Beyond', 'Finally' tells us this is the last application."
+    },
+    {
+      id: "w1-1-2-t6",
+      type: "mc",
+      question: "How many MAIN APPLICATIONS of FRT does the article discuss?",
+      options: [
+        "2 applications",
+        "3 applications",
+        "4 applications",
+        "5 applications"
+      ],
+      correctAnswer: 2,
+      explanation: "The article discusses 4 applications: (1) Campus Security, (2) Attendance Monitoring, (3) Virtual Learning/Online Exams, (4) Engagement Detection."
+    },
+    {
+      id: "w1-1-2-t7",
+      type: "short-answer",
+      question: "In ONE sentence, summarise what Paragraph 4 is about.",
+      hints: ["Start with: 'Facial recognition is also used for...'", "Focus on the virtual/online context"],
+      wordLimit: 25,
+      explanation: "Sample: 'Facial recognition is also used to verify student identity in online courses and exams.'"
+    },
+    {
+      id: "w1-1-2-t8",
+      type: "fill-blank",
+      question: "Complete: When summarising, include ______ points but skip most supporting ______.",
+      correctAnswer: "main|details",
+      explanation: "Include MAIN points, skip DETAILS. This is how you condense a long article into a short summary."
     }
   ],
   moduleRef: "Pre-course Writing"
 };
 
-// Unit 1.3: Brainstorming for Argumentative Essay
+// =============================================================================
+// UNIT 1.3: From Reading to Writing (Socratic, Task-Based)
+// =============================================================================
 export const unit1_3: LearningUnit = {
   id: "w1-1-3",
   title: "From Reading to Writing",
-  subtitle: "Use the article to develop your argumentative essay",
+  subtitle: "Use what you've learned to plan your Pre-course Writing",
   duration: "15 min",
   objectives: [
-    "Extract ideas from the article for your essay",
-    "Develop a clear position (for or against FRT in schools)",
-    "Plan your argument structure"
+    "Extract key ideas for your summary (Task 1)",
+    "Develop a position for your argument (Task 2)",
+    "Understand the difference between summary and argument"
   ],
   slides: [
+    // Intro to tasks
     {
       emoji: "✍️",
-      heading: "Task 2: Your Argumentative Essay",
-      subheading: "Is it advisable for schools to adopt FRT on campus?",
+      heading: "Your Pre-course Writing",
+      subheading: "Two tasks, one article",
       points: [
-        "You must take a **position** (YES or NO)",
-        "Use ideas from the article to **support** your argument",
-        "300 words maximum",
-        "You can add your own views and knowledge"
+        "**Task 1: Summary** (300 words) - What does the article say?",
+        "**Task 2: Argument** (300 words) - What do YOU think?",
+        "Both tasks use the same article",
+        "You now know how to identify the main points!"
       ],
-      tip: "The article provides EVIDENCE you can use - you don't need to do extra research!"
+      tip: "Don't start writing yet - let's plan first!"
     },
-    {
-      emoji: "⚖️",
-      heading: "Taking a Position",
-      subheading: "What the article tells us",
-      points: [
-        "The article presents **four uses** of FRT in schools",
-        "But notice the title: 'critical questions and **concerns**'",
-        "The authors are **critical** of FRT adoption",
-        "You can AGREE or DISAGREE with their concerns"
-      ],
-      examples: [
-        { title: "PRO position", text: "FRT should be adopted because it enhances security and saves time." },
-        { title: "CON position", text: "FRT should not be adopted because it raises privacy concerns." }
-      ]
-    },
-    {
-      emoji: "💡",
-      heading: "Ideas FOR Adopting FRT",
-      subheading: "Evidence from the article",
-      points: [
-        "**Security:** Can identify intruders and detect threats",
-        "**Efficiency:** Saves 2.5 hours of teacher time per week on attendance",
-        "**Integrity:** Verifies student identity in online exams",
-        "**Learning:** Can detect when students are confused or bored"
-      ],
-      tip: "If you argue FOR FRT, use these benefits as your main points."
-    },
-    {
-      emoji: "⚠️",
-      heading: "Ideas AGAINST Adopting FRT",
-      subheading: "Concerns raised in the article",
-      points: [
-        "**Privacy:** Constant surveillance of students",
-        "**Normalisation:** Makes surveillance seem 'normal' for young people",
-        "**Accuracy:** Relies on subtle facial movements that may not be reliable",
-        "**Consent:** Students cannot easily opt out"
-      ],
-      tip: "If you argue AGAINST FRT, use these concerns as your main points."
-    },
+    // TASK 1: Summary planning
     {
       emoji: "📝",
-      heading: "Essay Structure",
-      subheading: "How to organise your 300 words",
-      points: [
-        "**Introduction (50-70 words):** Background + Your thesis (position)",
-        "**Body Paragraph (150-180 words):** Your main argument with evidence",
-        "**Conclusion (50-70 words):** Restate position + final thought"
-      ],
-      examples: [
-        { title: "Thesis example (CON)", text: "This essay argues that schools should NOT adopt FRT due to privacy concerns." },
-        { title: "Thesis example (PRO)", text: "This essay argues that FRT adoption in schools is advisable for enhancing security." }
-      ]
+      heading: "Task 1: Planning Your Summary",
+      subheading: "What are the 4 applications you need to mention?",
     },
+    // TASK 2: Summary sentences
     {
       emoji: "🎯",
-      heading: "Using the Article in Your Essay",
-      subheading: "Remember to cite!",
+      heading: "One Sentence Per Application",
+      subheading: "Can you express each main point in one sentence?",
+    },
+    // Intro to argument
+    {
+      emoji: "⚖️",
+      heading: "Task 2: Taking a Position",
+      subheading: "Is it advisable for schools to adopt FRT?",
       points: [
-        "**Quote:** Use exact words in quotation marks + citation",
-        "**Paraphrase:** Rewrite in your own words + citation",
-        "**Reference:** Refer to findings + citation"
+        "You must take a **clear position** (YES or NO)",
+        "Use ideas from the article as **evidence**",
+        "You can add your **own views** and knowledge",
+        "300 words maximum"
       ],
-      examples: [
-        { title: "Good citation", text: "According to Andrejevic and Selwyn (2020), schools are increasingly adopting surveillance technologies." },
-        { title: "Without citation", text: "Schools are using more surveillance. ❌ (Needs a citation!)" }
+    },
+    // TASK 3: Your position
+    {
+      emoji: "🤔",
+      heading: "What Do You Think?",
+      subheading: "Before reading arguments, form your initial opinion",
+    },
+    // Arguments FOR
+    {
+      emoji: "✅",
+      heading: "Arguments FOR FRT in Schools",
+      subheading: "Ideas you can use if you support FRT",
+      points: [
+        "**Security:** Can identify intruders and prevent shootings",
+        "**Efficiency:** Saves teacher time on attendance (2.5 hrs/week)",
+        "**Academic Integrity:** Prevents cheating in online exams",
+        "**Engagement:** Can help teachers identify struggling students"
       ],
-      tip: "Every idea from the article needs a citation: (Andrejevic & Selwyn, 2020)"
+    },
+    // Arguments AGAINST
+    {
+      emoji: "❌",
+      heading: "Arguments AGAINST FRT in Schools",
+      subheading: "Ideas you can use if you oppose FRT",
+      points: [
+        "**Privacy:** Constant surveillance of students",
+        "**Normalisation:** Children grow up accepting being watched",
+        "**Accuracy Issues:** Technology can make mistakes (false positives)",
+        "**Trust:** Damages relationship between students and teachers"
+      ],
+      tip: "The article's TITLE hints the authors are critical: 'concerns' and 'questions'"
+    },
+    // TASK 4: Which side?
+    {
+      emoji: "⚖️",
+      heading: "Your Position",
+      subheading: "Now that you've seen both sides, where do you stand?",
+    },
+    // Final tips
+    {
+      emoji: "🚀",
+      heading: "Ready to Write!",
+      subheading: "You now have everything you need",
+      points: [
+        "**For Task 1:** List the 4 applications, skip the statistics",
+        "**For Task 2:** Pick ONE side and argue clearly",
+        "Use the article as evidence for your argument",
+        "300 words each = be concise!"
+      ],
+      tip: "Start with your position statement: 'Schools should/should not adopt FRT because...'"
     }
   ],
   tasks: [
     {
       id: "w1-1-3-t1",
       type: "mc",
-      question: "What position do the article's authors (Andrejevic & Selwyn) take?",
+      question: "What are the 4 applications of FRT discussed in the article?",
       options: [
-        "They strongly support FRT in schools",
-        "They are neutral - just presenting facts",
-        "They are critical and raise concerns about FRT",
-        "They only discuss the benefits of FRT"
+        "Security, Attendance, Grading, Discipline",
+        "Security, Attendance, Online Verification, Engagement Detection",
+        "Attendance, Exams, Homework Tracking, Behavior Monitoring",
+        "Security, Biometrics, Testing, Student Tracking"
       ],
-      correctAnswer: 2,
-      explanation: "The title 'critical questions and concerns' reveals their critical stance toward FRT adoption."
+      correctAnswer: 1,
+      explanation: "The 4 applications are: (1) Campus Security, (2) Attendance Monitoring, (3) Online Learning/Exam Verification, (4) Engagement/Learning Detection."
     },
     {
       id: "w1-1-3-t2",
-      type: "mc",
-      question: "Which is a better thesis statement for your essay?",
-      options: [
-        "Facial recognition is interesting technology.",
-        "This essay argues that FRT should not be adopted in schools due to privacy violations.",
-        "Many schools use facial recognition these days.",
-        "There are pros and cons to facial recognition."
-      ],
-      correctAnswer: 1,
-      explanation: "A thesis must state your POSITION clearly. Option B clearly states the position (against) and reason (privacy)."
+      type: "short-answer",
+      question: "Write ONE sentence summarising the first application (Campus Security).",
+      hints: ["Don't include statistics", "Focus on the main purpose"],
+      wordLimit: 30,
+      explanation: "Sample: 'One application of facial recognition in schools is campus security, which helps identify intruders and track individuals on school grounds.'"
     },
     {
       id: "w1-1-3-t3",
-      type: "paragraph",
-      question: "Write a thesis statement for your essay. State your position (for or against FRT in schools) and give one reason.",
-      hints: [
-        "Start with 'This essay argues that...'",
-        "Include your position: FRT SHOULD or SHOULD NOT be adopted",
-        "Add one reason: because/due to..."
+      type: "mc",
+      question: "Before seeing all the arguments, what is your initial position on FRT in schools?",
+      options: [
+        "Strongly support - safety is the priority",
+        "Slightly support - with some reservations",
+        "Slightly oppose - there are too many concerns",
+        "Strongly oppose - privacy is more important"
       ],
-      wordLimit: 40
+      correctAnswer: 0, // No correct answer - it's opinion
+      explanation: "There's no 'correct' answer! The key is to have a clear position and support it with evidence from the article."
     },
     {
       id: "w1-1-3-t4",
-      type: "short-answer",
-      question: "List TWO pieces of evidence from the article you could use to support your position.",
-      hints: [
-        "Think about which application (security, attendance, online learning, engagement) supports your view",
-        "Include the citation: (Andrejevic & Selwyn, 2020)"
+      type: "mc",
+      question: "If you SUPPORT FRT, which evidence from the article would you use?",
+      options: [
+        "The technology can detect gun-shaped objects (Harwell, 2018)",
+        "Students grow up normalised to surveillance",
+        "The technology might have accuracy problems",
+        "Privacy is a major concern"
       ],
-      wordLimit: 60
+      correctAnswer: 0,
+      explanation: "The gun detection capability is EVIDENCE for security benefits. The other options are arguments AGAINST FRT."
+    },
+    {
+      id: "w1-1-3-t5",
+      type: "mc",
+      question: "If you OPPOSE FRT, what would be your strongest argument from the article?",
+      options: [
+        "It saves teacher time on attendance",
+        "It can verify student identity in online exams",
+        "It normalises surveillance of young people",
+        "It helps detect engaged students"
+      ],
+      correctAnswer: 2,
+      explanation: "The 'normalisation of surveillance' is mentioned in Paragraph 1 and is a strong AGAINST argument about long-term effects on children."
+    },
+    {
+      id: "w1-1-3-t6",
+      type: "mc",
+      question: "What does the article's TITLE suggest about the authors' view?",
+      context: "Title: 'Facial recognition technology in schools: critical questions and concerns'",
+      options: [
+        "The authors are neutral and balanced",
+        "The authors strongly support FRT",
+        "The authors have concerns about FRT",
+        "The authors don't take a position"
+      ],
+      correctAnswer: 2,
+      explanation: "The words 'critical questions' and 'concerns' in the title signal the authors are skeptical about FRT in schools."
+    },
+    {
+      id: "w1-1-3-t7",
+      type: "short-answer",
+      question: "Write your position statement for Task 2 (your argument essay).",
+      hints: ["Start with: 'Schools should/should not adopt FRT because...'", "Be clear about your stance"],
+      wordLimit: 40,
+      explanation: "Sample: 'Schools should not adopt facial recognition technology because it normalises surveillance, raises serious privacy concerns, and damages trust between students and educators.'"
+    },
+    {
+      id: "w1-1-3-t8",
+      type: "mc",
+      question: "What's the difference between your Task 1 (summary) and Task 2 (argument)?",
+      options: [
+        "Task 1 is your opinion; Task 2 is what the article says",
+        "Task 1 is what the article says; Task 2 is your opinion + evidence",
+        "Both tasks are about your personal opinion",
+        "Both tasks are about summarising the article"
+      ],
+      correctAnswer: 1,
+      explanation: "Task 1 (summary) = report what the ARTICLE says. Task 2 (argument) = express YOUR position using evidence from the article."
     }
   ],
-  moduleRef: "Pre-course Writing Task 2"
+  moduleRef: "Pre-course Writing"
 };
 
-export const week1Hour1Units = [unit1_1, unit1_2, unit1_3];
+// Export all units for Week 1 Hour 1
+export const week1Hour1Units: LearningUnit[] = [unit1_1, unit1_2, unit1_3];
