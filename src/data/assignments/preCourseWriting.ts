@@ -26,7 +26,7 @@ export const preCourseWriting: Assignment = {
   id: "pre-course-writing",
   title: "Pre-course Writing",
   weight: "2.5%",
-  dueWeek: 2,
+  dueWeek: 1,
   type: "take-home",
   description:
     "This pre-course writing consists of two tasks: Task 1 (summary writing) and Task 2 (argumentation). Submissions made before the deadline will be awarded 2.5% (out of 15%) from Class Participation. This task is also used as a baseline to help your instructor understand your starting point in key academic writing skills.",

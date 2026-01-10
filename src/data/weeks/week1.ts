@@ -48,7 +48,8 @@ export const week1: WeekData = {
     "You help first-year students understand the structure of academic journal articles, specifically the differences between empirical and conceptual papers, and how to analyze titles and abstracts.",
   skillsIntroduced: ["journal-structure", "citation-recognition", "secondary-citations"],
   skillsReinforced: [],
-  assignmentsUpcoming: ["pre-course-writing", "referencing-quiz"],
+  assignmentsDue: ["pre-course-writing"],
+  assignmentsUpcoming: ["referencing-quiz"],
   lessons: [lesson1_1, lesson1_2, lesson1_3],
   classRundown: [
     {
@@ -79,6 +80,6 @@ export const week1: WeekData = {
 
 export const week1Meta: WeekMeta = {
   dateRange: "12-16 Jan 2026",
-  assignmentTagline: "Classes begin on 12 Jan - No assessments due this week",
-  assignmentIds: [],
+  assignmentTagline: "Pre-course Writing (2.5%) due 23 Jan, 6pm",
+  assignmentIds: ["pre-course-writing"],
 };
