@@ -70,35 +70,21 @@ export const unit1_1: LearningUnit = {
     "Understand the purpose of these features"
   ],
   slides: [
-    // SLIDE 1: Read + Task 1 - Notice the pattern
+    // SLIDE 1: Notice patterns in Para 2 + why they exist
     {
       emoji: "🔍",
-      heading: "Look Closely at Paragraph 2",
-      subheading: "Read carefully and notice any unusual patterns",
+      heading: "What Do You Notice?",
+      subheading: "Read Paragraph 2 and spot any unusual patterns",
       numberedText: [articleExcerpt.paragraphs[1]],
     },
-    // SLIDE 2: Count them (same paragraph shown)
-    {
-      emoji: "🔢",
-      heading: "Let's Count the Pattern",
-      subheading: "How many times do you see this pattern in Paragraph 2?",
-      numberedText: [articleExcerpt.paragraphs[1]],
-    },
-    // SLIDE 3: Why do authors use them?
-    {
-      emoji: "🤔",
-      heading: "Why Do Authors Use These?",
-      subheading: "Think about the purpose of (Author, Year) patterns",
-      numberedText: [articleExcerpt.paragraphs[1]],
-    },
-    // SLIDE 4: Apply to Paragraph 3
+    // SLIDE 2: Apply to Para 3
     {
       emoji: "🎯",
-      heading: "Apply to Paragraph 3",
-      subheading: "Find the same pattern in a new paragraph",
+      heading: "Find Citations in Paragraph 3",
+      subheading: "Apply what you learned to a new paragraph",
       numberedText: [articleExcerpt.paragraphs[2]],
     },
-    // SLIDE 5: Reveal - Citations
+    // SLIDE 3: Reveal - Citations
     {
       emoji: "💡",
       heading: "Discovery: In-Text Citations",
@@ -115,23 +101,18 @@ export const unit1_1: LearningUnit = {
       ],
       tip: "When summarising, you don't copy citations - you describe the IDEAS they support."
     },
-    // SLIDE 6: Compare Para 1 vs Para 2
+    // SLIDE 4: Compare Para 1 vs Para 2
     {
       emoji: "⚖️",
-      heading: "Compare: Paragraph 1 vs Paragraph 2",
-      subheading: "Why does Paragraph 1 have NO citations?",
-      numberedText: [articleExcerpt.paragraphs[0]],
-      points: [
-        "**Paragraph 2** had 4 citations",
-        "**Paragraph 1** (shown above) has 0 citations",
-        "Why the difference?"
-      ],
+      heading: "Compare Paragraphs",
+      subheading: "Why does Paragraph 1 have NO citations, but Paragraph 2 has many?",
+      numberedText: [articleExcerpt.paragraphs[0], articleExcerpt.paragraphs[1]],
     },
-    // SLIDE 7: First sentences pattern
+    // SLIDE 5: First sentences - Topic Sentences
     {
       emoji: "🎬",
       heading: "First Sentences Are Special",
-      subheading: "Look at how each paragraph begins",
+      subheading: "What do these first sentences have in common?",
       points: [
         "**Para 2:** \"One prominent educational application... is campus security.\"",
         "**Para 3:** \"Another application... is attendance monitoring.\"",
@@ -139,7 +120,7 @@ export const unit1_1: LearningUnit = {
         "**Para 5:** \"Finally, there is a growing interest in... engagement.\""
       ],
     },
-    // SLIDE 8: Reveal - Topic Sentences
+    // SLIDE 6: Reveal - Topic Sentences
     {
       emoji: "💡",
       heading: "Discovery: Topic Sentences",
@@ -156,7 +137,7 @@ export const unit1_1: LearningUnit = {
       ],
       tip: "When writing a summary, focus on topic sentences - they contain the main ideas!"
     },
-    // SLIDE 9: Apply - Find topic sentence in Para 4
+    // SLIDE 7: Apply - Find topic sentence in Para 4
     {
       emoji: "🎯",
       heading: "Find the Topic Sentence",
@@ -168,8 +149,8 @@ export const unit1_1: LearningUnit = {
     {
       id: "w1-1-1-t1",
       type: "mc",
-      question: "Look at Paragraph 2. What unusual pattern do you notice that appears multiple times?",
-      context: "Read carefully and look for anything that stands out from normal writing.",
+      question: "What unusual pattern appears multiple times in Paragraph 2?",
+      context: "Look for anything that stands out from normal writing.",
       options: [
         "Words in quotation marks",
         "Names with years in brackets like (Doffman, 2018)",
@@ -177,69 +158,49 @@ export const unit1_1: LearningUnit = {
         "Words in italics"
       ],
       correctAnswer: 1,
-      explanation: "You noticed the (Author, Year) pattern! These appear 4 times in this paragraph. Let's explore what they are..."
+      explanation: "You noticed the (Author, Year) pattern! These are called 'in-text citations' - there are 4 of them in this paragraph."
     },
     {
       id: "w1-1-1-t2",
       type: "mc",
-      question: "Count: How many times does the (Author, Year) pattern appear in Paragraph 2?",
-      context: "Look for: (Doffman, 2018), (Harwell, 2018), etc.",
-      options: ["2 times", "3 times", "4 times", "5 times"],
-      correctAnswer: 2,
-      explanation: "There are 4 citations: (Doffman, 2018), (Harwell, 2018) twice, and (SAFR, 2019). These are called 'in-text citations'."
+      question: "How many citations can you find in Paragraph 3?",
+      context: "Look for the (Author, Year) pattern. Note: 'et al.' means 'and others'.",
+      options: ["1 citation", "2 citations", "3 citations", "4 citations"],
+      correctAnswer: 1,
+      explanation: "There are 2 citations: (Puthea et al., 2017) and (Wagh et al., 2015)."
     },
     {
       id: "w1-1-1-t3",
       type: "mc",
-      question: "Why do you think authors include (Author, Year) after certain information?",
-      options: [
-        "To make the writing look more academic",
-        "To show where the information comes from",
-        "To fill up the word count",
-        "To confuse the reader"
-      ],
-      correctAnswer: 1,
-      explanation: "Citations show the SOURCE of information. This proves the author isn't making things up - the facts come from published research."
-    },
-    {
-      id: "w1-1-1-t4",
-      type: "mc",
-      question: "How many citations can you find in Paragraph 3?",
-      options: ["1 citation", "2 citations", "3 citations", "4 citations"],
-      correctAnswer: 1,
-      explanation: "There are 2 citations: (Puthea et al., 2017) and (Wagh et al., 2015). Note: 'et al.' means 'and others' - used when there are 3+ authors."
-    },
-    {
-      id: "w1-1-1-t5",
-      type: "mc",
-      question: "Paragraph 1 has NO citations, but Paragraph 2 has 4 citations. Why might this be?",
+      question: "Paragraph 1 has NO citations, but Paragraph 2 has 4. Why?",
+      context: "Think about what each paragraph is doing.",
       options: [
         "The author forgot to add citations to Paragraph 1",
-        "Paragraph 1 is the introduction, setting context; Paragraph 2 presents evidence",
+        "Paragraph 1 sets context; Paragraph 2 presents evidence",
         "Citations are only needed every other paragraph",
         "Paragraph 1 is opinion, Paragraph 2 is fact"
       ],
       correctAnswer: 1,
-      explanation: "Paragraph 1 introduces the TOPIC and sets CONTEXT - it doesn't need citations. Paragraph 2 makes CLAIMS that need evidence, so it uses citations."
+      explanation: "Paragraph 1 introduces the TOPIC and sets CONTEXT. Paragraph 2 makes CLAIMS that need evidence, so it uses citations."
     },
     {
-      id: "w1-1-1-t6",
+      id: "w1-1-1-t4",
       type: "mc",
-      question: "What do the first sentences of Paragraphs 2, 3, 4, and 5 have in common?",
+      question: "What do the first sentences of Paragraphs 2-5 have in common?",
       options: [
         "They all have citations",
-        "They all introduce a main point about FRT applications",
+        "They all introduce a different application of FRT",
         "They all use similar length",
         "They all mention schools"
       ],
       correctAnswer: 1,
-      explanation: "Each first sentence introduces a DIFFERENT APPLICATION of facial recognition: security, attendance, virtual learning, and engagement detection."
+      explanation: "Each first sentence introduces a DIFFERENT APPLICATION: security, attendance, virtual learning, and engagement detection."
     },
     {
-      id: "w1-1-1-t7",
+      id: "w1-1-1-t5",
       type: "mc",
       question: "Which sentence is the topic sentence in Paragraph 4?",
-      context: "Remember: The topic sentence states what the whole paragraph is about.",
+      context: "The topic sentence states what the whole paragraph is about.",
       options: [
         "Sentence 1 - introduces virtual learning applications",
         "Sentence 2 - gives an example about online courses",
@@ -247,7 +208,7 @@ export const unit1_1: LearningUnit = {
         "Sentence 4 - discusses e-assessment"
       ],
       correctAnswer: 0,
-      explanation: "Sentence 1 introduces the MAIN IDEA (FRT in virtual learning). Sentences 2-4 give EXAMPLES and DETAILS that support this main idea."
+      explanation: "Sentence 1 introduces the MAIN IDEA (FRT in virtual learning). Sentences 2-4 give EXAMPLES and DETAILS that support this."
     },
     {
       id: "w1-1-1-t8",

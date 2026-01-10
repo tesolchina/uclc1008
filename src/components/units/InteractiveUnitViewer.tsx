@@ -19,33 +19,27 @@ export function InteractiveUnitViewer({ unit, defaultOpen = false }: Interactive
   const [completedTasks, setCompletedTasks] = useState<Record<string, boolean>>({});
   const [isComplete, setIsComplete] = useState(false);
 
-  // Map tasks to slides - tasks appear on slides with reading passages or concept application
+  // Map tasks to slides - tasks appear on slides with reading passages
   const slideTaskMap = useMemo(() => {
     const map: Record<number, typeof unit.tasks[0] | undefined> = {};
     
-    // For consolidated slides: each slide with a passage or practice gets a task
-    // Slide 0: Read Para 2 + Task 1 (notice pattern)
-    // Slide 1: Count pattern + Task 2
-    // Slide 2: Why citations + Task 3
-    // Slide 3: Apply to Para 3 + Task 4
-    // Slide 4: Reveal (no task)
-    // Slide 5: Compare Para 1 + Task 5
-    // Slide 6: First sentences + Task 6
-    // Slide 7: Reveal (no task)
-    // Slide 8: Find topic sentence + Task 7
-    
-    // Map tasks to their corresponding slides
-    const taskSlideMapping = [0, 1, 2, 3, 5, 6, 8]; // Slide indices that have tasks
-    
-    unit.tasks.forEach((task, idx) => {
-      const slideIdx = taskSlideMapping[idx];
-      if (slideIdx !== undefined && slideIdx < unit.slides.length) {
-        map[slideIdx] = task;
+    // Simple approach: assign tasks sequentially to slides that have passages or are practice slides
+    let taskIndex = 0;
+    unit.slides.forEach((slide, slideIdx) => {
+      const hasPassage = slide.numberedText && slide.numberedText.length > 0;
+      const isPracticeSlide = slide.heading?.toLowerCase().includes('find') || 
+                             slide.heading?.toLowerCase().includes('compare') ||
+                             slide.heading?.toLowerCase().includes('notice') ||
+                             slide.heading?.toLowerCase().includes('what do');
+      
+      if ((hasPassage || isPracticeSlide) && taskIndex < unit.tasks.length) {
+        map[slideIdx] = unit.tasks[taskIndex];
+        taskIndex++;
       }
     });
     
     return map;
-  }, [unit.slides.length, unit.tasks]);
+  }, [unit.slides, unit.tasks]);
 
   const totalSlides = unit.slides.length;
   const progress = ((currentSlideIndex + 1) / totalSlides) * 100;
