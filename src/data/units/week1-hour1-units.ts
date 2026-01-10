@@ -70,46 +70,35 @@ export const unit1_1: LearningUnit = {
     "Understand the purpose of these features"
   ],
   slides: [
-    // TASK 1: Notice something unusual
+    // SLIDE 1: Read + Task 1 - Notice the pattern
     {
       emoji: "🔍",
       heading: "Look Closely at Paragraph 2",
       subheading: "Read carefully and notice any unusual patterns",
       numberedText: [articleExcerpt.paragraphs[1]],
     },
-    // TASK 2: What are those bracket things?
-    {
-      emoji: "❓",
-      heading: "What Do You Notice?",
-      subheading: "Answer the question below",
-    },
-    // TASK 3: Count them
+    // SLIDE 2: Count them (same paragraph shown)
     {
       emoji: "🔢",
-      heading: "Let's Count",
-      subheading: "How many times do you see this pattern?",
+      heading: "Let's Count the Pattern",
+      subheading: "How many times do you see this pattern in Paragraph 2?",
       numberedText: [articleExcerpt.paragraphs[1]],
     },
-    // TASK 4: Why do authors use them?
+    // SLIDE 3: Why do authors use them?
     {
       emoji: "🤔",
       heading: "Why Do Authors Use These?",
-      subheading: "Think about the purpose",
+      subheading: "Think about the purpose of (Author, Year) patterns",
+      numberedText: [articleExcerpt.paragraphs[1]],
     },
-    // Now read Paragraph 3
-    {
-      emoji: "📖",
-      heading: "Now Read Paragraph 3",
-      subheading: "Look for the same pattern",
-      numberedText: [articleExcerpt.paragraphs[2]],
-    },
-    // TASK 5: Find them in Para 3
+    // SLIDE 4: Apply to Paragraph 3
     {
       emoji: "🎯",
-      heading: "Apply Your Knowledge",
-      subheading: "Find the pattern in Paragraph 3",
+      heading: "Apply to Paragraph 3",
+      subheading: "Find the same pattern in a new paragraph",
+      numberedText: [articleExcerpt.paragraphs[2]],
     },
-    // Reveal: These are Citations
+    // SLIDE 5: Reveal - Citations
     {
       emoji: "💡",
       heading: "Discovery: In-Text Citations",
@@ -126,20 +115,19 @@ export const unit1_1: LearningUnit = {
       ],
       tip: "When summarising, you don't copy citations - you describe the IDEAS they support."
     },
-    // TASK 6: Compare paragraphs
+    // SLIDE 6: Compare Para 1 vs Para 2
     {
       emoji: "⚖️",
       heading: "Compare: Paragraph 1 vs Paragraph 2",
-      subheading: "Read both and spot the difference",
+      subheading: "Why does Paragraph 1 have NO citations?",
       numberedText: [articleExcerpt.paragraphs[0]],
+      points: [
+        "**Paragraph 2** had 4 citations",
+        "**Paragraph 1** (shown above) has 0 citations",
+        "Why the difference?"
+      ],
     },
-    // TASK 7: Why no citations in Para 1?
-    {
-      emoji: "🧠",
-      heading: "Think Deeper",
-      subheading: "Why does Paragraph 1 have no citations?",
-    },
-    // TASK 8: First sentence pattern
+    // SLIDE 7: First sentences pattern
     {
       emoji: "🎬",
       heading: "First Sentences Are Special",
@@ -151,17 +139,11 @@ export const unit1_1: LearningUnit = {
         "**Para 5:** \"Finally, there is a growing interest in... engagement.\""
       ],
     },
-    // TASK 9: What do first sentences do?
-    {
-      emoji: "🏷️",
-      heading: "What's the Pattern?",
-      subheading: "What do these first sentences have in common?",
-    },
-    // Reveal: Topic Sentences
+    // SLIDE 8: Reveal - Topic Sentences
     {
       emoji: "💡",
       heading: "Discovery: Topic Sentences",
-      subheading: "The first sentence usually tells you what the paragraph is about",
+      subheading: "The first sentence tells you what the paragraph is about",
       points: [
         "**Topic Sentence** = Main idea of the paragraph",
         "Usually the **first sentence** (sometimes second)",
@@ -174,11 +156,11 @@ export const unit1_1: LearningUnit = {
       ],
       tip: "When writing a summary, focus on topic sentences - they contain the main ideas!"
     },
-    // TASK 10: Identify topic sentence
+    // SLIDE 9: Apply - Find topic sentence in Para 4
     {
       emoji: "🎯",
-      heading: "Apply Your Knowledge",
-      subheading: "Find the topic sentence in Paragraph 4",
+      heading: "Find the Topic Sentence",
+      subheading: "Which sentence is the topic sentence in Paragraph 4?",
       numberedText: [articleExcerpt.paragraphs[3]],
     }
   ],

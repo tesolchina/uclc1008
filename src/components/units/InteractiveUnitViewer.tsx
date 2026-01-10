@@ -19,18 +19,27 @@ export function InteractiveUnitViewer({ unit, defaultOpen = false }: Interactive
   const [completedTasks, setCompletedTasks] = useState<Record<string, boolean>>({});
   const [isComplete, setIsComplete] = useState(false);
 
-  // Map slides to tasks - each slide may have a corresponding task
+  // Map tasks to slides - tasks appear on slides with reading passages or concept application
   const slideTaskMap = useMemo(() => {
     const map: Record<number, typeof unit.tasks[0] | undefined> = {};
     
-    // Distribute tasks across slides (after content slides)
-    // For this design, we interleave: content slide -> task slide
-    // Tasks follow slides that introduce the concept
-    const taskSlideIndices = [1, 2, 5, 8, 10, 12]; // Indices where tasks appear
+    // For consolidated slides: each slide with a passage or practice gets a task
+    // Slide 0: Read Para 2 + Task 1 (notice pattern)
+    // Slide 1: Count pattern + Task 2
+    // Slide 2: Why citations + Task 3
+    // Slide 3: Apply to Para 3 + Task 4
+    // Slide 4: Reveal (no task)
+    // Slide 5: Compare Para 1 + Task 5
+    // Slide 6: First sentences + Task 6
+    // Slide 7: Reveal (no task)
+    // Slide 8: Find topic sentence + Task 7
+    
+    // Map tasks to their corresponding slides
+    const taskSlideMapping = [0, 1, 2, 3, 5, 6, 8]; // Slide indices that have tasks
     
     unit.tasks.forEach((task, idx) => {
-      const slideIdx = taskSlideIndices[idx] ?? (idx + 1);
-      if (slideIdx < unit.slides.length) {
+      const slideIdx = taskSlideMapping[idx];
+      if (slideIdx !== undefined && slideIdx < unit.slides.length) {
         map[slideIdx] = task;
       }
     });
