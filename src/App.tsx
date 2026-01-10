@@ -20,6 +20,7 @@ import PreCourseWritingPage from "./pages/PreCourseWritingPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import SettingsPage from "./pages/SettingsPage";
 import JoinSessionPage from "./pages/JoinSessionPage";
+import UnitPage from "./pages/UnitPage";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +44,7 @@ const App = () => (
               <Route path="week/:weekId/assignment/:assignmentId" element={<WeekAssignmentPage />} />
               <Route path="week/1/lesson/1" element={<Lesson1Page />} />
               <Route path="week/:weekId/lesson/:lessonId" element={<LessonPage />} />
+              <Route path="week/:weekId/unit/:unitId" element={<UnitPage />} />
               <Route path="staff" element={<Staff />} />
               <Route path="admin" element={<AdminDashboard />} />
               <Route path="settings" element={<SettingsPage />} />
