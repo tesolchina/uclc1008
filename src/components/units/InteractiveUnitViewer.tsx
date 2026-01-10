@@ -19,25 +19,14 @@ export function InteractiveUnitViewer({ unit, defaultOpen = false }: Interactive
   const [completedTasks, setCompletedTasks] = useState<Record<string, boolean>>({});
   const [isComplete, setIsComplete] = useState(false);
 
-  // Map tasks to slides - tasks appear on slides with reading passages
+  // 1:1 mapping - every slide has a task
   const slideTaskMap = useMemo(() => {
     const map: Record<number, typeof unit.tasks[0] | undefined> = {};
-    
-    // Simple approach: assign tasks sequentially to slides that have passages or are practice slides
-    let taskIndex = 0;
-    unit.slides.forEach((slide, slideIdx) => {
-      const hasPassage = slide.numberedText && slide.numberedText.length > 0;
-      const isPracticeSlide = slide.heading?.toLowerCase().includes('find') || 
-                             slide.heading?.toLowerCase().includes('compare') ||
-                             slide.heading?.toLowerCase().includes('notice') ||
-                             slide.heading?.toLowerCase().includes('what do');
-      
-      if ((hasPassage || isPracticeSlide) && taskIndex < unit.tasks.length) {
-        map[slideIdx] = unit.tasks[taskIndex];
-        taskIndex++;
+    unit.slides.forEach((_, slideIdx) => {
+      if (slideIdx < unit.tasks.length) {
+        map[slideIdx] = unit.tasks[slideIdx];
       }
     });
-    
     return map;
   }, [unit.slides, unit.tasks]);
 

@@ -57,7 +57,7 @@ export const articleExcerpt = {
 };
 
 // =============================================================================
-// UNIT 1.1: Discovering Academic Features (Socratic, Task-Based)
+// UNIT 1.1: Discovering Academic Features (Every slide has a task)
 // =============================================================================
 export const unit1_1: LearningUnit = {
   id: "w1-1-1",
@@ -70,7 +70,7 @@ export const unit1_1: LearningUnit = {
     "Understand the purpose of these features"
   ],
   slides: [
-    // SLIDE 1: Notice patterns in Para 2 + why they exist
+    // SLIDE 1: Notice patterns in Para 2
     {
       emoji: "🔍",
       heading: "What Do You Notice?",
@@ -80,39 +80,34 @@ export const unit1_1: LearningUnit = {
     // SLIDE 2: Apply to Para 3
     {
       emoji: "🎯",
-      heading: "Find Citations in Paragraph 3",
-      subheading: "Apply what you learned to a new paragraph",
+      heading: "Apply: Find Citations in Paragraph 3",
+      subheading: "Now look for the same pattern in another paragraph",
       numberedText: [articleExcerpt.paragraphs[2]],
     },
-    // SLIDE 3: Reveal - Citations
+    // SLIDE 3: Why citations matter
     {
       emoji: "💡",
-      heading: "Discovery: In-Text Citations",
-      subheading: "What you found are called 'in-text citations'",
+      heading: "Why Do Authors Use Citations?",
+      subheading: "Think about the PURPOSE of this pattern",
       points: [
         "**Citations** show where information comes from",
         "Format: **(Author, Year)** or **Author (Year)**",
         "They prove the writer isn't making things up",
         "More citations = more evidence = stronger argument"
       ],
-      examples: [
-        { title: "Info-prominent", text: "Schools spend $2.7 billion (Doffman, 2018)." },
-        { title: "Author-prominent", text: "Harwell (2018) reports that vendors pitch FRT..." }
-      ],
-      tip: "When summarising, you don't copy citations - you describe the IDEAS they support."
     },
     // SLIDE 4: Compare Para 1 vs Para 2
     {
       emoji: "⚖️",
-      heading: "Compare Paragraphs",
-      subheading: "Why does Paragraph 1 have NO citations, but Paragraph 2 has many?",
+      heading: "Compare: Why the Difference?",
+      subheading: "Paragraph 1 has NO citations, but Paragraph 2 has many. Why?",
       numberedText: [articleExcerpt.paragraphs[0], articleExcerpt.paragraphs[1]],
     },
-    // SLIDE 5: First sentences - Topic Sentences
+    // SLIDE 5: First sentences pattern
     {
       emoji: "🎬",
       heading: "First Sentences Are Special",
-      subheading: "What do these first sentences have in common?",
+      subheading: "Read the first sentence of Paragraphs 2-5. What do they have in common?",
       points: [
         "**Para 2:** \"One prominent educational application... is campus security.\"",
         "**Para 3:** \"Another application... is attendance monitoring.\"",
@@ -120,32 +115,28 @@ export const unit1_1: LearningUnit = {
         "**Para 5:** \"Finally, there is a growing interest in... engagement.\""
       ],
     },
-    // SLIDE 6: Reveal - Topic Sentences
+    // SLIDE 6: Topic sentence concept
     {
       emoji: "💡",
       heading: "Discovery: Topic Sentences",
-      subheading: "The first sentence tells you what the paragraph is about",
+      subheading: "What is the job of a topic sentence?",
       points: [
         "**Topic Sentence** = Main idea of the paragraph",
         "Usually the **first sentence** (sometimes second)",
         "Contains the **topic** + **controlling idea**",
         "Everything else in the paragraph SUPPORTS this sentence"
       ],
-      examples: [
-        { title: "Topic", text: "facial recognition for campus security" },
-        { title: "Controlling Idea", text: "it's a prominent application" }
-      ],
-      tip: "When writing a summary, focus on topic sentences - they contain the main ideas!"
     },
     // SLIDE 7: Apply - Find topic sentence in Para 4
     {
       emoji: "🎯",
-      heading: "Find the Topic Sentence",
+      heading: "Apply: Find the Topic Sentence",
       subheading: "Which sentence is the topic sentence in Paragraph 4?",
       numberedText: [articleExcerpt.paragraphs[3]],
     }
   ],
   tasks: [
+    // Task 1: matches Slide 1
     {
       id: "w1-1-1-t1",
       type: "mc",
@@ -160,6 +151,7 @@ export const unit1_1: LearningUnit = {
       correctAnswer: 1,
       explanation: "You noticed the (Author, Year) pattern! These are called 'in-text citations' - there are 4 of them in this paragraph."
     },
+    // Task 2: matches Slide 2
     {
       id: "w1-1-1-t2",
       type: "mc",
@@ -169,8 +161,18 @@ export const unit1_1: LearningUnit = {
       correctAnswer: 1,
       explanation: "There are 2 citations: (Puthea et al., 2017) and (Wagh et al., 2015)."
     },
+    // Task 3: matches Slide 3
     {
       id: "w1-1-1-t3",
+      type: "short-answer",
+      question: "In your own words, why do academic writers use citations?",
+      hints: ["Think about credibility and evidence"],
+      wordLimit: 30,
+      explanation: "Sample answer: Citations show readers where information comes from and prove the writer has done research to support their claims."
+    },
+    // Task 4: matches Slide 4
+    {
+      id: "w1-1-1-t4",
       type: "mc",
       question: "Paragraph 1 has NO citations, but Paragraph 2 has 4. Why?",
       context: "Think about what each paragraph is doing.",
@@ -183,8 +185,9 @@ export const unit1_1: LearningUnit = {
       correctAnswer: 1,
       explanation: "Paragraph 1 introduces the TOPIC and sets CONTEXT. Paragraph 2 makes CLAIMS that need evidence, so it uses citations."
     },
+    // Task 5: matches Slide 5
     {
-      id: "w1-1-1-t4",
+      id: "w1-1-1-t5",
       type: "mc",
       question: "What do the first sentences of Paragraphs 2-5 have in common?",
       options: [
@@ -196,8 +199,17 @@ export const unit1_1: LearningUnit = {
       correctAnswer: 1,
       explanation: "Each first sentence introduces a DIFFERENT APPLICATION: security, attendance, virtual learning, and engagement detection."
     },
+    // Task 6: matches Slide 6
     {
-      id: "w1-1-1-t5",
+      id: "w1-1-1-t6",
+      type: "fill-blank",
+      question: "Complete: The first sentence of a paragraph that states the main idea is called a ______ sentence.",
+      correctAnswer: "topic",
+      explanation: "The TOPIC SENTENCE tells readers what the paragraph will be about. It's usually the first sentence."
+    },
+    // Task 7: matches Slide 7
+    {
+      id: "w1-1-1-t7",
       type: "mc",
       question: "Which sentence is the topic sentence in Paragraph 4?",
       context: "The topic sentence states what the whole paragraph is about.",
@@ -209,20 +221,13 @@ export const unit1_1: LearningUnit = {
       ],
       correctAnswer: 0,
       explanation: "Sentence 1 introduces the MAIN IDEA (FRT in virtual learning). Sentences 2-4 give EXAMPLES and DETAILS that support this."
-    },
-    {
-      id: "w1-1-1-t8",
-      type: "fill-blank",
-      question: "Complete: The first sentence of a paragraph that states the main idea is called a ______ sentence.",
-      correctAnswer: "topic",
-      explanation: "The TOPIC SENTENCE tells readers what the paragraph will be about. It's usually the first sentence."
     }
   ],
   moduleRef: "Pre-course Writing"
 };
 
 // =============================================================================
-// UNIT 1.2: Understanding Paragraph Structure (Socratic, Task-Based)
+// UNIT 1.2: Understanding Paragraph Structure (Every slide has a task)
 // =============================================================================
 export const unit1_2: LearningUnit = {
   id: "w1-1-2",
@@ -235,50 +240,30 @@ export const unit1_2: LearningUnit = {
     "Identify transition signals between ideas"
   ],
   slides: [
-    // TASK 1: Read and categorise
+    // SLIDE 1: Main point vs supporting detail intro
     {
       emoji: "📊",
       heading: "Main Points vs. Supporting Details",
-      subheading: "Not all sentences are equally important",
+      subheading: "Not all sentences are equally important. Read and identify.",
       numberedText: [articleExcerpt.paragraphs[1]],
     },
-    // TASK 2: Which is which?
+    // SLIDE 2: Specific claim question
     {
       emoji: "⚖️",
-      heading: "Sort the Sentences",
-      subheading: "Which sentences make claims? Which provide evidence?",
-    },
-    // Reveal: The pattern
-    {
-      emoji: "💡",
-      heading: "Discovery: The Claim-Evidence Pattern",
-      subheading: "Academic paragraphs follow a predictable structure",
+      heading: "Is This a Main Point or Supporting Detail?",
+      subheading: "Think about whether this makes a claim or provides evidence",
       points: [
-        "**Main Point (Claim):** What the author ARGUES",
-        "**Supporting Detail:** EVIDENCE that backs it up",
-        "**Example:** Specific cases, statistics, quotes",
-        "Sentences with citations are usually SUPPORTING DETAILS"
+        "**Sentence 2:** 'Schools annually spend $2.7 billion on security' (Doffman, 2018)"
       ],
-      examples: [
-        { title: "Main Point", text: "FRT is used for campus security (no citation needed)" },
-        { title: "Supporting Detail", text: "Schools spend $2.7 billion (Doffman, 2018)" }
-      ],
-      tip: "For summaries: Include MAIN POINTS, skip most DETAILS. That's how you condense 5 paragraphs into 300 words!"
     },
-    // TASK 3: Apply to new paragraph
+    // SLIDE 3: Apply to Paragraph 5
     {
       emoji: "🎯",
       heading: "Practice: Paragraph 5",
-      subheading: "Identify main point vs. supporting details",
+      subheading: "Identify the main point vs. supporting details",
       numberedText: [articleExcerpt.paragraphs[4]],
     },
-    // TASK 4: Identify details
-    {
-      emoji: "🔍",
-      heading: "Which Are Supporting Details?",
-      subheading: "Select all the sentences that provide evidence/examples",
-    },
-    // Transition words intro
+    // SLIDE 4: Transition words observation
     {
       emoji: "🔗",
       heading: "How Do Paragraphs Connect?",
@@ -290,40 +275,31 @@ export const unit1_2: LearningUnit = {
         "Para 5: \"**Finally**, there is growing interest...\""
       ],
     },
-    // TASK 5: What do these words do?
+    // SLIDE 5: What does 'Another' signal?
     {
       emoji: "🤔",
-      heading: "What's the Pattern?",
-      subheading: "What do 'One', 'Another', 'Beyond', and 'Finally' tell us?",
-    },
-    // Reveal: Transition signals
-    {
-      emoji: "💡",
-      heading: "Discovery: Transition Signals",
-      subheading: "These words show how ideas are organised",
+      heading: "What Does 'Another' Tell Us?",
+      subheading: "Think about what this transition word signals",
       points: [
-        "**Adding:** Another, Also, Furthermore, In addition",
-        "**Contrasting:** However, While, Although, On the other hand",
-        "**Examples:** For example, For instance, such as",
-        "**Concluding:** Finally, In conclusion, All told"
+        "Paragraph 3 starts: 'Another application of facial recognition...'",
+        "What relationship does 'Another' show with Paragraph 2?"
       ],
-      examples: [
-        { title: "From the article", text: "'Another application...' = adding a new point" },
-        { title: "From the article", text: "'For example...' = here comes evidence" }
-      ],
-      tip: "Transition words are signposts - they tell you what kind of information is coming next."
     },
-    // TASK 6: The article structure
+    // SLIDE 6: What does 'Finally' signal?
+    {
+      emoji: "🏁",
+      heading: "What Does 'Finally' Signal?",
+      subheading: "Think about the purpose of this transition word",
+      points: [
+        "Paragraph 5 starts: 'Finally, there is a growing interest...'",
+        "Why did the author use 'Finally' here?"
+      ],
+    },
+    // SLIDE 7: The big picture
     {
       emoji: "🏗️",
       heading: "The Big Picture",
-      subheading: "Now you can see the whole structure",
-    },
-    // Summary structure
-    {
-      emoji: "📋",
-      heading: "The Article's Blueprint",
-      subheading: "4 Applications of FRT in Education",
+      subheading: "Now you can see the whole article structure",
       points: [
         "**Paragraph 1:** Introduction - sets the context",
         "**Paragraph 2:** Application 1 - Campus Security",
@@ -331,10 +307,17 @@ export const unit1_2: LearningUnit = {
         "**Paragraph 4:** Application 3 - Virtual Learning/Online Exams",
         "**Paragraph 5:** Application 4 - Engagement Detection"
       ],
-      tip: "This is what you need for your summary: ONE sentence per application!"
+    },
+    // SLIDE 8: Summary sentence practice
+    {
+      emoji: "📝",
+      heading: "Practice: Summarise Paragraph 4",
+      subheading: "Can you express the main idea in one sentence?",
+      numberedText: [articleExcerpt.paragraphs[3]],
     }
   ],
   tasks: [
+    // Task 1: matches Slide 1
     {
       id: "w1-1-2-t1",
       type: "mc",
@@ -342,13 +325,14 @@ export const unit1_2: LearningUnit = {
       context: "The main point is what the author is arguing - not evidence or examples.",
       options: [
         "Sentence 1: 'One prominent application... is campus security.'",
-        "Sentence 2: 'This form... spend $2.7 billion' (Doffman, 2018)",
-        "Sentence 3: 'Facial recognition systems sold to thousands of schools' (Harwell, 2018)",
+        "Sentence 2: 'Schools spend $2.7 billion' (Doffman, 2018)",
+        "Sentence 3: 'Systems sold to thousands of schools' (Harwell, 2018)",
         "Sentence 6: 'SAFR system reasons...' (SAFR, 2019)"
       ],
       correctAnswer: 0,
       explanation: "Sentence 1 is the CLAIM - it states the main point. Sentences 2-6 provide EVIDENCE (with citations) to support this claim."
     },
+    // Task 2: matches Slide 2
     {
       id: "w1-1-2-t2",
       type: "mc",
@@ -362,22 +346,33 @@ export const unit1_2: LearningUnit = {
       correctAnswer: 1,
       explanation: "The $2.7 billion statistic is EVIDENCE (supporting detail) that proves the main point about FRT being used for security. Notice the citation!"
     },
+    // Task 3: matches Slide 3
     {
       id: "w1-1-2-t3",
       type: "mc",
-      question: "In Paragraph 5, which is the main point and which is a supporting detail?",
-      context: "Main Point: 'Interest in facial detection for student engagement.' Detail: 'Brow-raising and mouth dimpling indicate learning.'",
+      question: "In Paragraph 5, which sentence is the main point?",
+      context: "Main Point makes the general claim. Details give specific evidence.",
       options: [
-        "Both are main points",
-        "First is main point, second is supporting detail",
-        "First is supporting detail, second is main point",
-        "Both are supporting details"
+        "Sentence 1: 'Growing interest in facial detection for engagement'",
+        "Sentence 2: 'Detecting facial actions indicates engagement'",
+        "Sentence 3: 'Brow-raising and mouth dimpling indicate learning'",
+        "Sentence 5: 'The face as a way to understand learner's mind'"
       ],
-      correctAnswer: 1,
-      explanation: "The general claim (interest in engagement detection) is the MAIN POINT. The specific facial actions (brow-raising, etc.) are EXAMPLES that support it."
+      correctAnswer: 0,
+      explanation: "Sentence 1 states the general claim (interest in engagement detection). Sentences 2-5 provide specific evidence and examples."
     },
+    // Task 4: matches Slide 4
     {
       id: "w1-1-2-t4",
+      type: "short-answer",
+      question: "What pattern do you notice in the first words of Paragraphs 2-5?",
+      hints: ["One, Another, Beyond, Finally", "Think about what these words do"],
+      wordLimit: 25,
+      explanation: "These transition words signal a LIST of different applications, with 'Finally' showing we've reached the last one."
+    },
+    // Task 5: matches Slide 5
+    {
+      id: "w1-1-2-t5",
       type: "mc",
       question: "What does the transition word 'Another' in Paragraph 3 tell you?",
       options: [
@@ -389,8 +384,9 @@ export const unit1_2: LearningUnit = {
       correctAnswer: 2,
       explanation: "'Another application' signals the author is adding a NEW main point - a different application of FRT (attendance monitoring)."
     },
+    // Task 6: matches Slide 6
     {
-      id: "w1-1-2-t5",
+      id: "w1-1-2-t6",
       type: "mc",
       question: "What does the word 'Finally' in Paragraph 5 signal?",
       options: [
@@ -402,8 +398,9 @@ export const unit1_2: LearningUnit = {
       correctAnswer: 1,
       explanation: "'Finally' signals the LAST item in a list. After 'One', 'Another', and 'Beyond', 'Finally' tells us this is the last application."
     },
+    // Task 7: matches Slide 7
     {
-      id: "w1-1-2-t6",
+      id: "w1-1-2-t7",
       type: "mc",
       question: "How many MAIN APPLICATIONS of FRT does the article discuss?",
       options: [
@@ -415,27 +412,21 @@ export const unit1_2: LearningUnit = {
       correctAnswer: 2,
       explanation: "The article discusses 4 applications: (1) Campus Security, (2) Attendance Monitoring, (3) Virtual Learning/Online Exams, (4) Engagement Detection."
     },
+    // Task 8: matches Slide 8
     {
-      id: "w1-1-2-t7",
+      id: "w1-1-2-t8",
       type: "short-answer",
       question: "In ONE sentence, summarise what Paragraph 4 is about.",
       hints: ["Start with: 'Facial recognition is also used for...'", "Focus on the virtual/online context"],
       wordLimit: 25,
       explanation: "Sample: 'Facial recognition is also used to verify student identity in online courses and exams.'"
-    },
-    {
-      id: "w1-1-2-t8",
-      type: "fill-blank",
-      question: "Complete: When summarising, include ______ points but skip most supporting ______.",
-      correctAnswer: "main|details",
-      explanation: "Include MAIN points, skip DETAILS. This is how you condense a long article into a short summary."
     }
   ],
   moduleRef: "Pre-course Writing"
 };
 
 // =============================================================================
-// UNIT 1.3: From Reading to Writing (Socratic, Task-Based)
+// UNIT 1.3: From Reading to Writing (Every slide has a task)
 // =============================================================================
 export const unit1_3: LearningUnit = {
   id: "w1-1-3",
@@ -448,54 +439,41 @@ export const unit1_3: LearningUnit = {
     "Understand the difference between summary and argument"
   ],
   slides: [
-    // Intro to tasks
+    // SLIDE 1: What 4 applications?
     {
       emoji: "✍️",
       heading: "Your Pre-course Writing",
-      subheading: "Two tasks, one article",
+      subheading: "You need to summarise the 4 applications of FRT",
       points: [
         "**Task 1: Summary** (300 words) - What does the article say?",
         "**Task 2: Argument** (300 words) - What do YOU think?",
         "Both tasks use the same article",
         "You now know how to identify the main points!"
       ],
-      tip: "Don't start writing yet - let's plan first!"
     },
-    // TASK 1: Summary planning
+    // SLIDE 2: Write summary sentence for Campus Security
     {
       emoji: "📝",
-      heading: "Task 1: Planning Your Summary",
-      subheading: "What are the 4 applications you need to mention?",
+      heading: "Practice: Summarise Application 1",
+      subheading: "Write one sentence about Campus Security",
+      numberedText: [articleExcerpt.paragraphs[1]],
     },
-    // TASK 2: Summary sentences
-    {
-      emoji: "🎯",
-      heading: "One Sentence Per Application",
-      subheading: "Can you express each main point in one sentence?",
-    },
-    // Intro to argument
-    {
-      emoji: "⚖️",
-      heading: "Task 2: Taking a Position",
-      subheading: "Is it advisable for schools to adopt FRT?",
-      points: [
-        "You must take a **clear position** (YES or NO)",
-        "Use ideas from the article as **evidence**",
-        "You can add your **own views** and knowledge",
-        "300 words maximum"
-      ],
-    },
-    // TASK 3: Your position
+    // SLIDE 3: Initial position - before seeing arguments
     {
       emoji: "🤔",
-      heading: "What Do You Think?",
-      subheading: "Before reading arguments, form your initial opinion",
+      heading: "Your Initial Position",
+      subheading: "Before seeing all the arguments, what do you think about FRT in schools?",
+      points: [
+        "Is it advisable for schools to adopt FRT?",
+        "Don't overthink - go with your gut feeling",
+        "There's no 'correct' answer here"
+      ],
     },
-    // Arguments FOR
+    // SLIDE 4: Arguments FOR FRT
     {
       emoji: "✅",
       heading: "Arguments FOR FRT in Schools",
-      subheading: "Ideas you can use if you support FRT",
+      subheading: "If you SUPPORT FRT, which evidence would you use?",
       points: [
         "**Security:** Can identify intruders and prevent shootings",
         "**Efficiency:** Saves teacher time on attendance (2.5 hrs/week)",
@@ -503,40 +481,54 @@ export const unit1_3: LearningUnit = {
         "**Engagement:** Can help teachers identify struggling students"
       ],
     },
-    // Arguments AGAINST
+    // SLIDE 5: Arguments AGAINST FRT
     {
       emoji: "❌",
       heading: "Arguments AGAINST FRT in Schools",
-      subheading: "Ideas you can use if you oppose FRT",
+      subheading: "If you OPPOSE FRT, which evidence would you use?",
       points: [
         "**Privacy:** Constant surveillance of students",
         "**Normalisation:** Children grow up accepting being watched",
         "**Accuracy Issues:** Technology can make mistakes (false positives)",
         "**Trust:** Damages relationship between students and teachers"
       ],
-      tip: "The article's TITLE hints the authors are critical: 'concerns' and 'questions'"
     },
-    // TASK 4: Which side?
+    // SLIDE 6: What does the title suggest?
+    {
+      emoji: "📖",
+      heading: "What Does the Title Tell Us?",
+      subheading: "Facial recognition technology in schools: critical questions and concerns",
+      points: [
+        "Authors choose titles carefully",
+        "What do the words 'critical' and 'concerns' suggest?",
+        "Does this hint at the authors' position?"
+      ],
+    },
+    // SLIDE 7: Write your position statement
     {
       emoji: "⚖️",
-      heading: "Your Position",
-      subheading: "Now that you've seen both sides, where do you stand?",
+      heading: "Your Position Statement",
+      subheading: "Now write your argument thesis",
+      points: [
+        "Start with: 'Schools should/should not adopt FRT because...'",
+        "Be clear about your stance",
+        "Give 2-3 reasons"
+      ],
     },
-    // Final tips
+    // SLIDE 8: Summary vs Argument difference
     {
       emoji: "🚀",
-      heading: "Ready to Write!",
-      subheading: "You now have everything you need",
+      heading: "Summary vs. Argument",
+      subheading: "Make sure you understand the difference before writing",
       points: [
-        "**For Task 1:** List the 4 applications, skip the statistics",
-        "**For Task 2:** Pick ONE side and argue clearly",
-        "Use the article as evidence for your argument",
-        "300 words each = be concise!"
+        "**Summary (Task 1):** Report what the ARTICLE says",
+        "**Argument (Task 2):** Express YOUR position with evidence",
+        "Summary = objective, Argument = your opinion"
       ],
-      tip: "Start with your position statement: 'Schools should/should not adopt FRT because...'"
     }
   ],
   tasks: [
+    // Task 1: matches Slide 1
     {
       id: "w1-1-3-t1",
       type: "mc",
@@ -550,18 +542,20 @@ export const unit1_3: LearningUnit = {
       correctAnswer: 1,
       explanation: "The 4 applications are: (1) Campus Security, (2) Attendance Monitoring, (3) Online Learning/Exam Verification, (4) Engagement/Learning Detection."
     },
+    // Task 2: matches Slide 2
     {
       id: "w1-1-3-t2",
       type: "short-answer",
-      question: "Write ONE sentence summarising the first application (Campus Security).",
+      question: "Write ONE sentence summarising Campus Security (Application 1).",
       hints: ["Don't include statistics", "Focus on the main purpose"],
       wordLimit: 30,
       explanation: "Sample: 'One application of facial recognition in schools is campus security, which helps identify intruders and track individuals on school grounds.'"
     },
+    // Task 3: matches Slide 3
     {
       id: "w1-1-3-t3",
       type: "mc",
-      question: "Before seeing all the arguments, what is your initial position on FRT in schools?",
+      question: "What is your initial position on FRT in schools?",
       options: [
         "Strongly support - safety is the priority",
         "Slightly support - with some reservations",
@@ -571,6 +565,7 @@ export const unit1_3: LearningUnit = {
       correctAnswer: 0, // No correct answer - it's opinion
       explanation: "There's no 'correct' answer! The key is to have a clear position and support it with evidence from the article."
     },
+    // Task 4: matches Slide 4
     {
       id: "w1-1-3-t4",
       type: "mc",
@@ -584,6 +579,7 @@ export const unit1_3: LearningUnit = {
       correctAnswer: 0,
       explanation: "The gun detection capability is EVIDENCE for security benefits. The other options are arguments AGAINST FRT."
     },
+    // Task 5: matches Slide 5
     {
       id: "w1-1-3-t5",
       type: "mc",
@@ -597,6 +593,7 @@ export const unit1_3: LearningUnit = {
       correctAnswer: 2,
       explanation: "The 'normalisation of surveillance' is mentioned in Paragraph 1 and is a strong AGAINST argument about long-term effects on children."
     },
+    // Task 6: matches Slide 6
     {
       id: "w1-1-3-t6",
       type: "mc",
@@ -611,6 +608,7 @@ export const unit1_3: LearningUnit = {
       correctAnswer: 2,
       explanation: "The words 'critical questions' and 'concerns' in the title signal the authors are skeptical about FRT in schools."
     },
+    // Task 7: matches Slide 7
     {
       id: "w1-1-3-t7",
       type: "short-answer",
@@ -619,6 +617,7 @@ export const unit1_3: LearningUnit = {
       wordLimit: 40,
       explanation: "Sample: 'Schools should not adopt facial recognition technology because it normalises surveillance, raises serious privacy concerns, and damages trust between students and educators.'"
     },
+    // Task 8: matches Slide 8
     {
       id: "w1-1-3-t8",
       type: "mc",
