@@ -1,4 +1,4 @@
-import { WeekData, WeekMeta } from "../types";
+import { WeekData, WeekMeta, ClassRundownItem } from "../types";
 import { lesson1_1, lesson1_2, lesson1_3 } from "../lessons";
 
 export const week1: WeekData = {
@@ -8,6 +8,7 @@ export const week1: WeekData = {
   overview:
     "This week introduces you to the basic structure of academic journal articles (empirical vs. conceptual) and the fundamental skills for reading them effectively.",
   inClassActivities: [
+    "Pre-course Writing Test (1 hr)",
     "Course Introduction (0.5 hr)",
     "Module 1: Part 1 - Introduction to Academic Journal Articles",
     "Module 1: Part 2 - How to Read and Select Main Ideas (Activities 2.1, 2.2)",
@@ -49,6 +50,31 @@ export const week1: WeekData = {
   skillsReinforced: [],
   assignmentsUpcoming: ["pre-course-writing", "referencing-quiz"],
   lessons: [lesson1_1, lesson1_2, lesson1_3],
+  classRundown: [
+    {
+      time: "Hour 1",
+      title: "Pre-course Writing Test",
+      description: "Introduction to Task 1 (Summary) and Task 2 (Essay) - Complete in class",
+      activities: [
+        "Read the article excerpt from Andrejevic & Selwyn (2020) on facial recognition in schools",
+        "Complete Task 1: Write a 300-word summary of the article (no personal views)",
+        "Complete Task 2: Write a 300-word argumentative essay on whether schools should adopt facial recognition",
+        "Use APA in-text citations (7th edition) where needed"
+      ],
+      assignmentLink: "/week/1/assignment/pre-course-writing"
+    },
+    {
+      time: "Hour 2",
+      title: "Course Introduction & Module 1 Overview",
+      description: "Overview of UE1 course structure, expectations, and introduction to academic journal articles",
+      activities: [
+        "Course overview: learning outcomes, assessments, and schedule",
+        "Introduction to academic journal articles (empirical vs. conceptual)",
+        "Understanding article structure: abstract, introduction, methods, results, discussion",
+        "Preview of flipped classroom videos on APA citations"
+      ]
+    }
+  ]
 };
 
 export const week1Meta: WeekMeta = {
