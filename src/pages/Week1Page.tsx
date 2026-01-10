@@ -15,7 +15,9 @@ import {
 import { LessonAiTutor } from "@/components/LessonAiTutor";
 import { LessonCard } from "@/components/lessons/LessonCard";
 import { useLessons } from "@/hooks/useLessons";
-import { BookOpen, Lightbulb, Target, Clock, FileText, AlertCircle, CheckCircle2, Bot, Users, ArrowRight, Loader2, CalendarClock } from "lucide-react";
+import { UnitCard } from "@/components/units/UnitCard";
+import { week1Hour1Units } from "@/data/units";
+import { BookOpen, Lightbulb, Target, Clock, FileText, AlertCircle, CheckCircle2, Bot, Users, ArrowRight, Loader2, CalendarClock, PlayCircle } from "lucide-react";
 
 const skillCategoryColors: Record<string, string> = {
   "reading": "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
@@ -77,6 +79,18 @@ const Week1Page = () => {
   const assignmentsDue = week.assignmentsDue?.map(getAssignmentById).filter(Boolean) as Assignment[] || [];
   const assignmentsUpcoming = week.assignmentsUpcoming?.map(getAssignmentById).filter(Boolean) as Assignment[] || [];
 
+  // Define the hours with their units
+  const classHours = [
+    {
+      hour: 1,
+      title: "Reading the Pre-course Article",
+      theme: "Decoding Academic Journal Articles",
+      units: week1Hour1Units,
+      assignmentLink: "/week/1/assignment/pre-course-writing"
+    },
+    // Hour 2 and 3 will be added when units are created
+  ];
+
   return (
     <div className="space-y-4">
       <section className="hero-shell">
@@ -89,7 +103,7 @@ const Week1Page = () => {
               {meta?.dateRange && <span className="hero-badge">{meta.dateRange}</span>}
             </div>
             <h1 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-              AI-assisted lesson for {week.title}
+              Decoding Academic Journal Articles
             </h1>
             <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">{week.overview}</p>
           </div>
@@ -97,6 +111,45 @@ const Week1Page = () => {
       </section>
 
       <div className="space-y-3">
+        {/* Learning Units by Hour */}
+        {classHours.map((classHour) => (
+          <CollapsibleSection
+            key={classHour.hour}
+            title={`Hour ${classHour.hour}: ${classHour.title}`}
+            description={classHour.theme}
+            icon={<PlayCircle className="h-4 w-4 text-primary" />}
+            defaultOpen={classHour.hour === 1}
+            className="border-primary/30 bg-gradient-to-r from-primary/5 to-transparent"
+          >
+            <div className="space-y-4">
+              {/* Unit Cards Grid */}
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {classHour.units.map((unit, idx) => (
+                  <UnitCard
+                    key={unit.id}
+                    unit={unit}
+                    weekId={1}
+                    hourNumber={classHour.hour}
+                    unitIndex={idx}
+                  />
+                ))}
+              </div>
+              
+              {/* Assignment Link */}
+              {classHour.assignmentLink && (
+                <div className="pt-2 border-t">
+                  <Button size="sm" variant="outline" asChild>
+                    <Link to={classHour.assignmentLink} className="gap-2">
+                      <FileText className="h-3.5 w-3.5" />
+                      View Related Assignment
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
+                  </Button>
+                </div>
+              )}
+            </div>
+          </CollapsibleSection>
+        ))}
         {/* Class Rundown - First Meeting */}
         {week.classRundown && week.classRundown.length > 0 && (
           <CollapsibleSection
