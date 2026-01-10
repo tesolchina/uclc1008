@@ -1,16 +1,23 @@
-import { Link } from "react-router-dom";
-import { preCourseWriting } from "@/data/assignments/preCourseWriting";
+import { Link, useLocation } from "react-router-dom";
+import { preCourseWriting, preCourseWritingArticle } from "@/data/assignments/preCourseWriting";
 import { week2, week2Meta } from "@/data/weeks/week2";
+import { week1, week1Meta } from "@/data/weeks/week1";
 import { getSkillById } from "@/data";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Clock, FileText, ExternalLink, ArrowLeft, BookOpen } from "lucide-react";
+import { CheckCircle2, Clock, FileText, ExternalLink, ArrowLeft, BookOpen, ScrollText, Quote } from "lucide-react";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { CollapsibleSection } from "@/components/CollapsibleSection";
 
 const PreCourseWritingPage = () => {
+  const location = useLocation();
   const assignment = preCourseWriting;
-  const week = week2;
-  const meta = week2Meta;
+  
+  // Determine if user came from week 1 or week 2
+  const isFromWeek1 = location.pathname.includes("/week/1/");
+  const week = isFromWeek1 ? week1 : week2;
+  const meta = isFromWeek1 ? week1Meta : week2Meta;
+  const backLink = isFromWeek1 ? "/week/1" : "/week/2";
 
   const skillsAssessed = assignment.skillsAssessed
     ?.map((sid) => getSkillById(sid))
@@ -29,7 +36,7 @@ const PreCourseWritingPage = () => {
         <div className="hero-inner">
           <div className="space-y-3">
             <Link 
-              to="/week/2" 
+              to={backLink}
               className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
               <ArrowLeft className="h-3 w-3" />
@@ -63,6 +70,62 @@ const PreCourseWritingPage = () => {
           <span>Duration: {assignment.duration}</span>
         </div>
       )}
+
+      {/* Source Article - NEW SECTION */}
+      <CollapsibleSection
+        title="Source Article"
+        description="Read this excerpt before completing your tasks"
+        icon={<ScrollText className="h-4 w-4 text-primary" />}
+        defaultOpen={true}
+        className="border-primary/30 bg-primary/5"
+      >
+        <div className="space-y-4">
+          <div className="rounded-lg bg-muted/50 p-4 border border-border">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2">Full Citation</p>
+            <p className="text-sm italic text-foreground">{preCourseWritingArticle.fullCitation}</p>
+          </div>
+          
+          <Accordion type="single" collapsible defaultValue="section-0" className="space-y-2">
+            {preCourseWritingArticle.sections.map((section, idx) => (
+              <AccordionItem 
+                key={idx} 
+                value={`section-${idx}`}
+                className="border rounded-lg bg-card px-4"
+              >
+                <AccordionTrigger className="text-sm font-medium hover:no-underline">
+                  <span className="flex items-center gap-2">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                      {idx + 1}
+                    </span>
+                    {section.heading}
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="prose prose-sm dark:prose-invert max-w-none">
+                    <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                      {section.content}
+                    </p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+
+          <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 p-4">
+            <div className="flex items-start gap-3">
+              <Quote className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-amber-700 dark:text-amber-300">Citation Examples (APA 7th)</p>
+                <ul className="text-xs text-muted-foreground space-y-1.5">
+                  <li><strong>Author-prominent:</strong> Andrejevic and Selwyn (2020) report that...</li>
+                  <li><strong>Signal-phrase:</strong> According to Andrejevic and Selwyn (2020),...</li>
+                  <li><strong>Information-prominent:</strong> Facial recognition technologies are... (Andrejevic & Selwyn, 2020).</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </CollapsibleSection>
 
       <section aria-label="Requirements">
         <Card className="card-elevated">

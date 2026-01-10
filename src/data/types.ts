@@ -63,6 +63,14 @@ export type Lesson = {
   }[];
 };
 
+export type ClassRundownItem = {
+  time: string;
+  title: string;
+  description: string;
+  activities: string[];
+  assignmentLink?: string;
+};
+
 export type WeekData = {
   id: number;
   title: string;
@@ -78,6 +86,7 @@ export type WeekData = {
   assignmentsDue?: string[];
   assignmentsUpcoming?: string[];
   lessons: Lesson[];
+  classRundown?: ClassRundownItem[];
 };
 
 export type WeekMeta = {

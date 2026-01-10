@@ -15,7 +15,7 @@ import {
 import { LessonAiTutor } from "@/components/LessonAiTutor";
 import { LessonCard } from "@/components/lessons/LessonCard";
 import { useLessons } from "@/hooks/useLessons";
-import { BookOpen, Lightbulb, Target, Clock, FileText, AlertCircle, CheckCircle2, Bot, Users, ArrowRight, Loader2 } from "lucide-react";
+import { BookOpen, Lightbulb, Target, Clock, FileText, AlertCircle, CheckCircle2, Bot, Users, ArrowRight, Loader2, CalendarClock } from "lucide-react";
 
 const skillCategoryColors: Record<string, string> = {
   "reading": "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
@@ -97,6 +97,60 @@ const Week1Page = () => {
       </section>
 
       <div className="space-y-3">
+        {/* Class Rundown - First Meeting */}
+        {week.classRundown && week.classRundown.length > 0 && (
+          <CollapsibleSection
+            title="Class Rundown - First Meeting"
+            description="Hour-by-hour breakdown of your first class session"
+            icon={<CalendarClock className="h-4 w-4 text-primary" />}
+            defaultOpen={true}
+            className="border-primary/30 bg-primary/5"
+          >
+            <div className="space-y-4">
+              {week.classRundown.map((item, idx) => (
+                <div 
+                  key={idx} 
+                  className="relative rounded-xl border border-border bg-card p-4 shadow-sm"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                      <Clock className="h-5 w-5" />
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-semibold">
+                          {item.time}
+                        </Badge>
+                        <h4 className="font-semibold text-foreground">{item.title}</h4>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{item.description}</p>
+                      <ul className="space-y-1.5 pt-2">
+                        {item.activities.map((activity, actIdx) => (
+                          <li key={actIdx} className="flex items-start gap-2 text-sm text-muted-foreground">
+                            <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary/60 shrink-0" />
+                            <span>{activity}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      {item.assignmentLink && (
+                        <div className="pt-2">
+                          <Button size="sm" variant="outline" asChild>
+                            <Link to={item.assignmentLink} className="gap-2">
+                              <FileText className="h-3.5 w-3.5" />
+                              View Assignment Details
+                              <ArrowRight className="h-3.5 w-3.5" />
+                            </Link>
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CollapsibleSection>
+        )}
+
         {/* Skills Section */}
         {(skillsIntroduced.length > 0 || skillsReinforced.length > 0) && (
           <CollapsibleSection
