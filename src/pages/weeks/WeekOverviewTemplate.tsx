@@ -1,12 +1,13 @@
-import { useParams, Navigate, Link } from "react-router-dom";
-import { getWeekById, getWeekMetaById, getAssignmentById, Assignment } from "@/data";
+import { Link } from "react-router-dom";
+import { WeekData, WeekMeta, Assignment } from "@/data/types";
+import { getAssignmentById } from "@/data";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, FileText, ChevronRight, Target, BookOpen, ArrowLeft, ArrowRight } from "lucide-react";
+import { getWeekById } from "@/data";
 
 // CILOs for the course
-const CILOs = [
+export const CILOs = [
   { id: 1, short: "Critical Reading", full: "Read academic texts critically and identify key arguments" },
   { id: 2, short: "Summary & Synthesis", full: "Summarise and synthesise information from multiple sources" },
   { id: 3, short: "Academic Writing", full: "Write academic texts with appropriate structure and tone" },
@@ -15,7 +16,7 @@ const CILOs = [
 ];
 
 // Map weeks to their primary CILOs
-const weekCILOMapping: Record<number, number[]> = {
+export const weekCILOMapping: Record<number, number[]> = {
   1: [1, 2],      // Reading & Summary
   2: [1, 3],      // Reading & Writing  
   3: [4, 3],      // Citations & Writing
@@ -32,7 +33,7 @@ const weekCILOMapping: Record<number, number[]> = {
 };
 
 // Brief descriptions linking weeks
-const weekConnections: Record<number, { before?: string; after?: string; bigPicture: string }> = {
+export const weekConnections: Record<number, { before?: string; after?: string; bigPicture: string }> = {
   1: {
     after: "Next week you'll apply these reading strategies to identify thesis statements and build toward citation skills.",
     bigPicture: "This week establishes the foundation for all academic reading in UE1. The skills you learn here—analysing titles, decoding abstracts, and distinguishing claims from evidence—are essential for the AWQ in Week 5."
@@ -57,15 +58,56 @@ const weekConnections: Record<number, { before?: string; after?: string; bigPict
     after: "After AWQ, you'll apply similar skills to argumentation in ACE.",
     bigPicture: "The AWQ (15%) tests everything from Weeks 1-4: reading strategically, summarising accurately, citing correctly, and writing with academic tone."
   },
+  6: {
+    before: "AWQ complete! Now we shift to argumentation.",
+    after: "Week 7 continues building your ACE draft with evidence integration.",
+    bigPicture: "This week introduces the ACE (Argumentation Construction & Evaluation). You'll learn to construct arguments with claims, evidence, and warrants."
+  },
+  7: {
+    before: "Building on argument structure...",
+    after: "Week 8 focuses on counter-arguments and refutation.",
+    bigPicture: "Deepen your argumentation skills by integrating AI tools responsibly. Learn to evaluate AI-generated content critically."
+  },
+  8: {
+    before: "With argument basics in place...",
+    after: "Week 9 is your ACE final submission.",
+    bigPicture: "Master counter-arguments and refutation. These skills distinguish strong arguments from weak ones in your ACE."
+  },
+  9: {
+    before: "Final ACE preparations.",
+    after: "Week 10 begins the CRAA module.",
+    bigPicture: "Submit your ACE Final (20%). This assessment tests your ability to construct and evaluate arguments using multiple sources."
+  },
+  10: {
+    before: "ACE complete! Now we move to CRAA.",
+    after: "Week 11 continues with rhetorical analysis techniques.",
+    bigPicture: "The CRAA (Critical Reading & Argumentation Assessment) begins. Learn to analyze how authors construct persuasive texts."
+  },
+  11: {
+    before: "Building on rhetorical foundations...",
+    after: "Week 12 focuses on comparative analysis.",
+    bigPicture: "Deepen your rhetorical analysis skills. Focus on identifying persuasive strategies and evaluating their effectiveness."
+  },
+  12: {
+    before: "With analysis skills developed...",
+    after: "Week 13 wraps up the course.",
+    bigPicture: "Compare rhetorical strategies across texts. This comparative lens is essential for your CRAA success."
+  },
+  13: {
+    before: "Final week of UE1.",
+    bigPicture: "Course wrap-up and reflection. Review all five CILOs and prepare for your final assessments."
+  },
 };
 
-const HourCard = ({ weekId, hour, title, theme, unitCount }: { 
-  weekId: number; 
-  hour: number; 
-  title: string; 
+interface HourCardProps {
+  weekId: number;
+  hour: number;
+  title: string;
   theme: string;
   unitCount: number;
-}) => (
+}
+
+const HourCard = ({ weekId, hour, title, theme, unitCount }: HourCardProps) => (
   <Link to={`/week/${weekId}/hour/${hour}`} className="block group">
     <Card className="h-full transition-all hover:border-primary/50 hover:shadow-md group-hover:bg-accent/5">
       <CardHeader className="pb-2">
@@ -96,25 +138,23 @@ const AssignmentBadge = ({ assignment, weekId }: { assignment: Assignment; weekI
   </Link>
 );
 
-export const WeekPage = () => {
-  const params = useParams();
-  const id = Number(params.weekId);
-  const week = Number.isNaN(id) ? undefined : getWeekById(id);
-  const meta = Number.isNaN(id) ? undefined : getWeekMetaById(id);
+interface WeekOverviewProps {
+  week: WeekData;
+  meta?: WeekMeta;
+  classHours?: { hour: number; title: string; theme: string; unitCount: number }[];
+}
 
-  if (!week) {
-    return <Navigate to="/" replace />;
-  }
-
+export const WeekOverviewTemplate = ({ week, meta, classHours }: WeekOverviewProps) => {
+  const id = week.id;
   const assignmentsDue = week.assignmentsDue?.map(getAssignmentById).filter(Boolean) as Assignment[] || [];
   const ciloIds = weekCILOMapping[id] || [];
   const connections = weekConnections[id] || { bigPicture: week.overview };
   
-  // Get class hours or create default structure
-  const classHours = week.classHours || [
-    { hour: 1, title: "Hour 1", theme: "Introduction", units: [] },
-    { hour: 2, title: "Hour 2", theme: "Core Concepts", units: [] },
-    { hour: 3, title: "Hour 3", theme: "Practice & Application", units: [] },
+  // Default hours if not provided
+  const hours = classHours || [
+    { hour: 1, title: "Hour 1", theme: "Introduction", unitCount: 0 },
+    { hour: 2, title: "Hour 2", theme: "Core Concepts", unitCount: 0 },
+    { hour: 3, title: "Hour 3", theme: "Practice & Application", unitCount: 0 },
   ];
 
   const prevWeek = id > 1 ? getWeekById(id - 1) : null;
@@ -184,14 +224,14 @@ export const WeekPage = () => {
           This Week's Sessions
         </h2>
         <div className="grid gap-4 sm:grid-cols-3">
-          {classHours.slice(0, 3).map((ch) => (
+          {hours.slice(0, 3).map((ch) => (
             <HourCard 
               key={ch.hour}
               weekId={id}
               hour={ch.hour}
               title={ch.title}
               theme={ch.theme}
-              unitCount={ch.units?.length || 0}
+              unitCount={ch.unitCount}
             />
           ))}
         </div>
@@ -223,4 +263,4 @@ export const WeekPage = () => {
   );
 };
 
-export default WeekPage;
+export default WeekOverviewTemplate;
