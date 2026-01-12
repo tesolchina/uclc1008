@@ -250,9 +250,17 @@ export default function SettingsPage() {
             <p className="text-xs text-muted-foreground">
               Your progress and AI usage will be tracked under this ID. Keep it private and memorable.
             </p>
-            {savedStudentId && (
+            {savedStudentId ? (
               <p className="text-xs text-muted-foreground">
                 Current ID: <span className="font-mono font-medium">{savedStudentId}</span>
+              </p>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Don't have an ID yet?{' '}
+                <a href="/auth" className="text-primary hover:underline font-medium">
+                  Sign up here
+                </a>{' '}
+                to get started.
               </p>
             )}
           </div>
