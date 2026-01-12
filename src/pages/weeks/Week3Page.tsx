@@ -4,21 +4,21 @@ import { WeekOverviewTemplate } from "./WeekOverviewTemplate";
 const classHours = [
   { 
     hour: 1, 
-    title: "APA 7th Citation Mastery", 
-    theme: "Author-prominent vs information-prominent citations",
+    title: "Paraphrasing vs Summarizing", 
+    theme: "Understanding the difference and when to use each skill",
     unitCount: 3
   },
   { 
     hour: 2, 
-    title: "Reporting Verbs", 
-    theme: "Neutral, strong, and evidential verbs for citations",
-    unitCount: 3
+    title: "5 Paraphrasing Strategies", 
+    theme: "Synonyms, word forms, voice, structure, combining",
+    unitCount: 4
   },
   { 
     hour: 3, 
-    title: "Citation Practice", 
-    theme: "Integrating citations into academic writing",
-    unitCount: 2
+    title: "Summarizing from Abstracts", 
+    theme: "The Slasher Method: claims vs evidence",
+    unitCount: 3
   },
 ];
 
