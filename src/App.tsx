@@ -21,6 +21,9 @@ import AdminDashboard from "./pages/AdminDashboard";
 import SettingsPage from "./pages/SettingsPage";
 import JoinSessionPage from "./pages/JoinSessionPage";
 import UnitPage from "./pages/UnitPage";
+import HourPage from "./pages/HourPage";
+import StudentDashboard from "./pages/StudentDashboard";
+import TeacherDashboard from "./pages/TeacherDashboard";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +42,7 @@ const App = () => (
               <Route path="assessment" element={<AssessmentPage />} />
               <Route path="week/1" element={<Week1Page />} />
               <Route path="week/:weekId" element={<WeekPage />} />
+              <Route path="week/:weekId/hour/:hourId" element={<HourPage />} />
               <Route path="week/1/assignment/pre-course-writing" element={<PreCourseWritingPage />} />
               <Route path="week/2/assignment/pre-course-writing" element={<PreCourseWritingPage />} />
               <Route path="week/:weekId/assignment/:assignmentId" element={<WeekAssignmentPage />} />
@@ -50,6 +54,8 @@ const App = () => (
               <Route path="settings" element={<SettingsPage />} />
               <Route path="join" element={<JoinSessionPage />} />
               <Route path="join/:code" element={<JoinSessionPage />} />
+              <Route path="my-progress" element={<StudentDashboard />} />
+              <Route path="teacher-dashboard" element={<TeacherDashboard />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

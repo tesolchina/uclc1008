@@ -24,6 +24,7 @@ type WeekNavItem = {
   title: string;
   url: string;
   assignments: { id: string; title: string; weight: string }[];
+  hours?: { number: number; title: string }[];
 };
 
 const weeks: WeekNavItem[] = Array.from({ length: 13 }, (_, index) => {
@@ -40,10 +41,18 @@ const weeks: WeekNavItem[] = Array.from({ length: 13 }, (_, index) => {
     })
     .filter((a): a is { id: string; title: string; weight: string } => a !== null);
 
+  // Add hours for weeks 1-5
+  const hours = id <= 5 ? [
+    { number: 1, title: "Hour 1" },
+    { number: 2, title: "Hour 2" },
+    { number: 3, title: "Hour 3" },
+  ] : undefined;
+
   return {
     title: `Week ${id}`,
     url: `/week/${id}`,
     assignments,
+    hours,
   };
 });
 
@@ -74,12 +83,13 @@ export function AppSidebar() {
   // Build navigation items based on role
   const overviewItems = [
     { title: "Course overview", url: "/", icon: BookOpen },
-    { title: "Assessment & goals", url: "/assessment", icon: Target },
+    { title: "My Progress", url: "/my-progress", icon: Target },
     { title: "Settings", url: "/settings", icon: Settings, showStatus: true },
   ];
 
   // Add admin dashboard for teachers/admins
   if (isTeacher || isAdmin) {
+    overviewItems.push({ title: "Teacher Dashboard", url: "/teacher-dashboard", icon: MessageCircle, showStatus: false });
     overviewItems.push({ title: "Admin Dashboard", url: "/admin", icon: Shield, showStatus: false });
     overviewItems.push({ title: "Staff Space", url: "/staff", icon: Settings, showStatus: false });
   }
@@ -162,6 +172,28 @@ export function AppSidebar() {
                         </NavLink>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
+                    {!collapsed && week.hours?.map((hour) => {
+                      const hourPath = `${week.url}/hour/${hour.number}`;
+                      const hourActive = isActive(hourPath);
+
+                      return (
+                        <SidebarMenuItem key={hour.number}>
+                          <SidebarMenuButton asChild data-active={hourActive}>
+                            <NavLink
+                              to={hourPath}
+                              end
+                              className="flex items-center gap-2 rounded-md px-6 py-1.5 text-[11px] text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
+                              activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
+                            >
+                              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary/20 text-[9px] font-semibold text-primary">
+                                {hour.number}
+                              </span>
+                              <span className="truncate">{hour.title}</span>
+                            </NavLink>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      );
+                    })}
                     {!collapsed && week.assignments.map((assignment) => {
                       const assignmentPath = `${week.url}/assignment/${assignment.id}`;
                       const assignmentActive = isActive(assignmentPath);
