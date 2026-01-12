@@ -38,6 +38,60 @@ export type Database = {
         }
         Relationships: []
       }
+      hour_tasks: {
+        Row: {
+          context: string | null
+          correct_answer: string | null
+          created_at: string
+          explanation: string | null
+          hints: Json | null
+          hour_number: number
+          id: string
+          options: Json | null
+          question: string
+          skill_focus: string[] | null
+          task_order: number
+          task_type: string
+          updated_at: string
+          week_number: number
+          word_limit: number | null
+        }
+        Insert: {
+          context?: string | null
+          correct_answer?: string | null
+          created_at?: string
+          explanation?: string | null
+          hints?: Json | null
+          hour_number: number
+          id?: string
+          options?: Json | null
+          question: string
+          skill_focus?: string[] | null
+          task_order?: number
+          task_type: string
+          updated_at?: string
+          week_number: number
+          word_limit?: number | null
+        }
+        Update: {
+          context?: string | null
+          correct_answer?: string | null
+          created_at?: string
+          explanation?: string | null
+          hints?: Json | null
+          hour_number?: number
+          id?: string
+          options?: Json | null
+          question?: string
+          skill_focus?: string[] | null
+          task_order?: number
+          task_type?: string
+          updated_at?: string
+          week_number?: number
+          word_limit?: number | null
+        }
+        Relationships: []
+      }
       lesson_progress: {
         Row: {
           ai_feedback: Json | null
@@ -631,6 +685,56 @@ export type Database = {
           },
         ]
       }
+      student_questions: {
+        Row: {
+          context: string | null
+          created_at: string
+          hour_number: number | null
+          id: string
+          question: string
+          responded_at: string | null
+          responded_by: string | null
+          status: string
+          student_id: string
+          teacher_response: string | null
+          week_number: number
+        }
+        Insert: {
+          context?: string | null
+          created_at?: string
+          hour_number?: number | null
+          id?: string
+          question: string
+          responded_at?: string | null
+          responded_by?: string | null
+          status?: string
+          student_id: string
+          teacher_response?: string | null
+          week_number: number
+        }
+        Update: {
+          context?: string | null
+          created_at?: string
+          hour_number?: number | null
+          id?: string
+          question?: string
+          responded_at?: string | null
+          responded_by?: string | null
+          status?: string
+          student_id?: string
+          teacher_response?: string | null
+          week_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_questions_responded_by_fkey"
+            columns: ["responded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       student_sessions: {
         Row: {
           activity_data: Json
@@ -681,6 +785,50 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "students"
             referencedColumns: ["student_id"]
+          },
+        ]
+      }
+      student_task_responses: {
+        Row: {
+          ai_feedback: string | null
+          id: string
+          is_correct: boolean | null
+          response: string
+          score: number | null
+          student_id: string
+          submitted_at: string
+          task_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          ai_feedback?: string | null
+          id?: string
+          is_correct?: boolean | null
+          response: string
+          score?: number | null
+          student_id: string
+          submitted_at?: string
+          task_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ai_feedback?: string | null
+          id?: string
+          is_correct?: boolean | null
+          response?: string
+          score?: number | null
+          student_id?: string
+          submitted_at?: string
+          task_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_task_responses_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "hour_tasks"
+            referencedColumns: ["id"]
           },
         ]
       }
