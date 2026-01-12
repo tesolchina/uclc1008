@@ -1,6 +1,13 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+
+// Store student ID in localStorage
+function setStoredStudentId(id: string): void {
+  if (id.trim()) {
+    localStorage.setItem('student_id', id.trim());
+  }
+}
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -155,10 +162,20 @@ export default function AuthPage() {
   };
 
   const handleStudentComplete = () => {
-    // Generate unique ID preview
-    const uniqueId = `${lastFourDigits}-${firstInitial.toUpperCase()}${lastInitial.toUpperCase()}-XX`;
-    setSuccess(`Your student ID will be: ${uniqueId}`);
-    // TODO: Save to database and redirect to dashboard
+    // Generate random 2-char suffix
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const suffix = chars.charAt(Math.floor(Math.random() * chars.length)) + 
+                   chars.charAt(Math.floor(Math.random() * chars.length));
+    const uniqueId = `${lastFourDigits}-${firstInitial.toUpperCase()}${lastInitial.toUpperCase()}-${suffix}`;
+    
+    // Save to localStorage
+    setStoredStudentId(uniqueId);
+    setSuccess(`Your ID is: ${uniqueId}`);
+    
+    // Redirect to home after a short delay
+    setTimeout(() => {
+      navigate('/');
+    }, 1500);
   };
 
   const handleStudentLogin = () => {
@@ -169,8 +186,14 @@ export default function AuthPage() {
       setError('Please enter a valid ID (format: 1234-JD-XX)');
       return;
     }
-    // TODO: Verify ID exists in database and redirect
+    // Save to localStorage and redirect
+    setStoredStudentId(studentLoginId.toUpperCase());
     setSuccess(`Welcome back! Logging you in...`);
+    
+    // Redirect to home after a short delay
+    setTimeout(() => {
+      navigate('/');
+    }, 1000);
   };
 
   const handleBack = () => {
