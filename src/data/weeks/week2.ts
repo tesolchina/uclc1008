@@ -84,6 +84,6 @@ export const week2: WeekData = {
 
 export const week2Meta: WeekMeta = {
   dateRange: "19-23 Jan 2026",
-  assignmentTagline: "Referencing Quiz (2.5%) due 30 Jan, 6pm",
-  assignmentIds: ["referencing-quiz"],
+  assignmentTagline: "Preparing for AWQ (15%) in Week 5",
+  assignmentIds: [],
 };
