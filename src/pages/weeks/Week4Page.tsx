@@ -4,21 +4,21 @@ import { WeekOverviewTemplate } from "./WeekOverviewTemplate";
 const classHours = [
   { 
     hour: 1, 
-    title: "Paraphrasing Strategies", 
-    theme: "Synonyms, word forms, sentence restructuring",
+    title: "Listing vs Synthesis", 
+    theme: "Why synthesis matters for AWQ success",
     unitCount: 3
   },
   { 
     hour: 2, 
-    title: "Avoiding Patchwriting", 
-    theme: "Identifying and fixing inadequate paraphrasing",
-    unitCount: 3
+    title: "Synthesis Relationships", 
+    theme: "Agreement, contrast, elaboration with connectives",
+    unitCount: 4
   },
   { 
     hour: 3, 
-    title: "Integrated Citation + Paraphrase", 
-    theme: "The citation sandwich technique",
-    unitCount: 2
+    title: "AWQ Structure & Practice", 
+    theme: "3-paragraph model and sample analysis",
+    unitCount: 3
   },
 ];
 
