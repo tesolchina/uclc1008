@@ -8,7 +8,13 @@ import { ArticleExcerptDisplay } from "@/components/units/ArticleExcerptDisplay"
 import { InteractiveUnitViewer } from "@/components/units/InteractiveUnitViewer";
 import { Hour1LiveSession } from "@/components/units/Hour1LiveSession";
 import { week1Hour1Units, articleExcerpt } from "@/data/units";
-import { FileText, AlertCircle, ArrowRight, GraduationCap, PlayCircle } from "lucide-react";
+import { StudentLoginReminder } from "@/components/StudentLoginReminder";
+import { FileText, AlertCircle, ArrowRight, GraduationCap, PlayCircle, PenLine } from "lucide-react";
+
+// Check if user has a student ID in localStorage
+function getStoredStudentId(): string {
+  return localStorage.getItem('student_id') || '';
+}
 
 const AssignmentCard = ({ assignment, isDue }: { assignment: Assignment; isDue: boolean }) => (
   <Link 
@@ -33,11 +39,16 @@ const AssignmentCard = ({ assignment, isDue }: { assignment: Assignment; isDue: 
 const Week1Page = () => {
   const week = week1;
   const meta = week1Meta;
+  const studentId = getStoredStudentId();
+  const isLoggedIn = !!studentId;
 
   const assignmentsDue = week.assignmentsDue?.map(getAssignmentById).filter(Boolean) as Assignment[] || [];
 
   return (
     <div className="space-y-4">
+      {/* Login Reminder for non-logged-in users */}
+      {!isLoggedIn && <StudentLoginReminder />}
+
       {/* Hero */}
       <section className="hero-shell">
         <div className="hero-glow-orb" aria-hidden="true" />
@@ -52,6 +63,17 @@ const Week1Page = () => {
               Decoding Academic Journal Articles
             </h1>
             <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">{week.overview}</p>
+            
+            {/* Quick action: Pre-course Writing */}
+            <div className="pt-2">
+              <Button asChild>
+                <Link to="/week/1/assignment/pre-course-writing" className="gap-2">
+                  <PenLine className="h-4 w-4" />
+                  Pre-course Writing Assignment (2.5%)
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>
