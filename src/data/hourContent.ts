@@ -82,18 +82,35 @@ export const ARTICLE_A: ArticleExcerpt = {
   title: "Supporting schools to use face recognition systems: A continuance intention perspective of elementary school parents in China",
   authors: "Hong, Li, Kuo & An",
   year: 2022,
-  abstract: "A great deal of attention has been focused on technological innovation, for example, face recognition, which has been used in some countries in various fields. Nonetheless, there has been little attention paid to parents' acceptance of the use of face recognition systems on campus. To address this gap in the literature, this study examined how different degrees of technological innovativeness and dangerous beliefs in the virtual world (DBVW) influence parents' perceived value of using and intention to continue supporting schools' use of face recognition systems.",
-  excerpt: `The results indicate that the average score of parents' DBVW is 3.865, which is higher than the average level (3.000), indicating that the parents were worried about the disclosure of students' personal privacy, and generally had a cautious attitude towards new technologies.
+  abstract: "A great deal of attention has been focused on technological innovation, for example, face recognition, which has been used in some countries in various fields. Nonetheless, there has been little attention paid to parents' acceptance of the use of face recognition systems on campus. To address this gap in the literature, this study examined how different degrees of technological innovativeness and dangerous beliefs in the virtual world (DBVW) influence parents' perceived value of using and intention to continue supporting schools' use of face recognition systems. This study adopted snowball sampling to collect data through questionnaires, and received 380 valid responses from parents living in Xuzhou, China.",
+  excerpt: `4 Method
 
-The average score of parents' technological innovativeness is 3.796, which is higher than the average level (3.000), indicating that the parent respondents tended to accept new technology.
+The purpose of this study was to explore whether parents can accept the adoption of face recognition systems for the efficiency and convenience of identity verification when using the technology as a campus access control approach. The data were collected using "Questionnaire Star," a widely used online survey platform in mainland China.
 
-The average score of parents' perceived value is 3.919, which is much higher than the neutral level (3.000), indicating that the parents generally recognize the value of face recognition systems.
+4.1 Procedure
+In order to collect a large number of samples, the online questionnaire survey method was used. Representative samples were selected according to the feasibility principle of snowball sampling. The questionnaire was distributed from January 7 to 17, 2020.
 
-On the whole, although the parent respondents thought that the face recognition system had certain risks, they were willing to try technological innovation and they thought the system was valuable, so they intended to continue using it.`,
+4.2 Participants
+The participants were parents of elementary students from Xuzhou, China. A total of 394 valid data were collected. The proportion of male and female respondents accounted for 41.6% and 58.4% respectively.
+
+4.3 Instrument
+The questionnaire items were adapted from the relevant literature. The BDVW measurement was adapted from Aurigemma & Mattson (2017), the technological innovativeness measurement was adapted from Albertsen et al. (2020).
+
+The questionnaire used a 5-point Likert scale, with options "strongly disagree," "disagree," "neutral," "agree," and "strongly agree."
+
+6.4 Path analysis
+Fig. 3 shows that the influence path coefficient of DBVW on perceived value is β = -0.320 (p<0.001), and that of technological innovativeness is β=0.447 (p<0.001). This means that the higher the DBVW is, the lower the perceived value is.
+
+8.2 Limitations
+This study did not examine the usage timing, such as the time after returning to physical classrooms, or evening self-study, which might influence the parents' use intention. Similarly, the study did not focus on the usage scope, such as school gates or dormitories.`,
   glossary: {
     "DBVW": "Dangerous Beliefs in the Virtual World - Anxiety about potential dangers while using technologies",
     "Perceived value": "Value that users believe a technology or service has for themselves",
-    "Technological innovativeness": "The degree to which an individual is willing to try new technologies"
+    "Technological innovativeness": "The degree to which an individual is willing to try new technologies",
+    "Snowball sampling": "A sampling method where existing participants recruit future participants",
+    "5-point Likert scale": "A rating scale from strongly disagree (1) to strongly agree (5)",
+    "Path coefficient (β)": "A measure showing the strength of relationship between variables",
+    "p<0.001": "Statistical significance - the result is very unlikely to have occurred by chance"
   }
 };
 
@@ -101,17 +118,34 @@ export const ARTICLE_B: ArticleExcerpt = {
   title: "Facial recognition technology in schools: critical questions and concerns",
   authors: "Andrejevic & Selwyn",
   year: 2020,
-  abstract: "Facial recognition technology is now being introduced across various aspects of public life. This includes the burgeoning integration of facial recognition and facial detection into compulsory schooling to address issues such as campus security, automated registration and student emotion detection. This article contends that school-based facial recognition presents a number of social challenges and concerns that merit specific attention.",
-  excerpt: `Another point of concern is the inescapability of facial monitoring within school contexts. Unlike other forms of personal data, facial data lends itself to constant and permanent surveillance. In short, people are always connected to their faces. Thus, unlike social media posts or interactions with school learning management systems, there is no option for students to self-curate and restrict what data they 'share'.
+  abstract: "Facial recognition technology is now being introduced across various aspects of public life. This includes the burgeoning integration of facial recognition and facial detection into compulsory schooling to address issues such as campus security, automated registration and student emotion detection. So far, these technologies have largely been seen as routine additions to school systems with already extensive cultures of monitoring and surveillance. While critical commentators are beginning to question the pedagogical limitations of facially driven learning, this article contends that school-based facial recognition presents a number of other social challenges and concerns that merit specific attention. This includes the likelihood of facial recognition technology altering the nature of schools and schooling along divisive, authoritarian and oppressive lines. Against this background, the article considers whether or not a valid case can ever be made for allowing this form of technology in schools.",
+  excerpt: `Introduction
 
-While students might be able to opt-out from facial detection elements of their school's learning systems, there is no right to decline to participate in 'non-cooperative' facial recognition systems. This makes it difficult for students to obscure their faces from surveillance cameras.
+The past few years have seen the implementation of automated facial recognition systems across a range of social realms. While these technologies are associated most frequently with promises to strengthen public safety, a growing number of other applications have also emerged – from verifying the identity of bank users, through to 'smart billboards' that display advertisements in response to the moods of passers-by. Of particular interest is how facial recognition technologies are beginning to be implemented in school settings.
 
-The systems being deployed in schools for security and attendance purposes rely on complete sweeps of classrooms and corridors in order to operate. This renders 'opt-in' and 'opt-out' approaches counter-productive from the point of view of the system provider.`,
+In this sense, facial recognition could be seen as a logical extension of technology-based surveillance trends established in schools from the 1990s onwards. However, in this article, we seek to problematise the specific connotations and possible consequences of facial recognition technology in schools. Drawing on emerging debates amongst communications, media and surveillance scholars, the article addresses a number of specific social challenges and concerns – not least various ways in which this technology might alter the nature of schools and schooling along divisive, authoritarian and oppressive lines.
+
+Challenging the take-up of facial recognition in schools
+
+These questions over diminished notions of pedagogy and consent are important. Yet, at this point, we would like to argue that there are a number of additional issues and concerns that cast further serious doubt upon the implementation of facial recognition technologies in schools.
+
+(i) The dehumanising nature of facially focused schooling
+First is the argument that the statistical processes through which facial recognition technologies quantify and frame a student's face are inherently reductive. Facial recognition technologies work by assigning numerical values to schematic representations of facial features. This constitutes a very reductive engagement with students in contrast to how they would ordinarily be viewed by a human.
+
+(ii) The foregrounding of students' gender and race
+Another unsettling reduction is their role in foregrounding fixed attributions of students' race and gender in informing school decision-making.
+
+Conclusion
+Thus, it can be strongly argued that schools should not be places where local communities become desensitised to being automatically identified, profiled, and potentially discriminated against.`,
   glossary: {
-    "Inescapability": "Impossible to avoid",
-    "Self-curate": "To personally choose what to share",
-    "Opt-out": "Choosing not to participate",
-    "Surveillance": "Careful watching for security purposes"
+    "Problematise": "To critically examine and question something",
+    "Inescapability": "Impossible to avoid or escape from",
+    "Self-curate": "To personally choose what to share or display",
+    "Opt-out": "Choosing not to participate in something",
+    "Surveillance": "Careful watching for security purposes",
+    "Contends": "Argues or asserts strongly",
+    "Reductive": "Oversimplified; reducing complex things to simple terms",
+    "Foregrounding": "Making something the main focus or emphasis"
   }
 };
 
@@ -121,77 +155,86 @@ export const week1Hours: HourData[] = [
   {
     weekNumber: 1,
     hourNumber: 1,
-    title: "Features of Academic Research Papers",
-    theme: "Understanding What Makes Papers 'Academic'",
-    behaviourChange: "Before reading any paper, always check: Who wrote it? Where is it published? Does it have citations?",
+    title: "Skimming, Scanning & the IMRaD Structure",
+    theme: "Strategic Reading for Academic Articles",
+    behaviourChange: "Before reading any paper in detail, always SKIM first: Title → Abstract → Headings → Topic Sentences. Then SCAN for specific information.",
     learningGoals: [
-      "Identify 4 characteristics that make research papers 'academic'",
-      "Understand the role of peer review as academic gatekeeping",
-      "Recognize how citations build on existing knowledge",
-      "Distinguish academic from non-academic sources"
+      "Apply skimming techniques to get an overview of academic articles",
+      "Use scanning to locate specific information quickly",
+      "Understand the IMRaD structure (Introduction, Methods, Results, Discussion)",
+      "Identify whether an article is empirical or conceptual",
+      "Summarize the gist of an article in one sentence"
     ],
     ciloLinks: ["CILO 1: Examine Academic Discourse"],
     keyConcepts: [
       {
-        term: "Academic Journal Article",
-        definition: "A scholarly paper published in a peer-reviewed journal, written by experts, with citations to existing research.",
-        example: "Hong et al. (2022) in Education and Information Technologies is an academic article; a newspaper opinion piece about FRT is not.",
-        tip: "Look for author affiliations (universities), methodology sections, and reference lists."
+        term: "Skimming",
+        definition: "Reading quickly to get a general understanding of an article - an overview.",
+        example: "To skim Article A, read: Title → Abstract → Section Headings → First sentence of each paragraph.",
+        tip: "You can start with: Title, Abstract, Introduction & Conclusion, Topic sentences, Section headings, Boldfaced words, Graphics/tables."
       },
       {
-        term: "Peer Review",
-        definition: "A process where experts in the field evaluate a paper before publication to ensure quality and validity.",
-        example: "Before Hong et al.'s paper was published, 2-3 anonymous reviewers checked the methodology and conclusions.",
-        tip: "Peer review acts as 'academic gatekeeping' - not everything gets published."
-      },
-      {
-        term: "Citations",
-        definition: "References to other works that show how the current research builds on existing knowledge.",
-        example: "When Hong et al. write '(Kaiser et al., 2021)', they're showing their work connects to previous research.",
-        tip: "Citations are like academic 'receipts' - proof that you've done your research."
+        term: "Scanning",
+        definition: "Moving your eyes over a text to find specific information quickly.",
+        example: "To find the sample size, scan for numbers and words like 'participants', 'sample', 'n=' or 'N=' in Methods/Results.",
+        tip: "Look for: numbers, proper nouns, capitalized words, or abbreviations."
       },
       {
         term: "IMRaD Structure",
-        definition: "Introduction, Methods, Results, and Discussion - the standard structure for empirical research papers.",
-        example: "Hong et al. (2022) follows IMRaD: Introduction (why FRT?), Methods (survey of 380 parents), Results (scores), Discussion (implications).",
-        tip: "Conceptual papers don't follow IMRaD - they have argument-driven structures instead."
+        definition: "Introduction, Methods, Results, and Discussion - the standard structure for EMPIRICAL research papers.",
+        example: "Hong et al. (2022): Introduction (why study FRT?), Methods (survey of 380 parents), Results (DBVW score = 3.865), Discussion (implications).",
+        tip: "IMRaD papers have data and statistics. Conceptual papers like Andrejevic & Selwyn DON'T follow IMRaD."
+      },
+      {
+        term: "Empirical vs Conceptual",
+        definition: "Empirical = data-driven research with Methods & Results. Conceptual = argument-driven theory without data collection.",
+        example: "Hong et al. (2022) is EMPIRICAL - they collected survey data from 380 parents. Andrejevic & Selwyn (2020) is CONCEPTUAL - they theorize about risks without collecting new data.",
+        tip: "Check: Does it have a Methods section? Does it report collected data? If YES → Empirical. If NO → Conceptual."
+      },
+      {
+        term: "The Gist",
+        definition: "The essential meaning or main point of an article, usually found in the last sentence of the Abstract.",
+        example: "The gist of Hong et al.: 'Parents support the use of face recognition systems in elementary school.'",
+        tip: "Where to find the gist: Last sentence of the Abstract, or Purpose Statement in the Introduction."
       }
     ],
     articles: [ARTICLE_A],
     agenda: [
       { 
-        title: "Academic vs. Non-Academic Sources", 
-        duration: "12 min", 
-        activities: [
-          "Compare newspaper article with journal article on same topic",
-          "Identify 4 key differences",
-          "Discussion: Why does this matter for your assignments?"
-        ] 
-      },
-      { 
-        title: "The Peer Review Process", 
+        title: "Skimming & Scanning Techniques", 
         duration: "10 min", 
         activities: [
-          "Visualize the submission → review → revision → publication process",
-          "Why peer review makes papers more trustworthy",
-          "Limitations of peer review"
+          "Watch video on skimming vs scanning",
+          "Demo: How to preview and skim a text",
+          "Key elements to skim: Title, Abstract, Introduction/Conclusion, Topic sentences, Headings"
         ] 
       },
       { 
-        title: "Citations as Knowledge Building", 
-        duration: "10 min", 
-        activities: [
-          "Examine a paragraph from Hong et al. with multiple citations",
-          "Map how ideas connect across papers",
-          "Practice: Find citations in the excerpt"
-        ] 
-      },
-      { 
-        title: "Writing Task", 
+        title: "Skimming Practice: Article A", 
         duration: "12 min", 
         activities: [
-          "Write 2-3 sentences describing ONE academic feature",
-          "Include a citation to demonstrate"
+          "Skim Article A (Hong et al., 2022)",
+          "Answer: What is the gist? Where did you find it?",
+          "Identify: Is it empirical or conceptual? How do you know?"
+        ] 
+      },
+      { 
+        title: "IMRaD Structure Deep-Dive", 
+        duration: "10 min", 
+        activities: [
+          "Map Article A's sections to IMRaD",
+          "Introduction, Literature Review, Research Model, Method, Results, Discussion, Conclusions",
+          "Compare with conceptual papers (no Method/Results)"
+        ] 
+      },
+      { 
+        title: "Scanning Practice: Finding Specific Information", 
+        duration: "12 min", 
+        activities: [
+          "Scan for: Sample size (394 participants)",
+          "Scan for: Data collection instrument (5-point Likert scale)",
+          "Scan for: A statistically significant result (p<0.001)",
+          "Scan for: One limitation of the study"
         ] 
       }
     ],
@@ -199,56 +242,60 @@ export const week1Hours: HourData[] = [
       {
         id: "w1h1-mc1",
         type: "mc",
-        question: "Which of the following is a characteristic of academic research papers?",
+        question: "You are skimming Article A by Hong et al. (2022). Where would you find the GIST (main point) of the article?",
         options: [
-          "Written by journalists for general audiences",
-          "Published in peer-reviewed journals after expert evaluation",
-          "Uses informal language and personal opinions",
-          "Does not require citations or references"
+          "In the title only",
+          "In the last sentence of the Abstract",
+          "In the Methods section",
+          "In the References list"
         ],
         correctAnswer: 1,
-        explanation: "Academic papers are published in peer-reviewed journals, meaning they undergo evaluation by experts (usually 2-3 anonymous reviewers) before publication. This process ensures quality and validity.",
-        skillFocus: ["academic-discourse"],
-        examples: [
-          {
-            original: "Hong et al. (2022) published in Education and Information Technologies",
-            analysis: "This is peer-reviewed: authors are academics, journal requires review, paper has citations."
-          },
-          {
-            original: "A blog post titled 'Why I hate facial recognition'",
-            analysis: "NOT academic: personal opinion, no peer review, no methodology, no citations."
-          }
-        ]
+        explanation: "The gist is typically found in the LAST sentence of the Abstract. For Hong et al., it's: 'Parents support the use of face recognition systems in elementary school.' This tells you the main finding.",
+        skillFocus: ["skimming", "abstract-reading"]
       },
       {
         id: "w1h1-tf1",
         type: "true-false",
-        question: "Peer review means that only the journal editor reads the paper before publication.",
-        correctAnswer: "false",
-        explanation: "Peer review involves multiple experts in the field (usually 2-3 'reviewers' or 'referees') who evaluate the paper. The editor coordinates but doesn't do the review alone. Reviewers check methodology, validity, and contribution to the field.",
-        skillFocus: ["academic-discourse"]
+        question: "Hong et al. (2022) is an EMPIRICAL paper because it collected survey data from 380 parents.",
+        correctAnswer: "true",
+        explanation: "Correct! Empirical papers collect and analyze data. Hong et al. surveyed 380 parents using questionnaires - this is data collection. They have Methods, Results, and statistical analysis. Conceptual papers theorize WITHOUT collecting new data.",
+        skillFocus: ["article-structure", "empirical-conceptual"]
       },
       {
         id: "w1h1-mc2",
         type: "mc",
-        question: "Look at this sentence from Hong et al. (2022): 'individuals' attitude can promote the value perception before performing a behaviour (Kaiser et al., 2021)'. The citation '(Kaiser et al., 2021)' shows that:",
+        question: "When SCANNING Article A for the sample size, which section would you look in and what words would you search for?",
         options: [
-          "Hong et al. invented this idea themselves",
-          "Hong et al. are building on previous research by Kaiser and colleagues",
-          "Kaiser et al. disagreed with Hong et al.",
-          "This is a direct quote from Kaiser et al."
+          "Abstract - look for 'participants' or 'sample'",
+          "Method/Participants section - look for 'n=', 'N=', numbers, 'participants'",
+          "Discussion - look for 'implications'",
+          "References - look for author names"
         ],
         correctAnswer: 1,
-        explanation: "Citations show how research builds on existing knowledge. Here, Hong et al. are using Kaiser et al.'s previous findings about attitude and behaviour to support their own research framework. This is how academic knowledge accumulates.",
-        skillFocus: ["citation", "academic-discourse"]
+        explanation: "Sample size is found in the METHOD section, specifically under 'Participants'. Scan for numbers and words like 'participants', 'sample', 'n=' or 'N='. In Hong et al.: 'A total of 394 valid data were collected.'",
+        skillFocus: ["scanning"]
       },
       {
         id: "w1h1-fb1",
         type: "fill-blank",
-        question: "The standard structure for empirical research papers is called _______ (Introduction, Methods, Results, Discussion).",
-        correctAnswer: "IMRaD",
-        explanation: "IMRaD is the standard structure for empirical articles. Conceptual articles use a different, argument-driven structure. Knowing this helps you navigate papers efficiently.",
+        question: "The IMRaD structure stands for: Introduction, _______, Results, and Discussion.",
+        correctAnswer: "Methods",
+        explanation: "IMRaD = Introduction, Methods, Results, Discussion. This is the standard structure for EMPIRICAL papers. The Methods section describes how data was collected (e.g., surveys, experiments).",
         skillFocus: ["article-structure"]
+      },
+      {
+        id: "w1h1-mc3",
+        type: "mc",
+        question: "Read this from Hong et al.'s Method: 'The questionnaire used a 5-point Likert scale, with options strongly disagree, disagree, neutral, agree, and strongly agree.' This is an example of:",
+        options: [
+          "A research gap",
+          "A limitation",
+          "A data collection instrument",
+          "A statistical result"
+        ],
+        correctAnswer: 2,
+        explanation: "A 5-point Likert scale is a DATA COLLECTION INSTRUMENT - the tool used to measure participants' responses. When scanning for instruments, look for words like 'scale', 'questionnaire', 'survey', 'measure'.",
+        skillFocus: ["scanning", "article-structure"]
       },
       {
         id: "w1h1-sa1",

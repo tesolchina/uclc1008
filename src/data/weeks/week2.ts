@@ -4,48 +4,86 @@ import { lesson2_1, lesson2_2 } from "../lessons";
 export const week2: WeekData = {
   id: 2,
   title: "Week 2",
-  theme: "Summarising, Paraphrasing & Synthesising Skills",
+  theme: "Reading Conceptual Articles & Thesis Identification",
   overview:
-    "Explore the fundamental skills of academic writing: expressing ideas in your own words while maintaining integrity.",
+    "This week focuses on reading conceptual research papers, which differ from empirical papers by being argument-driven rather than data-driven. You'll learn to identify the thesis statement, locate purpose statements, and understand how conceptual papers build arguments through reasoning rather than data collection.",
   inClassActivities: [
-    "Module 1: Part 2 - Step 3 (Section Headings) & Step 4 (Topic Sentences)",
-    "Module 2: Part 1 - Paraphrasing Skills (Activities 1.1-1.3)",
-    "Flipped Classroom Video: AI Literacy (Authenticity)",
+    "Structure of Conceptual Research Papers",
+    "Analyzing Article B (Andrejevic & Selwyn, 2020) - a conceptual study",
+    "Finding the Thesis & Central Argument",
+    "Identifying supporting reasons and evidence",
+    "Preview of In-text & End-of-text Citations (APA 7th)",
   ],
   learningOutcomes: [
-    "Identify and analyze topic sentences and concluding sentences in academic texts.",
-    "Apply paraphrasing strategies (synonyms, word forms, voice, patterns).",
-    "Understand how to use AI tools ethically for academic writing.",
-    "Complete the Pre-course Writing assessment.",
+    "Understand the structure of conceptual research papers (argument-driven, not IMRaD).",
+    "Locate the thesis statement (purpose/central message) typically at the end of the Introduction.",
+    "Identify the central argument and supporting reasons in a conceptual paper.",
+    "Distinguish between section structures: how headings reveal argument flow.",
+    "Recognize word clues that signal thesis statements: 'This article contends...', 'we seek to problematise...'",
   ],
   resources: [
     {
-      title: "Module 2: Paraphrasing, Summarising & Synthesising Skills (Part 1)",
+      title: "Article B: Andrejevic & Selwyn (2020) - FRT in Schools: Critical Questions",
       type: "reading",
-      duration: "30 min",
+      duration: "40 min",
     },
     {
-      title: "Flipped video: AI Literacy (Authenticity)",
+      title: "Module 1: Part 3 - Reading Conceptual Papers",
+      type: "reading",
+      duration: "20 min",
+    },
+    {
+      title: "In-text citations in minutes (Video)",
       type: "video",
-      duration: "10 min",
-      url: "https://www.youtube.com/watch?v=6uhUqUG4-Vo",
+      duration: "8 min",
+      url: "https://www.youtube.com/watch?v=JpT1YwNcV04",
     },
   ],
   practiceTasks: [
-    "Complete Activity 1.3: Practising Paraphrasing Strategies in Module 2.",
-    "Draft your Pre-course Writing task focusing on original wording.",
-    "Use Gen-AI to brainstorm ideas but ensure final drafting is independent.",
+    "Is Article B an empirical or conceptual research paper? Explain with reasons.",
+    "Find the sentence(s) containing the purpose and central idea. Which words give you the clue?",
+    "Where does the thesis typically appear in a conceptual paper?",
+    "Identify TWO reasons supporting the thesis that FRT should not be implemented in schools.",
+    "Compare the body paragraph structures - what pattern do you notice?",
   ],
   aiPromptHint:
-    "You help students practice paraphrasing by evaluating their drafts against original texts to ensure they are not too close (avoiding 'patchwriting').",
-  skillsIntroduced: ["paraphrasing", "topic-sentences", "ai-authenticity"],
-  skillsReinforced: ["journal-structure", "citation-recognition"],
-  assignmentsUpcoming: ["referencing-quiz"],
+    "You help students analyze conceptual research papers, focusing on Andrejevic & Selwyn (2020). Help them identify thesis statements, central arguments, and the argument-driven structure that differs from empirical papers.",
+  skillsIntroduced: ["thesis-identification", "conceptual-paper-structure", "argument-mapping", "purpose-statement"],
+  skillsReinforced: ["skimming", "scanning", "title-analysis"],
+  assignmentsUpcoming: ["referencing-quiz", "academic-writing-quiz"],
   lessons: [lesson2_1, lesson2_2],
+  classRundown: [
+    {
+      time: "Hour 1",
+      title: "Structure of Conceptual Research Papers",
+      description: "Understanding how conceptual papers differ from empirical papers and locating the thesis",
+      activities: [
+        "Recap: Empirical (IMRaD) vs. Conceptual (argument-driven) structures",
+        "Skim Article B: Is it empirical or conceptual? Explain with reasons",
+        "Find the PURPOSE statement: What words give you the clue?",
+        "'This article contends...', 'we seek to problematise...' - thesis signals",
+        "The thesis appears at the END of the Introduction",
+        "Compare: Article A (empirical, supports FRT) vs Article B (conceptual, challenges FRT)"
+      ]
+    },
+    {
+      time: "Hour 2",
+      title: "Analyzing Arguments & Supporting Reasons",
+      description: "Deep dive into how conceptual papers build arguments through reasoning and evidence",
+      activities: [
+        "Find the CENTRAL ARGUMENT: 'schools should not be places where...'",
+        "Identify TWO supporting reasons from 'Challenging the take-up of FRT in schools'",
+        "Reason 1: Facially focused schooling is dehumanizing",
+        "Reason 2: Students' gender and race will be foregrounded",
+        "Body paragraph structure: Point + Evidence/Explanation pattern",
+        "Preview: APA 7th citations - In-text and End-of-text"
+      ]
+    }
+  ]
 };
 
 export const week2Meta: WeekMeta = {
   dateRange: "19-23 Jan 2026",
-  assignmentTagline: "Focus on paraphrasing and summarising skills",
-  assignmentIds: [],
+  assignmentTagline: "Referencing Quiz (2.5%) due 30 Jan, 6pm",
+  assignmentIds: ["referencing-quiz"],
 };
