@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,7 @@ interface TaskResponse {
 }
 
 export default function StudentDashboard() {
+  const { user, isLoading } = useAuth();
   const [studentId] = useState(() => localStorage.getItem("student_id") || "");
   const [questions, setQuestions] = useState<StudentQuestion[]>([]);
   const [responses, setResponses] = useState<TaskResponse[]>([]);
@@ -91,16 +93,9 @@ export default function StudentDashboard() {
     };
   });
 
-  if (!studentId) {
-    return (
-      <div className="text-center py-12 space-y-4">
-        <h2 className="text-xl font-semibold">Student Dashboard</h2>
-        <p className="text-muted-foreground">Please log in with your student ID to view your progress.</p>
-        <Button asChild>
-          <Link to="/">Go to Home</Link>
-        </Button>
-      </div>
-    );
+  // Redirect to settings if not logged in
+  if (!isLoading && !user && !studentId) {
+    return <Navigate to="/settings" replace />;
   }
 
   return (

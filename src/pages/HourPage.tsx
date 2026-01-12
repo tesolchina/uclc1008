@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { getHourData } from "@/data/hourContent";
+import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +8,7 @@ import { CollapsibleSection } from "@/components/CollapsibleSection";
 import { ObjectiveTask } from "@/components/tasks/ObjectiveTask";
 import { WritingTask } from "@/components/tasks/WritingTask";
 import { AskQuestionButton } from "@/components/tasks/AskQuestionButton";
+import { StudentLoginReminder } from "@/components/StudentLoginReminder";
 import { ArrowLeft, ArrowRight, Clock, Target, BookOpen, PenLine, CheckCircle2, Lightbulb, FileText, Sparkles } from "lucide-react";
 import { useState } from "react";
 
@@ -14,6 +16,7 @@ export default function HourPage() {
   const { weekId, hourId } = useParams();
   const weekNumber = parseInt(weekId || "1");
   const hourNumber = parseInt(hourId || "1");
+  const { user } = useAuth();
   
   const hourData = getHourData(weekNumber, hourNumber);
   const [completedTasks, setCompletedTasks] = useState<Set<string>>(new Set());
@@ -49,6 +52,9 @@ export default function HourPage() {
 
   return (
     <div className="space-y-6">
+      {/* Sign-in Reminder */}
+      {!user && <StudentLoginReminder />}
+
       {/* Navigation Header */}
       <div className="flex items-center justify-between">
         <Button variant="ghost" size="sm" asChild>
