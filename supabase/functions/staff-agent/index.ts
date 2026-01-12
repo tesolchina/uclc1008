@@ -19,17 +19,13 @@ if (!poeApiKey) {
   console.error("staff-agent: POE_API_KEY is not configured");
 }
 
-const supabase = SUPABASE_URL && SUPABASE_ANON_KEY
-  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: false } })
-  : null;
-
- type FolderRow = {
+type FolderRow = {
   id: string;
   name: string;
   parent_id: string | null;
 };
 
- type FileRow = {
+type FileRow = {
   id: string;
   filename: string;
   folder_id: string | null;
@@ -39,7 +35,7 @@ const supabase = SUPABASE_URL && SUPABASE_ANON_KEY
   markdown_content: string | null;
 };
 
- type AgentOperation =
+type AgentOperation =
   | { type: "create_folder"; path: string }
   | { type: "create_file"; path: string; content?: string | null; markdown?: string | null; linkToThread?: boolean }
   | { type: "move_file"; from: string; to: string }
@@ -48,11 +44,11 @@ const supabase = SUPABASE_URL && SUPABASE_ANON_KEY
   | { type: "link_file_to_thread"; path: string; link?: boolean }
   | { type: "convert_file_to_markdown"; path: string };
 
- type ApplyContext = {
+type ApplyContext = {
   currentThreadId: string | null;
 };
 
- type OperationResult = {
+type OperationResult = {
   operation: AgentOperation;
   status: "ok" | "error";
   message?: string;
@@ -101,9 +97,8 @@ function getFilePath(file: FileRow, folders: FolderRow[]): string {
   return normalizePath(base === "/" ? `/${file.filename}` : `${base}/${file.filename}`);
 }
 
-async function fetchLibrary() {
-  if (!supabase) throw new Error("Supabase client is not configured");
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function fetchLibrary(supabase: any) {
   const [{ data: folders, error: foldersError }, { data: files, error: filesError }] = await Promise.all([
     supabase
       .from("staff_library_folders")
@@ -124,9 +119,12 @@ async function fetchLibrary() {
   };
 }
 
-async function ensureFolderExists(path: string, folders: FolderRow[]): Promise<{ folder: FolderRow | null; folders: FolderRow[] }> {
-  if (!supabase) throw new Error("Supabase client is not configured");
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function ensureFolderExists(
+  path: string, 
+  folders: FolderRow[], 
+  supabase: any
+): Promise<{ folder: FolderRow | null; folders: FolderRow[] }> {
   const normalized = normalizePath(path);
   if (normalized === "/") {
     return { folder: null, folders };
@@ -138,7 +136,7 @@ async function ensureFolderExists(path: string, folders: FolderRow[]): Promise<{
   }
 
   const { parentPath, name } = splitPath(normalized);
-  const parentResult = await ensureFolderExists(parentPath, folders);
+  const parentResult = await ensureFolderExists(parentPath, folders, supabase);
   const parentFolder = parentResult.folder;
   folders = parentResult.folders;
 
@@ -196,20 +194,20 @@ async function convertTextToMarkdown(text: string): Promise<string> {
   return typeof markdown === "string" ? markdown : String(markdown);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function applyOperations(
   operations: AgentOperation[],
   folders: FolderRow[],
   files: FileRow[],
   context: ApplyContext,
+  supabase: any,
 ): Promise<{ results: OperationResult[] }> {
-  if (!supabase) throw new Error("Supabase client is not configured");
-
   const results: OperationResult[] = [];
 
   for (const op of operations) {
     try {
       if (op.type === "create_folder") {
-        const { folder, folders: updatedFolders } = await ensureFolderExists(op.path, folders);
+        const { folder, folders: updatedFolders } = await ensureFolderExists(op.path, folders, supabase);
         folders = updatedFolders;
         results.push({ operation: op, status: "ok", message: folder ? `Folder ensured at ${normalizePath(op.path)}` : "Root folder exists" });
         continue;
@@ -217,7 +215,7 @@ async function applyOperations(
 
       if (op.type === "create_file") {
         const { parentPath, name } = splitPath(op.path);
-        const folderResult = await ensureFolderExists(parentPath, folders);
+        const folderResult = await ensureFolderExists(parentPath, folders, supabase);
         const parentFolder = folderResult.folder;
         folders = folderResult.folders;
 
@@ -257,7 +255,7 @@ async function applyOperations(
         }
 
         const { parentPath, name } = splitPath(toPath);
-        const folderResult = await ensureFolderExists(parentPath, folders);
+        const folderResult = await ensureFolderExists(parentPath, folders, supabase);
         const parentFolder = folderResult.folder;
         folders = folderResult.folders;
 
@@ -449,13 +447,82 @@ async function planOperations(instruction: string, folders: FolderRow[], files: 
   }
 }
 
+/**
+ * Verify the user is authenticated and has teacher/admin role.
+ * SECURITY: This prevents unauthorized access to the staff-agent endpoint.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function verifyTeacherAuth(req: Request): Promise<{ userId: string; supabase: any } | Response> {
+  const authHeader = req.headers.get("authorization");
+  
+  if (!authHeader?.startsWith("Bearer ")) {
+    return new Response(
+      JSON.stringify({ error: "Unauthorized - missing or invalid authorization header" }),
+      { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+
+  const token = authHeader.replace("Bearer ", "");
+  
+  // Create a Supabase client with the user's token
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { persistSession: false },
+    global: { headers: { Authorization: authHeader } },
+  });
+
+  // Verify the JWT and get claims
+  const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
+  
+  if (claimsError || !claimsData?.claims) {
+    console.error("staff-agent: JWT verification failed", claimsError);
+    return new Response(
+      JSON.stringify({ error: "Unauthorized - invalid token" }),
+      { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+
+  const userId = claimsData.claims.sub;
+  if (!userId) {
+    return new Response(
+      JSON.stringify({ error: "Unauthorized - no user ID in token" }),
+      { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+
+  // Check if user has teacher or admin role
+  const { data: roles, error: rolesError } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("profile_id", userId);
+
+  if (rolesError) {
+    console.error("staff-agent: Error fetching user roles", rolesError);
+    return new Response(
+      JSON.stringify({ error: "Error verifying permissions" }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+
+  const isAuthorized = roles?.some((r) => r.role === "teacher" || r.role === "admin");
+  
+  if (!isAuthorized) {
+    console.log("staff-agent: User not authorized", userId, roles);
+    return new Response(
+      JSON.stringify({ error: "Forbidden - teachers and admins only" }),
+      { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+
+  return { userId, supabase };
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    if (!supabase) {
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
       return new Response(JSON.stringify({ error: "Supabase client is not configured" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -469,6 +536,14 @@ serve(async (req) => {
       });
     }
 
+    // SECURITY: Verify authentication and authorization
+    const authResult = await verifyTeacherAuth(req);
+    if (authResult instanceof Response) {
+      return authResult; // Return the error response
+    }
+    
+    const { supabase } = authResult;
+
     const { instruction, currentThreadId } = await req.json();
 
     if (!instruction || typeof instruction !== "string") {
@@ -478,7 +553,7 @@ serve(async (req) => {
       });
     }
 
-    const { folders, files } = await fetchLibrary();
+    const { folders, files } = await fetchLibrary(supabase);
 
     const operations = await planOperations(instruction, folders, files);
 
@@ -491,7 +566,7 @@ serve(async (req) => {
 
     const { results } = await applyOperations(operations, folders, files, {
       currentThreadId: typeof currentThreadId === "string" ? currentThreadId : null,
-    });
+    }, supabase);
 
     return new Response(JSON.stringify({ operations, results }), {
       status: 200,

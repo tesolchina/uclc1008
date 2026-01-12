@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import { Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/components/ui/use-toast";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { StaffLibrarySidebar } from "@/components/staff/StaffLibrarySidebar";
+import { Loader2, ShieldAlert } from "lucide-react";
 import * as pdfjsLib from "pdfjs-dist";
 import pdfjsWorker from "pdfjs-dist/build/pdf.worker.min?url";
 import mammoth from "mammoth";
@@ -29,8 +32,6 @@ const pdfjs = pdfjsLib as unknown as PdfjsModule;
 const mammothModule = mammoth as unknown as MammothModule;
 
 pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
-
-const STAFF_PASSWORD = "ue2026";
 
 type StaffThread = {
   id: string;
@@ -489,7 +490,7 @@ const StaffSpace = () => {
               />
               <div className="flex items-center justify-end gap-2 pt-1">
                 <Button type="submit" size="sm" disabled={isCreatingThread}>
-                  {isCreatingThread ? "Creating a0 a0 a0" : "Create thread"}
+                  {isCreatingThread ? "Creating..." : "Create thread"}
                 </Button>
               </div>
             </form>
@@ -499,292 +500,210 @@ const StaffSpace = () => {
             <div className="space-y-2">
               <p className="text-xs font-medium text-muted-foreground">Existing threads</p>
               {isLoadingThreads ? (
-                <p className="text-xs text-muted-foreground">Loading threads a0 a0 a0</p>
+                <p className="text-xs text-muted-foreground">Loading threads...</p>
               ) : threads.length === 0 ? (
-                <p className="text-xs text-muted-foreground">No threads yet. Start one above to begin planning.</p>
+                <p className="text-xs text-muted-foreground">No threads yet. Create your first one above.</p>
               ) : (
-                <ul className="space-y-1">
-                  {threads.map((thread) => (
-                    <li key={thread.id}>
-                      <button
-                        type="button"
-                        onClick={() => setSelectedThreadId(thread.id)}
-                        className={`flex w-full items-start justify-between rounded-md px-2 py-1.5 text-left text-xs transition-colors ${
-                          selectedThreadId === thread.id
-                            ? "bg-primary/10 text-foreground"
-                            : "hover:bg-muted/60 text-muted-foreground"
-                        }`}
-                      >
-                        <div className="min-w-0 pr-2">
-                          <p className="truncate font-medium">{thread.title}</p>
-                          {thread.description && (
-                            <p className="truncate text-[11px] text-muted-foreground">{thread.description}</p>
-                          )}
-                        </div>
-                        {thread.is_decided && (
-                          <span className="mt-0.5 inline-flex items-center rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary">
-                            Decided
-                          </span>
-                        )}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
+                <Select value={selectedThreadId ?? ""} onValueChange={setSelectedThreadId}>
+                  <SelectTrigger className="text-sm">
+                    <SelectValue placeholder="Choose a thread" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {threads.map((t) => (
+                      <SelectItem key={t.id} value={t.id}>
+                        {t.title}
+                        {t.is_decided && " ✓"}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               )}
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-border/70 bg-card/60 backdrop-blur">
-          <CardHeader className="space-y-2">
-            <CardTitle className="text-base">Thread details</CardTitle>
-            <CardDescription className="text-xs">
-              Capture decisions, comments, and attach materials. AI can help you convert raw notes into clean Markdown.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {!selectedThread ? (
-              <p className="text-xs text-muted-foreground">Select a thread on the left to see details.</p>
-            ) : (
-              <div className="space-y-5">
+        {selectedThread && (
+          <>
+            <Card className="border-border/70 bg-card/60 backdrop-blur">
+              <CardHeader className="space-y-1">
+                <CardTitle className="text-base">{selectedThread.title}</CardTitle>
+                {selectedThread.description && (
+                  <CardDescription className="text-xs">{selectedThread.description}</CardDescription>
+                )}
+              </CardHeader>
+              <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div className="min-w-0">
-                      <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                        Active thread
-                      </p>
-                      <h2 className="truncate text-sm font-semibold">{selectedThread.title}</h2>
-                    </div>
-                    <p className="text-[11px] text-muted-foreground">Created {formatDateTime(selectedThread.created_at)}</p>
-                  </div>
-
-                  {selectedThread.description && (
-                    <p className="text-xs text-muted-foreground">{selectedThread.description}</p>
-                  )}
-                </div>
-
-                <Separator className="my-1" />
-
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-xs font-medium text-muted-foreground">Decision for this thread</p>
-                    <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                      <input
-                        type="checkbox"
-                        className="h-3.5 w-3.5 rounded border-border bg-background text-primary"
-                        checked={isDecided}
-                        onChange={(e) => setIsDecided(e.target.checked)}
-                      />
-                      Mark as decided
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="is-decided"
+                      checked={isDecided}
+                      onChange={(e) => setIsDecided(e.target.checked)}
+                      className="h-4 w-4"
+                    />
+                    <label htmlFor="is-decided" className="text-xs font-medium">
+                      Mark this thread as decided
                     </label>
                   </div>
                   <Textarea
                     value={decisionSummary}
                     onChange={(e) => setDecisionSummary(e.target.value)}
-                    placeholder="Summarise the decision you've made here so future you remembers the reasoning."
+                    placeholder="What was the final decision or outcome?"
                     className="text-xs"
-                    rows={3}
                   />
                   <div className="flex justify-end">
-                    <Button size="sm" variant="outline" onClick={handleSaveDecision} disabled={isSavingDecision}>
-                      {isSavingDecision ? "Saving a0 a0 a0" : "Save decision"}
+                    <Button size="sm" onClick={handleSaveDecision} disabled={isSavingDecision}>
+                      {isSavingDecision ? "Saving..." : "Save decision"}
                     </Button>
                   </div>
                 </div>
+              </CardContent>
+            </Card>
 
-                <Separator className="my-1" />
-
-                <div className="space-y-2">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="text-xs font-medium text-muted-foreground">Comments</p>
-                    <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-                      <span>Posting as</span>
-                      <Select value={commentAuthor} onValueChange={setCommentAuthor}>
-                        <SelectTrigger className="h-7 w-[120px] text-xs">
-                          <SelectValue placeholder="Choose" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Simon">Simon</SelectItem>
-                          <SelectItem value="Naina">Naina</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <div className="space-y-2 rounded-md border border-border/70 bg-background/60 p-2">
-                    {comments.length === 0 ? (
-                      <p className="text-[11px] text-muted-foreground">No comments yet. Add one below.</p>
-                    ) : (
-                      <ul className="space-y-1.5">
-                        {comments.map((comment) => (
-                          <li key={comment.id} className="rounded-md bg-muted/60 px-2 py-1.5">
-                            <div className="flex items-center justify-between gap-2">
-                              <p className="text-[11px] font-medium text-muted-foreground">
-                                {comment.author_name || "Unknown"}
-                              </p>
-                              <p className="text-[10px] text-muted-foreground/80">
-                                {formatDateTime(comment.created_at)}
-                              </p>
-                            </div>
-                            <p className="mt-0.5 text-xs text-foreground">{comment.content}</p>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-
-                  <form onSubmit={handleAddComment} className="space-y-1.5">
-                    <Textarea
-                      value={commentContent}
-                      onChange={(e) => setCommentContent(e.target.value)}
-                      placeholder={`Add a quick note or idea as ${commentAuthor}`}
-                      className="text-xs"
-                      rows={2}
-                    />
-                    <div className="flex justify-end">
-                      <Button type="submit" size="sm" disabled={isSavingComment}>
-                        {isSavingComment ? "Posting a0 a0 a0" : "Post comment"}
-                      </Button>
-                    </div>
-                  </form>
-                </div>
-
-                <Separator className="my-1" />
-
-                <div className="space-y-3">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="text-xs font-medium text-muted-foreground">Materials attached to this thread</p>
-                    <p className="text-[11px] text-muted-foreground/80">
-                      {materials.length === 0 ? "No materials yet" : `${materials.length} material(s) saved in the database`}
-                    </p>
-                  </div>
-
-                  {materials.length > 0 && (
-                    <div className="space-y-2 rounded-md border border-border/70 bg-background/50 p-2">
-                      {materials.map((material) => (
-                        <div key={material.id} className="space-y-1 rounded-md bg-card/80 p-2">
-                          <div className="flex items-center justify-between gap-2">
-                            <div className="min-w-0">
-                              <p className="truncate text-xs font-semibold">{material.title}</p>
-                              <p className="text-[10px] text-muted-foreground/80">
-                                Saved {formatDateTime(material.created_at)}
-                              </p>
-                            </div>
-                            <Button
-                              type="button"
-                              size="icon"
-                              variant="ghost"
-                              className="h-6 w-6 text-destructive"
-                              onClick={() => handleDeleteMaterial(material.id)}
-                              disabled={deletingMaterialId === material.id}
-                              aria-label="Delete material"
-                            >
-                              {deletingMaterialId === material.id ? " a0 a0 a0" : " d7"}
-                            </Button>
-                          </div>
-                          {material.original_content && (
-                            <details className="group text-[11px] text-muted-foreground">
-                              <summary className="cursor-pointer select-none font-medium text-foreground">
-                                Original notes
-                              </summary>
-                              <pre className="mt-1 whitespace-pre-wrap rounded-md bg-muted/60 p-2 text-[11px] text-muted-foreground">
-                                {material.original_content}
-                              </pre>
-                            </details>
-                          )}
-                          {material.markdown_content && (
-                            <details className="group text-[11px] text-muted-foreground">
-                              <summary className="cursor-pointer select-none font-medium text-foreground">
-                                Markdown version
-                              </summary>
-                              <pre className="mt-1 whitespace-pre-wrap rounded-md bg-muted/60 p-2 text-[11px] text-muted-foreground">
-                                {material.markdown_content}
-                              </pre>
-                            </details>
-                          )}
+            <Card className="border-border/70 bg-card/60 backdrop-blur">
+              <CardHeader className="space-y-1">
+                <CardTitle className="text-base">Comments</CardTitle>
+                <CardDescription className="text-xs">
+                  Chat about this thread. Comments are saved immediately.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="max-h-64 space-y-3 overflow-y-auto">
+                  {comments.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">No comments yet on this thread.</p>
+                  ) : (
+                    comments.map((c) => (
+                      <div key={c.id} className="rounded-md border border-border/60 bg-background/70 p-2">
+                        <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                          <span className="font-semibold">{c.author_name ?? "Anonymous"}</span>
+                          <span>{formatDateTime(c.created_at)}</span>
                         </div>
-                      ))}
-                    </div>
+                        <p className="mt-1 whitespace-pre-wrap text-xs">{c.content}</p>
+                      </div>
+                    ))
                   )}
-
-                  <form
-                    onSubmit={handleSaveMaterial}
-                    className="space-y-2 rounded-md border border-dashed border-border/70 bg-background/60 p-3"
-                  >
-                    <p className="text-xs font-medium text-muted-foreground">Add new material</p>
-                    <Input
-                      value={materialTitle}
-                      onChange={(e) => setMaterialTitle(e.target.value)}
-                      placeholder="Title for this material (e.g. Week 3 reading guide)"
-                      className="text-sm"
-                    />
-                    <div className="space-y-1">
-                      <label className="text-[11px] font-medium text-muted-foreground">
-                        Upload text, PDF, or Word file (optional)
-                      </label>
-                      <Input
-                        type="file"
-                        accept=".txt,.md,.markdown,.html,.pdf,.doc,.docx"
-                        onChange={handleFileUpload}
-                        className="h-8 text-xs"
-                      />
-                      <p className="text-[10px] text-muted-foreground">
-                        We will pull out the text for you. For complex layouts, you can also paste the text manually.
-                      </p>
-                    </div>
-                    <Textarea
-                      value={materialOriginal}
-                      onChange={(e) => setMaterialOriginal(e.target.value)}
-                      placeholder="Paste raw notes, bullet points, or copied text here. AI can turn this into Markdown."
-                      className="text-xs"
-                      rows={4}
-                    />
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        onClick={handleConvertMaterial}
-                        disabled={isConvertingMaterial}
-                      >
-                        {isConvertingMaterial ? "Converting a0 a0 a0" : "Convert to Markdown with AI"}
-                      </Button>
-                      <p className="text-[11px] text-muted-foreground">
-                        Uses the shared Poe API key stored securely in the backend.
-                      </p>
-                    </div>
-                    <p className="text-[11px] font-medium text-muted-foreground">
-                      Step 2  2014 review and edit the Markdown before saving
-                    </p>
-                    <Textarea
-                      value={materialMarkdown}
-                      onChange={(e) => setMaterialMarkdown(e.target.value)}
-                      placeholder="Markdown will appear here. You can edit before saving."
-                      className="text-xs font-mono"
-                      rows={4}
-                    />
-                    <div className="flex justify-end">
-                      <Button type="submit" size="sm" disabled={isSavingMaterial}>
-                        {isSavingMaterial ? "Saving a0 a0 a0" : "Save reviewed material to thread"}
-                      </Button>
-                    </div>
-                  </form>
                 </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+
+                <Separator />
+
+                <form onSubmit={handleAddComment} className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Select value={commentAuthor} onValueChange={setCommentAuthor}>
+                      <SelectTrigger className="w-28 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Simon">Simon</SelectItem>
+                        <SelectItem value="Naina">Naina</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <span className="text-xs text-muted-foreground">says:</span>
+                  </div>
+                  <Textarea
+                    value={commentContent}
+                    onChange={(e) => setCommentContent(e.target.value)}
+                    placeholder="Add your thoughts..."
+                    className="text-xs"
+                  />
+                  <div className="flex justify-end">
+                    <Button type="submit" size="sm" disabled={isSavingComment || !commentContent.trim()}>
+                      {isSavingComment ? "Posting..." : "Post comment"}
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+
+            <Card className="border-border/70 bg-card/60 backdrop-blur">
+              <CardHeader className="space-y-1">
+                <CardTitle className="text-base">Materials</CardTitle>
+                <CardDescription className="text-xs">
+                  Paste raw content (Word, PDF text) and convert to Markdown for the learning hub.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="max-h-48 space-y-2 overflow-y-auto">
+                  {materials.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">No materials saved for this thread.</p>
+                  ) : (
+                    materials.map((m) => (
+                      <div
+                        key={m.id}
+                        className="flex items-start justify-between gap-2 rounded-md border border-border/60 bg-background/70 p-2"
+                      >
+                        <div className="flex-1">
+                          <p className="text-xs font-medium">{m.title}</p>
+                          <p className="text-[11px] text-muted-foreground">{formatDateTime(m.created_at)}</p>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 px-2 text-[11px] text-destructive"
+                          disabled={deletingMaterialId === m.id}
+                          onClick={() => handleDeleteMaterial(m.id)}
+                        >
+                          {deletingMaterialId === m.id ? "..." : "Delete"}
+                        </Button>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                <Separator />
+
+                <form onSubmit={handleSaveMaterial} className="space-y-3">
+                  <Input
+                    value={materialTitle}
+                    onChange={(e) => setMaterialTitle(e.target.value)}
+                    placeholder="Material title"
+                    className="text-sm"
+                  />
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-muted-foreground">
+                      Upload or paste original content
+                    </label>
+                    <Input type="file" accept=".pdf,.doc,.docx,.txt,.md" onChange={handleFileUpload} className="text-xs" />
+                  </div>
+
+                  <Textarea
+                    value={materialOriginal}
+                    onChange={(e) => setMaterialOriginal(e.target.value)}
+                    placeholder="Paste raw text here..."
+                    className="min-h-[100px] text-xs"
+                  />
+
+                  <div className="flex justify-end">
+                    <Button type="button" variant="outline" size="sm" onClick={handleConvertMaterial} disabled={isConvertingMaterial}>
+                      {isConvertingMaterial ? "Converting..." : "Convert to Markdown"}
+                    </Button>
+                  </div>
+
+                  <Textarea
+                    value={materialMarkdown}
+                    onChange={(e) => setMaterialMarkdown(e.target.value)}
+                    placeholder="Markdown output will appear here..."
+                    className="min-h-[100px] text-xs"
+                  />
+
+                  <div className="flex justify-end">
+                    <Button type="submit" size="sm" disabled={isSavingMaterial || !materialTitle.trim()}>
+                      {isSavingMaterial ? "Saving..." : "Save material"}
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          </>
+        )}
       </div>
 
       <Sheet open={isLibraryOpen} onOpenChange={setIsLibraryOpen}>
-        <SheetContent
-          side="right"
-          className="flex w-full max-w-md flex-col gap-3 border-l border-border/70 bg-background/95 p-4 sm:max-w-lg"
-        >
-          <SheetHeader className="space-y-1">
-            <SheetTitle className="text-sm font-semibold">Library & AI agent</SheetTitle>
+        <SheetContent side="right" className="w-full max-w-lg overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Staff library</SheetTitle>
             <SheetDescription className="text-xs">
-              Shared file library for staff. Use natural language instructions to create folders and files,
-              move items, archive them, or link them to the active thread.
+              Organise files across threads using natural language. The AI agent can move, rename, or archive items.
             </SheetDescription>
           </SheetHeader>
           <StaffLibrarySidebar selectedThreadId={selectedThreadId} />
@@ -794,69 +713,53 @@ const StaffSpace = () => {
   );
 };
 
+/**
+ * Staff page component with proper OAuth-based role authentication.
+ * SECURITY: Replaces client-side password with server-validated role checks.
+ */
 const Staff = () => {
-  const { toast } = useToast();
-  const [isAuthed, setIsAuthed] = useState(() => typeof window !== "undefined" && sessionStorage.getItem("staffAuthed") === "true");
-  const [password, setPassword] = useState("");
-  const [isChecking, setIsChecking] = useState(false);
+  const { isAuthenticated, isLoading, isTeacher, isAdmin } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsChecking(true);
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
-    const trimmed = password.trim();
-    if (trimmed === STAFF_PASSWORD) {
-      sessionStorage.setItem("staffAuthed", "true");
-      setIsAuthed(true);
-      setIsChecking(false);
-      setPassword("");
-      toast({ title: "Welcome to the staff workspace." });
-    } else {
-      setIsChecking(false);
-      toast({ variant: "destructive", title: "Incorrect staff password" });
-    }
-  };
+  // Redirect to auth page if not authenticated
+  if (!isAuthenticated) {
+    return <Navigate to="/auth" replace />;
+  }
 
-  if (!isAuthed) {
+  // Show access denied if user is not a teacher or admin
+  if (!isTeacher && !isAdmin) {
     return (
       <section className="flex min-h-[60vh] items-center justify-center">
         <Card className="w-full max-w-md border-border/80 bg-card/70 backdrop-blur">
-          <CardHeader className="space-y-2">
-            <CardTitle className="text-base">Staff workspace access</CardTitle>
+          <CardHeader className="space-y-2 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
+              <ShieldAlert className="h-6 w-6 text-destructive" />
+            </div>
+            <CardTitle className="text-base">Access Denied</CardTitle>
             <CardDescription className="text-xs">
-              This area is for Simon and Naina only. Enter the shared staff password to open the internal discussion and
-              materials space.
+              This area is restricted to teachers and administrators. If you believe you should have access, 
+              please contact your system administrator to update your role.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-3">
-              <div className="space-y-1">
-                <label className="text-xs font-medium text-muted-foreground" htmlFor="staff-password">
-                  Staff password
-                </label>
-                <Input
-                  id="staff-password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="text-sm"
-                  autoComplete="current-password"
-                />
-              </div>
-              <Button type="submit" className="w-full" disabled={isChecking}>
-                {isChecking ? "Checking a0 a0 a0" : "Enter staff space"}
-              </Button>
-              <p className="text-[11px] text-muted-foreground">
-                Tip: you can change the password by updating the <code>STAFF_PASSWORD</code> constant in the staff page
-                component.
-              </p>
-            </form>
+          <CardContent className="text-center">
+            <Button variant="outline" onClick={() => window.history.back()}>
+              Go Back
+            </Button>
           </CardContent>
         </Card>
       </section>
     );
   }
 
+  // User is authenticated and has teacher/admin role
   return <StaffSpace />;
 };
 
