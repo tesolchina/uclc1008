@@ -8,13 +8,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LogIn, AlertCircle, Loader2, GraduationCap, ShieldCheck, UserPlus, ArrowLeft, BookOpen } from 'lucide-react';
+import { LogIn, AlertCircle, Loader2, GraduationCap, ShieldCheck, UserPlus, ArrowLeft, BookOpen, KeyRound } from 'lucide-react';
 import { z } from 'zod';
 
 const emailSchema = z.string().email('Please enter a valid email address');
 const passwordSchema = z.string().min(6, 'Password must be at least 6 characters');
 
 type UserType = 'select' | 'teacher' | 'student';
+type StudentMode = 'choose' | 'register' | 'login';
 
 export default function AuthPage() {
   const { signIn, signUp, loginWithHkbu, isAuthenticated, isLoading } = useAuth();
@@ -33,12 +34,14 @@ export default function AuthPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState('signin');
 
-  // Student registration state
+  // Student state
+  const [studentMode, setStudentMode] = useState<StudentMode>('choose');
   const [studentStep, setStudentStep] = useState(1);
   const [lastFourDigits, setLastFourDigits] = useState('');
   const [firstInitial, setFirstInitial] = useState('');
   const [lastInitial, setLastInitial] = useState('');
   const [sectionNumber, setSectionNumber] = useState('');
+  const [studentLoginId, setStudentLoginId] = useState('');
 
   const urlError = searchParams.get('error');
 
@@ -158,15 +161,36 @@ export default function AuthPage() {
     // TODO: Save to database and redirect to dashboard
   };
 
-  const handleBack = () => {
-    if (userType === 'student' && studentStep > 1) {
-      setStudentStep(studentStep - 1);
-    } else {
-      setUserType('select');
-      setStudentStep(1);
-      setError(null);
-      setSuccess(null);
+  const handleStudentLogin = () => {
+    setError(null);
+    // Validate format: 1234-JD-XX
+    const idPattern = /^\d{4}-[A-Z]{2}-[A-Z0-9]{2}$/i;
+    if (!idPattern.test(studentLoginId.toUpperCase())) {
+      setError('Please enter a valid ID (format: 1234-JD-XX)');
+      return;
     }
+    // TODO: Verify ID exists in database and redirect
+    setSuccess(`Welcome back! Logging you in...`);
+  };
+
+  const handleBack = () => {
+    setError(null);
+    setSuccess(null);
+    
+    if (userType === 'student') {
+      if (studentMode !== 'choose') {
+        if (studentMode === 'register' && studentStep > 1) {
+          setStudentStep(studentStep - 1);
+          return;
+        }
+        setStudentMode('choose');
+        setStudentStep(1);
+        return;
+      }
+    }
+    setUserType('select');
+    setStudentMode('choose');
+    setStudentStep(1);
   };
 
   if (isLoading) {
@@ -230,8 +254,75 @@ export default function AuthPage() {
     );
   }
 
-  // Student registration flow
-  if (userType === 'student') {
+  // Student flow - choose between register or login
+  if (userType === 'student' && studentMode === 'choose') {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center p-4">
+        <Card className="w-full max-w-lg">
+          <CardHeader>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="w-fit -ml-2 mb-2"
+              onClick={handleBack}
+            >
+              <ArrowLeft className="h-4 w-4 mr-1" />
+              Back
+            </Button>
+            <div className="flex justify-center mb-2">
+              <div className="p-3 rounded-full bg-primary/10">
+                <BookOpen className="h-8 w-8 text-primary" />
+              </div>
+            </div>
+            <CardTitle className="text-2xl text-center">Student Access</CardTitle>
+            <CardDescription className="text-center">
+              Are you new or returning?
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Returning student */}
+            <button
+              onClick={() => setStudentMode('login')}
+              className="w-full p-5 rounded-lg border-2 border-muted hover:border-primary hover:bg-primary/5 transition-all text-left group"
+            >
+              <div className="flex items-start gap-4">
+                <div className="p-2.5 rounded-full bg-green-100 group-hover:bg-green-200 transition-colors">
+                  <KeyRound className="h-5 w-5 text-green-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold">Welcome back!</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    I already have my unique ID (e.g., 1234-JD-7X)
+                  </p>
+                </div>
+              </div>
+            </button>
+
+            {/* New student */}
+            <button
+              onClick={() => setStudentMode('register')}
+              className="w-full p-5 rounded-lg border-2 border-muted hover:border-primary hover:bg-primary/5 transition-all text-left group"
+            >
+              <div className="flex items-start gap-4">
+                <div className="p-2.5 rounded-full bg-blue-100 group-hover:bg-blue-200 transition-colors">
+                  <UserPlus className="h-5 w-5 text-blue-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold">I'm new here</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Register with my student ID to get started
+                  </p>
+                </div>
+              </div>
+            </button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Student login (returning)
+  if (userType === 'student' && studentMode === 'login') {
     return (
       <div className="min-h-[60vh] flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
@@ -246,8 +337,93 @@ export default function AuthPage() {
               Back
             </Button>
             <div className="flex justify-center mb-2">
-              <div className="p-3 rounded-full bg-primary/10">
-                <BookOpen className="h-8 w-8 text-primary" />
+              <div className="p-3 rounded-full bg-green-100">
+                <KeyRound className="h-8 w-8 text-green-600" />
+              </div>
+            </div>
+            <CardTitle className="text-2xl text-center">Welcome Back!</CardTitle>
+            <CardDescription className="text-center">
+              Enter your unique ID to continue
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            {success && (
+              <Alert className="border-green-500 bg-green-50 text-green-700">
+                <AlertDescription>{success}</AlertDescription>
+              </Alert>
+            )}
+
+            <div className="space-y-4">
+              <div className="text-center space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  Your unique ID looks like: <span className="font-mono font-medium">1234-JD-7X</span>
+                </p>
+              </div>
+              <Input
+                type="text"
+                value={studentLoginId}
+                onChange={(e) => setStudentLoginId(e.target.value.toUpperCase())}
+                className="text-center text-2xl tracking-wider font-mono h-14"
+                placeholder="1234-JD-XX"
+                autoFocus
+              />
+              <Button 
+                className="w-full" 
+                onClick={handleStudentLogin}
+                disabled={!studentLoginId}
+              >
+                <LogIn className="h-4 w-4 mr-2" />
+                Continue
+              </Button>
+            </div>
+
+            <div className="relative py-2">
+              <div className="absolute inset-0 flex items-center">
+                <Separator className="w-full" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">Or</span>
+              </div>
+            </div>
+
+            <Button 
+              variant="ghost" 
+              className="w-full"
+              onClick={() => setStudentMode('register')}
+            >
+              I don't have an ID yet — Register now
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Student registration flow
+  if (userType === 'student' && studentMode === 'register') {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="w-fit -ml-2 mb-2"
+              onClick={handleBack}
+            >
+              <ArrowLeft className="h-4 w-4 mr-1" />
+              Back
+            </Button>
+            <div className="flex justify-center mb-2">
+              <div className="p-3 rounded-full bg-blue-100">
+                <UserPlus className="h-8 w-8 text-blue-600" />
               </div>
             </div>
             <CardTitle className="text-2xl text-center">Student Registration</CardTitle>
