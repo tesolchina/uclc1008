@@ -159,11 +159,11 @@ export const week1Hours: HourData[] = [
     theme: "Strategic Reading for Academic Articles",
     behaviourChange: "Before reading any paper in detail, always SKIM first: Title → Abstract → Headings → Topic Sentences. Then SCAN for specific information.",
     learningGoals: [
-      "Apply skimming techniques to get an overview of academic articles",
-      "Use scanning to locate specific information quickly",
-      "Understand the IMRaD structure (Introduction, Methods, Results, Discussion)",
-      "Identify whether an article is empirical or conceptual",
-      "Summarize the gist of an article in one sentence"
+      "Apply skimming techniques to quickly get an overview of academic articles",
+      "Use scanning to locate specific information (publisher, author affiliations, dates)",
+      "Identify the macro-level structure and main sections of academic papers",
+      "Distinguish the function of each section in an argumentative/analytical paper",
+      "Create a brief outline summarizing the structure of an academic text"
     ],
     ciloLinks: ["CILO 1: Examine Academic Discourse"],
     keyConcepts: [
