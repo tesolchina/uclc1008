@@ -4,21 +4,21 @@ import { WeekOverviewTemplate } from "./WeekOverviewTemplate";
 const classHours = [
   { 
     hour: 1, 
-    title: "Reading Conceptual Articles", 
-    theme: "Argument-driven structure, thesis identification",
-    unitCount: 3
+    title: "In-Text Citations (APA 7th)", 
+    theme: "Citing sources within summary writing",
+    unitCount: 5
   },
   { 
     hour: 2, 
-    title: "Thesis Statements & Topic Sentences", 
-    theme: "Locating and analyzing controlling ideas",
-    unitCount: 3
+    title: "End-of-Text Citations (Reference List)", 
+    theme: "Building APA 7th reference entries",
+    unitCount: 5
   },
   { 
     hour: 3, 
-    title: "Mapping Article Structure", 
-    theme: "Paragraph functions, evidence organization",
-    unitCount: 2
+    title: "Practice, Feedback & Reflection", 
+    theme: "Practice → AI/Peer/Teacher Feedback → Reflect",
+    unitCount: 3
   },
 ];
 

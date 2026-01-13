@@ -1,6 +1,11 @@
 import { WeekData, WeekMeta } from "../types";
 import { lesson4_1, lesson4_2 } from "../lessons";
 
+// ============================================================
+// NOTE: Week 4+ content is subject to revision based on learning progress
+// Last updated: 2026-01-13
+// ============================================================
+
 export const week4: WeekData = {
   id: 4,
   title: "Week 4",

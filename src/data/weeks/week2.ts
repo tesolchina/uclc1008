@@ -1,12 +1,17 @@
 import { WeekData, WeekMeta } from "../types";
 import { lesson2_1, lesson2_2 } from "../lessons";
 
+// ============================================================
+// NOTE: Week 2 content is subject to revision based on learning progress
+// Last updated: 2026-01-13
+// ============================================================
+
 export const week2: WeekData = {
   id: 2,
   title: "Week 2",
-  theme: "Reading Conceptual Articles & Thesis Identification",
+  theme: "APA Citation Skills: In-Text & Reference List",
   overview:
-    "This week focuses on reading conceptual research papers, which differ from empirical papers by being argument-driven rather than data-driven. You'll learn to identify the thesis statement, locate purpose statements, and understand how conceptual papers build arguments through reasoning rather than data collection.",
+    "This week focuses on mastering APA 7th edition citation skills. Hour 1 covers in-text citations with varied sentence patterns for use in summary writing. Hour 2 introduces end-of-text citations (reference list entries). Hour 3 consolidates skills through practice, feedback, and reflection.",
   inClassActivities: [
     "Structure of Conceptual Research Papers",
     "Analyzing Article B (Andrejevic & Selwyn, 2020) - a conceptual study",
