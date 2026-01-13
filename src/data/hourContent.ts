@@ -826,88 +826,104 @@ export const week2Hours: HourData[] = [
   {
     weekNumber: 2,
     hourNumber: 1,
-    title: "APA Citation Bootcamp",
-    theme: "Mastering Three Citation Styles",
-    behaviourChange: "Use ALL THREE citation styles in every academic paragraph - variety shows sophistication.",
+    title: "In-Text Citations (APA 7th Edition)",
+    theme: "Citing Sources Within Summary Writing",
+    behaviourChange: "Every time you use an idea from a source, cite it immediately using varied sentence patterns.",
     learningGoals: [
       "Apply APA 7th edition in-text citation rules correctly",
-      "Distinguish and use Author-prominent, Information-prominent, and Signal-phrase styles",
-      "Apply the '&' vs 'and' rule and 'et al.' usage",
-      "Choose appropriate citation style for different purposes"
+      "Distinguish and use Author-prominent vs Information-prominent styles",
+      "Apply the '&' vs 'and' rule and 'et al.' usage for multiple authors",
+      "Integrate citations naturally into summary sentences"
     ],
     ciloLinks: ["CILO 2: Citation Conventions"],
     keyConcepts: [
       {
         term: "Author-Prominent Citation",
-        definition: "Puts the author's name in the sentence, emphasizing WHO said something.",
+        definition: "The author's name appears IN the sentence, emphasizing WHO said something.",
         example: "Hong et al. (2022) found that parents support FRT.",
-        tip: "Use when the author's identity matters - experts, famous researchers, or when comparing authors."
+        tip: "Use when the author's identity matters — experts, famous researchers, or when comparing authors' views."
       },
       {
         term: "Information-Prominent Citation",
-        definition: "Puts the citation at the end in parentheses, emphasizing WHAT was found.",
+        definition: "The citation appears at the END in parentheses, emphasizing WHAT was found.",
         example: "Parents generally support FRT in schools (Hong et al., 2022).",
         tip: "Use when the information matters more than who said it."
       },
       {
         term: "Signal-Phrase Citation",
-        definition: "Uses phrases like 'According to...' to introduce the source.",
+        definition: "Uses introductory phrases like 'According to...' to introduce the source smoothly.",
         example: "According to Hong et al. (2022), parents support FRT.",
         tip: "Use for smooth integration and variety in your writing."
       },
       {
         term: "'&' vs 'and' Rule",
         definition: "Use '&' INSIDE parentheses, use 'and' OUTSIDE in the sentence.",
-        example: "✓ (Hong & Lee, 2022) | ✓ Hong and Lee (2022) found... | ✗ (Hong and Lee, 2022)",
-        tip: "Think: & = inside (), and = outside in your sentence"
+        example: "✓ (Andrejevic & Selwyn, 2020) | ✓ Andrejevic and Selwyn (2020) argue... | ✗ (Andrejevic and Selwyn, 2020)",
+        tip: "Think: & = inside (), and = outside in your sentence."
       },
       {
         term: "'Et al.' Usage (APA 7th)",
-        definition: "For 3+ authors, use 'et al.' from the FIRST citation (changed from APA 6th).",
-        example: "Hong et al. (2022) - not 'Hong, Li, Kuo, and An (2022)' even the first time.",
+        definition: "For 3 or more authors, use 'et al.' from the FIRST citation (changed from APA 6th).",
+        example: "Hong et al. (2022) — not 'Hong, Li, Kuo, and An (2022)' even the first time.",
         tip: "Always: et al. (with period after 'al'), never 'et. al' or 'et al'"
+      },
+      {
+        term: "Reporting Verbs",
+        definition: "Verbs that introduce what an author said. Different verbs signal different attitudes.",
+        example: "Neutral: states, notes, reports | Strong: argues, contends, claims | Evidential: demonstrates, shows, reveals",
+        tip: "Match the verb to the author's stance — use 'argues' for debatable claims, 'demonstrates' for evidence-based findings."
       }
     ],
     articles: [ARTICLE_A, ARTICLE_B],
     agenda: [
       { 
-        title: "Three Citation Styles Demo", 
+        title: "Part 1: Author-Prominent vs Information-Prominent", 
         duration: "12 min", 
         activities: [
-          "Compare Author-prominent, Information-prominent, Signal-phrase",
+          "Compare the two main citation styles",
           "When to use each style",
-          "Practice identifying styles in text"
+          "Practice identifying styles in academic text"
         ] 
       },
       { 
-        title: "'&' vs 'and' and 'et al.' Rules", 
+        title: "Part 2: The '&' vs 'and' and 'et al.' Rules", 
         duration: "10 min", 
         activities: [
           "The '&' = inside parentheses rule",
-          "APA 7th et al. changes",
-          "Common errors to avoid"
+          "APA 7th 'et al.' from first citation",
+          "Common formatting errors to avoid"
         ] 
       },
       { 
-        title: "Citation Practice", 
+        title: "Part 3: Signal Phrases & Reporting Verbs", 
         duration: "10 min", 
         activities: [
-          "Fix citation format errors",
-          "Convert between citation styles",
-          "Build fluency"
+          "Using 'According to...' and other signal phrases",
+          "Choosing appropriate reporting verbs",
+          "Matching verb strength to author stance"
         ] 
       },
       { 
-        title: "Writing Task", 
-        duration: "12 min", 
+        title: "Part 4: Citation in Summaries", 
+        duration: "10 min", 
         activities: [
-          "Express ONE idea using all 3 citation styles"
+          "How to cite when summarizing",
+          "Combining paraphrase + citation",
+          "Avoiding over-citation and under-citation"
+        ] 
+      },
+      { 
+        title: "Part 5: AI Citation Coach", 
+        duration: "8 min", 
+        activities: [
+          "Practice with interactive citation tool",
+          "Get feedback on citation patterns"
         ] 
       }
     ],
     tasks: [
       {
-        id: "w2h1-demo1",
+        id: "w2h1-mc1",
         type: "mc",
         question: "Which citation style is this? 'Hong et al. (2022) found that parents generally support FRT.'",
         options: [
@@ -917,41 +933,22 @@ export const week2Hours: HourData[] = [
           "Secondary citation"
         ],
         correctAnswer: 1,
-        explanation: "The author's name (Hong et al.) appears IN the sentence, followed by the year in parentheses. This puts emphasis on WHO said it = Author-prominent.",
-        skillFocus: ["apa-citation"],
-        demoSteps: [
-          { title: "Step 1: Find the author name", content: "Is it IN the sentence or only in parentheses?", highlight: "Hong et al. - IN the sentence" },
-          { title: "Step 2: Check for signal phrases", content: "Is there 'According to' or similar?", highlight: "No signal phrase" },
-          { title: "Step 3: Identify", content: "Author name in sentence + year in parentheses = Author-prominent", highlight: "Author-prominent" }
-        ]
+        explanation: "The author's name (Hong et al.) appears IN the sentence, followed by the year in parentheses. This emphasizes WHO said it = Author-prominent.",
+        skillFocus: ["apa-citation"]
       },
       {
-        id: "w2h1-mc1",
+        id: "w2h1-mc2",
         type: "mc",
-        question: "Which citation is correctly formatted in APA 7th edition?",
+        question: "Which citation style is this? 'Parents in China generally accept FRT in schools (Hong et al., 2022).'",
         options: [
-          "Hong et al (2022) found that...",
-          "Hong et al., (2022) found that...",
-          "Hong et al. (2022) found that...",
-          "(Hong, et al., 2022)"
+          "Author-prominent",
+          "Information-prominent",
+          "Signal-phrase",
+          "Block quote"
         ],
-        correctAnswer: 2,
-        explanation: "In APA 7th: 'et al.' needs a period after 'al' (it's abbreviated Latin). No comma before the year in narrative citations. No comma after 'al' before the year.",
-        skillFocus: ["apa-citation"],
-        examples: [
-          {
-            original: "Hong et al (2022)",
-            analysis: "WRONG - missing period after 'al'"
-          },
-          {
-            original: "Hong et al., (2022)",
-            analysis: "WRONG - comma after 'al.' is incorrect"
-          },
-          {
-            original: "Hong et al. (2022)",
-            analysis: "CORRECT - period after 'al', no comma before year"
-          }
-        ]
+        correctAnswer: 1,
+        explanation: "The citation appears at the END in parentheses. The sentence focuses on WHAT was found, not who found it = Information-prominent.",
+        skillFocus: ["apa-citation"]
       },
       {
         id: "w2h1-tf1",
@@ -962,15 +959,29 @@ export const week2Hours: HourData[] = [
         skillFocus: ["apa-citation"]
       },
       {
+        id: "w2h1-mc3",
+        type: "mc",
+        question: "Which citation is correctly formatted in APA 7th edition?",
+        options: [
+          "Hong et al (2022) found that...",
+          "Hong et al., (2022) found that...",
+          "Hong et al. (2022) found that...",
+          "(Hong, et al., 2022)"
+        ],
+        correctAnswer: 2,
+        explanation: "In APA 7th: 'et al.' needs a period after 'al' (it's abbreviated Latin). No comma before the year in narrative citations. No comma after 'al' before the year.",
+        skillFocus: ["apa-citation"]
+      },
+      {
         id: "w2h1-fb1",
         type: "fill-blank",
         question: "For works with three or more authors in APA 7th edition, use the first author's name followed by _______.",
         correctAnswer: "et al.",
-        explanation: "APA 7th simplified this: use 'et al.' from the FIRST citation for works with 3+ authors. Remember the period after 'al' - it's abbreviated Latin for 'and others'.",
+        explanation: "APA 7th simplified this: use 'et al.' from the FIRST citation for works with 3+ authors. Remember the period after 'al'.",
         skillFocus: ["apa-citation"]
       },
       {
-        id: "w2h1-mc2",
+        id: "w2h1-mc4",
         type: "mc",
         question: "Which sentence correctly uses the '&' vs 'and' rule?",
         options: [
@@ -980,346 +991,11 @@ export const week2Hours: HourData[] = [
           "Both A and C are incorrect."
         ],
         correctAnswer: 1,
-        explanation: "A uses '&' outside parentheses (wrong). C uses 'and' inside parentheses (wrong). B correctly uses 'and' in the sentence (Andrejevic and Selwyn) because the author names are OUTSIDE the parentheses.",
+        explanation: "A uses '&' outside parentheses (wrong). C uses 'and' inside parentheses (wrong). B correctly uses 'and' in the sentence because the author names are OUTSIDE the parentheses.",
         skillFocus: ["apa-citation"]
       },
       {
-        id: "w2h1-sentence1",
-        type: "sentence",
-        question: "Convert this Author-prominent citation to Information-prominent: 'Hong et al. (2022) found that parents support FRT for its practical benefits.'",
-        wordLimit: 25,
-        hints: ["Move authors to the end", "Put author names INSIDE parentheses", "Keep the same information"],
-        skillFocus: ["apa-citation"],
-        modelAnswer: "Parents support FRT for its practical benefits (Hong et al., 2022).",
-        demoSteps: [
-          { title: "Step 1: Remove author from sentence start", content: "Take out 'Hong et al. (2022)'", highlight: "remove from start" },
-          { title: "Step 2: Keep the information", content: "'Parents support FRT for its practical benefits'", highlight: "main content" },
-          { title: "Step 3: Add parenthetical citation", content: "Add (Hong et al., 2022) at the end", highlight: "note the comma before year" }
-        ]
-      },
-      {
-        id: "w2h1-sentence2",
-        type: "sentence",
-        question: "Convert this Information-prominent citation to Signal-phrase: 'FRT raises concerns about student privacy (Andrejevic & Selwyn, 2020).'",
-        wordLimit: 30,
-        hints: ["Use 'According to...'", "Move authors to the start", "Remember: 'and' not '&' outside parentheses"],
-        skillFocus: ["apa-citation"],
-        modelAnswer: "According to Andrejevic and Selwyn (2020), FRT raises concerns about student privacy.",
-        examples: [
-          {
-            original: "According to Andrejevic & Selwyn (2020)...",
-            analysis: "WRONG - use 'and' not '&' when author names are in the sentence"
-          },
-          {
-            original: "According to Andrejevic and Selwyn (2020)...",
-            analysis: "CORRECT - 'and' used in sentence, year in parentheses"
-          }
-        ]
-      }
-    ],
-    writingTask: {
-      prompt: "Express this idea using ALL 3 citation styles (Author-prominent, Information-prominent, Signal-phrase): 'Parents in China generally accept FRT in schools despite privacy concerns.' Source: Hong et al. (2022). Write 3 separate sentences.",
-      wordLimit: 90,
-      modelAnswer: "Author-prominent: Hong et al. (2022) found that parents in China generally accept FRT in schools despite privacy concerns.\n\nInformation-prominent: Parents in China generally accept FRT in schools despite privacy concerns (Hong et al., 2022).\n\nSignal-phrase: According to Hong et al. (2022), parents in China generally accept FRT in schools despite privacy concerns.",
-      rubricCriteria: [
-        "All 3 styles correctly demonstrated",
-        "Correct APA format (et al., parentheses, punctuation)",
-        "Consistent meaning across all 3 versions",
-        "'&' vs 'and' rule followed correctly"
-      ],
-      demoSteps: [
-        { title: "Author-prominent", content: "Start with: [Author] (year) found/argue/demonstrate that...", highlight: "Hong et al. (2022) found that..." },
-        { title: "Information-prominent", content: "End with: ([Author], year).", highlight: "...despite privacy concerns (Hong et al., 2022)." },
-        { title: "Signal-phrase", content: "Start with: According to [Author] (year),...", highlight: "According to Hong et al. (2022),..." }
-      ]
-    }
-  },
-  {
-    weekNumber: 2,
-    hourNumber: 2,
-    title: "Paraphrasing Strategies",
-    theme: "Expressing Ideas in Your Own Words",
-    behaviourChange: "Always use 2-3 strategies when paraphrasing. Never just swap synonyms.",
-    learningGoals: [
-      "Apply 5 paraphrasing strategies effectively",
-      "Identify and avoid patchwriting (disguised copying)",
-      "Maintain original meaning while changing expression",
-      "Combine multiple strategies for effective paraphrasing"
-    ],
-    ciloLinks: ["CILO 2: Paraphrasing Skills", "CILO 3: Drafting Skills"],
-    keyConcepts: [
-      {
-        term: "Strategy 1: Using Synonyms",
-        definition: "Replace words with similar meanings.",
-        example: "'support' → 'endorse', 'accept', 'favor' | 'concerns' → 'worries', 'apprehensions', 'reservations'",
-        tip: "DON'T just use synonyms alone - this often leads to patchwriting. Combine with other strategies."
-      },
-      {
-        term: "Strategy 2: Changing Word Forms",
-        definition: "Change the grammatical form of key words (verb → noun, adjective → adverb, etc.).",
-        example: "'The technology enables...' → 'The technology's enablement of...' (verb → noun)",
-        tip: "Verbs → nouns is especially useful: recognize → recognition, perceive → perception"
-      },
-      {
-        term: "Strategy 3: Changing Voice",
-        definition: "Switch between active and passive voice.",
-        example: "'Parents support FRT' (active) → 'FRT is supported by parents' (passive)",
-        tip: "Active voice emphasizes the actor; passive emphasizes the action or object."
-      },
-      {
-        term: "Strategy 4: Changing Sentence Structure",
-        definition: "Break complex sentences into simpler ones, or combine simple sentences.",
-        example: "'Although parents worry about privacy, they support FRT' → 'Parents worry about privacy. However, they still support FRT.'",
-        tip: "This is powerful for long, complex source sentences."
-      },
-      {
-        term: "Patchwriting (AVOID!)",
-        definition: "Making minor word changes while keeping the original structure - this is a form of plagiarism even with citation.",
-        example: "Original: 'There is no option to restrict what data they share' → Patchwriting: 'There is no choice to limit what data they share' (just synonym swaps!)",
-        tip: "If your paraphrase follows the same pattern as the original, you're patchwriting. Restructure completely."
-      }
-    ],
-    articles: [ARTICLE_A, ARTICLE_B],
-    agenda: [
-      { 
-        title: "5 Paraphrasing Strategies", 
-        duration: "15 min", 
-        activities: [
-          "Demo each strategy with examples",
-          "See how to combine strategies",
-          "Practice identifying strategies"
-        ] 
-      },
-      { 
-        title: "Patchwriting Workshop", 
-        duration: "10 min", 
-        activities: [
-          "Identify patchwriting examples",
-          "Understand why it's problematic",
-          "Learn how to avoid it"
-        ] 
-      },
-      { 
-        title: "Paraphrasing Practice", 
-        duration: "10 min", 
-        activities: [
-          "Apply strategies to sample sentences",
-          "Combine 2+ strategies"
-        ] 
-      },
-      { 
-        title: "Writing Task", 
-        duration: "10 min", 
-        activities: [
-          "Paraphrase a passage using 2+ strategies",
-          "Identify which strategies you used"
-        ] 
-      }
-    ],
-    tasks: [
-      {
-        id: "w2h2-demo1",
-        type: "mc",
-        question: "Which paraphrasing strategy changes 'The technology enables...' to 'The technology's enablement of...'?",
-        options: [
-          "Using synonyms",
-          "Changing word forms",
-          "Changing voice",
-          "Combining sentences"
-        ],
-        correctAnswer: 1,
-        explanation: "This changes 'enables' (verb) to 'enablement' (noun) - that's changing the WORD FORM. This is a powerful strategy that naturally requires restructuring.",
-        skillFocus: ["paraphrasing"],
-        demoSteps: [
-          { title: "Identify the change", content: "What changed between versions?", highlight: "enables → enablement" },
-          { title: "Categorize", content: "Verb → noun = word form change", highlight: "word form strategy" },
-          { title: "Note the effect", content: "The sentence structure had to change too", highlight: "natural restructuring" }
-        ]
-      },
-      {
-        id: "w2h2-tf1",
-        type: "true-false",
-        question: "Patchwriting is acceptable as long as you include a citation.",
-        correctAnswer: "false",
-        explanation: "FALSE! Patchwriting (making minor changes to original text) is a form of plagiarism even WITH citations. You must use your own words AND structure, not just swap a few words.",
-        skillFocus: ["paraphrasing", "academic-integrity"]
-      },
-      {
-        id: "w2h2-mc1",
-        type: "mc",
-        question: "Read the original: 'There is no option for students to self-curate and restrict what data they share.' Which is proper paraphrasing?",
-        options: [
-          "There is no choice for students to self-curate and limit what data they share.",
-          "Students lack the ability to control or limit their personal data sharing.",
-          "There is no option for students to manage and restrict what information they share.",
-          "Students cannot self-curate and restrict what data they share."
-        ],
-        correctAnswer: 1,
-        explanation: "Option B restructures completely AND changes words. The others are patchwriting - they keep the 'There is no option for students to...' structure and just swap a few words.",
-        skillFocus: ["paraphrasing"],
-        examples: [
-          {
-            original: "There is no option for students to self-curate and limit what data they share.",
-            analysis: "PATCHWRITING - keeps the same structure, just swaps 'restrict' → 'limit'. Still too close to original."
-          },
-          {
-            original: "Students lack the ability to control or limit their personal data sharing.",
-            analysis: "PROPER PARAPHRASE - completely restructured, different words, same meaning."
-          }
-        ]
-      },
-      {
-        id: "w2h2-fb1",
-        type: "fill-blank",
-        question: "Changing 'The teacher observed the students' to 'The students were observed by the teacher' uses the strategy of changing _______.",
-        correctAnswer: "voice",
-        explanation: "Active voice (teacher observed) → Passive voice (students were observed). This shifts emphasis from the actor to the action/object.",
-        skillFocus: ["paraphrasing"]
-      },
-      {
-        id: "w2h2-mc2",
-        type: "mc",
-        question: "How many strategies should you typically use when paraphrasing?",
-        options: [
-          "Just 1 - using synonyms is enough",
-          "At least 2-3 strategies combined",
-          "All 5 strategies every time",
-          "Strategies don't matter if you cite correctly"
-        ],
-        correctAnswer: 1,
-        explanation: "Use 2-3 strategies for effective paraphrasing. Just using synonyms often leads to patchwriting. Combining strategies (e.g., synonyms + restructuring + word form changes) creates truly original expression.",
-        skillFocus: ["paraphrasing"]
-      },
-      {
-        id: "w2h2-sentence1",
-        type: "sentence",
-        question: "Paraphrase using the VOICE CHANGE strategy: 'The school has already made this decision on their behalf.'",
-        wordLimit: 20,
-        hints: ["Active → Passive: 'X did Y' → 'Y was done by X'", "Or Passive → Active"],
-        skillFocus: ["paraphrasing"],
-        modelAnswer: "This decision has already been made by the school on their behalf.",
-        demoSteps: [
-          { title: "Identify current voice", content: "Who is the subject doing the action?", highlight: "'The school' = subject, 'made' = active verb" },
-          { title: "Convert to passive", content: "Make the object the new subject", highlight: "'decision' becomes subject" },
-          { title: "Restructure", content: "'This decision has been made by the school'", highlight: "passive voice version" }
-        ]
-      },
-      {
-        id: "w2h2-paragraph1",
-        type: "paragraph",
-        question: "Paraphrase this passage using AT LEAST 2 strategies: 'There is no option for students to self-curate and restrict what data they share because the school has already made this decision on their behalf.' Identify which strategies you used.",
-        wordLimit: 50,
-        hints: ["Try synonyms + restructuring", "Or voice change + sentence splitting", "Name your strategies at the end"],
-        skillFocus: ["paraphrasing"],
-        modelAnswer: "Schools determine which personal information is collected, leaving students without the ability to control their own data sharing (Hong et al., 2022). Strategies used: 1) Restructuring - changed 'There is no option for students to...' to 'Schools determine... leaving students...'; 2) Synonyms - 'self-curate and restrict' → 'control', 'data' → 'personal information'.",
-        examples: [
-          {
-            original: "Students have no option to choose and limit the data they share since schools make this decision for them.",
-            analysis: "PATCHWRITING - too close to original structure. Just swapped a few words."
-          },
-          {
-            original: "Schools predetermine data collection policies, effectively removing students' autonomy over their personal information sharing.",
-            analysis: "EXCELLENT - complete restructuring + synonyms + word form changes (decide → predetermine, option → autonomy)"
-          }
-        ]
-      }
-    ],
-    writingTask: {
-      prompt: "Paraphrase this passage using AT LEAST 2 strategies: 'Although the parent respondents thought that the face recognition system had certain risks, they were willing to try technological innovation and they thought the system was valuable, so they intended to continue using it.' (Hong et al., 2022). Name the strategies you used.",
-      wordLimit: 60,
-      modelAnswer: "Despite recognizing potential dangers associated with facial recognition technology, parents demonstrated willingness to embrace innovation, perceiving the system as beneficial and expressing intent to maintain its use (Hong et al., 2022).\n\nStrategies: (1) Synonyms: risks → dangers, valuable → beneficial, continue → maintain; (2) Sentence combining: merged two sentences into one complex sentence; (3) Word form: they thought → perceiving, intended → intent.",
-      rubricCriteria: [
-        "At least 2 strategies clearly used",
-        "Meaning preserved accurately",
-        "Not patchwriting - genuine restructuring",
-        "Strategies correctly identified"
-      ]
-    }
-  },
-  {
-    weekNumber: 2,
-    hourNumber: 3,
-    title: "Integrated Writing",
-    theme: "Combining Paraphrase with Citation",
-    behaviourChange: "Match reporting verbs to author stance - 'argues' vs 'notes' vs 'demonstrates' convey different attitudes.",
-    learningGoals: [
-      "Select appropriate reporting verbs for different stances",
-      "Apply the 'citation sandwich' technique for source integration",
-      "Integrate sources smoothly into your own argument",
-      "Vary citation styles and reporting verbs for sophisticated writing"
-    ],
-    ciloLinks: ["CILO 2: Source Integration", "CILO 3: Academic Writing"],
-    keyConcepts: [
-      {
-        term: "Reporting Verbs",
-        definition: "Verbs that introduce what another author said. Different verbs convey different attitudes toward the source.",
-        example: "Neutral: states, notes, reports | Positive: demonstrates, shows, reveals | Critical: argues, contends, challenges",
-        tip: "Match the verb to the author's stance. Use 'argues' for debatable claims, 'demonstrates' for evidence-based findings."
-      },
-      {
-        term: "The Citation Sandwich",
-        definition: "A three-layer technique: (1) Introduce the source, (2) Present the idea, (3) Comment/connect to your argument.",
-        example: "(1) Hong et al. (2022) investigated parental attitudes. (2) Their findings indicate widespread acceptance. (3) This suggests practical benefits outweigh privacy concerns.",
-        tip: "The 'comment' layer is what makes your writing analytical, not just descriptive."
-      },
-      {
-        term: "Neutral Reporting Verbs",
-        definition: "Verbs that present information without signaling whether you agree or disagree.",
-        example: "states, notes, reports, describes, explains, observes, mentions",
-        tip: "Use for factual information where stance doesn't matter."
-      },
-      {
-        term: "Strong/Argumentative Reporting Verbs",
-        definition: "Verbs that signal the author is making a claim that could be debated.",
-        example: "argues, contends, claims, asserts, maintains, insists, challenges",
-        tip: "Use 'argues' when the author is making a point that others might disagree with."
-      },
-      {
-        term: "Positive/Evidential Reporting Verbs",
-        definition: "Verbs that suggest the author has strong evidence or proof.",
-        example: "demonstrates, shows, reveals, proves, establishes, confirms, indicates",
-        tip: "Use for research findings backed by clear evidence."
-      }
-    ],
-    articles: [ARTICLE_A, ARTICLE_B],
-    agenda: [
-      { 
-        title: "Reporting Verbs Workshop", 
-        duration: "12 min", 
-        activities: [
-          "Categorize verbs: neutral, positive, critical",
-          "Match verbs to author stance",
-          "Practice selecting appropriate verbs"
-        ] 
-      },
-      { 
-        title: "The Citation Sandwich", 
-        duration: "10 min", 
-        activities: [
-          "Learn the 3-layer technique",
-          "Analyze examples from academic writing",
-          "Build your own sandwiches"
-        ] 
-      },
-      { 
-        title: "Integration Practice", 
-        duration: "10 min", 
-        activities: [
-          "Rewrite sentences with different reporting verbs",
-          "Build complete citation sandwiches"
-        ] 
-      },
-      { 
-        title: "Writing Task", 
-        duration: "12 min", 
-        activities: [
-          "Write 3 sentences using different reporting verbs"
-        ] 
-      }
-    ],
-    tasks: [
-      {
-        id: "w2h3-demo1",
+        id: "w2h1-mc5",
         type: "mc",
         question: "Which reporting verb best matches Andrejevic and Selwyn's (2020) CRITICAL stance on FRT?",
         options: [
@@ -1329,116 +1005,437 @@ export const week2Hours: HourData[] = [
           "observes"
         ],
         correctAnswer: 2,
-        explanation: "'Contends' signals that the author is making an argumentative claim that could be debated. Since Andrejevic & Selwyn take a critical stance (they question FRT), use a strong verb like 'contends', 'argues', or 'challenges'.",
-        skillFocus: ["reporting-verbs"],
-        demoSteps: [
-          { title: "Step 1: Identify author stance", content: "Is the author critical, supportive, or neutral?", highlight: "Andrejevic & Selwyn are CRITICAL" },
-          { title: "Step 2: Match verb strength", content: "Critical stance needs a strong/argumentative verb", highlight: "contends, argues, challenges" },
-          { title: "Step 3: Avoid mismatch", content: "Don't use neutral verbs for strong arguments", highlight: "'notes' is too weak" }
-        ]
-      },
-      {
-        id: "w2h3-mc1",
-        type: "mc",
-        question: "Which reporting verb suggests the author has provided strong evidence?",
-        options: [
-          "suggests",
-          "claims",
-          "demonstrates",
-          "argues"
-        ],
-        correctAnswer: 2,
-        explanation: "'Demonstrates' implies the author has shown something with evidence. 'Suggests' is weaker/tentative. 'Claims' and 'argues' signal debatable positions rather than proven findings.",
-        skillFocus: ["reporting-verbs"],
-        examples: [
-          {
-            original: "Hong et al. (2022) suggest that parents accept FRT.",
-            analysis: "Tentative - implies the finding is not definitive"
-          },
-          {
-            original: "Hong et al. (2022) demonstrate that parents accept FRT.",
-            analysis: "Strong - implies solid evidence supports this finding"
-          }
-        ]
-      },
-      {
-        id: "w2h3-tf1",
-        type: "true-false",
-        question: "'Argues' is a neutral reporting verb that can be used for any type of source.",
-        correctAnswer: "false",
-        explanation: "'Argues' is NOT neutral - it signals the author is making a debatable claim. Use it for opinion-based arguments, not factual statements. For neutral presentation, use 'states', 'notes', or 'reports'.",
+        explanation: "'Contends' signals the author is making an argumentative claim. Since Andrejevic & Selwyn take a critical stance, use a strong verb like 'contends', 'argues', or 'challenges'.",
         skillFocus: ["reporting-verbs"]
       },
       {
-        id: "w2h3-fb1",
+        id: "w2h1-mc6",
+        type: "mc",
+        question: "When writing a summary paragraph with multiple ideas from the same source, how should you cite?",
+        options: [
+          "Cite every single sentence",
+          "Only cite at the very end of the paragraph",
+          "Cite at the beginning and signal phrases to show the ideas continue from the same source",
+          "No citation needed if you paraphrased"
+        ],
+        correctAnswer: 2,
+        explanation: "Start with a clear citation, then use phrases like 'The authors also note...', 'They further explain...' to show ideas continue from the same source without over-citing.",
+        skillFocus: ["apa-citation", "summary-writing"]
+      },
+      {
+        id: "w2h1-sentence1",
+        type: "sentence",
+        question: "Convert this Author-prominent citation to Information-prominent: 'Hong et al. (2022) found that parents support FRT for its practical benefits.'",
+        wordLimit: 25,
+        hints: ["Move authors to the end", "Put author names INSIDE parentheses", "Keep the same information"],
+        skillFocus: ["apa-citation"],
+        modelAnswer: "Parents support FRT for its practical benefits (Hong et al., 2022)."
+      },
+      {
+        id: "w2h1-sentence2",
+        type: "sentence",
+        question: "Convert this Information-prominent citation to Signal-phrase: 'FRT raises concerns about student privacy (Andrejevic & Selwyn, 2020).'",
+        wordLimit: 30,
+        hints: ["Use 'According to...'", "Move authors to the start", "Remember: 'and' not '&' outside parentheses"],
+        skillFocus: ["apa-citation"],
+        modelAnswer: "According to Andrejevic and Selwyn (2020), FRT raises concerns about student privacy."
+      }
+    ],
+    writingTask: {
+      prompt: "Write a 3-sentence summary of Hong et al. (2022)'s main finding about parental attitudes toward FRT. Use:\n- Sentence 1: Author-prominent citation with a reporting verb\n- Sentence 2: Continue the idea without repeating the full citation\n- Sentence 3: Information-prominent citation for a supporting detail",
+      wordLimit: 80,
+      modelAnswer: "Hong et al. (2022) demonstrate that Chinese parents generally support the use of facial recognition technology in elementary schools. The researchers found that perceived practical value outweighed privacy concerns for most participants. This acceptance was particularly strong among parents who embraced technological innovation (Hong et al., 2022).",
+      rubricCriteria: [
+        "Author-prominent citation with appropriate reporting verb in sentence 1",
+        "Smooth continuation without over-citation in sentence 2",
+        "Information-prominent citation correctly formatted in sentence 3",
+        "Content accurately reflects the source"
+      ]
+    }
+  },
+  {
+    weekNumber: 2,
+    hourNumber: 2,
+    title: "End-of-Text Citations (Reference List)",
+    theme: "Building APA 7th Reference Entries",
+    behaviourChange: "Every in-text citation MUST have a matching reference entry. Check both before submitting.",
+    learningGoals: [
+      "Construct APA 7th reference entries for journal articles",
+      "Identify the 4 required elements: Author, Date, Title, Source",
+      "Apply formatting rules for italics, capitalization, and DOIs",
+      "Match in-text citations to reference list entries"
+    ],
+    ciloLinks: ["CILO 2: Citation Conventions"],
+    keyConcepts: [
+      {
+        term: "The 4 Core Elements",
+        definition: "Every APA reference needs: (1) Author, (2) Date, (3) Title, (4) Source.",
+        example: "Hong, X., Li, Y., Kuo, B., & An, S. (2022). Supporting schools... Education and Information Technologies, 27(3), 1-18.",
+        tip: "Think: WHO said it, WHEN, WHAT is it called, WHERE to find it."
+      },
+      {
+        term: "Author Format",
+        definition: "Last name, First initial. Second initial. Use '&' before the last author.",
+        example: "Andrejevic, M., & Selwyn, N. (2020).",
+        tip: "Up to 20 authors: list all. 21+: first 19... last author."
+      },
+      {
+        term: "Title Capitalization",
+        definition: "Article titles: Sentence case (only first word and proper nouns capitalized). Journal names: Title Case.",
+        example: "Article: 'Facial recognition technology in schools: Critical questions' | Journal: 'Learning, Media and Technology'",
+        tip: "Sentence case for articles. Title Case for journals. Italicize journal names."
+      },
+      {
+        term: "DOI Format",
+        definition: "Digital Object Identifier — a permanent link. Format: https://doi.org/xxxxx",
+        example: "https://doi.org/10.1080/17439884.2019.1644806",
+        tip: "Always include DOI if available. Use https://doi.org/ format (not dx.doi.org)."
+      },
+      {
+        term: "Volume & Issue",
+        definition: "Volume number in italics, issue number in parentheses (not italicized).",
+        example: "Education and Information Technologies, 27(3), 1-18.",
+        tip: "Format: Journal Name, volume(issue), pages. Italicize journal name and volume."
+      },
+      {
+        term: "Hanging Indent",
+        definition: "The first line is flush left; subsequent lines are indented 0.5 inches.",
+        example: "Hong, X., Li, Y., Kuo, B., & An, S. (2022). Supporting schools to use face\n        recognition systems... Education and Information Technologies, 27(3).",
+        tip: "In Word: Ctrl+T for hanging indent. Essential for reference lists."
+      }
+    ],
+    articles: [ARTICLE_A, ARTICLE_B],
+    agenda: [
+      { 
+        title: "Part 1: The 4 Core Elements", 
+        duration: "12 min", 
+        activities: [
+          "Learn the WHO-WHEN-WHAT-WHERE framework",
+          "Identify elements in sample references",
+          "Practice extracting information from articles"
+        ] 
+      },
+      { 
+        title: "Part 2: Author & Date Formatting", 
+        duration: "10 min", 
+        activities: [
+          "Last name, Initial. format",
+          "Multiple authors: commas and '&'",
+          "Date in parentheses with period"
+        ] 
+      },
+      { 
+        title: "Part 3: Title & Source Formatting", 
+        duration: "10 min", 
+        activities: [
+          "Sentence case vs Title Case",
+          "Italics rules",
+          "Volume, issue, and page numbers"
+        ] 
+      },
+      { 
+        title: "Part 4: DOIs and Online Sources", 
+        duration: "8 min", 
+        activities: [
+          "When and how to include DOIs",
+          "The https://doi.org/ format",
+          "What to do if there's no DOI"
+        ] 
+      },
+      { 
+        title: "Part 5: AI Reference Builder", 
+        duration: "10 min", 
+        activities: [
+          "Practice building reference entries",
+          "Get feedback on formatting"
+        ] 
+      }
+    ],
+    tasks: [
+      {
+        id: "w2h2-mc1",
+        type: "mc",
+        question: "What are the 4 core elements of an APA reference entry?",
+        options: [
+          "Title, Abstract, Keywords, DOI",
+          "Author, Date, Title, Source",
+          "Author, Journal, Volume, Pages",
+          "Name, Year, Publisher, URL"
+        ],
+        correctAnswer: 1,
+        explanation: "The 4 core elements are: (1) Author - WHO, (2) Date - WHEN, (3) Title - WHAT, (4) Source - WHERE. Every reference must have these four parts.",
+        skillFocus: ["apa-reference"]
+      },
+      {
+        id: "w2h2-mc2",
+        type: "mc",
+        question: "Which author format is correct for APA 7th?",
+        options: [
+          "Hong, Xiaomei & Li, Y.",
+          "Hong, X., Li, Y., Kuo, B., & An, S.",
+          "X. Hong, Y. Li, B. Kuo, and S. An",
+          "Hong X, Li Y, Kuo B, An S."
+        ],
+        correctAnswer: 1,
+        explanation: "APA format: Last name, Initial. Use commas between authors, '&' before the final author. No 'and', no full first names.",
+        skillFocus: ["apa-reference"]
+      },
+      {
+        id: "w2h2-tf1",
+        type: "true-false",
+        question: "In APA references, article titles use Title Case (capitalizing major words).",
+        correctAnswer: "false",
+        explanation: "FALSE! Article titles use sentence case (only first word and proper nouns capitalized). Journal NAMES use Title Case. Example: Article: 'Facial recognition technology in schools' | Journal: 'Learning, Media and Technology'",
+        skillFocus: ["apa-reference"]
+      },
+      {
+        id: "w2h2-mc3",
+        type: "mc",
+        question: "Which journal/volume/issue format is correct?",
+        options: [
+          "Learning, Media and Technology (15), 2, 115-128",
+          "Learning, Media and Technology, 15(2), 115-128.",
+          "Learning, Media and Technology, Vol. 15, No. 2, pp. 115-128",
+          "Learning Media Technology 15.2: 115-128"
+        ],
+        correctAnswer: 1,
+        explanation: "Correct APA format: Journal Name (italicized), volume(issue), pages. Volume is italicized, issue is in parentheses (not italicized).",
+        skillFocus: ["apa-reference"]
+      },
+      {
+        id: "w2h2-fb1",
         type: "fill-blank",
-        question: "The 'citation sandwich' has three layers: (1) Introduce the source, (2) Present the paraphrased idea, (3) Add your own _______.",
-        correctAnswer: "comment",
-        explanation: "The 'comment' layer is crucial - it's where YOU interpret or connect the source to your argument. Without it, you're just describing sources, not analyzing them.",
-        skillFocus: ["source-integration"]
+        question: "In APA references, the journal name and _______ number are italicized.",
+        correctAnswer: "volume",
+        explanation: "Italicize the journal name AND the volume number. The issue number in parentheses is NOT italicized. Example: Education and Information Technologies, 27(3)",
+        skillFocus: ["apa-reference"]
+      },
+      {
+        id: "w2h2-mc4",
+        type: "mc",
+        question: "Which DOI format is correct for APA 7th?",
+        options: [
+          "DOI: 10.1080/17439884.2019.1644806",
+          "doi:10.1080/17439884.2019.1644806",
+          "https://doi.org/10.1080/17439884.2019.1644806",
+          "Retrieved from dx.doi.org/10.1080/17439884.2019.1644806"
+        ],
+        correctAnswer: 2,
+        explanation: "APA 7th uses the https://doi.org/ format as a clickable link. No 'DOI:' label, no 'Retrieved from', no 'dx.doi.org'.",
+        skillFocus: ["apa-reference"]
+      },
+      {
+        id: "w2h2-mc5",
+        type: "mc",
+        question: "Look at this reference. What's WRONG?\n\n'Hong, X., Li, Y., Kuo, B., & An, S. (2022). Supporting Schools To Use Face Recognition Systems. Education and information technologies, 27(3), 1-18.'",
+        options: [
+          "The author names are formatted incorrectly",
+          "The article title should be in sentence case, and the journal name should be in Title Case",
+          "The year should not be in parentheses",
+          "The page numbers are formatted incorrectly"
+        ],
+        correctAnswer: 1,
+        explanation: "The article title incorrectly uses Title Case ('Supporting Schools To Use'). It should be sentence case: 'Supporting schools to use'. Also, the journal name should be Title Case: 'Education and Information Technologies'.",
+        skillFocus: ["apa-reference"]
+      },
+      {
+        id: "w2h2-tf2",
+        type: "true-false",
+        question: "Every in-text citation must have a corresponding entry in the reference list.",
+        correctAnswer: "true",
+        explanation: "TRUE! This is a fundamental rule. If you cite it in the text, it must appear in the reference list. If it's in the reference list, it must be cited in the text.",
+        skillFocus: ["apa-reference"]
+      },
+      {
+        id: "w2h2-sentence1",
+        type: "sentence",
+        question: "What's wrong with this reference entry? Fix it.\n\n'Andrejevic, M. and Selwyn, N. (2020). Facial Recognition Technology In Schools: Critical Questions And Concerns, Learning, Media and Technology, 15(2).'",
+        wordLimit: 60,
+        hints: ["Check: & vs and", "Check: title capitalization", "Check: what's missing at the end?"],
+        skillFocus: ["apa-reference"],
+        modelAnswer: "Errors: (1) 'and' should be '&', (2) article title should be sentence case, (3) missing page numbers and DOI. Corrected: Andrejevic, M., & Selwyn, N. (2020). Facial recognition technology in schools: Critical questions and concerns. Learning, Media and Technology, 15(2), 115-128. https://doi.org/10.1080/17439884.2019.1644806"
+      }
+    ],
+    writingTask: {
+      prompt: "Create a complete APA 7th reference entry for this article:\n\nAuthors: Xiaomei Hong, Yue Li, Bor-Chen Kuo, and Shirong An\nYear: 2022\nTitle: Supporting schools to use face recognition systems: A continuance intention perspective of elementary school parents in China\nJournal: Education and Information Technologies\nVolume: 27, Issue: 3\nPages: 3679-3696\nDOI: 10.1007/s10639-022-10969-9",
+      wordLimit: 100,
+      modelAnswer: "Hong, X., Li, Y., Kuo, B., & An, S. (2022). Supporting schools to use face recognition systems: A continuance intention perspective of elementary school parents in China. Education and Information Technologies, 27(3), 3679-3696. https://doi.org/10.1007/s10639-022-10969-9",
+      rubricCriteria: [
+        "Authors correctly formatted (Last, Initial.)",
+        "Date in parentheses with period after",
+        "Article title in sentence case",
+        "Journal name in Title Case and italicized",
+        "Volume italicized, issue in parentheses",
+        "DOI in https://doi.org/ format"
+      ]
+    }
+  },
+  {
+    weekNumber: 2,
+    hourNumber: 3,
+    title: "Practice, Feedback & Reflection",
+    theme: "Consolidating Citation Skills",
+    behaviourChange: "Before submitting any assignment, use a checklist to verify BOTH in-text AND reference list citations.",
+    learningGoals: [
+      "Apply in-text citation skills in integrated practice",
+      "Construct reference entries from scratch",
+      "Identify and correct citation errors",
+      "Reflect on learning and set goals for Week 3"
+    ],
+    ciloLinks: ["CILO 2: Citation Conventions", "CILO 5: Self-Directed Learning"],
+    keyConcepts: [
+      {
+        term: "Citation Checklist",
+        definition: "A systematic way to verify your citations are correct before submitting.",
+        example: "✓ Every in-text citation has a reference entry | ✓ '&' inside, 'and' outside | ✓ et al. format correct | ✓ DOI included",
+        tip: "Create your own checklist based on your common errors."
+      },
+      {
+        term: "Common In-Text Errors",
+        definition: "Frequent mistakes in in-text citations that lose marks.",
+        example: "✗ Hong et al (2022) — missing period | ✗ (Hong and Selwyn, 2020) — 'and' inside parentheses | ✗ Hong, et al., (2022) — extra commas",
+        tip: "Most errors are punctuation-related. Read citations character by character."
+      },
+      {
+        term: "Common Reference Errors",
+        definition: "Frequent mistakes in reference list entries.",
+        example: "✗ Title Case for article titles | ✗ 'Retrieved from' before URL | ✗ 'and' instead of '&' | ✗ Missing DOI",
+        tip: "Use a reference generator, then ALWAYS double-check the output."
+      },
+      {
+        term: "Self-Assessment",
+        definition: "Evaluating your own work against criteria before seeking feedback.",
+        example: "Before submitting: 'Did I use varied citation styles? Are all my references formatted correctly?'",
+        tip: "Catching your own errors is a valuable academic skill."
+      }
+    ],
+    articles: [ARTICLE_A, ARTICLE_B],
+    agenda: [
+      { 
+        title: "Warm-Up: Quick Citation Review", 
+        duration: "10 min", 
+        activities: [
+          "Rapid-fire MC on in-text citation rules",
+          "Quick check on reference formatting",
+          "Identify areas needing practice"
+        ] 
+      },
+      { 
+        title: "Integrated Citation Practice", 
+        duration: "15 min", 
+        activities: [
+          "Write sentences with in-text citations",
+          "Build matching reference entries",
+          "Get AI feedback and revise"
+        ] 
+      },
+      { 
+        title: "Error Detection Challenge", 
+        duration: "10 min", 
+        activities: [
+          "Find errors in sample citations",
+          "Fix common mistakes",
+          "Compare with correct versions"
+        ] 
+      },
+      { 
+        title: "Reflection & Goal Setting", 
+        duration: "15 min", 
+        activities: [
+          "Complete the reflection questions",
+          "Self-assess citation confidence",
+          "Set specific goals for Week 3"
+        ] 
+      }
+    ],
+    tasks: [
+      {
+        id: "w2h3-mc1",
+        type: "mc",
+        question: "Quick Review: Which is correctly formatted for APA 7th in-text citation?",
+        options: [
+          "Hong et al (2022)",
+          "Hong et al. (2022)",
+          "Hong, et al., (2022)",
+          "(Hong et. al, 2022)"
+        ],
+        correctAnswer: 1,
+        explanation: "Correct: 'et al.' with period after 'al', no comma before year in narrative citations.",
+        skillFocus: ["review", "apa-citation"]
       },
       {
         id: "w2h3-mc2",
         type: "mc",
-        question: "Read this citation sandwich: 'Hong et al. (2022) investigated parental attitudes toward FRT. Their findings indicate that parents accept the technology despite privacy concerns. This suggests that practical benefits may outweigh perceived risks in parents' decision-making.' Which part is the 'comment' layer?",
+        question: "Quick Review: In APA references, article titles should use:",
         options: [
-          "Hong et al. (2022) investigated parental attitudes toward FRT.",
-          "Their findings indicate that parents accept the technology despite privacy concerns.",
-          "This suggests that practical benefits may outweigh perceived risks in parents' decision-making.",
-          "All parts together form the comment."
+          "ALL CAPS",
+          "Title Case (Major Words Capitalized)",
+          "Sentence case (only first word and proper nouns)",
+          "lowercase (no capitals at all)"
         ],
         correctAnswer: 2,
-        explanation: "The third sentence is YOUR interpretation/comment - 'This suggests that...' is the writer adding their own analysis, connecting the finding to a broader point.",
-        skillFocus: ["source-integration"]
+        explanation: "Article titles: Sentence case. Journal names: Title Case. Remember: sentence case for the ARTICLE, Title Case for the JOURNAL.",
+        skillFocus: ["review", "apa-reference"]
+      },
+      {
+        id: "w2h3-mc3",
+        type: "mc",
+        question: "Find the error: 'According to Andrejevic & Selwyn (2020), FRT raises concerns.'",
+        options: [
+          "Should be 'Andrejevic and Selwyn' because names are in the sentence",
+          "Missing a comma after the year",
+          "Should be 'et al.' for two authors",
+          "No error — this is correct"
+        ],
+        correctAnswer: 0,
+        explanation: "Use 'and' (not '&') when author names appear IN the sentence (outside parentheses). Correct: 'According to Andrejevic and Selwyn (2020)...'",
+        skillFocus: ["apa-citation"]
+      },
+      {
+        id: "w2h3-tf1",
+        type: "true-false",
+        question: "This reference is correct: 'Hong, X., Li, Y., Kuo, B., and An, S. (2022). Supporting Schools...'",
+        correctAnswer: "false",
+        explanation: "FALSE! Two errors: (1) Use '&' not 'and' before the last author, (2) Article title should be sentence case, not Title Case.",
+        skillFocus: ["review", "apa-reference"]
       },
       {
         id: "w2h3-sentence1",
         type: "sentence",
-        question: "Rewrite using a DIFFERENT reporting verb that matches the author's stance: 'Hong et al. (2022) say that parents accept FRT.'",
-        wordLimit: 20,
-        hints: ["Hong et al. have EVIDENCE (empirical study)", "Try: demonstrate, show, find, reveal, indicate"],
-        skillFocus: ["reporting-verbs"],
-        modelAnswer: "Hong et al. (2022) demonstrate that parents accept FRT.",
-        examples: [
-          {
-            original: "Hong et al. (2022) argue that parents accept FRT.",
-            analysis: "'Argue' is for debatable claims - but this is a research finding, not an opinion. Use 'demonstrate' or 'show'."
-          },
-          {
-            original: "Hong et al. (2022) demonstrate that parents accept FRT.",
-            analysis: "Good! 'Demonstrate' shows they have evidence to support this finding."
-          }
-        ]
+        question: "Write ONE sentence using an information-prominent citation that summarizes Hong et al. (2022)'s finding about parental support for FRT.",
+        wordLimit: 30,
+        hints: ["Information-prominent: citation at the END in parentheses", "Focus on WHAT was found, not who found it"],
+        skillFocus: ["apa-citation"],
+        modelAnswer: "Chinese parents generally support the use of facial recognition systems in elementary schools despite some privacy concerns (Hong et al., 2022)."
       },
       {
         id: "w2h3-paragraph1",
         type: "paragraph",
-        question: "Write a 'citation sandwich' (3 sentences) about Andrejevic and Selwyn's (2020) argument on consent. Layer 1: Introduce with appropriate reporting verb. Layer 2: Present the main idea (paraphrased). Layer 3: Add your comment.",
-        wordLimit: 70,
-        hints: [
-          "Layer 1: Use a verb matching their CRITICAL stance (argue, contend, challenge)",
-          "Layer 2: Paraphrase their consent argument",
-          "Layer 3: Connect to broader implications (e.g., 'This raises questions about...')"
-        ],
-        skillFocus: ["reporting-verbs", "source-integration", "paraphrasing"],
-        modelAnswer: "Andrejevic and Selwyn (2020) contend that facial recognition technology undermines student consent in schools. They argue that the inescapable nature of facial monitoring means students cannot choose to opt out of surveillance. This raises important questions about whether schools should implement technologies that remove students' agency over their personal data."
+        question: "Error Correction: Fix ALL the errors in this citation and reference pair.\n\nIn-text: 'Hong et al (2022) argues that parents accept FRT.'\n\nReference: 'Hong, X., Li, Y., Kuo, B., and An, S. (2022). Supporting Schools To Use Face Recognition Systems. education and information technologies, 27(3).'",
+        wordLimit: 120,
+        hints: ["Check: period after 'al'", "Check: subject-verb agreement", "Check: '&' vs 'and'", "Check: capitalization", "Check: missing information"],
+        skillFocus: ["apa-citation", "apa-reference"],
+        modelAnswer: "In-text errors: (1) Missing period: 'et al' → 'et al.' (2) Subject-verb agreement: 'argues' → 'argue' (et al. is plural).\n\nReference errors: (1) 'and' → '&' (2) Title Case → sentence case (3) Journal name needs Title Case (4) Missing page numbers and DOI.\n\nCorrected in-text: Hong et al. (2022) argue that parents accept FRT.\n\nCorrected reference: Hong, X., Li, Y., Kuo, B., & An, S. (2022). Supporting schools to use face recognition systems. Education and Information Technologies, 27(3), 3679-3696. https://doi.org/10.1007/s10639-022-10969-9"
+      },
+      {
+        id: "w2h3-paragraph2",
+        type: "paragraph",
+        question: "Reflection: Based on your practice this week, answer:\n1. What citation skill do you feel most confident about?\n2. What still needs practice?\n3. What is ONE specific goal for improving your citation skills?",
+        wordLimit: 100,
+        hints: ["Be specific — 'citations' is too vague", "A good goal is measurable"],
+        skillFocus: ["reflection", "goal-setting"],
+        modelAnswer: "I feel most confident about distinguishing author-prominent from information-prominent citations — I can now switch between styles easily. I still need practice with reference list formatting, especially remembering which parts to italicize. My goal for next week is to practice building 3 reference entries from scratch and check them against the APA manual before looking at the answer."
       }
     ],
     writingTask: {
-      prompt: "Write 3 sentences about Hong et al. (2022) using THREE different reporting verbs. Choose verbs that match the nature of each point: (1) a research finding (use evidential verb), (2) an interpretation (use tentative verb), (3) a recommendation (use appropriate verb).",
-      wordLimit: 80,
-      modelAnswer: "Hong et al. (2022) demonstrate through their survey of 380 parents that FRT is generally accepted in Chinese elementary schools. The study suggests that parents prioritize practical benefits over privacy concerns when evaluating school technologies. Based on these findings, the researchers recommend that other schools could adopt similar FRT systems.",
+      prompt: "Final Reflection & Self-Assessment:\n\n1. Rate your confidence (1-5) on each Week 2 skill:\n   - Author-prominent citations: __/5\n   - Information-prominent citations: __/5\n   - '&' vs 'and' rule: __/5\n   - 'et al.' formatting: __/5\n   - Building reference entries: __/5\n\n2. What was your biggest 'aha moment' this week?\n\n3. Write ONE specific, measurable goal for Week 3.",
+      wordLimit: 150,
+      modelAnswer: "Confidence ratings:\n- Author-prominent citations: 4/5\n- Information-prominent citations: 4/5\n- '&' vs 'and' rule: 5/5 (easy to remember!)\n- 'et al.' formatting: 4/5\n- Building reference entries: 3/5 (still need practice)\n\nMy biggest 'aha moment' was realizing that article titles use sentence case but journal names use Title Case — I had been doing it wrong before.\n\nGoal for Week 3: Create a personal citation checklist with my common errors, and use it to check every citation before submitting the Academic Writing Quiz.",
       rubricCriteria: [
-        "3 different reporting verbs used appropriately",
-        "Verbs match the type of content (finding/interpretation/recommendation)",
-        "Proper APA citation format",
-        "Clear, coherent writing"
-      ],
-      examples: [
-        {
-          original: "(1) Hong et al. demonstrate... (2) The study suggests... (3) The researchers recommend...",
-          analysis: "Excellent verb variety: demonstrate (evidential) → suggests (tentative) → recommend (prescriptive)"
-        }
+        "Honest self-assessment with specific ratings",
+        "Identifies a clear 'aha moment' or insight",
+        "Goal is specific and measurable",
+        "Shows understanding of Week 2 concepts"
       ]
     }
   }
