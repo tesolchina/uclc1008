@@ -12,7 +12,7 @@ import { StudentLoginReminder } from "@/components/StudentLoginReminder";
 import { QuickCheckMC } from "@/components/lessons/QuickCheckMC";
 import { LectureOutline, useSectionProgress, generateSectionId } from "@/features/lecture-mode";
 import type { AgendaSectionEnhanced } from "@/features/lecture-mode";
-import { ArrowLeft, ArrowRight, Clock, Target, BookOpen, PenLine, CheckCircle2, Lightbulb, FileText, Sparkles, ExternalLink, AlertCircle, Calendar, GraduationCap } from "lucide-react";
+import { ArrowLeft, ArrowRight, Clock, Target, BookOpen, PenLine, CheckCircle2, Lightbulb, FileText, Sparkles, ExternalLink, AlertCircle, Calendar, GraduationCap, ScrollText } from "lucide-react";
 import { useState, useMemo, useCallback } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
@@ -358,17 +358,14 @@ export default function HourPage() {
             </CollapsibleSection>
 
             {/* Part 3a: Outlining - Macro Level */}
-            <Card className="border-2 border-purple-500/30 bg-purple-500/5">
-              <CardHeader className="pb-2">
-                <div className="flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-purple-600" />
-                  <CardTitle className="text-lg">Part 3a: Outlining – Macro Level</CardTitle>
-                </div>
-                <CardDescription>
-                  Learn to identify the overall structure of academic papers
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            <CollapsibleSection
+              title="Part 3a: Outlining – Macro Level"
+              description="Learn to identify the overall structure of academic papers"
+              icon={<FileText className="h-4 w-4 text-purple-600" />}
+              defaultOpen={true}
+              className="border-2 border-purple-500/30 bg-purple-500/5"
+            >
+              <div className="space-y-4">
                 <div className="p-4 rounded-lg bg-background/80 space-y-3">
                   <h4 className="font-medium flex items-center gap-2">
                     <Lightbulb className="h-4 w-4 text-purple-500" />
@@ -390,57 +387,150 @@ export default function HourPage() {
                     <p className="font-medium">1. ABSTRACT</p>
                     <p className="font-medium">2. Introduction</p>
                     <p className="font-medium">3. The emergence of facial recognition technology across society</p>
-                    <p className="font-medium">4. Problematising the rise of facial recognition</p>
-                    <p className="font-medium">5. Facial recognition technologies in education</p>
-                    <p className="font-medium">6. Making sense of the take-up of facial recognition technology in schools</p>
-                    <p className="font-medium">7. Challenging the take-up of facial recognition in schools</p>
+                    <p className="font-medium text-purple-700">4. Problematising the rise of facial recognition</p>
+                    <p className="font-medium text-purple-700">5. Facial recognition technologies in education</p>
+                    <p className="font-medium text-purple-700">6. Making sense of the take-up of facial recognition technology in schools</p>
+                    <p className="font-medium text-purple-700">7. Challenging the take-up of facial recognition in schools</p>
                     <p className="font-medium">8. Discussion</p>
                     <p className="font-medium">9. Conclusion</p>
                     <p className="text-muted-foreground">10. Disclosure statement</p>
                     <p className="text-muted-foreground">11. References</p>
                   </div>
+                  <p className="text-xs text-purple-600 mt-2">
+                    💡 Sections 4-7 (highlighted) form the core argument of the paper.
+                  </p>
                 </div>
+
+                {/* MC Question on Logical Flow */}
+                <QuickCheckMC
+                  questionNumber={8}
+                  question="What is the logical flow among sections 4-7 of the article?"
+                  options={[
+                    { label: "A", text: "General concerns → Educational applications → Explaining adoption → Critiquing adoption" },
+                    { label: "B", text: "History → Benefits → Costs → Recommendations" },
+                    { label: "C", text: "Problem → Solution → Implementation → Evaluation" },
+                    { label: "D", text: "Theory → Methodology → Results → Discussion" },
+                  ]}
+                  correctAnswer="A"
+                  explanation="The sections follow a logical progression: Section 4 raises general concerns about FRT → Section 5 describes how FRT is being applied in education → Section 6 explains WHY schools are adopting it → Section 7 challenges and critiques this adoption. This moves from context to critique."
+                />
 
                 {/* Example 2: Excerpt Structure */}
                 <div className="p-4 rounded-lg border bg-muted/30 space-y-3">
-                  <h4 className="font-medium text-sm">Example 2: Overall Structure of the Excerpt (Pre-course Writing)</h4>
-                  <p className="text-xs text-muted-foreground mb-2">
-                    The excerpt provided for your assignment covers a specific section. Its structure:
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    Example 2: Structure of the Excerpt
+                    <Badge variant="outline" className="text-xs">Pre-course Writing Source</Badge>
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    The excerpt is from Section 5 "Facial recognition technologies in education". Read the numbered paragraphs below:
                   </p>
-                  <div className="text-sm space-y-1 pl-4 border-l-2 border-purple-500/50">
-                    <p className="font-medium">1. Context: Introduction to facial recognition in schools</p>
-                    <p className="font-medium">2. Main argument: Concerns about surveillance</p>
-                    <p className="font-medium">3. Supporting evidence: Examples and implications</p>
-                  </div>
+                  
+                  <Button variant="link" size="sm" className="p-0 h-auto text-purple-600" asChild>
+                    <Link to="/week/1/assignment/pre-course-writing">
+                      View full assignment page →
+                    </Link>
+                  </Button>
                 </div>
 
-                {/* Quick Check */}
-                <QuickCheckMC
-                  questionNumber={4}
-                  question="Based on the article headings, what is the overall structure of this paper?"
-                  options={[
-                    { label: "A", text: "Abstract → Methods → Results → Discussion → Conclusion" },
-                    { label: "B", text: "Abstract → Introduction → Context sections → Analysis sections → Discussion → Conclusion" },
-                    { label: "C", text: "Introduction → Literature Review → Methodology → Findings" },
-                    { label: "D", text: "Summary → Analysis → Recommendations → References" },
-                  ]}
-                  correctAnswer="B"
-                  explanation="The article follows: Abstract → Introduction → 'The emergence of facial recognition technology' → 'Problematising the rise of facial recognition' → 'Facial recognition technologies in education' → 'Making sense of the take-up' → 'Challenging the take-up' → Discussion → Conclusion."
-                />
+                {/* Toggled Source Text with Numbered Paragraphs */}
+                <CollapsibleSection
+                  title="Source Text (6 Paragraphs)"
+                  description="The excerpt from the article – read and identify the macro structure"
+                  icon={<ScrollText className="h-4 w-4 text-purple-500" />}
+                  defaultOpen={false}
+                  className="border-purple-500/20"
+                >
+                  <div className="space-y-4 text-sm leading-relaxed text-muted-foreground">
+                    <div className="p-3 rounded-lg bg-purple-500/5 border border-purple-500/20">
+                      <p className="font-bold text-purple-700 text-xs mb-1">Paragraph 1</p>
+                      <p>
+                        Against this contentious background, then, we need to consider how these technologies are being applied to the specific context of education. While rarely foregrounded in debates about facial recognition in society, the school sector is one of the public settings where this technology is beginning to be taken up and implemented at scale. This is perhaps not surprising given, on the one hand, the role played by the classroom in the development of monitoring and disciplinary practices and, on the other, the increasing normalisation of surveillance in the name of protecting and securing young people.
+                      </p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-purple-500/5 border border-purple-500/20">
+                      <p className="font-bold text-purple-700 text-xs mb-1">Paragraph 2</p>
+                      <p>
+                        One prominent educational application of facial recognition technology is campus security. This form of facial recognition is most prevalent in the US, where school shooting incidents have prompted school authorities to annually spend $2.7 billion on-campus security products and services (Doffman, 2018). Facial recognition systems have now been sold to thousands of US schools, with vendors "pitching the technology as an all-seeing shield against school shootings" (Harwell, 2018, n.p). As well as purporting to identify unauthorised intruders, systems have been developed to make use of video object classification trained to detect gun-shaped objects, alongside more subtle forms of 'anomaly detection' such as students arriving at school in different-than-usual clothes, bags and other apparel (Harwell, 2018).
+                      </p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-purple-500/5 border border-purple-500/20">
+                      <p className="font-bold text-purple-700 text-xs mb-1">Paragraph 3</p>
+                      <p>
+                        Another application of facial recognition in schools is attendance monitoring – promising to put an end to the inevitable gaps and omissions that arise when human teachers are tasked with repeatedly conducting roll-calls of large student groups (Puthea et al., 2017). This application of facial recognition is proving popular in countries such as the UK and Australia where school shootings and unauthorised campus incursions are rare. For example, the Australian 'Loop-Learn' facial recognition roll-call system has been marketed amidst estimates of saving up to 2.5 hours of teacher time per week.
+                      </p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-purple-500/5 border border-purple-500/20">
+                      <p className="font-bold text-purple-700 text-xs mb-1">Paragraph 4</p>
+                      <p>
+                        Beyond campus-based security and tracking physical bodies, facial recognition is also being used in a number of 'virtual learning' contexts. For example, facial recognition systems are now being developed as a means of ensuring the integrity of various aspects of online courses. This includes controlling access to online educational content (Montgomery & Marais, 2014), as well as using webcam-based facial recognition to authenticate online learners (Valera et al., 2015). Similarly, there is a growing interest in using facial recognition technology for so-called e-assessment security.
+                      </p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-purple-500/5 border border-purple-500/20">
+                      <p className="font-bold text-purple-700 text-xs mb-1">Paragraph 5</p>
+                      <p>
+                        Finally, there is a growing interest in facial detection techniques as an indicator of student 'engagement' and learning. For example, research and development in this area have reported that detecting brief 'facial actions' can prove an accurate indicator of students' (non)engagement with online learning environments – highlighting episodes of boredom, confusion, delight, flow, frustration, and surprise (Dewan et al., 2019). Particularly insightful facial actions with regards to learning are reckoned to include brow-raising, eyelid tightening, and mouth dimpling.
+                      </p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-purple-500/5 border border-purple-500/20">
+                      <p className="font-bold text-purple-700 text-xs mb-1">Paragraph 6</p>
+                      <p>
+                        These largely experimental developments have led some educationalists to enthusiastically anticipate facial learning detection being deployed on a mass scale. As Timms (2016, p. 712) reasons, it might soon be possible to gain a 'real-time' sense of which groups of students are in a 'productive state' and other instances 'where the overall activity is not productive'. The promise of customisation that characterises the development of automated learning systems encourages their incorporation into student learning interfaces.
+                      </p>
+                    </div>
+                  </div>
+                </CollapsibleSection>
+
+                {/* MC Questions on Excerpt Structure */}
+                <div className="space-y-3">
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    <Target className="h-4 w-4 text-purple-500" />
+                    Quick Check: Macro Structure of the Excerpt
+                  </h4>
+                  
+                  <QuickCheckMC
+                    questionNumber={9}
+                    question="What is the main focus of each paragraph in the excerpt?"
+                    options={[
+                      { label: "A", text: "P1: Introduction → P2-4: Three types of applications → P5-6: Engagement monitoring" },
+                      { label: "B", text: "P1: History → P2: Benefits → P3: Costs → P4-6: Conclusions" },
+                      { label: "C", text: "P1-3: Problem → P4-5: Solution → P6: Implementation" },
+                      { label: "D", text: "All paragraphs discuss the same application in different countries" },
+                    ]}
+                    correctAnswer="A"
+                    explanation="P1 introduces FRT in education. P2 covers security, P3 covers attendance, P4 covers online/virtual learning. P5-6 discuss engagement/emotion detection. This shows 4 distinct applications organized logically."
+                  />
+
+                  <QuickCheckMC
+                    questionNumber={10}
+                    question="How are the four applications (security, attendance, online authentication, engagement detection) organized in the excerpt?"
+                    options={[
+                      { label: "A", text: "From most expensive to least expensive" },
+                      { label: "B", text: "From physical/visible surveillance to invisible/emotional surveillance" },
+                      { label: "C", text: "Chronologically by when they were invented" },
+                      { label: "D", text: "Alphabetically by application name" },
+                    ]}
+                    correctAnswer="B"
+                    explanation="The excerpt moves from visible/physical applications (security cameras, attendance tracking) to increasingly invisible/intimate forms of surveillance (online authentication, then emotion/engagement detection from facial expressions)."
+                  />
+                </div>
 
                 {/* Writing Practice */}
                 <div className="p-4 rounded-lg bg-purple-500/10 border border-purple-500/30 space-y-3">
                   <h4 className="font-medium text-sm flex items-center gap-2">
                     <PenLine className="h-4 w-4 text-purple-600" />
-                    Writing Practice: Create a Macro-Level Outline
+                    Writing Practice: Narrate the Excerpt Structure
                   </h4>
                   <p className="text-xs text-muted-foreground">
-                    Find another academic article in your field and create a macro-level outline listing all major sections. 
-                    Identify how the sections work together to build the author's argument.
+                    Write <strong>3 sentences</strong> that summarize what the excerpt covers at the macro level. 
+                    Don't summarize the content in detail – just describe the <em>structure</em> and <em>progression</em> of ideas.
                   </p>
+                  <div className="p-3 rounded bg-background/80 text-xs text-muted-foreground space-y-2">
+                    <p className="font-medium">Example format:</p>
+                    <p className="italic">"The excerpt begins by... Then, it moves on to discuss... Finally, it explores..."</p>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </CollapsibleSection>
 
             {/* Part 3b: Outlining - Micro Level */}
             <Card className="border-2 border-indigo-500/30 bg-indigo-500/5">
