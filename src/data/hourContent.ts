@@ -351,223 +351,278 @@ export const week1Hours: HourData[] = [
   {
     weekNumber: 1,
     hourNumber: 2,
-    title: "Anatomy of Academic Articles",
-    theme: "Empirical vs. Conceptual & Title/Abstract Analysis",
-    behaviourChange: "Always analyze the title BEFORE reading - predict Subject, Context, and Stance.",
+    title: "Paraphrasing Fundamentals",
+    theme: "4 Core Strategies with AI-Guided Practice",
+    behaviourChange: "Before writing ANY paraphrase: Read → Understand meaning → Choose strategies → Draft → Cite → Check similarity.",
     learningGoals: [
-      "Distinguish between empirical and conceptual journal articles",
-      "Apply the Subject + Context + Stance formula to analyze titles",
-      "Decode abstract structure to identify purpose statements",
-      "Predict article content and stance from title alone"
+      "Apply 4 core paraphrasing strategies (synonyms, word forms, voice, sentence structure)",
+      "Identify and avoid 'patchwriting' (insufficient changes that constitute plagiarism)",
+      "Integrate citations correctly with paraphrased content",
+      "Practice paraphrasing with AI-guided step-by-step feedback"
     ],
-    ciloLinks: ["CILO 1: Examine Academic Discourse", "CILO 2: Evaluate Arguments"],
+    ciloLinks: ["CILO 3: Demonstrate Awareness of Academic Conventions", "CILO 4: Demonstrate Awareness of Accuracy in Academic Discourse"],
     keyConcepts: [
       {
-        term: "Empirical Article",
-        definition: "A paper that reports on original research with data collection and analysis.",
-        example: "Hong et al. (2022) surveyed 380 parents and analyzed the data - this is empirical research.",
-        tip: "Look for: Methods section, Results with numbers/data, words like 'study', 'survey', 'experiment'."
+        term: "Paraphrasing",
+        definition: "Restating someone else's ideas in YOUR OWN words while keeping the original meaning.",
+        example: "Original: 'Technology impacts education.' → Paraphrase: 'Educational practices are influenced by technological developments.'",
+        tip: "The AWQ requires paraphrasing - NO direct quotes allowed. You must change BOTH words AND structure."
       },
       {
-        term: "Conceptual Article",
-        definition: "A paper that develops theories, critiques ideas, or synthesizes arguments WITHOUT new data collection.",
-        example: "Andrejevic & Selwyn (2020) analyze existing concerns about FRT - they didn't collect new data.",
-        tip: "Look for: argument-driven structure, words like 'contends', 'argues', 'critical questions'."
+        term: "Patchwriting",
+        definition: "A form of plagiarism where you only make minor word changes to the original text.",
+        example: "Original: 'Facial recognition technology is now being introduced across various aspects of public life.' Patchwork: 'Facial recognition is currently introduced across many aspects of public life.' ← TOO CLOSE!",
+        tip: "If you keep the same sentence structure and only swap a few words, that's patchwriting. Change STRUCTURE too."
       },
       {
-        term: "Title Analysis Formula",
-        definition: "Subject Matter + Context + Stance = Complete understanding of what the paper is about.",
-        example: "'Supporting schools to use FRT' → Subject: FRT, Context: schools/parents in China, Stance: Support (positive).",
-        tip: "The VERB in the title often reveals stance: 'supporting' vs. 'challenging' vs. 'examining'."
+        term: "Strategy 1: Synonym Replacement",
+        definition: "Replace words with words that have similar meanings.",
+        example: "'introduced' → 'implemented', 'various' → 'numerous', 'aspects' → 'areas'",
+        tip: "Warning: Don't abuse the thesaurus! Some synonyms don't fit the context. 'Big' doesn't always mean 'enormous'."
       },
       {
-        term: "Purpose Statement",
-        definition: "The sentence in the abstract that tells you exactly what the paper aims to do.",
-        example: "'This study examined how... influence parents' perceived value' - this is the purpose statement.",
-        tip: "Look for phrases like 'This study/article examines/investigates/argues/contends...'"
+        term: "Strategy 2: Word Form Changes",
+        definition: "Change the form of words (verb → noun, adjective → adverb, etc.).",
+        example: "'technology is introduced' (verb) → 'the introduction of technology' (noun)",
+        tip: "This naturally changes sentence structure. Very powerful strategy!"
       },
       {
-        term: "Stance Indicators",
-        definition: "Words in titles/abstracts that signal whether the author supports, questions, or opposes something.",
-        example: "'Critical questions and concerns' = negative/skeptical stance; 'Supporting' = positive stance.",
-        tip: "Positive: supporting, benefits, advantages | Negative: concerns, critical, challenges | Neutral: examining, exploring"
+        term: "Strategy 3: Active ↔ Passive Voice",
+        definition: "Change active sentences to passive, or vice versa.",
+        example: "Active: 'Researchers collected data' → Passive: 'Data was collected by researchers'",
+        tip: "Academic writing often uses passive voice. This is a safe strategy for paraphrasing."
+      },
+      {
+        term: "Strategy 4: Sentence Structure",
+        definition: "Reorder the sentence, combine/split sentences, or change clause positions.",
+        example: "'Because X happened, Y resulted.' → 'Y was the result of X happening.'",
+        tip: "Start your sentence from a different point than the original."
+      },
+      {
+        term: "Citation Integration",
+        definition: "Every paraphrase MUST include a citation to the original source.",
+        example: "Author-prominent: 'Hong et al. (2022) argue that...' | Info-prominent: '...according to recent research (Hong et al., 2022).'",
+        tip: "No citation = plagiarism, even if you paraphrased perfectly!"
       }
     ],
     articles: [ARTICLE_A, ARTICLE_B],
     agenda: [
       { 
-        title: "Empirical vs. Conceptual Articles", 
-        duration: "12 min", 
-        activities: [
-          "Compare Hong et al. (empirical) with Andrejevic & Selwyn (conceptual)",
-          "Identify key structural differences",
-          "Practice: Which type is this?"
-        ] 
-      },
-      { 
-        title: "Title Analysis Strategy", 
-        duration: "12 min", 
-        activities: [
-          "Learn Subject + Context + Stance formula",
-          "Analyze both article titles step-by-step",
-          "Practice with new titles"
-        ] 
-      },
-      { 
-        title: "Abstract Decoding", 
+        title: "Why Paraphrase? (Concept)", 
         duration: "10 min", 
         activities: [
-          "Label abstract components: Background → Purpose → Methods → Findings → Implications",
-          "Find the purpose statement in each abstract",
-          "Compare empirical vs. conceptual abstract structures"
+          "AWQ requires paraphrasing - no direct quotes",
+          "The 3 assessed skills: Paraphrase, Summarize, Synthesize",
+          "Paraphrase vs. Summary vs. Direct Quote distinction"
         ] 
       },
       { 
-        title: "Writing Task", 
+        title: "The 4 Paraphrasing Strategies", 
+        duration: "20 min", 
+        activities: [
+          "Strategy 1: Synonym Replacement (with warnings about misuse)",
+          "Strategy 2: Word Form Changes (verb → noun)",
+          "Strategy 3: Active ↔ Passive Voice",
+          "Strategy 4: Sentence Structure Changes"
+        ] 
+      },
+      { 
+        title: "Patchwriting Detection", 
         duration: "10 min", 
         activities: [
-          "Paraphrase ONE key finding with proper citation"
+          "What is patchwriting and why is it plagiarism?",
+          "Side-by-side examples: Too Close vs. Acceptable",
+          "Practice identifying patchwriting"
+        ] 
+      },
+      { 
+        title: "AI-Guided Paraphrasing Practice", 
+        duration: "25 min", 
+        activities: [
+          "Step-by-step guided paraphrasing with AI coach",
+          "Practice with sentences from course materials",
+          "Get feedback on similarity and quality"
         ] 
       }
     ],
     tasks: [
       {
-        id: "w1h2-demo1",
+        id: "w1h2-mc1",
         type: "mc",
-        question: "Look at this title: 'Supporting schools to use face recognition systems: A continuance intention perspective of elementary school parents in China' (Hong et al., 2022). What is the author's STANCE?",
-        context: "Title Analysis Demo: Apply the Subject + Context + Stance formula.",
+        question: "What is the main difference between paraphrasing and summarizing?",
         options: [
-          "Negative - the authors are critical of FRT",
-          "Neutral - the authors are just describing FRT",
-          "Positive - the authors support FRT in schools",
-          "Cannot be determined from the title"
+          "Paraphrasing is longer than the original; summarizing is shorter",
+          "Paraphrasing restates the same content in different words; summarizing condenses the main ideas",
+          "Paraphrasing requires citations; summarizing does not",
+          "Paraphrasing is for quotes; summarizing is for ideas"
         ],
-        correctAnswer: 2,
-        explanation: "The word 'Supporting' at the start of the title reveals a POSITIVE stance. The authors are investigating factors that support FRT adoption, not questioning it.",
-        skillFocus: ["stance-prediction"],
-        demoSteps: [
-          { title: "Step 1: Find the Subject Matter", content: "What is this paper about?", highlight: "face recognition systems" },
-          { title: "Step 2: Identify the Context", content: "What's the specific focus?", highlight: "elementary school parents in China" },
-          { title: "Step 3: Determine the Stance", content: "What verb/word reveals attitude?", highlight: "Supporting = POSITIVE stance" }
-        ]
+        correctAnswer: 1,
+        explanation: "Paraphrasing = same length, different words (restate). Summarizing = shorter, main ideas only (condense). Both require citations!",
+        skillFocus: ["paraphrasing", "summarizing"]
       },
       {
         id: "w1h2-mc2",
         type: "mc",
-        question: "Now analyze: 'Facial recognition technology in schools: critical questions and concerns' (Andrejevic & Selwyn, 2020). What is the STANCE?",
+        question: "Which paraphrasing strategy was used here?\n\nOriginal: 'Researchers collected data from participants.'\nParaphrase: 'Data was gathered from participants by the researchers.'",
         options: [
-          "Positive - supporting FRT adoption",
-          "Negative - skeptical of FRT",
-          "Neutral - balanced analysis",
-          "Cannot tell from title"
+          "Synonym replacement only",
+          "Word form change",
+          "Active to passive voice",
+          "Sentence structure change"
         ],
-        correctAnswer: 1,
-        explanation: "'Critical questions' and 'concerns' are negative stance indicators. These words signal skepticism and doubt. Compare with Hong et al.'s 'Supporting' - opposite stances on the same topic!",
-        skillFocus: ["stance-prediction"],
-        examples: [
-          {
-            original: "Benefits of remote learning for students",
-            analysis: "POSITIVE stance - 'benefits' is a positive word"
-          },
-          {
-            original: "Challenges facing remote learning implementation",
-            analysis: "NEGATIVE/CRITICAL stance - 'challenges' suggests problems"
-          },
-          {
-            original: "Exploring factors affecting remote learning",
-            analysis: "NEUTRAL stance - 'exploring' suggests open investigation"
-          }
+        correctAnswer: 2,
+        explanation: "The sentence changed from ACTIVE voice ('Researchers collected') to PASSIVE voice ('Data was collected by researchers'). Also used synonym: collected → gathered.",
+        skillFocus: ["paraphrasing"],
+        demoSteps: [
+          { title: "Identify the original structure", content: "Subject (Researchers) + Verb (collected) + Object (data)", highlight: "Active voice" },
+          { title: "Identify the paraphrase structure", content: "Object (Data) + was + Verb (gathered) + by Subject", highlight: "Passive voice" },
+          { title: "Confirm the strategy", content: "Active → Passive = Voice Change strategy", highlight: "Strategy 3" }
         ]
-      },
-      {
-        id: "w1h2-tf1",
-        type: "true-false",
-        question: "Empirical articles always follow the IMRaD structure (Introduction, Methods, Results, Discussion), while conceptual articles have argument-driven structures.",
-        correctAnswer: "true",
-        explanation: "Correct! Empirical = IMRaD (data-based). Conceptual = argument-driven (ideas-based). This is a key distinction for understanding how to read each type.",
-        skillFocus: ["article-structure"]
-      },
-      {
-        id: "w1h2-fb1",
-        type: "fill-blank",
-        question: "In Hong et al.'s abstract, the purpose statement begins with: 'To address this gap in the literature, this study _______...'",
-        correctAnswer: "examined",
-        explanation: "Purpose statements often use verbs like 'examines', 'investigates', 'explores', 'argues', 'contends'. Finding these verbs helps you quickly locate what the paper aims to do.",
-        skillFocus: ["reading-strategy"]
       },
       {
         id: "w1h2-mc3",
         type: "mc",
-        question: "Read this from the abstract: 'Nonetheless, there has been little attention paid to parents' acceptance of the use of face recognition systems on campus.' This sentence indicates:",
+        question: "Which paraphrasing strategy was used here?\n\nOriginal: 'The technology significantly impacts education.'\nParaphrase: 'The significant impact of technology on education...'",
         options: [
-          "The study's main finding",
-          "A research gap the study aims to fill",
-          "The methodology used",
-          "The implications for practice"
+          "Synonym replacement",
+          "Word form change (verb → noun)",
+          "Active to passive voice",
+          "Combining sentences"
         ],
         correctAnswer: 1,
-        explanation: "'Little attention paid to...' is a classic research gap phrase. This tells readers WHY the study is needed - there's a gap in existing knowledge that this paper addresses.",
-        skillFocus: ["reading-strategy", "academic-discourse"]
+        explanation: "'impacts' (verb) → 'impact' (noun), 'significantly' (adverb) → 'significant' (adjective). Word form changes naturally alter sentence structure!",
+        skillFocus: ["paraphrasing"]
+      },
+      {
+        id: "w1h2-tf1",
+        type: "true-false",
+        question: "Patchwriting is acceptable as long as you include a citation.",
+        correctAnswer: "false",
+        explanation: "FALSE! Patchwriting is still plagiarism even with a citation. You must significantly change BOTH the words AND the structure - not just swap a few synonyms.",
+        skillFocus: ["academic-integrity"]
+      },
+      {
+        id: "w1h2-mc4",
+        type: "mc",
+        question: "Is this an acceptable paraphrase or patchwriting?\n\nOriginal: 'Facial recognition technology is now being introduced across various aspects of public life.'\nAttempt: 'Facial recognition is currently being introduced across many aspects of public life.'",
+        options: [
+          "Acceptable paraphrase - words were changed",
+          "Patchwriting - too close to the original",
+          "Direct quote - needs quotation marks",
+          "Summary - it's shorter"
+        ],
+        correctAnswer: 1,
+        explanation: "This is PATCHWRITING. Only 3 words changed (now→currently, various→many, technology removed), but the sentence structure is IDENTICAL. You must change more than just a few words!",
+        skillFocus: ["paraphrasing", "academic-integrity"],
+        examples: [
+          {
+            original: "Facial recognition is currently being introduced across many aspects of public life.",
+            analysis: "❌ PATCHWRITING: Same structure, minimal word changes."
+          },
+          {
+            original: "Across numerous areas of society, facial identification systems are increasingly being implemented.",
+            analysis: "✅ ACCEPTABLE: Different structure (starts with 'Across'), multiple synonyms (recognition→identification, introduced→implemented, aspects→areas)."
+          }
+        ]
+      },
+      {
+        id: "w1h2-mc5",
+        type: "mc",
+        question: "Which is the BEST paraphrase of: 'Parents support the use of face recognition systems in elementary schools.'?",
+        options: [
+          "Parents support using face recognition in elementary schools.",
+          "Face recognition systems are supported by parents in elementary schools.",
+          "In primary education settings, facial identification technology receives parental approval.",
+          "Parents like face recognition technology in schools."
+        ],
+        correctAnswer: 2,
+        explanation: "Option C uses multiple strategies: synonyms (elementary→primary, face recognition→facial identification, support→approval), word form changes (support→approval), AND restructured the sentence. Options A and B are patchwriting (too similar).",
+        skillFocus: ["paraphrasing"]
+      },
+      {
+        id: "w1h2-mc6",
+        type: "mc",
+        question: "What is the correct APA 7th citation for this paraphrase?\n\n'Recent studies indicate that technological innovation influences parental attitudes toward school safety measures.'",
+        context: "Source: Hong, Li, Kuo & An (2022)",
+        options: [
+          "...safety measures (Hong, Li, Kuo & An, 2022).",
+          "...safety measures (Hong et al., 2022).",
+          "...safety measures. (Hong et al., 2022)",
+          "...safety measures [Hong et al., 2022]."
+        ],
+        correctAnswer: 1,
+        explanation: "For 3+ authors in APA 7th: use 'et al.' from the FIRST citation. The period goes AFTER the parentheses. No brackets in APA - those are for other styles.",
+        skillFocus: ["citation"]
+      },
+      {
+        id: "w1h2-mc7",
+        type: "mc",
+        question: "Which version shows author-prominent citation?",
+        options: [
+          "Technology impacts education significantly (Hong et al., 2022).",
+          "Hong et al. (2022) argue that technology impacts education significantly.",
+          "According to (Hong et al., 2022), technology impacts education.",
+          "Technology impacts education (2022)."
+        ],
+        correctAnswer: 1,
+        explanation: "Author-prominent (narrative) puts the author's name as part of the sentence: 'Hong et al. (2022) argue...' Option A is info-prominent (parenthetical). Options C and D have formatting errors.",
+        skillFocus: ["citation"]
       },
       {
         id: "w1h2-sentence1",
         type: "sentence",
-        question: "Paraphrase this finding: 'The results suggest that parents support the use of face recognition systems in elementary schools.' Include a proper citation.",
+        question: "Paraphrase this sentence using at least 2 strategies, then add a proper citation:\n\n'Parents support the use of face recognition systems in elementary schools.'",
         context: "Original from Hong et al. (2022)",
-        wordLimit: 30,
-        hints: ["Change the sentence structure", "Use synonyms", "Keep the meaning exactly the same"],
+        wordLimit: 35,
+        hints: [
+          "Try changing 'support' to a different word form",
+          "Consider passive voice: 'Facial recognition is...'",
+          "Synonyms: elementary → primary, support → approval/acceptance"
+        ],
         skillFocus: ["paraphrasing", "citation"],
-        modelAnswer: "According to Hong et al. (2022), parents express acceptance of facial recognition technology in primary school settings.",
+        modelAnswer: "According to Hong et al. (2022), parental approval for facial identification technology in primary education settings is evident from recent survey findings.",
         examples: [
           {
-            original: "Results suggest parents support FRT use in elementary schools (Hong et al., 2022).",
-            analysis: "Too close to original - 'support', 'elementary schools' unchanged. This is PATCHWRITING."
+            original: "Parents support face recognition systems in schools (Hong et al., 2022).",
+            analysis: "❌ Patchwriting - too close to original, minimal changes."
           },
           {
-            original: "Parents demonstrate favorable attitudes toward facial recognition implementation in primary education (Hong et al., 2022).",
-            analysis: "Good paraphrase! Changed: support → favorable attitudes, elementary → primary, use → implementation."
+            original: "In primary education contexts, facial identification technology receives considerable parental endorsement (Hong et al., 2022).",
+            analysis: "✅ Good! Changed structure, used synonyms (elementary→primary, support→endorsement, face recognition→facial identification)."
           }
-        ],
-        demoSteps: [
-          { title: "Step 1: Identify key ideas", content: "parents + support + FRT + schools", highlight: "the meaning to preserve" },
-          { title: "Step 2: Find synonyms", content: "support → accept/favor; elementary → primary", highlight: "word changes" },
-          { title: "Step 3: Restructure", content: "Change sentence pattern while keeping meaning", highlight: "Results suggest → According to" },
-          { title: "Step 4: Add citation", content: "Include (Hong et al., 2022) or Hong et al. (2022)", highlight: "proper APA format" }
         ]
       },
       {
-        id: "w1h2-paragraph1",
-        type: "paragraph",
-        question: "Analyze both article titles using the Subject + Context + Stance formula. Write a short paragraph comparing them.",
-        wordLimit: 80,
-        hints: [
-          "Article A: 'Supporting schools to use face recognition systems...'",
-          "Article B: 'Facial recognition technology in schools: critical questions and concerns'",
-          "Compare: Same subject, same context, OPPOSITE stances"
+        id: "w1h2-mc8",
+        type: "mc",
+        question: "You're writing an AWQ response and want to include this idea: 'FRT raises concerns about student privacy.' Which approach is correct for AWQ?",
+        options: [
+          "Quote directly: 'FRT raises concerns about student privacy' (Andrejevic & Selwyn, 2020).",
+          "Paraphrase: Student privacy issues are a significant consideration regarding facial recognition implementation in schools (Andrejevic & Selwyn, 2020).",
+          "Summarize without citation: FRT has privacy concerns.",
+          "Use your own opinion: I think FRT has privacy problems."
         ],
-        skillFocus: ["stance-prediction", "comparison"],
-        modelAnswer: "Both articles examine facial recognition technology in schools, but take opposing stances. Hong et al.'s (2022) title 'Supporting schools to use face recognition systems' uses the word 'supporting' to signal a positive stance toward FRT adoption. In contrast, Andrejevic and Selwyn's (2020) title highlights 'critical questions and concerns,' indicating skepticism. While sharing the same subject and context, these titles reveal fundamentally different perspectives on FRT in education."
+        correctAnswer: 1,
+        explanation: "AWQ requires PARAPHRASING with citations - no direct quotes allowed! Option B paraphrases correctly with a citation. Option A uses quotes (not allowed). Options C and D lack citations or add opinion (not allowed).",
+        skillFocus: ["paraphrasing", "awq-prep"]
       }
     ],
     writingTask: {
-      prompt: "Paraphrase ONE key finding from Hong et al. (2022) in your own words, including a proper citation. Then explain in one sentence what this finding tells us about parents' attitudes.",
-      wordLimit: 50,
-      modelAnswer: "Hong et al. (2022) found that parents recognize the value of facial recognition systems despite having concerns about potential risks. This indicates that practical benefits outweigh privacy worries in parents' decision-making about school technology.",
+      prompt: "Paraphrase ONE of the following sentences using at least 2 strategies. Include a proper APA citation.\n\n1. 'Facial recognition technology is now being introduced across various aspects of public life.' (Andrejevic & Selwyn, 2020)\n\n2. 'The research demonstrates that technology significantly impacts education.' (Hong et al., 2022)",
+      wordLimit: 40,
+      modelAnswer: "Across numerous sectors of society, facial identification systems are increasingly being implemented (Andrejevic & Selwyn, 2020). OR: According to Hong et al. (2022), educational practices are considerably influenced by technological developments.",
       rubricCriteria: [
-        "Accurate paraphrase (not patchwriting)",
-        "Proper APA citation format",
-        "Own words throughout",
-        "Clear interpretation of finding"
+        "Uses at least 2 paraphrasing strategies",
+        "Not patchwriting (significant word AND structure changes)",
+        "Preserves the original meaning accurately",
+        "Includes correct APA 7th citation format"
       ],
-      examples: [
-        {
-          original: "Parents support FRT because they think it is valuable (Hong et al., 2022).",
-          analysis: "Too simple and too close to original. Add more detail and change structure."
-        },
-        {
-          original: "According to Hong et al. (2022), parents demonstrate acceptance of facial recognition technology in schools primarily due to its perceived practical advantages, even while acknowledging potential privacy risks.",
-          analysis: "Excellent! Captures the nuance (acceptance despite concerns), uses synonyms, proper citation."
-        }
+      demoSteps: [
+        { title: "Step 1: Read and understand", content: "What is the main idea? Don't paraphrase yet.", highlight: "meaning first" },
+        { title: "Step 2: Choose strategies", content: "Select 2+: synonyms, word forms, voice, structure", highlight: "plan your approach" },
+        { title: "Step 3: Draft", content: "Write your version WITHOUT looking at the original", highlight: "close the original" },
+        { title: "Step 4: Compare", content: "Check similarity - is it still too close?", highlight: "verify changes" },
+        { title: "Step 5: Cite", content: "Add APA citation (author-prominent or info-prominent)", highlight: "always cite" }
       ]
     }
   },
