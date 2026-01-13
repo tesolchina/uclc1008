@@ -629,222 +629,192 @@ export const week1Hours: HourData[] = [
   {
     weekNumber: 1,
     hourNumber: 3,
-    title: "Reading with Purpose",
-    theme: "Strategic Reading: Headings, Topic Sentences & Claims vs. Evidence",
-    behaviourChange: "Read STRATEGICALLY: Headings first → Topic sentences → Claims only. Skip detailed data.",
+    title: "Practice, Feedback & Reflection",
+    theme: "Consolidate Week 1 Skills with Guided Practice",
+    behaviourChange: "Before each study session: Review → Practice → Get Feedback → Reflect on what to improve.",
     learningGoals: [
-      "Use section headings as navigation roadmaps",
-      "Locate and analyze topic sentences (Topic + Controlling Idea)",
-      "Distinguish claims from supporting evidence",
-      "Apply the 'Keep Claims, Skip Data' rule for efficient reading"
+      "Consolidate skimming and scanning skills from Hour 1",
+      "Apply paraphrasing strategies practiced in Hour 2",
+      "Receive AI and peer feedback on practice attempts",
+      "Reflect on progress and identify areas for improvement",
+      "Catch up on any incomplete tasks from Hours 1 and 2"
     ],
-    ciloLinks: ["CILO 2: Evaluate Arguments"],
+    ciloLinks: ["CILO 1: Examine Academic Discourse", "CILO 3: Academic Conventions", "CILO 4: Accuracy"],
     keyConcepts: [
       {
-        term: "Section Headings as Roadmaps",
-        definition: "Headings reveal the structure and argument flow of a paper - read them FIRST to understand the overall argument.",
-        example: "Andrejevic & Selwyn's heading 'Challenging the take-up of facial recognition in schools' tells you this section presents criticisms.",
-        tip: "Before reading a paper, scan ALL headings. This gives you the 'skeleton' of the argument."
+        term: "Deliberate Practice",
+        definition: "Focused, purposeful practice with clear goals and immediate feedback — the key to skill development.",
+        example: "Instead of reading passively, set a goal: 'I will identify 3 topic sentences in this excerpt and check my answers.'",
+        tip: "Practice with intention. Ask: What am I trying to improve? How will I know if I succeeded?"
       },
       {
-        term: "Topic Sentence",
-        definition: "The first sentence of a paragraph that states the main idea, containing a Topic + Controlling Idea.",
-        example: "'Another point of concern is the inescapability of facial monitoring' - Topic: facial monitoring; Controlling Idea: inescapability is a concern.",
-        tip: "80% of the time, the topic sentence is the FIRST sentence. Read it carefully, then skim the rest."
+        term: "Feedback Loop",
+        definition: "The cycle of Practice → Feedback → Adjust → Practice Again that accelerates learning.",
+        example: "Write a paraphrase → Get AI feedback → Identify what to change → Try again with improvements.",
+        tip: "Don't just practice — practice, get feedback, and adjust. Each cycle builds skill."
       },
       {
-        term: "Topic + Controlling Idea Formula",
-        definition: "A topic sentence = What the paragraph is about (Topic) + What the author says about it (Controlling Idea).",
-        example: "'Privacy concerns (TOPIC) outweigh the benefits of FRT (CONTROLLING IDEA)'",
-        tip: "The controlling idea tells you the author's POSITION on the topic."
+        term: "Self-Assessment",
+        definition: "Evaluating your own work against criteria before seeking external feedback.",
+        example: "Before submitting: 'Did I use 2+ strategies? Is the structure different? Did I include a citation?'",
+        tip: "Use checklists. They help you catch errors before the teacher does!"
       },
       {
-        term: "Claims vs. Evidence",
-        definition: "Claims = main arguments (KEEP for summaries). Evidence = data, examples, statistics (SKIP for summaries).",
-        example: "CLAIM: 'Parents support FRT' | EVIDENCE: 'score of 3.919 out of 5.000'. Keep the claim, skip the numbers.",
-        tip: "When summarizing, focus on WHAT the author argues, not the specific numbers they use to prove it."
-      },
-      {
-        term: "The 'Keep Claims, Skip Data' Rule",
-        definition: "For AWQ: Include main arguments and conclusions; omit specific statistics, methodological details, and examples.",
-        example: "❌ 'The score was 3.865, higher than 3.000' → ✓ 'Parents expressed concern about privacy'",
-        tip: "Ask: 'Is this the main point, or proof of the main point?' Include main points only."
+        term: "Reflection",
+        definition: "Thinking about your learning process — what worked, what didn't, and what to do differently.",
+        example: "'I struggled with word form changes. Next time, I'll practice verb→noun conversions first.'",
+        tip: "Reflection turns experience into learning. Take 2 minutes to write down insights."
       }
     ],
     articles: [ARTICLE_A, ARTICLE_B],
     agenda: [
       { 
-        title: "Section Headings as Roadmaps", 
+        title: "Warm-Up: Quick Skills Review", 
         duration: "10 min", 
         activities: [
-          "Map the heading structure of both articles",
-          "Predict content from headings alone",
-          "Identify how headings reveal argument flow"
+          "Rapid-fire MC on skimming, scanning, paraphrasing",
+          "Self-check: What do I remember from Hours 1-2?",
+          "Identify areas that need more practice"
         ] 
       },
       { 
-        title: "Topic Sentence Analysis", 
-        duration: "15 min", 
+        title: "Paraphrasing Practice Station", 
+        duration: "20 min", 
         activities: [
-          "Learn Topic + Controlling Idea formula",
-          "Find topic sentences in sample paragraphs",
-          "Practice writing topic sentences"
+          "Choose a sentence from the articles",
+          "Apply 2+ paraphrasing strategies",
+          "Get AI feedback and revise",
+          "Compare with model answers"
         ] 
       },
       { 
-        title: "Claims vs. Evidence Workshop", 
+        title: "Reading Skills Application", 
         duration: "10 min", 
         activities: [
-          "Sort information into Claims vs. Evidence",
-          "Apply 'Keep Claims, Skip Data' rule",
-          "Practice with AWQ-style excerpts"
+          "Skim a new excerpt for main idea",
+          "Scan for specific information",
+          "Identify one topic sentence"
         ] 
       },
       { 
-        title: "Writing Task", 
+        title: "Reflection & Goal Setting", 
         duration: "10 min", 
         activities: [
-          "Write a topic sentence summarizing one author's main claim"
+          "Complete the reflection questions",
+          "Set 1-2 specific goals for Week 2",
+          "Catch up on incomplete Hour 1-2 tasks"
         ] 
       }
     ],
     tasks: [
       {
-        id: "w1h3-demo1",
-        type: "mc",
-        question: "Look at this heading from Andrejevic & Selwyn (2020): 'Challenging the take-up of facial recognition in schools'. What does this heading tell you about the section's content?",
-        options: [
-          "The section will support FRT adoption",
-          "The section will present criticisms of FRT",
-          "The section will explain how FRT works technically",
-          "The section will compare different FRT systems"
-        ],
-        correctAnswer: 1,
-        explanation: "'Challenging' is a CRITICAL word - it signals the authors will present arguments AGAINST FRT adoption. Headings reveal stance and argument direction.",
-        skillFocus: ["reading-strategy"],
-        demoSteps: [
-          { title: "Step 1: Identify key verb/adjective", content: "Find the action word in the heading", highlight: "'Challenging'" },
-          { title: "Step 2: Determine stance", content: "'Challenging' = opposing, criticizing", highlight: "NEGATIVE stance" },
-          { title: "Step 3: Predict content", content: "This section will present criticisms/problems with FRT", highlight: "arguments against" }
-        ]
-      },
-      {
         id: "w1h3-mc1",
         type: "mc",
-        question: "A topic sentence typically:",
+        question: "Quick Review: What is 'skimming'?",
         options: [
-          "Appears at the end of a paragraph and summarizes the content",
-          "Appears at the beginning and states the paragraph's main idea",
-          "Contains only evidence and data",
-          "Is always the longest sentence in the paragraph"
+          "Reading every word carefully for complete understanding",
+          "Reading quickly to get the main idea and overall structure",
+          "Looking for specific facts, dates, or numbers",
+          "Memorizing key vocabulary from a text"
         ],
         correctAnswer: 1,
-        explanation: "Topic sentences usually appear at the BEGINNING of paragraphs and state the main idea. They contain a Topic (what it's about) + Controlling Idea (what the author says about it).",
-        skillFocus: ["topic-sentences"]
-      },
-      {
-        id: "w1h3-fb1",
-        type: "fill-blank",
-        question: "In the sentence 'Another point of concern is the inescapability of facial monitoring,' the TOPIC is 'facial monitoring' and the CONTROLLING IDEA is _______.",
-        correctAnswer: "inescapability is a concern",
-        explanation: "The controlling idea tells you the author's POSITION: facial monitoring is concerning because it's inescapable. This reveals the author's critical stance.",
-        skillFocus: ["topic-sentences"]
-      },
-      {
-        id: "w1h3-tf1",
-        type: "true-false",
-        question: "When summarizing for the AWQ, you should include specific statistics like 'the average score was 3.919 out of 5.000'.",
-        correctAnswer: "false",
-        explanation: "For AWQ summaries, include CLAIMS but skip specific DATA. Instead of '3.919/5.000', write 'parents generally recognized the value of FRT'. Keep the main point, skip the numbers.",
-        skillFocus: ["summarising"],
-        examples: [
-          {
-            original: "The average score of parents' perceived value is 3.919, which is much higher than the neutral level (3.000)",
-            analysis: "This is EVIDENCE (specific data). Don't include these numbers in your summary."
-          },
-          {
-            original: "Parents generally recognize the value of face recognition systems",
-            analysis: "This is the CLAIM. Include this kind of statement in your summary."
-          }
-        ]
+        explanation: "Skimming = reading quickly for main idea and structure. Focus on headings, first sentences, and key terms.",
+        skillFocus: ["review", "skimming"]
       },
       {
         id: "w1h3-mc2",
         type: "mc",
-        question: "Read this excerpt: 'The results indicate that the average score of parents' DBVW is 3.865, which is higher than the average level (3.000), indicating that the parents were worried about the disclosure of students' personal privacy.' For a summary, you should write:",
+        question: "Quick Review: What is 'patchwriting'?",
         options: [
-          "'The DBVW score was 3.865, higher than 3.000'",
-          "'Parents expressed concern about students' privacy'",
-          "'The results indicate the average score was above neutral'",
-          "'Confirmatory factor analysis showed significant results'"
+          "Writing a rough draft before editing",
+          "Combining ideas from multiple sources",
+          "Making only minor changes to original text (still plagiarism)",
+          "Using quotation marks around borrowed phrases"
+        ],
+        correctAnswer: 2,
+        explanation: "Patchwriting = changing only a few words while keeping the same structure. It's STILL plagiarism even with a citation!",
+        skillFocus: ["review", "paraphrasing"]
+      },
+      {
+        id: "w1h3-mc3",
+        type: "mc",
+        question: "Quick Review: For 3+ authors in APA 7th, use:",
+        options: [
+          "All author names every time (Hong, Li, Kuo & An, 2022)",
+          "'et al.' from the first citation (Hong et al., 2022)",
+          "'et al.' only after the first citation",
+          "Just the first author's name (Hong, 2022)"
         ],
         correctAnswer: 1,
-        explanation: "Keep the CLAIM ('parents were worried about privacy'), skip the DATA (3.865, 3.000). Option B captures the meaning without unnecessary statistics.",
-        skillFocus: ["summarising"]
+        explanation: "APA 7th changed from APA 6th! Now use 'et al.' from the FIRST citation for 3+ authors.",
+        skillFocus: ["review", "citation"]
+      },
+      {
+        id: "w1h3-tf1",
+        type: "true-false",
+        question: "You can paraphrase effectively by only changing synonyms (keeping the same sentence structure).",
+        correctAnswer: "false",
+        explanation: "FALSE! You must change BOTH words AND structure. Only changing synonyms = patchwriting = plagiarism.",
+        skillFocus: ["review", "paraphrasing"]
+      },
+      {
+        id: "w1h3-mc4",
+        type: "mc",
+        question: "Practice: Which paraphrasing strategies are used in this example?\n\nOriginal: 'Schools are implementing facial recognition systems.'\nParaphrase: 'The implementation of facial identification technology is occurring in educational institutions.'",
+        options: [
+          "Synonym replacement only",
+          "Synonym replacement + word form change (verb→noun)",
+          "Active to passive voice only",
+          "Sentence structure change only"
+        ],
+        correctAnswer: 1,
+        explanation: "Multiple strategies: 'implementing'→'implementation' (word form), 'facial recognition'→'facial identification' (synonym), 'schools'→'educational institutions' (synonym).",
+        skillFocus: ["paraphrasing"]
       },
       {
         id: "w1h3-sentence1",
         type: "sentence",
-        question: "Identify the topic sentence: 'Another point of concern is the inescapability of facial monitoring within school contexts. Unlike other forms of personal data, facial data lends itself to constant and permanent surveillance. In short, people are always connected to their faces.'",
-        wordLimit: 25,
-        hints: ["Topic sentences are usually first", "It should state the main idea of the paragraph"],
-        skillFocus: ["topic-sentences"],
-        modelAnswer: "The topic sentence is: 'Another point of concern is the inescapability of facial monitoring within school contexts.'",
-        demoSteps: [
-          { title: "Step 1: Check the first sentence", content: "Does it state a main idea?", highlight: "'Another point of concern is the inescapability...'" },
-          { title: "Step 2: Verify", content: "Do the following sentences support this idea?", highlight: "Yes - they explain WHY it's inescapable" },
-          { title: "Step 3: Identify Topic + Controlling Idea", content: "Topic: facial monitoring | Controlling Idea: inescapability is a concern", highlight: "complete topic sentence" }
-        ]
+        question: "What is ONE thing you found challenging in Hour 1 or Hour 2? Write a specific example.",
+        wordLimit: 50,
+        hints: ["Be specific — 'paraphrasing' is too vague", "Good: 'I struggled to change sentence structure while keeping meaning'"],
+        skillFocus: ["reflection"],
+        modelAnswer: "I found it challenging to identify which parts of my paraphrase were still too close to the original. I need to practice comparing my version with the source more carefully."
       },
       {
         id: "w1h3-paragraph1",
         type: "paragraph",
-        question: "Read the Hong et al. excerpt. Identify TWO main CLAIMS (not data/evidence) and write them in your own words.",
-        context: "Use the 'Keep Claims, Skip Data' rule. Focus on what the authors ARGUE, not the statistics they use.",
-        wordLimit: 60,
+        question: "Paraphrase Practice: Rewrite this sentence using at least 2 strategies, then explain which strategies you used.\n\n'Facial recognition technologies work by assigning numerical values to schematic representations of facial features.' (Andrejevic & Selwyn, 2020)",
+        wordLimit: 80,
         hints: [
-          "SKIP numbers like 3.865, 3.919",
-          "KEEP conclusions like 'parents were worried about privacy'",
-          "Paraphrase - don't copy"
+          "Try: word form changes (assigning→assignment, work→function)",
+          "Try: passive voice (are assigned)",
+          "Try: synonyms (numerical→numeric, features→characteristics)"
         ],
-        skillFocus: ["summarising", "paraphrasing"],
-        modelAnswer: "Two main claims from Hong et al. (2022): First, parents expressed concern about potential privacy risks associated with facial recognition technology. Second, despite these concerns, parents still recognized the practical value of FRT and intended to continue supporting its use in schools.",
-        examples: [
-          {
-            original: "The average score of parents' technological innovativeness is 3.796",
-            analysis: "This is DATA - skip it in your summary"
-          },
-          {
-            original: "Parents tended to accept new technology",
-            analysis: "This is a CLAIM - include it (paraphrased) in your summary"
-          }
-        ]
+        skillFocus: ["paraphrasing", "citation"],
+        modelAnswer: "According to Andrejevic and Selwyn (2020), facial identification systems function through the assignment of numeric values to simplified representations of facial characteristics.\n\nStrategies used: (1) word form change: 'work'→'function', 'assigning'→'assignment'; (2) synonyms: 'technologies'→'systems', 'features'→'characteristics'."
+      },
+      {
+        id: "w1h3-paragraph2",
+        type: "paragraph",
+        question: "Reflection: Based on your practice today, write 2-3 sentences about:\n1. What skill improved the most?\n2. What do you still need to work on?\n3. One specific goal for Week 2.",
+        wordLimit: 100,
+        hints: [
+          "Be specific and honest",
+          "A good goal is measurable: 'I will practice 3 paraphrases with AI feedback'"
+        ],
+        skillFocus: ["reflection", "goal-setting"],
+        modelAnswer: "Today I improved at identifying patchwriting — I can now spot when changes are too minor. I still need to work on using word form changes more naturally. My goal for Week 2 is to complete at least 5 paraphrasing exercises using the AI coach and focus on verb→noun transformations."
       }
     ],
     writingTask: {
-      prompt: "Write a topic sentence that captures Andrejevic and Selwyn's (2020) main argument about consent and FRT in schools. Your sentence should have a clear Topic + Controlling Idea.",
-      wordLimit: 35,
-      modelAnswer: "Andrejevic and Selwyn (2020) argue that facial recognition technology in schools fundamentally undermines students' ability to consent to data collection, creating an inescapable surveillance environment.",
+      prompt: "Final Reflection & Goal Setting:\n\n1. Rate your confidence (1-5) on each Week 1 skill:\n   - Skimming: __/5\n   - Scanning: __/5\n   - Paraphrasing: __/5\n   - APA Citations: __/5\n\n2. What was your biggest 'aha moment' this week?\n\n3. Write ONE specific, measurable goal for Week 2.",
+      wordLimit: 150,
+      modelAnswer: "Confidence ratings:\n- Skimming: 4/5 (I can quickly find main ideas)\n- Scanning: 4/5 (I can locate specific info)\n- Paraphrasing: 3/5 (Need more practice with strategies)\n- APA Citations: 3/5 (Sometimes confused about et al.)\n\nMy biggest 'aha moment' was realizing that patchwriting is still plagiarism even with a citation. I used to think changing a few words was enough.\n\nGoal for Week 2: Practice paraphrasing 3 sentences per day using the AI coach, focusing on word form changes. By Friday, I want to paraphrase without any 'too similar' warnings.",
       rubricCriteria: [
-        "Clear Topic identified (FRT/consent/students)",
-        "Controlling Idea present (what they argue about it)",
-        "Accurate representation of source",
-        "Proper citation included"
-      ],
-      demoSteps: [
-        { title: "Step 1: Identify the Topic", content: "What is the main subject?", highlight: "consent and FRT in schools" },
-        { title: "Step 2: Find the Controlling Idea", content: "What do Andrejevic & Selwyn say about this?", highlight: "it undermines consent, creates inescapable surveillance" },
-        { title: "Step 3: Combine with Citation", content: "Write as one sentence with proper citation", highlight: "Andrejevic and Selwyn (2020) argue that..." }
-      ],
-      examples: [
-        {
-          original: "Andrejevic and Selwyn write about FRT (2020).",
-          analysis: "Too vague - missing controlling idea. WHAT do they write about it?"
-        },
-        {
-          original: "Andrejevic and Selwyn (2020) contend that school-based facial recognition systems deny students meaningful consent because surveillance is constant and unavoidable.",
-          analysis: "Excellent! Clear topic (FRT/consent), clear controlling idea (denies consent), with reason (constant/unavoidable)."
-        }
+        "Honest self-assessment with specific ratings",
+        "Identifies a clear 'aha moment' or insight",
+        "Goal is specific and measurable",
+        "Shows understanding of Week 1 concepts"
       ]
     }
   }

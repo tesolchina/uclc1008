@@ -497,20 +497,385 @@ Remember to also save any written responses separately.
           </CardContent>
         </Card>
 
-        {/* Week 1 Hour 2: Paraphrasing with AI Coach */}
+        {/* Week 1 Hour 2: Paraphrasing Fundamentals - Structured like Hour 1 */}
         {weekNumber === 1 && hourNumber === 2 && (
           <section className="space-y-6">
+            {/* Part 1: Why Paraphrase? */}
             <CollapsibleSection
-              title="Part 4: AI-Guided Paraphrasing Practice"
-              description="Practice paraphrasing step-by-step with AI feedback"
+              title="Part 1: Why Paraphrase?"
+              description="Understand the importance of paraphrasing for academic writing and the AWQ"
+              icon={<BookOpen className="h-4 w-4 text-blue-600" />}
+              defaultOpen={true}
+              className="border-2 border-blue-500/30 bg-blue-500/5"
+            >
+              <div className="space-y-4">
+                {/* Concept Introduction */}
+                <div className="p-4 rounded-lg bg-background/80 space-y-3">
+                  <h4 className="font-medium flex items-center gap-2">
+                    <Lightbulb className="h-4 w-4 text-amber-500" />
+                    What is Paraphrasing?
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    <strong>Paraphrasing</strong> is restating someone else's ideas in <strong>YOUR OWN words</strong> while keeping the original meaning. 
+                    The AWQ requires paraphrasing — <span className="text-red-600 font-medium">NO direct quotes allowed!</span>
+                  </p>
+                  <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
+                    <p className="text-sm font-medium text-amber-700 mb-2">🎯 The 3 Skills Assessed in AWQ:</p>
+                    <ol className="text-sm text-muted-foreground list-decimal list-inside space-y-1">
+                      <li><strong>Paraphrasing</strong> — Restate ideas in your own words</li>
+                      <li><strong>Summarizing</strong> — Condense main ideas (shorter than original)</li>
+                      <li><strong>Synthesizing</strong> — Connect ideas across multiple sources</li>
+                    </ol>
+                  </div>
+                </div>
+
+                {/* Key Difference Box */}
+                <div className="grid md:grid-cols-3 gap-3">
+                  <div className="p-3 rounded-lg border bg-green-500/5 border-green-500/30">
+                    <p className="text-xs font-medium text-green-700 mb-1">Paraphrase</p>
+                    <p className="text-sm text-muted-foreground">Same length, different words</p>
+                  </div>
+                  <div className="p-3 rounded-lg border bg-blue-500/5 border-blue-500/30">
+                    <p className="text-xs font-medium text-blue-700 mb-1">Summary</p>
+                    <p className="text-sm text-muted-foreground">Shorter, main ideas only</p>
+                  </div>
+                  <div className="p-3 rounded-lg border bg-purple-500/5 border-purple-500/30">
+                    <p className="text-xs font-medium text-purple-700 mb-1">Direct Quote</p>
+                    <p className="text-sm text-muted-foreground">Exact words with "quotation marks"</p>
+                  </div>
+                </div>
+
+                {/* MC Questions for Part 1 */}
+                <div className="space-y-3 pt-2">
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    <Target className="h-4 w-4 text-blue-500" />
+                    Quick Check
+                  </h4>
+                  
+                  <QuickCheckMC
+                    questionNumber={1}
+                    question="What is the main difference between paraphrasing and summarizing?"
+                    options={[
+                      { label: "A", text: "Paraphrasing is longer than the original; summarizing is shorter" },
+                      { label: "B", text: "Paraphrasing restates the same content in different words; summarizing condenses the main ideas" },
+                      { label: "C", text: "Paraphrasing requires citations; summarizing does not" },
+                      { label: "D", text: "Paraphrasing is for quotes; summarizing is for ideas" },
+                    ]}
+                    correctAnswer="B"
+                    explanation="Paraphrasing = same length, different words (restate). Summarizing = shorter, main ideas only (condense). Both require citations!"
+                  />
+
+                  <QuickCheckMC
+                    questionNumber={2}
+                    question="For the AWQ, which approach is correct?"
+                    options={[
+                      { label: "A", text: "Quote directly: 'FRT raises concerns about student privacy' (Andrejevic & Selwyn, 2020)." },
+                      { label: "B", text: "Paraphrase: Student privacy issues are a significant consideration regarding FRT (Andrejevic & Selwyn, 2020)." },
+                      { label: "C", text: "Summarize without citation: FRT has privacy concerns." },
+                      { label: "D", text: "Use your own opinion: I think FRT has privacy problems." },
+                    ]}
+                    correctAnswer="B"
+                    explanation="AWQ requires PARAPHRASING with citations — no direct quotes allowed! Option B paraphrases correctly with a citation."
+                  />
+                </div>
+              </div>
+            </CollapsibleSection>
+
+            {/* Part 2: The 4 Paraphrasing Strategies */}
+            <CollapsibleSection
+              title="Part 2: The 4 Paraphrasing Strategies"
+              description="Learn and apply four key techniques for effective paraphrasing"
+              icon={<PenLine className="h-4 w-4 text-green-600" />}
+              defaultOpen={true}
+              className="border-2 border-green-500/30 bg-green-500/5"
+            >
+              <div className="space-y-4">
+                {/* Strategy Cards */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  {/* Strategy 1 */}
+                  <div className="p-4 rounded-lg border bg-background space-y-2">
+                    <p className="font-medium text-sm flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-green-500/20 text-green-700 flex items-center justify-center text-xs font-bold">1</span>
+                      Synonym Replacement
+                    </p>
+                    <p className="text-xs text-muted-foreground">Replace words with similar-meaning words.</p>
+                    <div className="text-xs p-2 bg-muted/50 rounded">
+                      <span className="text-red-500 line-through">introduced</span> → <span className="text-green-600">implemented</span>, 
+                      <span className="text-red-500 line-through ml-2">various</span> → <span className="text-green-600">numerous</span>
+                    </div>
+                    <p className="text-xs text-amber-600 italic">⚠️ Don't abuse the thesaurus! Check context fit.</p>
+                  </div>
+
+                  {/* Strategy 2 */}
+                  <div className="p-4 rounded-lg border bg-background space-y-2">
+                    <p className="font-medium text-sm flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-green-500/20 text-green-700 flex items-center justify-center text-xs font-bold">2</span>
+                      Word Form Changes
+                    </p>
+                    <p className="text-xs text-muted-foreground">Change word forms (verb → noun, adjective → adverb).</p>
+                    <div className="text-xs p-2 bg-muted/50 rounded">
+                      "technology is <span className="text-red-500 line-through">introduced</span>" → "the <span className="text-green-600">introduction</span> of technology"
+                    </div>
+                    <p className="text-xs text-amber-600 italic">💡 This naturally changes sentence structure!</p>
+                  </div>
+
+                  {/* Strategy 3 */}
+                  <div className="p-4 rounded-lg border bg-background space-y-2">
+                    <p className="font-medium text-sm flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-green-500/20 text-green-700 flex items-center justify-center text-xs font-bold">3</span>
+                      Active ↔ Passive Voice
+                    </p>
+                    <p className="text-xs text-muted-foreground">Switch between active and passive voice.</p>
+                    <div className="text-xs p-2 bg-muted/50 rounded">
+                      <span className="text-red-500">"Researchers collected data"</span> → <span className="text-green-600">"Data was collected by researchers"</span>
+                    </div>
+                    <p className="text-xs text-amber-600 italic">💡 Academic writing often uses passive voice.</p>
+                  </div>
+
+                  {/* Strategy 4 */}
+                  <div className="p-4 rounded-lg border bg-background space-y-2">
+                    <p className="font-medium text-sm flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-green-500/20 text-green-700 flex items-center justify-center text-xs font-bold">4</span>
+                      Sentence Structure
+                    </p>
+                    <p className="text-xs text-muted-foreground">Reorder, combine, or split sentences.</p>
+                    <div className="text-xs p-2 bg-muted/50 rounded">
+                      <span className="text-red-500">"Because X happened, Y resulted."</span> → <span className="text-green-600">"Y was the result of X happening."</span>
+                    </div>
+                    <p className="text-xs text-amber-600 italic">💡 Start from a different point than the original.</p>
+                  </div>
+                </div>
+
+                {/* MC Questions for Part 2 */}
+                <div className="space-y-3 pt-2">
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    <Target className="h-4 w-4 text-green-500" />
+                    Identify the Strategy
+                  </h4>
+
+                  <QuickCheckMC
+                    questionNumber={3}
+                    question="Which paraphrasing strategy was used here?\n\nOriginal: 'Researchers collected data from participants.'\nParaphrase: 'Data was gathered from participants by the researchers.'"
+                    options={[
+                      { label: "A", text: "Synonym replacement only" },
+                      { label: "B", text: "Word form change" },
+                      { label: "C", text: "Active to passive voice" },
+                      { label: "D", text: "Sentence structure change" },
+                    ]}
+                    correctAnswer="C"
+                    explanation="The sentence changed from ACTIVE voice ('Researchers collected') to PASSIVE voice ('Data was collected by researchers'). Also used synonym: collected → gathered."
+                  />
+
+                  <QuickCheckMC
+                    questionNumber={4}
+                    question="Which paraphrasing strategy was used here?\n\nOriginal: 'The technology significantly impacts education.'\nParaphrase: 'The significant impact of technology on education...'"
+                    options={[
+                      { label: "A", text: "Synonym replacement" },
+                      { label: "B", text: "Word form change (verb → noun)" },
+                      { label: "C", text: "Active to passive voice" },
+                      { label: "D", text: "Combining sentences" },
+                    ]}
+                    correctAnswer="B"
+                    explanation="'impacts' (verb) → 'impact' (noun), 'significantly' (adverb) → 'significant' (adjective). Word form changes naturally alter sentence structure!"
+                  />
+
+                  <QuickCheckMC
+                    questionNumber={5}
+                    question="Which is the BEST paraphrase of: 'Parents support the use of face recognition systems in elementary schools.'?"
+                    options={[
+                      { label: "A", text: "Parents support using face recognition in elementary schools." },
+                      { label: "B", text: "Face recognition systems are supported by parents in elementary schools." },
+                      { label: "C", text: "In primary education settings, facial identification technology receives parental approval." },
+                      { label: "D", text: "Parents like face recognition technology in schools." },
+                    ]}
+                    correctAnswer="C"
+                    explanation="Option C uses multiple strategies: synonyms (elementary→primary, face recognition→facial identification), word form changes (support→approval), AND restructured the sentence. Options A and B are patchwriting."
+                  />
+                </div>
+              </div>
+            </CollapsibleSection>
+
+            {/* Part 3: Patchwriting Detection */}
+            <CollapsibleSection
+              title="Part 3: Patchwriting Detection"
+              description="Learn to identify and avoid patchwriting (a form of plagiarism)"
+              icon={<AlertCircle className="h-4 w-4 text-red-600" />}
+              defaultOpen={true}
+              className="border-2 border-red-500/30 bg-red-500/5"
+            >
+              <div className="space-y-4">
+                {/* Patchwriting Explanation */}
+                <div className="p-4 rounded-lg bg-background/80 space-y-3">
+                  <h4 className="font-medium flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4 text-red-500" />
+                    What is Patchwriting?
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    <strong>Patchwriting</strong> is a form of <span className="text-red-600 font-medium">plagiarism</span> where you only make 
+                    minor word changes to the original text while keeping the same structure.
+                  </p>
+                  <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30">
+                    <p className="text-sm font-medium text-red-700 mb-2">❌ Even WITH a citation, patchwriting is still plagiarism!</p>
+                    <p className="text-xs text-muted-foreground">You must change BOTH words AND structure significantly.</p>
+                  </div>
+                </div>
+
+                {/* Side-by-side Examples */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="p-4 rounded-lg border border-red-500/30 bg-red-500/5 space-y-2">
+                    <p className="text-xs font-medium text-red-700">❌ PATCHWRITING (Too Close)</p>
+                    <p className="text-sm text-muted-foreground italic">"Facial recognition is currently being introduced across many aspects of public life."</p>
+                    <p className="text-xs text-red-600">Only 3 words changed, structure identical!</p>
+                  </div>
+                  <div className="p-4 rounded-lg border border-green-500/30 bg-green-500/5 space-y-2">
+                    <p className="text-xs font-medium text-green-700">✅ ACCEPTABLE PARAPHRASE</p>
+                    <p className="text-sm text-muted-foreground italic">"Across numerous sectors of society, facial identification systems are increasingly being implemented."</p>
+                    <p className="text-xs text-green-600">Different structure, multiple word changes.</p>
+                  </div>
+                </div>
+
+                {/* MC Questions for Part 3 */}
+                <div className="space-y-3 pt-2">
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    <Target className="h-4 w-4 text-red-500" />
+                    Spot the Patchwriting
+                  </h4>
+
+                  <QuickCheckMC
+                    questionNumber={6}
+                    question="Patchwriting is acceptable as long as you include a citation."
+                    options={[
+                      { label: "A", text: "True" },
+                      { label: "B", text: "False" },
+                    ]}
+                    correctAnswer="B"
+                    explanation="FALSE! Patchwriting is still plagiarism even with a citation. You must significantly change BOTH the words AND the structure."
+                  />
+
+                  <QuickCheckMC
+                    questionNumber={7}
+                    question="Is this an acceptable paraphrase or patchwriting?\n\nOriginal: 'Facial recognition technology is now being introduced across various aspects of public life.'\nAttempt: 'Facial recognition is currently being introduced across many aspects of public life.'"
+                    options={[
+                      { label: "A", text: "Acceptable paraphrase — words were changed" },
+                      { label: "B", text: "Patchwriting — too close to the original" },
+                      { label: "C", text: "Direct quote — needs quotation marks" },
+                      { label: "D", text: "Summary — it's shorter" },
+                    ]}
+                    correctAnswer="B"
+                    explanation="This is PATCHWRITING. Only 3 words changed (now→currently, various→many, technology removed), but the sentence structure is IDENTICAL."
+                  />
+                </div>
+
+                {/* Writing Task for Part 3 */}
+                <div className="space-y-3 pt-4 border-t">
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    <PenLine className="h-4 w-4 text-red-500" />
+                    Writing Task: Paraphrase with Strategies
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    Paraphrase ONE of the following sentences using at least 2 strategies. Include a proper APA citation.
+                  </p>
+                  <div className="p-3 rounded-lg bg-muted/50 border text-sm space-y-2">
+                    <p>1. "Facial recognition technology is now being introduced across various aspects of public life." (Andrejevic & Selwyn, 2020)</p>
+                    <p>2. "The research demonstrates that technology significantly impacts education." (Hong et al., 2022)</p>
+                  </div>
+                  <WritingTaskWithFeedback
+                    taskId="w1h2-paraphrase-practice"
+                    placeholder="Write your paraphrase here using at least 2 strategies. Don't forget the citation!"
+                    onComplete={handleTaskComplete}
+                    studentId={studentId}
+                  />
+                </div>
+              </div>
+            </CollapsibleSection>
+
+            {/* Part 4: Citations with Paraphrasing */}
+            <CollapsibleSection
+              title="Part 4: Citation Integration"
+              description="Learn to correctly cite your paraphrased content"
+              icon={<FileText className="h-4 w-4 text-purple-600" />}
+              defaultOpen={true}
+              className="border-2 border-purple-500/30 bg-purple-500/5"
+            >
+              <div className="space-y-4">
+                {/* Citation Types */}
+                <div className="p-4 rounded-lg bg-background/80 space-y-3">
+                  <h4 className="font-medium flex items-center gap-2">
+                    <Lightbulb className="h-4 w-4 text-purple-500" />
+                    Two Ways to Cite
+                  </h4>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="p-3 rounded-lg border bg-purple-500/5 border-purple-500/30">
+                      <p className="text-xs font-medium text-purple-700 mb-1">Author-Prominent (Narrative)</p>
+                      <p className="text-sm text-muted-foreground italic">"Hong et al. (2022) argue that..."</p>
+                      <p className="text-xs text-muted-foreground mt-1">Emphasizes WHO said it</p>
+                    </div>
+                    <div className="p-3 rounded-lg border bg-purple-500/5 border-purple-500/30">
+                      <p className="text-xs font-medium text-purple-700 mb-1">Information-Prominent (Parenthetical)</p>
+                      <p className="text-sm text-muted-foreground italic">"...according to recent research (Hong et al., 2022)."</p>
+                      <p className="text-xs text-muted-foreground mt-1">Emphasizes WHAT was found</p>
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 mt-3">
+                    <p className="text-sm font-medium text-amber-700">💡 APA 7th Quick Rule:</p>
+                    <p className="text-xs text-muted-foreground">For 3+ authors, use "et al." from the FIRST citation: Hong et al. (2022)</p>
+                  </div>
+                </div>
+
+                {/* MC Questions for Part 4 */}
+                <div className="space-y-3 pt-2">
+                  <QuickCheckMC
+                    questionNumber={8}
+                    question="What is the correct APA 7th citation for this paraphrase?\n\n'Recent studies indicate that technological innovation influences parental attitudes toward school safety measures.'\n\nSource: Hong, Li, Kuo & An (2022)"
+                    options={[
+                      { label: "A", text: "...safety measures (Hong, Li, Kuo & An, 2022)." },
+                      { label: "B", text: "...safety measures (Hong et al., 2022)." },
+                      { label: "C", text: "...safety measures. (Hong et al., 2022)" },
+                      { label: "D", text: "...safety measures [Hong et al., 2022]." },
+                    ]}
+                    correctAnswer="B"
+                    explanation="For 3+ authors in APA 7th: use 'et al.' from the FIRST citation. The period goes AFTER the parentheses. No brackets in APA."
+                  />
+
+                  <QuickCheckMC
+                    questionNumber={9}
+                    question="Which version shows author-prominent citation?"
+                    options={[
+                      { label: "A", text: "Technology impacts education significantly (Hong et al., 2022)." },
+                      { label: "B", text: "Hong et al. (2022) argue that technology impacts education significantly." },
+                      { label: "C", text: "According to (Hong et al., 2022), technology impacts education." },
+                      { label: "D", text: "Technology impacts education (2022)." },
+                    ]}
+                    correctAnswer="B"
+                    explanation="Author-prominent (narrative) puts the author's name as part of the sentence: 'Hong et al. (2022) argue...' Option A is info-prominent."
+                  />
+                </div>
+              </div>
+            </CollapsibleSection>
+
+            {/* Part 5: AI-Guided Paraphrasing Practice (Learning App) */}
+            <CollapsibleSection
+              title="Part 5: AI Paraphrasing Coach (Learning App)"
+              description="Practice paraphrasing step-by-step with AI guidance"
               icon={<Sparkles className="h-4 w-4 text-accent" />}
               defaultOpen={true}
-              className="border-2 border-accent/30 bg-accent/5"
+              className="border-2 border-accent/30 bg-gradient-to-r from-accent/10 to-transparent"
             >
-              <ParaphraseCoach 
-                studentId={studentId} 
-                onComplete={(sentenceId) => handleTaskComplete(`paraphrase-${sentenceId}`)}
-              />
+              <div className="space-y-3">
+                <div className="p-3 rounded-lg bg-accent/10 border border-accent/30">
+                  <p className="text-sm font-medium text-accent-foreground flex items-center gap-2">
+                    <Sparkles className="h-4 w-4" />
+                    Interactive Learning App
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    This AI coach guides you through paraphrasing step-by-step: Read → Understand → Plan → Draft → Cite → Check.
+                  </p>
+                </div>
+                <ParaphraseCoach 
+                  studentId={studentId} 
+                  onComplete={(sentenceId) => handleTaskComplete(`paraphrase-${sentenceId}`)}
+                />
+              </div>
             </CollapsibleSection>
           </section>
         )}
