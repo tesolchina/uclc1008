@@ -543,12 +543,19 @@ export default function HourPage() {
                   </h4>
                   <p className="text-xs text-muted-foreground">
                     Write <strong>3 sentences</strong> that summarize what the excerpt covers at the macro level. 
-                    Don't summarize the content in detail – just describe the <em>structure</em> and <em>progression</em> of ideas.
+                    Do not summarize the content in detail – just describe the <em>structure</em> and <em>progression</em> of ideas.
                   </p>
                   <div className="p-3 rounded bg-background/80 text-xs text-muted-foreground space-y-2">
                     <p className="font-medium">Example format:</p>
                     <p className="italic">"The excerpt begins by... Then, it moves on to discuss... Finally, it explores..."</p>
                   </div>
+                  <textarea 
+                    className="w-full min-h-[120px] p-3 rounded-lg border bg-background text-sm resize-y placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                    placeholder="Write your 3 sentences here describing the structure and progression of the excerpt..."
+                  />
+                  <p className="text-xs text-muted-foreground italic">
+                    💡 Tip: Your work is saved locally in this browser. Remember to copy your writing to a separate document as backup.
+                  </p>
                 </div>
               </div>
             </CollapsibleSection>
