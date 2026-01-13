@@ -12,9 +12,99 @@ import { StudentLoginReminder } from "@/components/StudentLoginReminder";
 import { QuickCheckMC } from "@/components/lessons/QuickCheckMC";
 import { LectureOutline, useSectionProgress, generateSectionId } from "@/features/lecture-mode";
 import type { AgendaSectionEnhanced } from "@/features/lecture-mode";
-import { ArrowLeft, ArrowRight, Clock, Target, BookOpen, PenLine, CheckCircle2, Lightbulb, FileText, Sparkles, ExternalLink, AlertCircle, Calendar, GraduationCap, ScrollText } from "lucide-react";
+import { ArrowLeft, ArrowRight, Clock, Target, BookOpen, PenLine, CheckCircle2, Lightbulb, FileText, Sparkles, ExternalLink, AlertCircle, Calendar, GraduationCap, ScrollText, ChevronDown } from "lucide-react";
 import { useState, useMemo, useCallback } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+// Paragraph options for micro-level practice
+const PRACTICE_PARAGRAPHS = [
+  {
+    id: "para2",
+    label: "Paragraph 2: Problematising FRT",
+    text: "In this sense, facial recognition could be seen as a logical extension of technology-based surveillance trends established in schools from the 1990s onwards. However, in this article, we seek to problematise the specific connotations and possible consequences of facial recognition technology in schools. Drawing on emerging debates amongst communications, media and surveillance scholars, the article addresses a number of specific social challenges and concerns – not least various ways in which this technology might alter the nature of schools and schooling along divisive, authoritarian and oppressive lines."
+  },
+  {
+    id: "para3",
+    label: "Paragraph 3: Challenging FRT in Schools",
+    text: "These questions over diminished notions of pedagogy and consent are important. Yet, at this point, we would like to argue that there are a number of additional issues and concerns that cast further serious doubt upon the implementation of facial recognition technologies in schools."
+  },
+  {
+    id: "para4",
+    label: "Paragraph 4: Dehumanising Nature",
+    text: "First is the argument that the statistical processes through which facial recognition technologies quantify and frame a student's face are inherently reductive. Facial recognition technologies work by assigning numerical values to schematic representations of facial features. This constitutes a very reductive engagement with students in contrast to how they would ordinarily be viewed by a human."
+  },
+  {
+    id: "para5",
+    label: "Paragraph 5: Gender and Race Issues",
+    text: "Another unsettling reduction is their role in foregrounding fixed attributions of students' race and gender in informing school decision-making."
+  },
+  {
+    id: "para6",
+    label: "Paragraph 6: Conclusion",
+    text: "Thus, it can be strongly argued that schools should not be places where local communities become desensitised to being automatically identified, profiled, and potentially discriminated against."
+  }
+];
+
+// Micro-level practice component with paragraph selector
+function MicroLevelPractice() {
+  const [selectedParagraph, setSelectedParagraph] = useState(PRACTICE_PARAGRAPHS[0].id);
+  const currentParagraph = PRACTICE_PARAGRAPHS.find(p => p.id === selectedParagraph) || PRACTICE_PARAGRAPHS[0];
+
+  return (
+    <div className="p-4 rounded-lg bg-indigo-500/10 border border-indigo-500/30 space-y-4">
+      <h4 className="font-medium text-sm flex items-center gap-2">
+        <PenLine className="h-4 w-4 text-indigo-600" />
+        Your Turn: Analyze a Paragraph
+      </h4>
+      
+      {/* Paragraph Selector */}
+      <div className="space-y-2">
+        <label className="text-xs font-medium text-indigo-700">Choose a paragraph to analyze:</label>
+        <Select value={selectedParagraph} onValueChange={setSelectedParagraph}>
+          <SelectTrigger className="w-full bg-background">
+            <SelectValue placeholder="Select a paragraph" />
+          </SelectTrigger>
+          <SelectContent className="bg-background z-50">
+            {PRACTICE_PARAGRAPHS.map((para) => (
+              <SelectItem key={para.id} value={para.id}>
+                {para.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      
+      {/* Selected paragraph */}
+      <div className="p-3 rounded bg-background border text-sm">
+        <p className="font-medium text-xs text-indigo-600 mb-2">{currentParagraph.label}:</p>
+        <p className="text-muted-foreground leading-relaxed">
+          "{currentParagraph.text}"
+        </p>
+      </div>
+      
+      {/* Writing area */}
+      <div className="space-y-2">
+        <p className="text-xs text-muted-foreground">
+          Create a micro-level outline for the paragraph above. Identify the topic sentence, supporting details, and concluding thought:
+        </p>
+        <textarea 
+          className="w-full min-h-[150px] p-3 rounded-lg border bg-background text-sm resize-y placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+          placeholder={"Topic Sentence:\n...\n\nSupporting Details:\n• ...\n• ...\n\nConcluding Thought:\n..."}
+        />
+        <p className="text-xs text-muted-foreground italic">
+          💡 Remember to save your work externally – copy and paste to a document as backup.
+        </p>
+      </div>
+    </div>
+  );
+}
 
 export default function HourPage() {
   const { weekId, hourId } = useParams();
@@ -561,17 +651,14 @@ export default function HourPage() {
             </CollapsibleSection>
 
             {/* Part 3b: Outlining - Micro Level */}
-            <Card className="border-2 border-indigo-500/30 bg-indigo-500/5">
-              <CardHeader className="pb-2">
-                <div className="flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-indigo-600" />
-                  <CardTitle className="text-lg">Part 3b: Outlining – Micro Level</CardTitle>
-                </div>
-                <CardDescription>
-                  Learn to identify key points within paragraphs
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            <CollapsibleSection
+              title="Part 3b: Outlining – Micro Level"
+              description="Learn to identify key points within paragraphs"
+              icon={<FileText className="h-4 w-4 text-indigo-600" />}
+              defaultOpen={true}
+              className="border-2 border-indigo-500/30 bg-indigo-500/5"
+            >
+              <div className="space-y-4">
                 <div className="p-4 rounded-lg bg-background/80 space-y-3">
                   <h4 className="font-medium flex items-center gap-2">
                     <Lightbulb className="h-4 w-4 text-indigo-500" />
@@ -597,6 +684,18 @@ export default function HourPage() {
                   </div>
                 </div>
 
+                {/* Why Outlining Matters - Hint for Summaries */}
+                <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
+                  <p className="text-xs text-amber-700 flex items-start gap-2">
+                    <Lightbulb className="h-4 w-4 shrink-0 mt-0.5" />
+                    <span>
+                      <strong>Why this matters:</strong> Micro-level outlines help you write better summaries. 
+                      When you identify the topic sentence and key details, you have the building blocks for a concise summary. 
+                      In Week 6, you will use these skills to summarize and synthesize multiple sources!
+                    </span>
+                  </p>
+                </div>
+
                 {/* Demonstration: Example Paragraph from Excerpt */}
                 <div className="p-4 rounded-lg border-2 border-indigo-500/50 bg-indigo-500/10 space-y-4">
                   <h4 className="font-medium text-sm flex items-center gap-2">
@@ -606,10 +705,10 @@ export default function HourPage() {
                   
                   {/* The paragraph */}
                   <div className="p-3 rounded bg-background border text-sm space-y-2">
-                    <p className="font-medium text-xs text-indigo-600 mb-2">Paragraph from Article B (Andrejevic & Selwyn, 2020):</p>
+                    <p className="font-medium text-xs text-indigo-600 mb-2">Paragraph 1: Introduction to FRT (Andrejevic & Selwyn, 2020)</p>
                     <p className="text-muted-foreground leading-relaxed">
                       <span className="bg-green-200/50 px-0.5">"The past few years have seen the implementation of automated facial recognition systems across a range of social realms."</span>{" "}
-                      <span className="bg-blue-200/50 px-0.5">While these technologies are associated most frequently with promises to strengthen public safety, a growing number of other applications have also emerged – from verifying the identity of bank users, through to 'smart billboards' that display advertisements in response to the moods of passers-by.</span>{" "}
+                      <span className="bg-blue-200/50 px-0.5">While these technologies are associated most frequently with promises to strengthen public safety, a growing number of other applications have also emerged – from verifying the identity of bank users, through to "smart billboards" that display advertisements in response to the moods of passers-by.</span>{" "}
                       <span className="bg-amber-200/50 px-0.5">Of particular interest is how facial recognition technologies are beginning to be implemented in school settings.</span>
                     </p>
                   </div>
@@ -644,37 +743,10 @@ export default function HourPage() {
                   </div>
                 </div>
 
-                {/* Student Practice */}
-                <div className="p-4 rounded-lg bg-indigo-500/10 border border-indigo-500/30 space-y-4">
-                  <h4 className="font-medium text-sm flex items-center gap-2">
-                    <PenLine className="h-4 w-4 text-indigo-600" />
-                    Your Turn: Analyze Another Paragraph
-                  </h4>
-                  
-                  {/* Practice paragraph */}
-                  <div className="p-3 rounded bg-background border text-sm">
-                    <p className="font-medium text-xs text-indigo-600 mb-2">Paragraph to Analyze:</p>
-                    <p className="text-muted-foreground leading-relaxed">
-                      "In this sense, facial recognition could be seen as a logical extension of technology-based surveillance trends established in schools from the 1990s onwards. However, in this article, we seek to problematise the specific connotations and possible consequences of facial recognition technology in schools. Drawing on emerging debates amongst communications, media and surveillance scholars, the article addresses a number of specific social challenges and concerns – not least various ways in which this technology might alter the nature of schools and schooling along divisive, authoritarian and oppressive lines."
-                    </p>
-                  </div>
-                  
-                  {/* Writing area */}
-                  <div className="space-y-2">
-                    <p className="text-xs text-muted-foreground">
-                      Create a micro-level outline for the paragraph above. Identify the topic sentence, supporting details, and concluding thought:
-                    </p>
-                    <textarea 
-                      className="w-full min-h-[150px] p-3 rounded-lg border bg-background text-sm resize-y placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
-                      placeholder="Topic Sentence:&#10;...&#10;&#10;Supporting Details:&#10;• ...&#10;• ...&#10;&#10;Concluding Thought:&#10;..."
-                    />
-                    <p className="text-xs text-muted-foreground italic">
-                      💡 Remember to save your work externally – copy and paste to a document as backup.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                {/* Student Practice with Paragraph Selector */}
+                <MicroLevelPractice />
+              </div>
+            </CollapsibleSection>
           </section>
         )}
 

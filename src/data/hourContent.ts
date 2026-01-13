@@ -155,15 +155,15 @@ export const week1Hours: HourData[] = [
   {
     weekNumber: 1,
     hourNumber: 1,
-    title: "Skimming, Scanning & the IMRaD Structure",
+    title: "Skimming, Scanning & Outlining Academic Texts",
     theme: "Strategic Reading for Academic Articles",
     behaviourChange: "Before reading any paper in detail, always SKIM first: Title → Abstract → Headings → Topic Sentences. Then SCAN for specific information.",
     learningGoals: [
       "Apply skimming techniques to quickly get an overview of academic articles",
       "Use scanning to locate specific information (publisher, author affiliations, dates)",
-      "Identify the macro-level structure and main sections of academic papers",
-      "Distinguish the function of each section in an argumentative/analytical paper",
-      "Create a brief outline summarizing the structure of an academic text"
+      "Identify the macro-level structure (sections and their functions) of academic papers",
+      "Create micro-level outlines identifying topic sentences, supporting details, and transitions",
+      "Understand how outlining skills prepare you for writing summaries and syntheses"
     ],
     ciloLinks: ["CILO 1: Examine Academic Discourse"],
     keyConcepts: [
