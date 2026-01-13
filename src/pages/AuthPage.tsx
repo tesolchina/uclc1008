@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 // Store student ID in localStorage
 function setStoredStudentId(id: string): void {
@@ -161,21 +162,76 @@ export default function AuthPage() {
     }
   };
 
-  const handleStudentComplete = () => {
-    // Generate random 2-char suffix
+  const handleStudentComplete = async () => {
+    setError(null);
+    setIsSubmitting(true);
+    
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    const suffix = chars.charAt(Math.floor(Math.random() * chars.length)) + 
-                   chars.charAt(Math.floor(Math.random() * chars.length));
-    const uniqueId = `${lastFourDigits}-${firstInitial.toUpperCase()}${lastInitial.toUpperCase()}-${suffix}`;
+    const maxAttempts = 10;
     
-    // Save to localStorage
-    setStoredStudentId(uniqueId);
-    setSuccess(`Your ID is: ${uniqueId}`);
-    
-    // Redirect to home after a short delay
-    setTimeout(() => {
-      navigate('/');
-    }, 1500);
+    try {
+      let uniqueId = '';
+      let isUnique = false;
+      
+      // Try to generate a unique ID (up to maxAttempts)
+      for (let attempt = 0; attempt < maxAttempts && !isUnique; attempt++) {
+        const suffix = chars.charAt(Math.floor(Math.random() * chars.length)) + 
+                       chars.charAt(Math.floor(Math.random() * chars.length));
+        uniqueId = `${lastFourDigits}-${firstInitial.toUpperCase()}${lastInitial.toUpperCase()}-${suffix}`;
+        
+        // Check if this ID already exists in the database
+        const { data: existing, error: checkError } = await supabase
+          .from('students')
+          .select('student_id')
+          .eq('student_id', uniqueId)
+          .maybeSingle();
+        
+        if (checkError) {
+          console.error('Error checking student ID uniqueness:', checkError);
+          // Continue trying - don't fail on check errors
+        }
+        
+        if (!existing) {
+          isUnique = true;
+        }
+      }
+      
+      if (!isUnique) {
+        setError('Unable to generate a unique ID. Please try again or contact support.');
+        setIsSubmitting(false);
+        return;
+      }
+      
+      // Insert the new student record into the database
+      const { error: insertError } = await supabase
+        .from('students')
+        .insert({ student_id: uniqueId });
+      
+      if (insertError) {
+        // If insert fails due to uniqueness constraint, ask to retry
+        if (insertError.code === '23505') {
+          setError('This ID was just taken. Please try again.');
+          setIsSubmitting(false);
+          return;
+        }
+        console.error('Error registering student:', insertError);
+        // Still allow registration even if DB insert fails (fallback to local-only)
+      }
+      
+      // Save to localStorage
+      setStoredStudentId(uniqueId);
+      setSuccess(`Your ID is: ${uniqueId}`);
+      
+      // Redirect to home after a short delay
+      setTimeout(() => {
+        navigate('/');
+      }, 1500);
+    } catch (err) {
+      console.error('Student registration error:', err);
+      setError('An error occurred. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleStudentLogin = () => {
