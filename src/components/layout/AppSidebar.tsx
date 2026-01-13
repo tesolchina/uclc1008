@@ -83,7 +83,6 @@ export function AppSidebar() {
   // Build navigation items based on role
   const overviewItems = [
     { title: "Course overview", url: "/", icon: BookOpen },
-    { title: "My Progress", url: "/my-progress", icon: Target },
     { title: "Settings", url: "/settings", icon: Settings, showStatus: true },
   ];
 

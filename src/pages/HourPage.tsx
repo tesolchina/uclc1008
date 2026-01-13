@@ -3,7 +3,7 @@ import { getHourData } from "@/data/hourContent";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { CollapsibleSection } from "@/components/CollapsibleSection";
 import { ObjectiveTask } from "@/components/tasks/ObjectiveTask";
 import { WritingTask } from "@/components/tasks/WritingTask";
@@ -11,8 +11,9 @@ import { AskQuestionButton } from "@/components/tasks/AskQuestionButton";
 import { StudentLoginReminder } from "@/components/StudentLoginReminder";
 import { LectureOutline, useSectionProgress, generateSectionId } from "@/features/lecture-mode";
 import type { AgendaSectionEnhanced } from "@/features/lecture-mode";
-import { ArrowLeft, ArrowRight, Clock, Target, BookOpen, PenLine, CheckCircle2, Lightbulb, FileText, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Clock, Target, BookOpen, PenLine, CheckCircle2, Lightbulb, FileText, Sparkles, ExternalLink, AlertCircle, Calendar, GraduationCap } from "lucide-react";
 import { useState, useMemo, useCallback } from "react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function HourPage() {
   const { weekId, hourId } = useParams();
@@ -118,6 +119,119 @@ export default function HourPage() {
             {/* Behaviour Change Goal - Now in outline sidebar */}
           </div>
         </section>
+
+        {/* Week 1 Hour 1: Course Introduction Section */}
+        {weekNumber === 1 && hourNumber === 1 && (
+          <section className="space-y-4">
+            {/* Course Docs Card */}
+            <Card className="border-2 border-primary/30 bg-primary/5">
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <GraduationCap className="h-5 w-5 text-primary" />
+                  <CardTitle className="text-lg">Welcome to UE1 - Course Introduction</CardTitle>
+                </div>
+                <CardDescription>
+                  Let's start by reviewing the key course documents and understanding what's ahead
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <Button variant="outline" className="justify-start h-auto py-3" asChild>
+                    <a 
+                      href="https://buelearning.hkbu.edu.hk/mod/resource/view.php?id=1894083" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2"
+                    >
+                      <FileText className="h-4 w-4 text-primary" />
+                      <div className="text-left">
+                        <div className="font-medium">Course Info Sheet</div>
+                        <div className="text-xs text-muted-foreground">Official course document</div>
+                      </div>
+                      <ExternalLink className="h-3 w-3 ml-auto" />
+                    </a>
+                  </Button>
+                  <Button variant="outline" className="justify-start h-auto py-3" asChild>
+                    <Link to="/" className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-primary" />
+                      <div className="text-left">
+                        <div className="font-medium">Course Overview</div>
+                        <div className="text-xs text-muted-foreground">Schedule & CILOs</div>
+                      </div>
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Week 6 Milestone Highlight */}
+            <Alert className="border-amber-500/50 bg-amber-500/5">
+              <AlertCircle className="h-4 w-4 text-amber-600" />
+              <AlertTitle className="text-amber-800 dark:text-amber-300">Key Milestone: Week 6 - Academic Writing Quiz (15%)</AlertTitle>
+              <AlertDescription className="text-sm text-amber-700 dark:text-amber-400 space-y-2">
+                <p>
+                  Everything before Week 6 prepares you for the <strong>Academic Writing Quiz</strong> — an in-class test 
+                  where you'll summarise and synthesise two journal article excerpts in 300 words.
+                </p>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  <Badge variant="outline" className="border-amber-500/50 text-amber-700 dark:text-amber-300">50 minutes</Badge>
+                  <Badge variant="outline" className="border-amber-500/50 text-amber-700 dark:text-amber-300">In-class</Badge>
+                  <Badge variant="outline" className="border-amber-500/50 text-amber-700 dark:text-amber-300">CILOs 1, 2, 3</Badge>
+                </div>
+              </AlertDescription>
+            </Alert>
+
+            {/* Pre-course Writing Assignment Card */}
+            <Card className="border-2 border-blue-500/30 bg-blue-500/5">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <PenLine className="h-5 w-5 text-blue-600" />
+                    <CardTitle className="text-base">Pre-course Writing (2.5%)</CardTitle>
+                  </div>
+                  <Badge className="bg-blue-500 text-white">Due: 23 Jan, 6pm</Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  Your first assignment! Write a 350-word essay based on a provided article excerpt. 
+                  You can get <strong>full credit</strong> as long as the similarity rate and AI detection rate are not too high.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Badge variant="outline" className="text-xs">350 words max</Badge>
+                  <Badge variant="outline" className="text-xs">Submit on Moodle</Badge>
+                  <Badge variant="outline" className="text-xs text-red-600 border-red-500/50">No late submissions</Badge>
+                </div>
+                <div className="pt-2">
+                  <Button size="sm" asChild>
+                    <Link to="/week/1/assignment/pre-course-writing" className="flex items-center gap-2">
+                      View Assignment Details
+                      <ArrowRight className="h-3 w-3" />
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* What to do discussion prompt */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Target className="h-4 w-4 text-primary" />
+                  Getting Things Done (GTD) - Let's Plan
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm text-muted-foreground">
+                <p>Before we dive into Module 1, let's think about how to approach the Pre-course Writing:</p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li><strong>Set aside time:</strong> How much time will this take? When will you do it?</li>
+                  <li><strong>Understand the purpose:</strong> What skills is this assignment testing?</li>
+                  <li><strong>Read the rubric:</strong> What do you need to do to get full marks?</li>
+                </ul>
+              </CardContent>
+            </Card>
+          </section>
+        )}
 
         {/* Mobile: Lecture Outline (collapsible) */}
         <div className="lg:hidden">
