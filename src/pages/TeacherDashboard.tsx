@@ -29,9 +29,20 @@ interface StudentQuestion {
   created_at: string;
 }
 
+interface StudentResponse {
+  id: string;
+  student_id: string;
+  task_id: string;
+  response: string;
+  is_correct: boolean | null;
+  ai_feedback: string | null;
+  submitted_at: string;
+}
+
 export default function TeacherDashboard() {
   const { user, isTeacher, isAdmin } = useAuth();
   const [questions, setQuestions] = useState<StudentQuestion[]>([]);
+  const [studentResponses, setStudentResponses] = useState<StudentResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [responding, setResponding] = useState<string | null>(null);
   const [responseText, setResponseText] = useState<Record<string, string>>({});
@@ -46,9 +57,18 @@ export default function TeacherDashboard() {
 
       if (error) throw error;
       setQuestions(data || []);
+      
+      // Fetch student responses
+      const { data: responsesData } = await supabase
+        .from("student_task_responses")
+        .select("*")
+        .order("submitted_at", { ascending: false })
+        .limit(100);
+      
+      if (responsesData) setStudentResponses(responsesData);
     } catch (err) {
-      console.error("Error fetching questions:", err);
-      toast.error("Failed to load questions");
+      console.error("Error fetching data:", err);
+      toast.error("Failed to load data");
     } finally {
       setLoading(false);
     }
@@ -201,6 +221,10 @@ export default function TeacherDashboard() {
             <CheckCircle2 className="h-4 w-4" />
             Answered ({answeredQuestions.length})
           </TabsTrigger>
+          <TabsTrigger value="responses" className="gap-1">
+            <MessageCircle className="h-4 w-4" />
+            Student Work ({studentResponses.length})
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="pending" className="space-y-4">
@@ -298,6 +322,45 @@ export default function TeacherDashboard() {
                     <div className="p-3 bg-primary/5 rounded-lg">
                       <p className="text-xs font-medium text-primary mb-1">Your Response:</p>
                       <p className="text-sm">{q.teacher_response}</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </TabsContent>
+
+        <TabsContent value="responses" className="space-y-4">
+          {studentResponses.length === 0 ? (
+            <Card>
+              <CardContent className="py-8 text-center text-muted-foreground">
+                <MessageCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <p>No student work submitted yet</p>
+              </CardContent>
+            </Card>
+          ) : (
+            studentResponses.map(r => (
+              <Card key={r.id}>
+                <CardContent className="pt-4 space-y-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="space-y-1 flex-1">
+                      <p className="text-xs text-muted-foreground">Student: {r.student_id} • Task: {r.task_id}</p>
+                      <p className="text-sm">{r.response}</p>
+                    </div>
+                    <Badge 
+                      variant={r.is_correct ? "default" : r.is_correct === false ? "destructive" : "secondary"}
+                      className="shrink-0"
+                    >
+                      {r.is_correct ? "Correct" : r.is_correct === false ? "Incorrect" : "Written"}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Submitted: {new Date(r.submitted_at).toLocaleString()}
+                  </p>
+                  {r.ai_feedback && (
+                    <div className="p-3 bg-blue-500/10 rounded-lg">
+                      <p className="text-xs font-medium text-blue-700 mb-1">AI Feedback Given:</p>
+                      <p className="text-sm text-muted-foreground">{r.ai_feedback}</p>
                     </div>
                   )}
                 </CardContent>

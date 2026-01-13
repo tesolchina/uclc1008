@@ -42,14 +42,14 @@ const courseSchedule = [
   {
     week: 1,
     dates: "12-16 Jan",
-    activities: "Course Introduction • Module 1: Components of Academic Journal Articles",
+    activities: "Course Introduction • Components of Academic Journal Articles",
     assignments: "Flipped Classroom Videos: In-text Citations, Reference List, Secondary Citations",
     highlight: false,
   },
   {
     week: 2,
     dates: "19-23 Jan",
-    activities: "Module 1 • Module 2: Summarising, Paraphrasing & Synthesising Skills",
+    activities: "Summarising, Paraphrasing & Synthesising Skills",
     assignments: "Pre-course Writing (2.5%) [Due: 23 Jan, 6pm]",
     highlight: true,
     highlightType: "assignment",
@@ -58,7 +58,7 @@ const courseSchedule = [
   {
     week: 3,
     dates: "26-30 Jan",
-    activities: "Module 2: Summarising, Paraphrasing & Synthesising Skills",
+    activities: "Summarising, Paraphrasing & Synthesising Skills",
     assignments: "Referencing Quiz (2.5%) [Due: 30 Jan, 6pm]",
     highlight: true,
     highlightType: "assignment",
