@@ -626,41 +626,42 @@ export const week1Hours: HourData[] = [
       ]
     }
   },
+  // ============ WEEK 1 HOUR 3: PRACTICE, FEEDBACK & REFLECTION ============
+  // NOTE: Content subject to revision based on learning progress
   {
     weekNumber: 1,
     hourNumber: 3,
     title: "Practice, Feedback & Reflection",
-    theme: "Consolidate Week 1 Skills with Guided Practice",
-    behaviourChange: "Before each study session: Review → Practice → Get Feedback → Reflect on what to improve.",
+    theme: "Consolidate Week 1 Skills Through Guided Practice",
+    behaviourChange: "Learning cycle: Practice → AI Feedback → Peer Discussion → Teacher Review → Reflect.",
     learningGoals: [
-      "Consolidate skimming and scanning skills from Hour 1",
-      "Apply paraphrasing strategies practiced in Hour 2",
-      "Receive AI and peer feedback on practice attempts",
-      "Reflect on progress and identify areas for improvement",
-      "Catch up on any incomplete tasks from Hours 1 and 2"
+      "Consolidate skimming, scanning, and paraphrasing skills from Hours 1-2",
+      "Receive multi-source feedback: AI, peers, and teacher",
+      "Identify personal strengths and areas for improvement",
+      "Develop reflective learning habits for continuous growth"
     ],
-    ciloLinks: ["CILO 1: Examine Academic Discourse", "CILO 3: Academic Conventions", "CILO 4: Accuracy"],
+    ciloLinks: ["CILO 1: Examine Academic Discourse", "CILO 3: Academic Conventions", "CILO 5: Self-Directed Learning"],
     keyConcepts: [
       {
         term: "Deliberate Practice",
         definition: "Focused, purposeful practice with clear goals and immediate feedback — the key to skill development.",
-        example: "Instead of reading passively, set a goal: 'I will identify 3 topic sentences in this excerpt and check my answers.'",
+        example: "Instead of reading passively, set a goal: 'I will identify 3 topic sentences and check my answers.'",
         tip: "Practice with intention. Ask: What am I trying to improve? How will I know if I succeeded?"
       },
       {
-        term: "Feedback Loop",
-        definition: "The cycle of Practice → Feedback → Adjust → Practice Again that accelerates learning.",
-        example: "Write a paraphrase → Get AI feedback → Identify what to change → Try again with improvements.",
-        tip: "Don't just practice — practice, get feedback, and adjust. Each cycle builds skill."
+        term: "Multi-Source Feedback",
+        definition: "Getting feedback from different sources: AI (immediate), peers (collaborative), teacher (expert).",
+        example: "AI catches technical errors → Peers share strategies → Teacher addresses deeper issues.",
+        tip: "Each feedback source offers different insights. Value all three!"
       },
       {
-        term: "Self-Assessment",
-        definition: "Evaluating your own work against criteria before seeking external feedback.",
-        example: "Before submitting: 'Did I use 2+ strategies? Is the structure different? Did I include a citation?'",
-        tip: "Use checklists. They help you catch errors before the teacher does!"
+        term: "Performance Summary",
+        definition: "An overview of your practice attempts showing patterns, common errors, and progress.",
+        example: "Summary: 8/10 MC correct, common error: confusing skimming with scanning, strength: paraphrasing strategies.",
+        tip: "Use summaries to identify what to focus on, not just what score you got."
       },
       {
-        term: "Reflection",
+        term: "Reflective Learning",
         definition: "Thinking about your learning process — what worked, what didn't, and what to do differently.",
         example: "'I struggled with word form changes. Next time, I'll practice verb→noun conversions first.'",
         tip: "Reflection turns experience into learning. Take 2 minutes to write down insights."
@@ -668,45 +669,51 @@ export const week1Hours: HourData[] = [
     ],
     articles: [ARTICLE_A, ARTICLE_B],
     agenda: [
+      // ============ PART A: PRACTICE ============
       { 
-        title: "Warm-Up: Quick Skills Review", 
-        duration: "10 min", 
-        activities: [
-          "Rapid-fire MC on skimming, scanning, paraphrasing",
-          "Self-check: What do I remember from Hours 1-2?",
-          "Identify areas that need more practice"
-        ] 
-      },
-      { 
-        title: "Paraphrasing Practice Station", 
+        title: "Part A: Practice Review & Extension", 
         duration: "20 min", 
         activities: [
-          "Choose a sentence from the articles",
-          "Apply 2+ paraphrasing strategies",
-          "Get AI feedback and revise",
-          "Compare with model answers"
+          "📊 View summary of your Hour 1-2 practice attempts",
+          "🔍 AI identifies common issues and patterns",
+          "🎯 Additional targeted practice on weak areas",
+          "💡 Get instant AI feedback on new attempts"
         ] 
       },
+      // ============ PART B: FEEDBACK ============
       { 
-        title: "Reading Skills Application", 
-        duration: "10 min", 
+        title: "Part B: Teacher & Peer Feedback", 
+        duration: "15 min", 
         activities: [
-          "Skim a new excerpt for main idea",
-          "Scan for specific information",
-          "Identify one topic sentence"
+          "👨‍🏫 [TEACHER]: Review individual student work samples",
+          "👨‍🏫 [TEACHER]: Provide targeted feedback on common class issues",
+          "👥 [PEER]: Exchange paraphrases with a partner",
+          "👥 [PEER]: Give feedback using the checklist provided"
         ] 
       },
+      // ============ PART C: REFLECTION ============
       { 
-        title: "Reflection & Goal Setting", 
-        duration: "10 min", 
+        title: "Part C: Reflection & Goal Setting", 
+        duration: "15 min", 
         activities: [
-          "Complete the reflection questions",
-          "Set 1-2 specific goals for Week 2",
-          "Catch up on incomplete Hour 1-2 tasks"
+          "📝 Reflect on feedback from AI, peers, and teacher",
+          "🤔 What did each feedback source teach you?",
+          "📈 Self-assess confidence on Week 1 skills",
+          "🎯 Set specific, measurable goals for Week 2"
         ] 
       }
     ],
     tasks: [
+      // ============ PART A: PRACTICE TASKS ============
+      {
+        id: "w1h3-practice-summary",
+        type: "short-answer",
+        question: "📊 PRACTICE SUMMARY (AI-generated)\n\n[PLACEHOLDER: This section will display a summary of the student's Hour 1-2 practice attempts, including:\n- Tasks completed vs. attempted\n- Common error patterns identified\n- Skills demonstrated vs. needs improvement\n- Recommended focus areas]\n\nBased on your practice summary, what is ONE skill you want to improve today?",
+        wordLimit: 30,
+        hints: ["Be specific — 'paraphrasing' is too vague", "Good: 'I want to improve word form changes'"],
+        skillFocus: ["self-assessment"],
+        modelAnswer: "I want to improve my ability to change sentence structure when paraphrasing, as most of my attempts kept the same word order as the original."
+      },
       {
         id: "w1h3-mc1",
         type: "mc",
@@ -736,85 +743,80 @@ export const week1Hours: HourData[] = [
         skillFocus: ["review", "paraphrasing"]
       },
       {
-        id: "w1h3-mc3",
-        type: "mc",
-        question: "Quick Review: For 3+ authors in APA 7th, use:",
-        options: [
-          "All author names every time (Hong, Li, Kuo & An, 2022)",
-          "'et al.' from the first citation (Hong et al., 2022)",
-          "'et al.' only after the first citation",
-          "Just the first author's name (Hong, 2022)"
-        ],
-        correctAnswer: 1,
-        explanation: "APA 7th changed from APA 6th! Now use 'et al.' from the FIRST citation for 3+ authors.",
-        skillFocus: ["review", "citation"]
-      },
-      {
-        id: "w1h3-tf1",
-        type: "true-false",
-        question: "You can paraphrase effectively by only changing synonyms (keeping the same sentence structure).",
-        correctAnswer: "false",
-        explanation: "FALSE! You must change BOTH words AND structure. Only changing synonyms = patchwriting = plagiarism.",
-        skillFocus: ["review", "paraphrasing"]
-      },
-      {
-        id: "w1h3-mc4",
-        type: "mc",
-        question: "Practice: Which paraphrasing strategies are used in this example?\n\nOriginal: 'Schools are implementing facial recognition systems.'\nParaphrase: 'The implementation of facial identification technology is occurring in educational institutions.'",
-        options: [
-          "Synonym replacement only",
-          "Synonym replacement + word form change (verb→noun)",
-          "Active to passive voice only",
-          "Sentence structure change only"
-        ],
-        correctAnswer: 1,
-        explanation: "Multiple strategies: 'implementing'→'implementation' (word form), 'facial recognition'→'facial identification' (synonym), 'schools'→'educational institutions' (synonym).",
-        skillFocus: ["paraphrasing"]
-      },
-      {
-        id: "w1h3-sentence1",
-        type: "sentence",
-        question: "What is ONE thing you found challenging in Hour 1 or Hour 2? Write a specific example.",
-        wordLimit: 50,
-        hints: ["Be specific — 'paraphrasing' is too vague", "Good: 'I struggled to change sentence structure while keeping meaning'"],
-        skillFocus: ["reflection"],
-        modelAnswer: "I found it challenging to identify which parts of my paraphrase were still too close to the original. I need to practice comparing my version with the source more carefully."
-      },
-      {
-        id: "w1h3-paragraph1",
+        id: "w1h3-practice1",
         type: "paragraph",
-        question: "Paraphrase Practice: Rewrite this sentence using at least 2 strategies, then explain which strategies you used.\n\n'Facial recognition technologies work by assigning numerical values to schematic representations of facial features.' (Andrejevic & Selwyn, 2020)",
-        wordLimit: 80,
+        question: "🎯 TARGETED PRACTICE\n\nParaphrase this sentence using at least 2 strategies. The AI will provide feedback.\n\n'Facial recognition technologies work by assigning numerical values to schematic representations of facial features.' (Andrejevic & Selwyn, 2020)",
+        wordLimit: 60,
         hints: [
           "Try: word form changes (assigning→assignment, work→function)",
           "Try: passive voice (are assigned)",
           "Try: synonyms (numerical→numeric, features→characteristics)"
         ],
         skillFocus: ["paraphrasing", "citation"],
-        modelAnswer: "According to Andrejevic and Selwyn (2020), facial identification systems function through the assignment of numeric values to simplified representations of facial characteristics.\n\nStrategies used: (1) word form change: 'work'→'function', 'assigning'→'assignment'; (2) synonyms: 'technologies'→'systems', 'features'→'characteristics'."
+        modelAnswer: "According to Andrejevic and Selwyn (2020), facial identification systems function through the assignment of numeric values to simplified representations of facial characteristics."
+      },
+      
+      // ============ PART B: FEEDBACK TASKS ============
+      {
+        id: "w1h3-teacher-instructions",
+        type: "short-answer",
+        question: "👨‍🏫 TEACHER FEEDBACK SECTION\n\n[INSTRUCTIONS FOR TEACHER]:\n1. Access the class dashboard to view student work samples\n2. Identify 2-3 common issues across the class\n3. Share screen and discuss these issues with examples\n4. Provide individual written feedback on flagged submissions\n\n[FOR STUDENTS]: Write down ONE piece of feedback your teacher shared with the class.",
+        wordLimit: 50,
+        hints: ["Listen carefully to the teacher's feedback", "Focus on feedback relevant to your own work"],
+        skillFocus: ["feedback-reception"],
+        modelAnswer: "The teacher noted that many students are still keeping the same sentence structure when paraphrasing, which counts as patchwriting. We need to change both words AND structure."
       },
       {
-        id: "w1h3-paragraph2",
+        id: "w1h3-peer-feedback",
         type: "paragraph",
-        question: "Reflection: Based on your practice today, write 2-3 sentences about:\n1. What skill improved the most?\n2. What do you still need to work on?\n3. One specific goal for Week 2.",
-        wordLimit: 100,
+        question: "👥 PEER FEEDBACK ACTIVITY\n\n1. Exchange your paraphrase from the practice task with a partner\n2. Use this checklist to give feedback:\n   ✓ Are 2+ strategies used?\n   ✓ Is the structure genuinely different?\n   ✓ Is the meaning preserved?\n   ✓ Is the citation correct?\n\nWrite the feedback you received from your peer AND one thing you learned from reading their paraphrase.",
+        wordLimit: 80,
+        hints: ["Be specific about what worked and what could improve", "Learn from how your peer approached the task"],
+        skillFocus: ["peer-feedback", "collaborative-learning"],
+        modelAnswer: "My peer said my paraphrase used good synonyms but kept a similar structure to the original. They suggested I try starting with a different part of the sentence. From their paraphrase, I learned that changing 'work by assigning' to 'function through the assignment of' is a useful word form change I hadn't thought of."
+      },
+      
+      // ============ PART C: REFLECTION TASKS ============
+      {
+        id: "w1h3-reflection-sources",
+        type: "paragraph",
+        question: "🤔 REFLECTION: Learning from Multiple Sources\n\nReflect on the feedback you received today:\n\n1. What did you learn from AI feedback?\n2. What did you learn from peer feedback?\n3. What did you learn from teacher feedback?\n4. Which source was most helpful for you? Why?",
+        wordLimit: 120,
         hints: [
-          "Be specific and honest",
-          "A good goal is measurable: 'I will practice 3 paraphrases with AI feedback'"
+          "Each source offers different insights",
+          "AI: immediate, technical | Peer: strategies, comparison | Teacher: expert, deeper issues"
         ],
-        skillFocus: ["reflection", "goal-setting"],
-        modelAnswer: "Today I improved at identifying patchwriting — I can now spot when changes are too minor. I still need to work on using word form changes more naturally. My goal for Week 2 is to complete at least 5 paraphrasing exercises using the AI coach and focus on verb→noun transformations."
+        skillFocus: ["reflection", "metacognition"],
+        modelAnswer: "From AI feedback, I learned that my paraphrase was still 65% similar to the original — too close. From my peer, I learned a new strategy: changing verb→noun word forms. From the teacher, I understood WHY patchwriting is problematic — it shows I didn't truly understand the idea. The teacher feedback was most helpful because it explained the reasoning, not just the error."
+      },
+      {
+        id: "w1h3-confidence-rating",
+        type: "paragraph",
+        question: "📈 SELF-ASSESSMENT\n\nRate your confidence (1-5) on each Week 1 skill:\n\n- Skimming (finding main idea quickly): __/5\n- Scanning (finding specific info): __/5\n- Identifying IMRaD structure: __/5\n- Paraphrasing (2+ strategies): __/5\n- APA in-text citations: __/5\n\nExplain your LOWEST rating — what makes this skill challenging?",
+        wordLimit: 100,
+        hints: ["Be honest — low ratings help you know where to focus", "Explain WHY it's challenging, not just that it is"],
+        skillFocus: ["self-assessment"],
+        modelAnswer: "Skimming: 4/5, Scanning: 4/5, IMRaD: 3/5, Paraphrasing: 2/5, Citations: 3/5.\n\nMy lowest is paraphrasing (2/5). I find it challenging because when I try to change the structure, I sometimes change the meaning too. I also struggle to think of synonyms quickly. I need more practice separating 'understanding the idea' from 'writing it in my own words.'"
+      },
+      {
+        id: "w1h3-goal-setting",
+        type: "paragraph",
+        question: "🎯 GOAL SETTING FOR WEEK 2\n\nWrite ONE specific, measurable goal for next week.\n\nA good goal:\n✓ Is specific (not 'improve paraphrasing' but 'practice word form changes')\n✓ Is measurable (includes a number or clear outcome)\n✓ Is achievable in one week\n\nExample: 'I will complete 5 paraphrasing exercises with AI feedback, focusing on verb→noun changes.'",
+        wordLimit: 60,
+        hints: ["Include a number or measurable outcome", "Focus on your weakest skill from the self-assessment"],
+        skillFocus: ["goal-setting"],
+        modelAnswer: "My goal for Week 2: Before each class, I will practice paraphrasing one sentence from the readings using all 4 strategies (synonyms, word forms, voice, structure) and check with the AI coach until I get below 40% similarity."
       }
     ],
     writingTask: {
-      prompt: "Final Reflection & Goal Setting:\n\n1. Rate your confidence (1-5) on each Week 1 skill:\n   - Skimming: __/5\n   - Scanning: __/5\n   - Paraphrasing: __/5\n   - APA Citations: __/5\n\n2. What was your biggest 'aha moment' this week?\n\n3. Write ONE specific, measurable goal for Week 2.",
+      prompt: "FINAL REFLECTION: Week 1 Learning Journey\n\nWrite a short reflection (100-150 words) addressing:\n\n1. What was your biggest 'aha moment' this week?\n2. How did feedback from AI, peers, and teacher each contribute to your learning?\n3. What specific action will you take to prepare for the Academic Writing Quiz?",
       wordLimit: 150,
-      modelAnswer: "Confidence ratings:\n- Skimming: 4/5 (I can quickly find main ideas)\n- Scanning: 4/5 (I can locate specific info)\n- Paraphrasing: 3/5 (Need more practice with strategies)\n- APA Citations: 3/5 (Sometimes confused about et al.)\n\nMy biggest 'aha moment' was realizing that patchwriting is still plagiarism even with a citation. I used to think changing a few words was enough.\n\nGoal for Week 2: Practice paraphrasing 3 sentences per day using the AI coach, focusing on word form changes. By Friday, I want to paraphrase without any 'too similar' warnings.",
+      modelAnswer: "My biggest 'aha moment' was realizing that patchwriting is still plagiarism even with a citation — I used to think changing a few words was enough. The AI feedback showed me exactly how similar my paraphrases were to the original (65%!), which was eye-opening. My peer showed me new strategies I hadn't considered, like starting sentences with different elements. The teacher explained the deeper 'why' — that genuine paraphrasing proves you understood the idea.\n\nTo prepare for the AWQ, I will practice paraphrasing one sentence per day using the AI coach, aiming for <40% similarity. I'll focus on word form changes since that's my weakest strategy.",
       rubricCriteria: [
-        "Honest self-assessment with specific ratings",
-        "Identifies a clear 'aha moment' or insight",
-        "Goal is specific and measurable",
-        "Shows understanding of Week 1 concepts"
+        "Identifies a specific 'aha moment' or insight",
+        "Reflects on value of each feedback source (AI, peer, teacher)",
+        "Sets a specific, actionable preparation step",
+        "Shows genuine reflection, not generic statements"
       ]
     }
   }
@@ -1270,17 +1272,19 @@ export const week2Hours: HourData[] = [
       ]
     }
   },
+  // ============ WEEK 2 HOUR 3: PRACTICE, FEEDBACK & REFLECTION ============
+  // NOTE: Content subject to revision based on learning progress
   {
     weekNumber: 2,
     hourNumber: 3,
     title: "Practice, Feedback & Reflection",
-    theme: "Consolidating Citation Skills",
-    behaviourChange: "Before submitting any assignment, use a checklist to verify BOTH in-text AND reference list citations.",
+    theme: "Consolidating Citation Skills Through Guided Practice",
+    behaviourChange: "Learning cycle: Practice → AI Feedback → Peer Discussion → Teacher Review → Reflect.",
     learningGoals: [
-      "Apply in-text citation skills in integrated practice",
-      "Construct reference entries from scratch",
-      "Identify and correct citation errors",
-      "Reflect on learning and set goals for Week 3"
+      "Consolidate in-text and end-of-text citation skills from Hours 1-2",
+      "Receive multi-source feedback: AI, peers, and teacher",
+      "Identify personal strengths and areas for improvement",
+      "Develop reflective learning habits for continuous growth"
     ],
     ciloLinks: ["CILO 2: Citation Conventions", "CILO 5: Self-Directed Learning"],
     keyConcepts: [
@@ -1291,64 +1295,71 @@ export const week2Hours: HourData[] = [
         tip: "Create your own checklist based on your common errors."
       },
       {
-        term: "Common In-Text Errors",
-        definition: "Frequent mistakes in in-text citations that lose marks.",
-        example: "✗ Hong et al (2022) — missing period | ✗ (Hong and Selwyn, 2020) — 'and' inside parentheses | ✗ Hong, et al., (2022) — extra commas",
-        tip: "Most errors are punctuation-related. Read citations character by character."
+        term: "Multi-Source Feedback",
+        definition: "Getting feedback from different sources: AI (immediate), peers (collaborative), teacher (expert).",
+        example: "AI catches formatting errors → Peers share strategies → Teacher addresses deeper issues.",
+        tip: "Each feedback source offers different insights. Value all three!"
       },
       {
-        term: "Common Reference Errors",
-        definition: "Frequent mistakes in reference list entries.",
-        example: "✗ Title Case for article titles | ✗ 'Retrieved from' before URL | ✗ 'and' instead of '&' | ✗ Missing DOI",
-        tip: "Use a reference generator, then ALWAYS double-check the output."
+        term: "Performance Summary",
+        definition: "An overview of your practice attempts showing patterns, common errors, and progress.",
+        example: "Summary: 7/10 MC correct, common error: '&' vs 'and' rule, strength: reference formatting.",
+        tip: "Use summaries to identify what to focus on, not just what score you got."
       },
       {
-        term: "Self-Assessment",
-        definition: "Evaluating your own work against criteria before seeking feedback.",
-        example: "Before submitting: 'Did I use varied citation styles? Are all my references formatted correctly?'",
-        tip: "Catching your own errors is a valuable academic skill."
+        term: "Reflective Learning",
+        definition: "Thinking about your learning process — what worked, what didn't, and what to do differently.",
+        example: "'I kept confusing sentence case with Title Case. I'll make a visual reminder.'",
+        tip: "Reflection turns experience into learning. Take 2 minutes to write down insights."
       }
     ],
     articles: [ARTICLE_A, ARTICLE_B],
     agenda: [
+      // ============ PART A: PRACTICE ============
       { 
-        title: "Warm-Up: Quick Citation Review", 
-        duration: "10 min", 
+        title: "Part A: Practice Review & Extension", 
+        duration: "20 min", 
         activities: [
-          "Rapid-fire MC on in-text citation rules",
-          "Quick check on reference formatting",
-          "Identify areas needing practice"
+          "📊 View summary of your Hour 1-2 practice attempts",
+          "🔍 AI identifies common citation errors and patterns",
+          "🎯 Additional targeted practice on weak areas",
+          "💡 Get instant AI feedback on new citation attempts"
         ] 
       },
+      // ============ PART B: FEEDBACK ============
       { 
-        title: "Integrated Citation Practice", 
+        title: "Part B: Teacher & Peer Feedback", 
         duration: "15 min", 
         activities: [
-          "Write sentences with in-text citations",
-          "Build matching reference entries",
-          "Get AI feedback and revise"
+          "👨‍🏫 [TEACHER]: Review individual student citation work",
+          "👨‍🏫 [TEACHER]: Address common class citation issues",
+          "👥 [PEER]: Exchange reference entries with a partner",
+          "👥 [PEER]: Check each other's work using the citation checklist"
         ] 
       },
+      // ============ PART C: REFLECTION ============
       { 
-        title: "Error Detection Challenge", 
-        duration: "10 min", 
-        activities: [
-          "Find errors in sample citations",
-          "Fix common mistakes",
-          "Compare with correct versions"
-        ] 
-      },
-      { 
-        title: "Reflection & Goal Setting", 
+        title: "Part C: Reflection & Goal Setting", 
         duration: "15 min", 
         activities: [
-          "Complete the reflection questions",
-          "Self-assess citation confidence",
-          "Set specific goals for Week 3"
+          "📝 Reflect on feedback from AI, peers, and teacher",
+          "🤔 What did each feedback source teach you?",
+          "📈 Self-assess confidence on Week 2 citation skills",
+          "🎯 Set specific, measurable goals for Week 3"
         ] 
       }
     ],
     tasks: [
+      // ============ PART A: PRACTICE TASKS ============
+      {
+        id: "w2h3-practice-summary",
+        type: "short-answer",
+        question: "📊 PRACTICE SUMMARY (AI-generated)\n\n[PLACEHOLDER: This section will display a summary of the student's Hour 1-2 practice attempts, including:\n- In-text citation accuracy rate\n- Reference entry completeness\n- Common error patterns identified\n- Recommended focus areas]\n\nBased on your practice summary, what is ONE citation skill you want to improve today?",
+        wordLimit: 30,
+        hints: ["Be specific — 'citations' is too vague", "Good: 'I want to improve my DOI formatting'"],
+        skillFocus: ["self-assessment"],
+        modelAnswer: "I want to improve my reference list formatting, especially remembering to use sentence case for article titles and Title Case for journal names."
+      },
       {
         id: "w2h3-mc1",
         type: "mc",
@@ -1378,64 +1389,80 @@ export const week2Hours: HourData[] = [
         skillFocus: ["review", "apa-reference"]
       },
       {
-        id: "w2h3-mc3",
-        type: "mc",
-        question: "Find the error: 'According to Andrejevic & Selwyn (2020), FRT raises concerns.'",
-        options: [
-          "Should be 'Andrejevic and Selwyn' because names are in the sentence",
-          "Missing a comma after the year",
-          "Should be 'et al.' for two authors",
-          "No error — this is correct"
+        id: "w2h3-practice1",
+        type: "paragraph",
+        question: "🎯 TARGETED PRACTICE\n\nWrite a sentence with an in-text citation, then create the matching reference entry for this source:\n\nAuthors: Mark Andrejevic and Neil Selwyn\nYear: 2020\nTitle: Facial recognition technology in schools: Critical questions and concerns\nJournal: Learning, Media and Technology\nVolume: 15, Issue: 2, Pages: 115-128\nDOI: 10.1080/17439884.2019.1644806",
+        wordLimit: 150,
+        hints: [
+          "Choose author-prominent or information-prominent style",
+          "Remember: & vs and, sentence case vs Title Case",
+          "Include the DOI in https://doi.org/ format"
         ],
-        correctAnswer: 0,
-        explanation: "Use 'and' (not '&') when author names appear IN the sentence (outside parentheses). Correct: 'According to Andrejevic and Selwyn (2020)...'",
-        skillFocus: ["apa-citation"]
-      },
-      {
-        id: "w2h3-tf1",
-        type: "true-false",
-        question: "This reference is correct: 'Hong, X., Li, Y., Kuo, B., and An, S. (2022). Supporting Schools...'",
-        correctAnswer: "false",
-        explanation: "FALSE! Two errors: (1) Use '&' not 'and' before the last author, (2) Article title should be sentence case, not Title Case.",
-        skillFocus: ["review", "apa-reference"]
-      },
-      {
-        id: "w2h3-sentence1",
-        type: "sentence",
-        question: "Write ONE sentence using an information-prominent citation that summarizes Hong et al. (2022)'s finding about parental support for FRT.",
-        wordLimit: 30,
-        hints: ["Information-prominent: citation at the END in parentheses", "Focus on WHAT was found, not who found it"],
-        skillFocus: ["apa-citation"],
-        modelAnswer: "Chinese parents generally support the use of facial recognition systems in elementary schools despite some privacy concerns (Hong et al., 2022)."
-      },
-      {
-        id: "w2h3-paragraph1",
-        type: "paragraph",
-        question: "Error Correction: Fix ALL the errors in this citation and reference pair.\n\nIn-text: 'Hong et al (2022) argues that parents accept FRT.'\n\nReference: 'Hong, X., Li, Y., Kuo, B., and An, S. (2022). Supporting Schools To Use Face Recognition Systems. education and information technologies, 27(3).'",
-        wordLimit: 120,
-        hints: ["Check: period after 'al'", "Check: subject-verb agreement", "Check: '&' vs 'and'", "Check: capitalization", "Check: missing information"],
         skillFocus: ["apa-citation", "apa-reference"],
-        modelAnswer: "In-text errors: (1) Missing period: 'et al' → 'et al.' (2) Subject-verb agreement: 'argues' → 'argue' (et al. is plural).\n\nReference errors: (1) 'and' → '&' (2) Title Case → sentence case (3) Journal name needs Title Case (4) Missing page numbers and DOI.\n\nCorrected in-text: Hong et al. (2022) argue that parents accept FRT.\n\nCorrected reference: Hong, X., Li, Y., Kuo, B., & An, S. (2022). Supporting schools to use face recognition systems. Education and Information Technologies, 27(3), 3679-3696. https://doi.org/10.1007/s10639-022-10969-9"
+        modelAnswer: "In-text: Andrejevic and Selwyn (2020) argue that facial recognition technology raises significant concerns about student privacy in schools.\n\nReference: Andrejevic, M., & Selwyn, N. (2020). Facial recognition technology in schools: Critical questions and concerns. Learning, Media and Technology, 15(2), 115-128. https://doi.org/10.1080/17439884.2019.1644806"
+      },
+      
+      // ============ PART B: FEEDBACK TASKS ============
+      {
+        id: "w2h3-teacher-instructions",
+        type: "short-answer",
+        question: "👨‍🏫 TEACHER FEEDBACK SECTION\n\n[INSTRUCTIONS FOR TEACHER]:\n1. Access the class dashboard to view student citation attempts\n2. Identify 2-3 common citation errors across the class\n3. Share screen and demonstrate correct formatting\n4. Provide individual written feedback on flagged submissions\n\n[FOR STUDENTS]: Write down ONE piece of feedback your teacher shared about citation formatting.",
+        wordLimit: 50,
+        hints: ["Listen carefully to the teacher's feedback", "Focus on feedback relevant to your own errors"],
+        skillFocus: ["feedback-reception"],
+        modelAnswer: "The teacher pointed out that many of us are forgetting to italicize the journal name AND volume number in references. Only the issue number in parentheses should NOT be italicized."
       },
       {
-        id: "w2h3-paragraph2",
+        id: "w2h3-peer-feedback",
         type: "paragraph",
-        question: "Reflection: Based on your practice this week, answer:\n1. What citation skill do you feel most confident about?\n2. What still needs practice?\n3. What is ONE specific goal for improving your citation skills?",
+        question: "👥 PEER FEEDBACK ACTIVITY\n\n1. Exchange your reference entry from the practice task with a partner\n2. Use this checklist to check their work:\n   ✓ Authors: Last, Initial. format with '&'?\n   ✓ Title: Sentence case?\n   ✓ Journal: Title Case and italicized?\n   ✓ Volume: Italicized? Issue in parentheses?\n   ✓ DOI: https://doi.org/ format?\n\nWrite the feedback you received AND one error you caught in your peer's work.",
+        wordLimit: 80,
+        hints: ["Be specific about what was correct and what needs fixing", "Learning to spot errors in others' work helps you avoid them yourself"],
+        skillFocus: ["peer-feedback", "collaborative-learning"],
+        modelAnswer: "My peer found that I forgot to italicize the volume number — I only italicized the journal name. In their reference, I noticed they used 'and' instead of '&' before the last author. We both learned that these small details matter in APA formatting."
+      },
+      
+      // ============ PART C: REFLECTION TASKS ============
+      {
+        id: "w2h3-reflection-sources",
+        type: "paragraph",
+        question: "🤔 REFLECTION: Learning from Multiple Sources\n\nReflect on the feedback you received today:\n\n1. What did you learn from AI feedback?\n2. What did you learn from peer feedback?\n3. What did you learn from teacher feedback?\n4. Which source was most helpful for your citation skills? Why?",
+        wordLimit: 120,
+        hints: [
+          "Each source offers different insights",
+          "AI: immediate, technical | Peer: comparison, shared learning | Teacher: expert explanation"
+        ],
+        skillFocus: ["reflection", "metacognition"],
+        modelAnswer: "From AI feedback, I learned I was consistently missing the period after 'et al.' — a pattern I hadn't noticed. From my peer, I learned a memory trick: 'And is for sentences, Ampersand is for parentheses.' From the teacher, I understood WHY sentence case is used for titles — it's less emphasis than the journal name. The AI was most helpful because it caught errors I made repeatedly without realizing."
+      },
+      {
+        id: "w2h3-confidence-rating",
+        type: "paragraph",
+        question: "📈 SELF-ASSESSMENT\n\nRate your confidence (1-5) on each Week 2 skill:\n\n- Author-prominent citations: __/5\n- Information-prominent citations: __/5\n- '&' vs 'and' rule: __/5\n- 'et al.' formatting: __/5\n- Building reference entries: __/5\n- Matching in-text to references: __/5\n\nExplain your LOWEST rating — what makes this skill challenging?",
         wordLimit: 100,
-        hints: ["Be specific — 'citations' is too vague", "A good goal is measurable"],
-        skillFocus: ["reflection", "goal-setting"],
-        modelAnswer: "I feel most confident about distinguishing author-prominent from information-prominent citations — I can now switch between styles easily. I still need practice with reference list formatting, especially remembering which parts to italicize. My goal for next week is to practice building 3 reference entries from scratch and check them against the APA manual before looking at the answer."
+        hints: ["Be honest — low ratings help you know where to focus", "Explain WHY it's challenging, not just that it is"],
+        skillFocus: ["self-assessment"],
+        modelAnswer: "Author-prominent: 4/5, Information-prominent: 4/5, '&' vs 'and': 5/5, 'et al.': 4/5, Reference entries: 2/5, Matching: 3/5.\n\nMy lowest is building reference entries (2/5). I find it challenging because there are so many small formatting rules — what to italicize, where to put periods, sentence case vs Title Case. I need a checklist I can follow step by step."
+      },
+      {
+        id: "w2h3-goal-setting",
+        type: "paragraph",
+        question: "🎯 GOAL SETTING FOR WEEK 3\n\nWrite ONE specific, measurable goal for next week.\n\nA good goal:\n✓ Is specific (not 'improve citations' but 'master reference formatting')\n✓ Is measurable (includes a number or clear outcome)\n✓ Is achievable in one week\n\nExample: 'I will build 3 reference entries from scratch without looking at examples, then check against APA guidelines.'",
+        wordLimit: 60,
+        hints: ["Include a number or measurable outcome", "Focus on your weakest skill from the self-assessment"],
+        skillFocus: ["goal-setting"],
+        modelAnswer: "My goal for Week 3: Create a personal 'APA Reference Checklist' with the 6 key elements, then practice building one reference entry each day before class using the AI checker until I can do it without errors."
       }
     ],
     writingTask: {
-      prompt: "Final Reflection & Self-Assessment:\n\n1. Rate your confidence (1-5) on each Week 2 skill:\n   - Author-prominent citations: __/5\n   - Information-prominent citations: __/5\n   - '&' vs 'and' rule: __/5\n   - 'et al.' formatting: __/5\n   - Building reference entries: __/5\n\n2. What was your biggest 'aha moment' this week?\n\n3. Write ONE specific, measurable goal for Week 3.",
+      prompt: "FINAL REFLECTION: Week 2 Learning Journey\n\nWrite a short reflection (100-150 words) addressing:\n\n1. What was your biggest 'aha moment' about citations this week?\n2. How did feedback from AI, peers, and teacher each contribute to your learning?\n3. How will you use citation skills to prepare for the Academic Writing Quiz?",
       wordLimit: 150,
-      modelAnswer: "Confidence ratings:\n- Author-prominent citations: 4/5\n- Information-prominent citations: 4/5\n- '&' vs 'and' rule: 5/5 (easy to remember!)\n- 'et al.' formatting: 4/5\n- Building reference entries: 3/5 (still need practice)\n\nMy biggest 'aha moment' was realizing that article titles use sentence case but journal names use Title Case — I had been doing it wrong before.\n\nGoal for Week 3: Create a personal citation checklist with my common errors, and use it to check every citation before submitting the Academic Writing Quiz.",
+      modelAnswer: "My biggest 'aha moment' was realizing that article titles use sentence case but journal names use Title Case — I had been doing it backwards! The AI feedback instantly caught my formatting errors, which helped me see patterns I was missing. My peer taught me a memory trick for '&' vs 'and' that I'll never forget. The teacher explained the logic behind the rules, which makes them easier to remember.\n\nFor the AWQ, I'll create a citation checklist with all the rules I learned and use it to verify every citation before submitting. I'll also practice building reference entries using the AI checker until I can do it correctly without help.",
       rubricCriteria: [
-        "Honest self-assessment with specific ratings",
-        "Identifies a clear 'aha moment' or insight",
-        "Goal is specific and measurable",
-        "Shows understanding of Week 2 concepts"
+        "Identifies a specific 'aha moment' about citations",
+        "Reflects on value of each feedback source (AI, peer, teacher)",
+        "Connects citation skills to AWQ preparation",
+        "Shows genuine reflection, not generic statements"
       ]
     }
   }
