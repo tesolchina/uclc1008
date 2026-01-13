@@ -6,7 +6,7 @@ export const academicWritingQuiz: Assignment = {
   weight: "15%",
   dueWeek: 6,
   type: "in-class",
-  duration: "45-50 minutes",
+  duration: "60 minutes",
   description: "Analyse academic texts to summarise, synthesise, and paraphrase key information with proper citations and academic tone.",
   requirements: [
     "Summarise key information from provided academic texts",
@@ -17,11 +17,11 @@ export const academicWritingQuiz: Assignment = {
   ],
   skillsAssessed: ["summarising", "paraphrasing", "synthesising", "academic-tone", "apa-referencing"],
   detailedInfo: {
-    exactDueDate: "Week of 23-27 February 2026 (In-class)",
+    exactDueDate: "Week 6 (23-27 February 2026) - Exact date TBA",
     submissionMethod: "In-class written answer sheet",
     format: "Handwritten or typed answer sheet",
     wordLimit: "Maximum 300 words",
-    timeLimit: "50 minutes",
+    timeLimit: "60 minutes",
     gradingCriteria: [
       "Summary Accuracy (20%): Coverage of main ideas, precision, avoidance of misinterpretation",
       "Synthesis (20%): Connection of main ideas and relationships among ideas",

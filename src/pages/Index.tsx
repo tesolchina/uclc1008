@@ -81,7 +81,7 @@ const courseSchedule = [
   {
     week: 6,
     dates: "23-27 Feb",
-    activities: "In-class Academic Writing Quiz (15%) [50 mins]",
+    activities: "In-class Academic Writing Quiz (15%) [60 mins]",
     assignments: "",
     highlight: true,
     highlightType: "exam",
@@ -141,7 +141,7 @@ const assessments = [
     name: "Academic Writing Quiz",
     weight: "15%",
     type: "In-class",
-    timing: "Week 6 (23-27 Feb)",
+    timing: "Week 6 (23-27 Feb) - TBA",
     cilos: "1, 2, 3",
     description: "Students will summarise, paraphrase and synthesise the main claims or arguments from two academic journal excerpts in no more than 300 words, ensuring the use of academic tone and proper citations and references.",
     icon: PenLine,
@@ -282,6 +282,39 @@ const Index = () => {
             <li>Develop critical thinking, reading and writing skills for crafting well-structured academic essays</li>
             <li>Use reflection and self-assessment to become more independent readers and writers</li>
           </ol>
+        </CardContent>
+      </Card>
+
+      {/* Key Facts to Know */}
+      <Card className="border-green-500/30 bg-green-500/5">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <CheckCircle2 className="h-4 w-4 text-green-600" />
+            Key Facts to Know
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-3 sm:grid-cols-3">
+          <div className="flex items-start gap-3 p-3 rounded-lg bg-background/50">
+            <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+            <div>
+              <p className="font-medium text-sm">5 CILOs</p>
+              <p className="text-xs text-muted-foreground">Critical reading, argument evaluation, academic writing, speaking, and AI as learning partner</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3 p-3 rounded-lg bg-background/50">
+            <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+            <div>
+              <p className="font-medium text-sm">4 Modules</p>
+              <p className="text-xs text-muted-foreground">Academic Articles → Summarising/Paraphrasing → Argumentation → Critical Response</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3 p-3 rounded-lg bg-background/50">
+            <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+            <div>
+              <p className="font-medium text-sm">6 Assessments (100%)</p>
+              <p className="text-xs text-muted-foreground">Class Participation (15%), AWQ (15%), ACE Draft (15%), ACE Final (25%), CRAA (20%), Portfolio (10%)</p>
+            </div>
+          </div>
         </CardContent>
       </Card>
 

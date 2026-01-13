@@ -87,7 +87,7 @@ export default function HourPage() {
   const nextWeek = hourNumber === 3 && weekNumber < 5 ? weekNumber + 1 : null;
 
   return (
-    <div className="flex gap-6">
+    <div className="space-y-6">
       {/* Main Content */}
       <div className="flex-1 space-y-6 min-w-0">
         {/* Sign-in Reminder */}
@@ -115,32 +115,30 @@ export default function HourPage() {
             </div>
             <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{hourData.title}</h1>
             <p className="text-muted-foreground">{hourData.theme}</p>
-            
-            {/* Behaviour Change Goal - Now in outline sidebar */}
           </div>
         </section>
 
-        {/* Week 1 Hour 1: Course Introduction Section */}
+        {/* Week 1 Hour 1: Restructured Course Introduction with Skimming Practice */}
         {weekNumber === 1 && hourNumber === 1 && (
           <section className="space-y-4">
-            {/* Course Overview Link */}
+            {/* Part 1: Course Overview Link */}
             <Card className="border-2 border-primary/30 bg-primary/5">
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-2">
                   <GraduationCap className="h-5 w-5 text-primary" />
-                  <CardTitle className="text-lg">Welcome to UE1 - Course Introduction</CardTitle>
+                  <CardTitle className="text-lg">Part 1: Course Introduction</CardTitle>
                 </div>
                 <CardDescription>
-                  Let's start by reviewing the key course information
+                  Start by reviewing the key course information on our Course Overview page
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent>
                 <Button variant="default" className="w-full justify-start h-auto py-3" asChild>
                   <Link to="/" className="flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
                     <div className="text-left flex-1">
                       <div className="font-medium">View Course Overview</div>
-                      <div className="text-xs opacity-80">Full schedule, assessments, CILOs & policies</div>
+                      <div className="text-xs opacity-80">Key facts, schedule, assessments, CILOs & policies</div>
                     </div>
                     <ArrowRight className="h-4 w-4" />
                   </Link>
@@ -148,47 +146,237 @@ export default function HourPage() {
               </CardContent>
             </Card>
 
-            {/* Key Facts from Course Overview */}
-            <Card>
+            {/* Part 2: Skimming Technique Introduction */}
+            <Card className="border-2 border-green-500/30 bg-green-500/5">
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Target className="h-4 w-4 text-primary" />
-                  Key Facts to Know
-                </CardTitle>
+                <div className="flex items-center gap-2">
+                  <BookOpen className="h-5 w-5 text-green-600" />
+                  <CardTitle className="text-lg">Part 2: Introduction to Skimming</CardTitle>
+                </div>
+                <CardDescription>
+                  Learn how to quickly identify key information in academic texts
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid gap-3 text-sm">
-                  <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                    <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-                    <div>
-                      <p className="font-medium">5 CILOs (Course Intended Learning Outcomes)</p>
-                      <p className="text-xs text-muted-foreground">Critical reading, argument evaluation, academic writing, speaking, and AI as learning partner</p>
+                <div className="p-4 rounded-lg bg-background/80 space-y-3">
+                  <h4 className="font-medium flex items-center gap-2">
+                    <Lightbulb className="h-4 w-4 text-amber-500" />
+                    What is Skimming?
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    <strong>Skimming</strong> is a reading technique that allows you to quickly get the main idea and structure of a text 
+                    without reading every word. It's essential for academic reading when you need to evaluate many sources.
+                  </p>
+                  <div className="grid gap-2 text-sm">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                      <span>Read titles, headings, and subheadings</span>
                     </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                    <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-                    <div>
-                      <p className="font-medium">4 Modules covering different skills</p>
-                      <p className="text-xs text-muted-foreground">Academic Articles → Summarising/Paraphrasing → Argumentation → Critical Response</p>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                      <span>Look at the first and last sentences of paragraphs</span>
                     </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                    <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-                    <div>
-                      <p className="font-medium">6 Assessments totaling 100%</p>
-                      <p className="text-xs text-muted-foreground">Class Participation (15%), AWQ (15%), ACE Draft (15%), ACE Final (25%), CRAA (20%), Portfolio (10%)</p>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                      <span>Notice bold, italicized, or underlined text</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                      <span>Check the abstract and conclusion first</span>
                     </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Key Milestones */}
+            {/* Part 3: Practice with Real Academic Article */}
+            <Card className="border-2 border-blue-500/30 bg-blue-500/5">
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-blue-600" />
+                  <CardTitle className="text-lg">Part 3: Skimming Practice - Exploring an Academic Source</CardTitle>
+                </div>
+                <CardDescription>
+                  Practice skimming with a real academic article you'll use for Pre-course Writing
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="p-4 rounded-lg bg-background/80 border">
+                  <p className="text-xs text-muted-foreground mb-2">Source Article:</p>
+                  <p className="text-sm font-medium mb-2">
+                    Mark Andrejevic & Neil Selwyn (2020) Facial recognition technology in schools: critical questions and concerns, 
+                    <em> Learning, Media and Technology</em>, 45:2, 115-128
+                  </p>
+                  <p className="text-xs text-muted-foreground">DOI: 10.1080/17439884.2020.1686014</p>
+                </div>
+                
+                <Button className="w-full" variant="outline" asChild>
+                  <a 
+                    href="https://www.tandfonline.com/doi/full/10.1080/17439884.2020.1686014#d1e380" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    Open Article (Taylor & Francis Online)
+                  </a>
+                </Button>
+
+                <Alert className="bg-amber-500/10 border-amber-500/30">
+                  <AlertCircle className="h-4 w-4 text-amber-600" />
+                  <AlertTitle className="text-sm">Activity Instructions</AlertTitle>
+                  <AlertDescription className="text-xs">
+                    Open the article link above and <strong>skim</strong> the page (don't read everything!). 
+                    Answer the questions below to test your skimming skills.
+                  </AlertDescription>
+                </Alert>
+              </CardContent>
+            </Card>
+
+            {/* Quick Check MC Questions */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Target className="h-4 w-4 text-primary" />
+                  Quick Check: Source Exploration
+                </CardTitle>
+                <CardDescription>
+                  Answer these questions by skimming the article page (not reading the full text)
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Question 1 */}
+                <div className="p-4 rounded-lg bg-muted/30 space-y-2">
+                  <p className="font-medium text-sm">1. Who is the publisher of this article?</p>
+                  <div className="grid gap-2 text-sm">
+                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
+                      <input type="radio" name="q1" className="h-4 w-4" />
+                      <span>A) Elsevier</span>
+                    </label>
+                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
+                      <input type="radio" name="q1" className="h-4 w-4" />
+                      <span>B) Taylor & Francis</span>
+                    </label>
+                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
+                      <input type="radio" name="q1" className="h-4 w-4" />
+                      <span>C) Springer Nature</span>
+                    </label>
+                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
+                      <input type="radio" name="q1" className="h-4 w-4" />
+                      <span>D) SAGE Publications</span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Question 2 */}
+                <div className="p-4 rounded-lg bg-muted/30 space-y-2">
+                  <p className="font-medium text-sm">2. What is the journal name?</p>
+                  <div className="grid gap-2 text-sm">
+                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
+                      <input type="radio" name="q2" className="h-4 w-4" />
+                      <span>A) Educational Technology Research</span>
+                    </label>
+                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
+                      <input type="radio" name="q2" className="h-4 w-4" />
+                      <span>B) Learning, Media and Technology</span>
+                    </label>
+                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
+                      <input type="radio" name="q2" className="h-4 w-4" />
+                      <span>C) Computers & Education</span>
+                    </label>
+                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
+                      <input type="radio" name="q2" className="h-4 w-4" />
+                      <span>D) Journal of Digital Learning</span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Question 3 */}
+                <div className="p-4 rounded-lg bg-muted/30 space-y-2">
+                  <p className="font-medium text-sm">3. Which universities do the authors come from?</p>
+                  <div className="grid gap-2 text-sm">
+                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
+                      <input type="radio" name="q3" className="h-4 w-4" />
+                      <span>A) Harvard University & MIT</span>
+                    </label>
+                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
+                      <input type="radio" name="q3" className="h-4 w-4" />
+                      <span>B) Monash University (both authors)</span>
+                    </label>
+                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
+                      <input type="radio" name="q3" className="h-4 w-4" />
+                      <span>C) University of Melbourne & University of Sydney</span>
+                    </label>
+                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
+                      <input type="radio" name="q3" className="h-4 w-4" />
+                      <span>D) University of Oxford & Cambridge</span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Question 4 */}
+                <div className="p-4 rounded-lg bg-muted/30 space-y-2">
+                  <p className="font-medium text-sm">4. What are the main sections (overall structure) of this paper?</p>
+                  <div className="grid gap-2 text-sm">
+                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
+                      <input type="radio" name="q4" className="h-4 w-4" />
+                      <span>A) Abstract → Methods → Results → Discussion</span>
+                    </label>
+                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
+                      <input type="radio" name="q4" className="h-4 w-4" />
+                      <span>B) Introduction → Literature Review → Methodology → Findings → Conclusion</span>
+                    </label>
+                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
+                      <input type="radio" name="q4" className="h-4 w-4" />
+                      <span>C) Abstract → Introduction → Critical Questions/Concerns → Conclusion</span>
+                    </label>
+                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
+                      <input type="radio" name="q4" className="h-4 w-4" />
+                      <span>D) Summary → Analysis → Recommendations</span>
+                    </label>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Pre-course Writing Assignment Card */}
+            <Card className="border-2 border-blue-500/30 bg-blue-500/5">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <PenLine className="h-5 w-5 text-blue-600" />
+                    <CardTitle className="text-base">Pre-course Writing (2.5%)</CardTitle>
+                  </div>
+                  <Badge className="bg-blue-500 text-white">Due: 23 Jan, 6pm</Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  Now that you've explored the source, you're ready for the assignment! Write a 350-word essay based on the article excerpt.
+                  You can get <strong>full credit</strong> as long as the similarity rate and AI detection rate are not too high.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Badge variant="outline" className="text-xs">350 words max</Badge>
+                  <Badge variant="outline" className="text-xs">Submit on Moodle</Badge>
+                  <Badge variant="outline" className="text-xs text-red-600 border-red-500/50">No late submissions</Badge>
+                </div>
+                <div className="pt-2">
+                  <Button size="sm" asChild>
+                    <Link to="/week/1/assignment/pre-course-writing" className="flex items-center gap-2">
+                      View Assignment Details
+                      <ArrowRight className="h-3 w-3" />
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Key Milestones - Moved to end */}
             <Card className="border-amber-500/30 bg-amber-500/5">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
                   <AlertCircle className="h-4 w-4 text-amber-600" />
-                  Major In-Class Tests
+                  Major In-Class Tests (Mark Your Calendar!)
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -200,7 +388,7 @@ export default function HourPage() {
                     <PenLine className="h-4 w-4 text-amber-600" />
                     <div>
                       <p className="font-medium text-sm">Week 6: Academic Writing Quiz (15%)</p>
-                      <p className="text-xs text-muted-foreground">50 mins • Summarise & synthesise 2 excerpts → 300 words</p>
+                      <p className="text-xs text-muted-foreground">60 mins • Summarise & synthesise 2 excerpts → 300 words</p>
                     </div>
                   </div>
                   <ArrowRight className="h-4 w-4 text-amber-600" />
@@ -220,75 +408,8 @@ export default function HourPage() {
                 </Link>
               </CardContent>
             </Card>
-
-            {/* Pre-course Writing Assignment Card */}
-            <Card className="border-2 border-blue-500/30 bg-blue-500/5">
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <PenLine className="h-5 w-5 text-blue-600" />
-                    <CardTitle className="text-base">Pre-course Writing (2.5%)</CardTitle>
-                  </div>
-                  <Badge className="bg-blue-500 text-white">Due: 23 Jan, 6pm</Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <p className="text-sm text-muted-foreground">
-                  Your first assignment! Write a 350-word essay based on a provided article excerpt. 
-                  You can get <strong>full credit</strong> as long as the similarity rate and AI detection rate are not too high.
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  <Badge variant="outline" className="text-xs">350 words max</Badge>
-                  <Badge variant="outline" className="text-xs">Submit on Moodle</Badge>
-                  <Badge variant="outline" className="text-xs text-red-600 border-red-500/50">No late submissions</Badge>
-                </div>
-                <div className="pt-2">
-                  <Button size="sm" asChild>
-                    <Link to="/week/1/assignment/pre-course-writing" className="flex items-center gap-2">
-                      View Assignment Details
-                      <ArrowRight className="h-3 w-3" />
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* What to do discussion prompt */}
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-primary" />
-                  Getting Things Done (GTD) - Let's Plan
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <p>Before we dive into Module 1, let's think about how to approach the Pre-course Writing:</p>
-                <ul className="list-disc pl-5 space-y-1">
-                  <li><strong>Set aside time:</strong> How much time will this take? When will you do it?</li>
-                  <li><strong>Understand the purpose:</strong> What skills is this assignment testing?</li>
-                  <li><strong>Read the rubric:</strong> What do you need to do to get full marks?</li>
-                </ul>
-              </CardContent>
-            </Card>
           </section>
         )}
-
-        {/* Mobile: Lecture Outline (collapsible) */}
-        <div className="lg:hidden">
-          <LectureOutline
-            weekNumber={weekNumber}
-            hourNumber={hourNumber}
-            sections={sectionsWithIds}
-            currentIndex={currentSectionIndex}
-            completedIndices={completedSectionIndices}
-            isLive={false}
-            isTeacher={false}
-            onSectionClick={handleSectionClick}
-            behaviorGoal={hourData.behaviourChange}
-            sectionNotes={sectionNotes}
-            onNotesChange={user ? handleNotesChange : undefined}
-          />
-        </div>
 
         {/* Learning Goals */}
         <CollapsibleSection
@@ -497,25 +618,6 @@ export default function HourPage() {
           </div>
         </div>
       </div>
-
-      {/* Desktop: Sticky Lecture Outline Sidebar */}
-      <aside className="hidden lg:block w-80 shrink-0">
-        <div className="sticky top-6">
-          <LectureOutline
-            weekNumber={weekNumber}
-            hourNumber={hourNumber}
-            sections={sectionsWithIds}
-            currentIndex={currentSectionIndex}
-            completedIndices={completedSectionIndices}
-            isLive={false}
-            isTeacher={false}
-            onSectionClick={handleSectionClick}
-            behaviorGoal={hourData.behaviourChange}
-            sectionNotes={sectionNotes}
-            onNotesChange={user ? handleNotesChange : undefined}
-          />
-        </div>
-      </aside>
     </div>
   );
 }
