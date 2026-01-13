@@ -148,17 +148,14 @@ export default function HourPage() {
             </Card>
 
             {/* Part 2: Introduction to Skimming & Scanning + Practice */}
-            <Card className="border-2 border-green-500/30 bg-green-500/5">
-              <CardHeader className="pb-2">
-                <div className="flex items-center gap-2">
-                  <BookOpen className="h-5 w-5 text-green-600" />
-                  <CardTitle className="text-lg">Part 2: Skimming & Scanning</CardTitle>
-                </div>
-                <CardDescription>
-                  Learn essential reading techniques for academic texts, then practice with a real article
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            <CollapsibleSection
+              title="Part 2: Skimming & Scanning"
+              description="Learn essential reading techniques for academic texts, then practice with a real article"
+              icon={<BookOpen className="h-4 w-4 text-green-600" />}
+              defaultOpen={true}
+              className="border-2 border-green-500/30 bg-green-500/5"
+            >
+              <div className="space-y-4">
                 {/* Skimming Introduction */}
                 <div className="p-4 rounded-lg bg-background/80 space-y-3">
                   <h4 className="font-medium flex items-center gap-2">
@@ -166,7 +163,7 @@ export default function HourPage() {
                     What is Skimming?
                   </h4>
                   <p className="text-sm text-muted-foreground">
-                    <strong>Skimming</strong> is a reading technique that allows you to quickly get the main idea and structure of a text 
+                    <strong>Skimming</strong> is a reading technique that allows you to quickly get the <strong>main idea and overall structure</strong> of a text 
                     without reading every word. It's essential for academic reading when you need to evaluate many sources.
                   </p>
                   <div className="grid gap-2 text-sm">
@@ -196,7 +193,7 @@ export default function HourPage() {
                     What is Scanning?
                   </h4>
                   <p className="text-sm text-muted-foreground">
-                    <strong>Scanning</strong> is used to find specific information quickly. You move your eyes rapidly 
+                    <strong>Scanning</strong> is used to find <strong>specific information</strong> quickly. You move your eyes rapidly 
                     over text looking for particular words, numbers, or phrases.
                   </p>
                   <div className="grid gap-2 text-sm">
@@ -245,14 +242,14 @@ export default function HourPage() {
                   </Button>
                 </div>
 
-                {/* Quick Check Questions */}
+                {/* Scanning Tasks */}
                 <div className="space-y-3 pt-2">
                   <h4 className="font-medium text-sm flex items-center gap-2">
-                    <Target className="h-4 w-4 text-primary" />
-                    Quick Check: Source Exploration
+                    <Target className="h-4 w-4 text-blue-500" />
+                    Scanning Practice: Find Specific Information
                   </h4>
                   <p className="text-xs text-muted-foreground">
-                    Answer these questions by skimming/scanning the article page. Click an option to check your answer.
+                    Scan the article page to find these specific details. Don't read everything—just locate the information!
                   </p>
                   
                   <QuickCheckMC
@@ -293,9 +290,72 @@ export default function HourPage() {
                     correctAnswer="B"
                     explanation="Both Mark Andrejevic and Neil Selwyn are affiliated with Monash University in Australia. This is shown in the author information section."
                   />
+
+                  <QuickCheckMC
+                    questionNumber={4}
+                    question="When was this article published online?"
+                    options={[
+                      { label: "A", text: "15 January 2020" },
+                      { label: "B", text: "27 January 2020" },
+                      { label: "C", text: "14 February 2020" },
+                      { label: "D", text: "3 March 2020" },
+                    ]}
+                    correctAnswer="B"
+                    explanation="The article shows 'Published online: 27 Jan 2020' in the publication information section."
+                  />
                 </div>
-              </CardContent>
-            </Card>
+
+                {/* Skimming Tasks */}
+                <div className="space-y-3 pt-4 border-t">
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    <Target className="h-4 w-4 text-green-500" />
+                    Skimming Practice: Understand the Big Picture
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    Skim the article by reading headings, the abstract, and the first sentence of each section. Don't read in detail!
+                  </p>
+                  
+                  <QuickCheckMC
+                    questionNumber={5}
+                    question="What is the main topic of this article?"
+                    options={[
+                      { label: "A", text: "How to implement facial recognition systems in schools" },
+                      { label: "B", text: "Critical examination of facial recognition technology use in educational settings" },
+                      { label: "C", text: "The benefits of surveillance technology for student safety" },
+                      { label: "D", text: "A comparison of different facial recognition software vendors" },
+                    ]}
+                    correctAnswer="B"
+                    explanation="The title and abstract clearly indicate this is a critical examination of FRT in schools, raising 'critical questions and concerns' rather than promoting its use."
+                  />
+
+                  <QuickCheckMC
+                    questionNumber={6}
+                    question="Based on the headings, what is the authors' overall stance on FRT in schools?"
+                    options={[
+                      { label: "A", text: "Strongly supportive of widespread adoption" },
+                      { label: "B", text: "Neutral, presenting only facts without opinion" },
+                      { label: "C", text: "Critical and questioning, highlighting concerns" },
+                      { label: "D", text: "Focused only on technical implementation details" },
+                    ]}
+                    correctAnswer="C"
+                    explanation="Headings like 'Problematising the rise of facial recognition' and 'Challenging the take-up of facial recognition in schools' indicate a critical, questioning stance."
+                  />
+
+                  <QuickCheckMC
+                    questionNumber={7}
+                    question="What type of article structure does this paper follow?"
+                    options={[
+                      { label: "A", text: "Experimental study with methods, results, and statistics" },
+                      { label: "B", text: "Argumentative/analytical essay discussing issues and concerns" },
+                      { label: "C", text: "Case study of a specific school implementation" },
+                      { label: "D", text: "Literature review summarizing other research only" },
+                    ]}
+                    correctAnswer="B"
+                    explanation="The structure (Introduction → Context → Analysis → Discussion → Conclusion) with no 'Methods' or 'Results' sections indicates this is an argumentative/analytical piece rather than an empirical study."
+                  />
+                </div>
+              </div>
+            </CollapsibleSection>
 
             {/* Part 3a: Outlining - Macro Level */}
             <Card className="border-2 border-purple-500/30 bg-purple-500/5">
