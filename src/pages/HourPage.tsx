@@ -123,7 +123,7 @@ export default function HourPage() {
         {/* Week 1 Hour 1: Course Introduction Section */}
         {weekNumber === 1 && hourNumber === 1 && (
           <section className="space-y-4">
-            {/* Course Docs Card */}
+            {/* Course Overview Link */}
             <Card className="border-2 border-primary/30 bg-primary/5">
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-2">
@@ -131,55 +131,95 @@ export default function HourPage() {
                   <CardTitle className="text-lg">Welcome to UE1 - Course Introduction</CardTitle>
                 </div>
                 <CardDescription>
-                  Let's start by reviewing the key course documents and understanding what's ahead
+                  Let's start by reviewing the key course information
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <Button variant="outline" className="justify-start h-auto py-3" asChild>
-                    <a 
-                      href="https://buelearning.hkbu.edu.hk/mod/resource/view.php?id=1894083" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2"
-                    >
-                      <FileText className="h-4 w-4 text-primary" />
-                      <div className="text-left">
-                        <div className="font-medium">Course Info Sheet</div>
-                        <div className="text-xs text-muted-foreground">Official course document</div>
-                      </div>
-                      <ExternalLink className="h-3 w-3 ml-auto" />
-                    </a>
-                  </Button>
-                  <Button variant="outline" className="justify-start h-auto py-3" asChild>
-                    <Link to="/" className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-primary" />
-                      <div className="text-left">
-                        <div className="font-medium">Course Overview</div>
-                        <div className="text-xs text-muted-foreground">Schedule & CILOs</div>
-                      </div>
-                    </Link>
-                  </Button>
+                <Button variant="default" className="w-full justify-start h-auto py-3" asChild>
+                  <Link to="/" className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    <div className="text-left flex-1">
+                      <div className="font-medium">View Course Overview</div>
+                      <div className="text-xs opacity-80">Full schedule, assessments, CILOs & policies</div>
+                    </div>
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Key Facts from Course Overview */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Target className="h-4 w-4 text-primary" />
+                  Key Facts to Know
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-3 text-sm">
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                    <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-medium">5 CILOs (Course Intended Learning Outcomes)</p>
+                      <p className="text-xs text-muted-foreground">Critical reading, argument evaluation, academic writing, speaking, and AI as learning partner</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                    <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-medium">4 Modules covering different skills</p>
+                      <p className="text-xs text-muted-foreground">Academic Articles → Summarising/Paraphrasing → Argumentation → Critical Response</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                    <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-medium">6 Assessments totaling 100%</p>
+                      <p className="text-xs text-muted-foreground">Class Participation (15%), AWQ (15%), ACE Draft (15%), ACE Final (25%), CRAA (20%), Portfolio (10%)</p>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Week 6 Milestone Highlight */}
-            <Alert className="border-amber-500/50 bg-amber-500/5">
-              <AlertCircle className="h-4 w-4 text-amber-600" />
-              <AlertTitle className="text-amber-800 dark:text-amber-300">Key Milestone: Week 6 - Academic Writing Quiz (15%)</AlertTitle>
-              <AlertDescription className="text-sm text-amber-700 dark:text-amber-400 space-y-2">
-                <p>
-                  Everything before Week 6 prepares you for the <strong>Academic Writing Quiz</strong> — an in-class test 
-                  where you'll summarise and synthesise two journal article excerpts in 300 words.
-                </p>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  <Badge variant="outline" className="border-amber-500/50 text-amber-700 dark:text-amber-300">50 minutes</Badge>
-                  <Badge variant="outline" className="border-amber-500/50 text-amber-700 dark:text-amber-300">In-class</Badge>
-                  <Badge variant="outline" className="border-amber-500/50 text-amber-700 dark:text-amber-300">CILOs 1, 2, 3</Badge>
-                </div>
-              </AlertDescription>
-            </Alert>
+            {/* Key Milestones */}
+            <Card className="border-amber-500/30 bg-amber-500/5">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 text-amber-600" />
+                  Major In-Class Tests
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Link 
+                  to="/week/6/assignment/academic-writing-quiz"
+                  className="flex items-center justify-between p-3 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <PenLine className="h-4 w-4 text-amber-600" />
+                    <div>
+                      <p className="font-medium text-sm">Week 6: Academic Writing Quiz (15%)</p>
+                      <p className="text-xs text-muted-foreground">50 mins • Summarise & synthesise 2 excerpts → 300 words</p>
+                    </div>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-amber-600" />
+                </Link>
+                <Link 
+                  to="/week/9/assignment/ace-draft"
+                  className="flex items-center justify-between p-3 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <FileText className="h-4 w-4 text-amber-600" />
+                    <div>
+                      <p className="font-medium text-sm">Week 9: ACE Draft (15%)</p>
+                      <p className="text-xs text-muted-foreground">100 mins • Argument + counterargument + rebuttal → 400 words</p>
+                    </div>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-amber-600" />
+                </Link>
+              </CardContent>
+            </Card>
 
             {/* Pre-course Writing Assignment Card */}
             <Card className="border-2 border-blue-500/30 bg-blue-500/5">
@@ -217,7 +257,7 @@ export default function HourPage() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm flex items-center gap-2">
-                  <Target className="h-4 w-4 text-primary" />
+                  <Sparkles className="h-4 w-4 text-primary" />
                   Getting Things Done (GTD) - Let's Plan
                 </CardTitle>
               </CardHeader>

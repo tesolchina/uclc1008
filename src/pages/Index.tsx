@@ -1,4 +1,4 @@
-import { BookOpenCheck, Clock3, GraduationCap, Target, CheckCircle2, AlertTriangle, User, ExternalLink, Calendar, FileText, AlertCircle, Book, PenLine, Mic, Users, Brain } from "lucide-react";
+import { BookOpenCheck, Clock3, GraduationCap, Target, CheckCircle2, AlertTriangle, User, ExternalLink, Calendar, FileText, AlertCircle, Book, PenLine, Mic, Users, Brain, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -74,17 +74,18 @@ const courseSchedule = [
   {
     week: 5,
     dates: "9-13 Feb (H: 16-20 Feb)",
-    activities: "In-class Academic Writing Quiz (15%) [50 mins] • Module 3",
+    activities: "Module 3: Argumentation Models",
     assignments: "",
-    highlight: true,
-    highlightType: "exam",
+    highlight: false,
   },
   {
     week: 6,
     dates: "23-27 Feb",
-    activities: "Module 3: Argumentation Models",
+    activities: "In-class Academic Writing Quiz (15%) [50 mins]",
     assignments: "",
-    highlight: false,
+    highlight: true,
+    highlightType: "exam",
+    assignmentLink: "/week/6/assignment/academic-writing-quiz",
   },
   {
     week: 7,
@@ -96,17 +97,18 @@ const courseSchedule = [
   {
     week: 8,
     dates: "9-13 Mar",
-    activities: "In-class ACE Draft (15%) [100 mins] • Module 4",
+    activities: "Module 4: Critical Response to Academic Arguments",
     assignments: "",
-    highlight: true,
-    highlightType: "exam",
+    highlight: false,
   },
   {
     week: 9,
     dates: "16-20 Mar",
-    activities: "Module 4: Critical Response to Academic Arguments",
+    activities: "In-class ACE Draft (15%) [100 mins]",
     assignments: "",
-    highlight: false,
+    highlight: true,
+    highlightType: "exam",
+    assignmentLink: "/week/9/assignment/ace-draft",
   },
   {
     week: 10,
@@ -139,23 +141,25 @@ const assessments = [
     name: "Academic Writing Quiz",
     weight: "15%",
     type: "In-class",
-    timing: "Week 5 (23-27 Feb)",
+    timing: "Week 6 (23-27 Feb)",
     cilos: "1, 2, 3",
     description: "Students will summarise, paraphrase and synthesise the main claims or arguments from two academic journal excerpts in no more than 300 words, ensuring the use of academic tone and proper citations and references.",
     icon: PenLine,
     color: "text-amber-600",
     bgColor: "bg-amber-500/10",
+    link: "/week/6/assignment/academic-writing-quiz",
   },
   {
     name: "ACE Draft",
     weight: "15%",
     type: "In-class",
-    timing: "Week 8 (16-20 Mar)",
+    timing: "Week 9 (16-20 Mar)",
     cilos: "1, 2, 3",
     description: "Based on academic articles provided, students will write a draft of around 400 words, utilising a specific argumentation model to construct a detailed argument, a counterargument and a rebuttal on a selected topic.",
     icon: FileText,
     color: "text-blue-600",
     bgColor: "bg-blue-500/10",
+    link: "/week/9/assignment/ace-draft",
   },
   {
     name: "ACE Final",
@@ -336,10 +340,16 @@ const Index = () => {
                     {item.highlightType === "exam" && (
                       <Badge className="mr-2 bg-amber-500 text-white text-[10px]">In-class Test</Badge>
                     )}
-                    {item.activities}
+                    {item.assignmentLink ? (
+                      <Link to={item.assignmentLink} className="text-primary hover:underline">
+                        {item.activities}
+                      </Link>
+                    ) : (
+                      item.activities
+                    )}
                   </TableCell>
                   <TableCell className="text-sm">
-                    {item.assignmentLink ? (
+                    {item.assignmentLink && !item.activities.includes("In-class") ? (
                       <Link to={item.assignmentLink} className="text-primary hover:underline">
                         {item.assignments}
                       </Link>
@@ -377,8 +387,19 @@ const Index = () => {
                     </div>
                     <div>
                       <CardTitle className="text-base flex items-center gap-2">
-                        {assessment.name}
+                        {assessment.link ? (
+                          <Link to={assessment.link} className="hover:underline hover:text-primary">
+                            {assessment.name}
+                          </Link>
+                        ) : (
+                          assessment.name
+                        )}
                         <Badge variant="secondary" className="text-xs">{assessment.weight}</Badge>
+                        {assessment.link && (
+                          <Link to={assessment.link}>
+                            <ArrowRight className="h-3 w-3 text-muted-foreground hover:text-primary" />
+                          </Link>
+                        )}
                       </CardTitle>
                       <div className="flex flex-wrap gap-2 mt-1">
                         <Badge variant="outline" className="text-[10px]">{assessment.type}</Badge>
