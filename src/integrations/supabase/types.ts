@@ -92,6 +92,48 @@ export type Database = {
         }
         Relationships: []
       }
+      lecture_section_progress: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          hour_number: number
+          id: string
+          key_takeaway_viewed: boolean | null
+          notes: string | null
+          section_id: string
+          section_index: number
+          student_id: string
+          visited_at: string | null
+          week_number: number
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          hour_number: number
+          id?: string
+          key_takeaway_viewed?: boolean | null
+          notes?: string | null
+          section_id: string
+          section_index?: number
+          student_id: string
+          visited_at?: string | null
+          week_number: number
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          hour_number?: number
+          id?: string
+          key_takeaway_viewed?: boolean | null
+          notes?: string | null
+          section_id?: string
+          section_index?: number
+          student_id?: string
+          visited_at?: string | null
+          week_number?: number
+        }
+        Relationships: []
+      }
       lesson_progress: {
         Row: {
           ai_feedback: Json | null
@@ -194,13 +236,17 @@ export type Database = {
       live_sessions: {
         Row: {
           allow_ahead: boolean | null
+          completed_sections: Json | null
           created_at: string
+          current_agenda_index: number | null
           current_question_index: number | null
           current_section: string | null
           ended_at: string | null
           id: string
           lesson_id: string
+          section_started_at: string | null
           session_code: string
+          session_type: string | null
           settings: Json | null
           started_at: string | null
           status: string
@@ -210,13 +256,17 @@ export type Database = {
         }
         Insert: {
           allow_ahead?: boolean | null
+          completed_sections?: Json | null
           created_at?: string
+          current_agenda_index?: number | null
           current_question_index?: number | null
           current_section?: string | null
           ended_at?: string | null
           id?: string
           lesson_id: string
+          section_started_at?: string | null
           session_code: string
+          session_type?: string | null
           settings?: Json | null
           started_at?: string | null
           status?: string
@@ -226,13 +276,17 @@ export type Database = {
         }
         Update: {
           allow_ahead?: boolean | null
+          completed_sections?: Json | null
           created_at?: string
+          current_agenda_index?: number | null
           current_question_index?: number | null
           current_section?: string | null
           ended_at?: string | null
           id?: string
           lesson_id?: string
+          section_started_at?: string | null
           session_code?: string
+          session_type?: string | null
           settings?: Json | null
           started_at?: string | null
           status?: string
