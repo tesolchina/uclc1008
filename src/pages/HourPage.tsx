@@ -597,114 +597,82 @@ export default function HourPage() {
                   </div>
                 </div>
 
-                {/* Example: Paragraph Outline */}
-                <div className="p-4 rounded-lg border bg-muted/30 space-y-3">
-                  <h4 className="font-medium text-sm">Example: Key Points in a Paragraph</h4>
-                  <p className="text-xs text-muted-foreground mb-2">
-                    Consider the first paragraph of the excerpt. A micro-level outline might look like:
-                  </p>
-                  <div className="text-sm space-y-2 pl-4 border-l-2 border-indigo-500/50">
-                    <div>
-                      <p className="font-medium text-indigo-700">Topic Sentence:</p>
-                      <p className="text-muted-foreground text-xs">Introduces the main concern about FRT in schools</p>
-                    </div>
-                    <div>
-                      <p className="font-medium text-indigo-700">Supporting Details:</p>
-                      <p className="text-muted-foreground text-xs">• Specific examples of school implementations</p>
-                      <p className="text-muted-foreground text-xs">• Statistics or evidence of adoption</p>
-                    </div>
-                    <div>
-                      <p className="font-medium text-indigo-700">Concluding Thought:</p>
-                      <p className="text-muted-foreground text-xs">Raises questions that the paper will address</p>
+                {/* Demonstration: Example Paragraph from Excerpt */}
+                <div className="p-4 rounded-lg border-2 border-indigo-500/50 bg-indigo-500/10 space-y-4">
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-indigo-600" />
+                    Demonstration: Analyzing an Example Paragraph
+                  </h4>
+                  
+                  {/* The paragraph */}
+                  <div className="p-3 rounded bg-background border text-sm space-y-2">
+                    <p className="font-medium text-xs text-indigo-600 mb-2">Paragraph from Article B (Andrejevic & Selwyn, 2020):</p>
+                    <p className="text-muted-foreground leading-relaxed">
+                      <span className="bg-green-200/50 px-0.5">"The past few years have seen the implementation of automated facial recognition systems across a range of social realms."</span>{" "}
+                      <span className="bg-blue-200/50 px-0.5">While these technologies are associated most frequently with promises to strengthen public safety, a growing number of other applications have also emerged – from verifying the identity of bank users, through to 'smart billboards' that display advertisements in response to the moods of passers-by.</span>{" "}
+                      <span className="bg-amber-200/50 px-0.5">Of particular interest is how facial recognition technologies are beginning to be implemented in school settings.</span>
+                    </p>
+                  </div>
+                  
+                  {/* The analysis */}
+                  <div className="space-y-3">
+                    <p className="text-xs font-medium text-indigo-700">Micro-Level Outline:</p>
+                    <div className="text-sm space-y-2 pl-4 border-l-2 border-indigo-500/50">
+                      <div className="flex items-start gap-2">
+                        <span className="inline-block w-3 h-3 rounded-full bg-green-400 mt-1 shrink-0"></span>
+                        <div>
+                          <p className="font-medium text-green-700">Topic Sentence:</p>
+                          <p className="text-muted-foreground text-xs">Introduces the general trend: facial recognition is being used in many areas of society.</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <span className="inline-block w-3 h-3 rounded-full bg-blue-400 mt-1 shrink-0"></span>
+                        <div>
+                          <p className="font-medium text-blue-700">Supporting Details:</p>
+                          <p className="text-muted-foreground text-xs">• Main use: public safety</p>
+                          <p className="text-muted-foreground text-xs">• Other examples: banking identity verification, smart billboards</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <span className="inline-block w-3 h-3 rounded-full bg-amber-400 mt-1 shrink-0"></span>
+                        <div>
+                          <p className="font-medium text-amber-700">Concluding Thought / Transition:</p>
+                          <p className="text-muted-foreground text-xs">Narrows focus to schools – signals what the paper will discuss next.</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Writing Practice */}
-                <div className="p-4 rounded-lg bg-indigo-500/10 border border-indigo-500/30 space-y-3">
+                {/* Student Practice */}
+                <div className="p-4 rounded-lg bg-indigo-500/10 border border-indigo-500/30 space-y-4">
                   <h4 className="font-medium text-sm flex items-center gap-2">
                     <PenLine className="h-4 w-4 text-indigo-600" />
-                    Writing Practice: Create a Micro-Level Outline
+                    Your Turn: Analyze Another Paragraph
                   </h4>
-                  <p className="text-xs text-muted-foreground">
-                    Choose one paragraph from the article excerpt. Identify and write out:
-                  </p>
-                  <ul className="text-xs text-muted-foreground list-disc pl-4 space-y-1">
-                    <li>The topic sentence (main idea)</li>
-                    <li>2-3 supporting details or examples</li>
-                    <li>The concluding thought (if present)</li>
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Pre-course Writing Assignment Card */}
-            <Card className="border-2 border-blue-500/30 bg-blue-500/5">
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <PenLine className="h-5 w-5 text-blue-600" />
-                    <CardTitle className="text-base">Pre-course Writing (2.5%)</CardTitle>
+                  
+                  {/* Practice paragraph */}
+                  <div className="p-3 rounded bg-background border text-sm">
+                    <p className="font-medium text-xs text-indigo-600 mb-2">Paragraph to Analyze:</p>
+                    <p className="text-muted-foreground leading-relaxed">
+                      "In this sense, facial recognition could be seen as a logical extension of technology-based surveillance trends established in schools from the 1990s onwards. However, in this article, we seek to problematise the specific connotations and possible consequences of facial recognition technology in schools. Drawing on emerging debates amongst communications, media and surveillance scholars, the article addresses a number of specific social challenges and concerns – not least various ways in which this technology might alter the nature of schools and schooling along divisive, authoritarian and oppressive lines."
+                    </p>
                   </div>
-                  <Badge className="bg-blue-500 text-white">Due: 23 Jan, 6pm</Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <p className="text-sm text-muted-foreground">
-                  Now that you've learned skimming, scanning, and outlining, you're ready for the assignment! Write a 350-word essay based on the article excerpt.
-                  You can get <strong>full credit</strong> as long as the similarity rate and AI detection rate are not too high.
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  <Badge variant="outline" className="text-xs">350 words max</Badge>
-                  <Badge variant="outline" className="text-xs">Submit on Moodle</Badge>
-                  <Badge variant="outline" className="text-xs text-red-600 border-red-500/50">No late submissions</Badge>
-                </div>
-                <div className="pt-2">
-                  <Button size="sm" asChild>
-                    <Link to="/week/1/assignment/pre-course-writing" className="flex items-center gap-2">
-                      View Assignment Details
-                      <ArrowRight className="h-3 w-3" />
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Key Milestones */}
-            <Card className="border-amber-500/30 bg-amber-500/5">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <AlertCircle className="h-4 w-4 text-amber-600" />
-                  Major In-Class Tests (Mark Your Calendar!)
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Link 
-                  to="/week/6/assignment/academic-writing-quiz"
-                  className="flex items-center justify-between p-3 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <PenLine className="h-4 w-4 text-amber-600" />
-                    <div>
-                      <p className="font-medium text-sm">Week 6: Academic Writing Quiz (15%)</p>
-                      <p className="text-xs text-muted-foreground">60 mins • Summarise & synthesise 2 excerpts → 300 words</p>
-                    </div>
+                  
+                  {/* Writing area */}
+                  <div className="space-y-2">
+                    <p className="text-xs text-muted-foreground">
+                      Create a micro-level outline for the paragraph above. Identify the topic sentence, supporting details, and concluding thought:
+                    </p>
+                    <textarea 
+                      className="w-full min-h-[150px] p-3 rounded-lg border bg-background text-sm resize-y placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                      placeholder="Topic Sentence:&#10;...&#10;&#10;Supporting Details:&#10;• ...&#10;• ...&#10;&#10;Concluding Thought:&#10;..."
+                    />
+                    <p className="text-xs text-muted-foreground italic">
+                      💡 Remember to save your work externally – copy and paste to a document as backup.
+                    </p>
                   </div>
-                  <ArrowRight className="h-4 w-4 text-amber-600" />
-                </Link>
-                <Link 
-                  to="/week/9/assignment/ace-draft"
-                  className="flex items-center justify-between p-3 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <FileText className="h-4 w-4 text-amber-600" />
-                    <div>
-                      <p className="font-medium text-sm">Week 9: ACE Draft (15%)</p>
-                      <p className="text-xs text-muted-foreground">100 mins • Argument + counterargument + rebuttal → 400 words</p>
-                    </div>
-                  </div>
-                  <ArrowRight className="h-4 w-4 text-amber-600" />
-                </Link>
+                </div>
               </CardContent>
             </Card>
           </section>
