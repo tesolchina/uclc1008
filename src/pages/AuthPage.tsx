@@ -170,29 +170,37 @@ export default function AuthPage() {
     const maxAttempts = 10;
     
     try {
+      // First check if there are any existing students with the same 4 digits
+      const { data: existingWithSameDigits, error: checkDigitsError } = await supabase
+        .from('students')
+        .select('student_id')
+        .like('student_id', `${lastFourDigits}-%`);
+      
+      if (checkDigitsError) {
+        console.error('Error checking existing students:', checkDigitsError);
+      }
+      
       let uniqueId = '';
       let isUnique = false;
       
-      // Try to generate a unique ID (up to maxAttempts)
-      for (let attempt = 0; attempt < maxAttempts && !isUnique; attempt++) {
+      // If no students with same 4 digits exist, any suffix will be unique
+      if (!existingWithSameDigits || existingWithSameDigits.length === 0) {
         const suffix = chars.charAt(Math.floor(Math.random() * chars.length)) + 
                        chars.charAt(Math.floor(Math.random() * chars.length));
         uniqueId = `${lastFourDigits}-${firstInitial.toUpperCase()}${lastInitial.toUpperCase()}-${suffix}`;
+        isUnique = true;
+      } else {
+        // Need to check for uniqueness among existing IDs with same 4 digits
+        const existingIds = new Set(existingWithSameDigits.map(s => s.student_id));
         
-        // Check if this ID already exists in the database
-        const { data: existing, error: checkError } = await supabase
-          .from('students')
-          .select('student_id')
-          .eq('student_id', uniqueId)
-          .maybeSingle();
-        
-        if (checkError) {
-          console.error('Error checking student ID uniqueness:', checkError);
-          // Continue trying - don't fail on check errors
-        }
-        
-        if (!existing) {
-          isUnique = true;
+        for (let attempt = 0; attempt < maxAttempts && !isUnique; attempt++) {
+          const suffix = chars.charAt(Math.floor(Math.random() * chars.length)) + 
+                         chars.charAt(Math.floor(Math.random() * chars.length));
+          uniqueId = `${lastFourDigits}-${firstInitial.toUpperCase()}${lastInitial.toUpperCase()}-${suffix}`;
+          
+          if (!existingIds.has(uniqueId)) {
+            isUnique = true;
+          }
         }
       }
       
@@ -639,11 +647,34 @@ export default function AuthPage() {
                     (XX will be generated randomly)
                   </p>
                 </div>
-                <Button className="w-full" onClick={handleStudentComplete}>
-                  <GraduationCap className="h-4 w-4 mr-2" />
+                
+                {/* Beta warning and privacy statement */}
+                <div className="space-y-3 text-xs text-muted-foreground">
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                    <p className="font-semibold text-amber-700 mb-1">⚠️ Beta Mode</p>
+                    <p className="text-amber-600">
+                      This system is in beta and may crash or malfunction. <strong>Always save a copy of your work</strong> externally. 
+                      Do not rely solely on this website to save your work.
+                    </p>
+                  </div>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <p className="font-semibold text-blue-700 mb-1">🔒 Privacy Notice</p>
+                    <p className="text-blue-600">
+                      Please do not share any personal information or sensitive data on this platform. 
+                      Only use your student ID and initials as instructed.
+                    </p>
+                  </div>
+                </div>
+                
+                <Button className="w-full" onClick={handleStudentComplete} disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <GraduationCap className="h-4 w-4 mr-2" />
+                  )}
                   Complete Registration
                 </Button>
-                <Button variant="ghost" className="w-full" onClick={handleStudentComplete}>
+                <Button variant="ghost" className="w-full" onClick={handleStudentComplete} disabled={isSubmitting}>
                   Skip section, complete anyway
                 </Button>
               </div>
