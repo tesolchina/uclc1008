@@ -12,6 +12,7 @@ import { StudentLoginReminder } from "@/components/StudentLoginReminder";
 import { QuickCheckMC } from "@/components/lessons/QuickCheckMC";
 import { LectureOutline, useSectionProgress, generateSectionId } from "@/features/lecture-mode";
 import type { AgendaSectionEnhanced } from "@/features/lecture-mode";
+import { ParaphraseCoach } from "@/components/lessons/ParaphraseCoach";
 import { ArrowLeft, ArrowRight, Clock, Target, BookOpen, PenLine, CheckCircle2, Lightbulb, FileText, Sparkles, ExternalLink, AlertCircle, Calendar, GraduationCap, ScrollText, ChevronDown, Download, LogIn, Loader2 } from "lucide-react";
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -495,6 +496,24 @@ Remember to also save any written responses separately.
             </ul>
           </CardContent>
         </Card>
+
+        {/* Week 1 Hour 2: Paraphrasing with AI Coach */}
+        {weekNumber === 1 && hourNumber === 2 && (
+          <section className="space-y-6">
+            <CollapsibleSection
+              title="Part 4: AI-Guided Paraphrasing Practice"
+              description="Practice paraphrasing step-by-step with AI feedback"
+              icon={<Sparkles className="h-4 w-4 text-accent" />}
+              defaultOpen={true}
+              className="border-2 border-accent/30 bg-accent/5"
+            >
+              <ParaphraseCoach 
+                studentId={studentId} 
+                onComplete={(sentenceId) => handleTaskComplete(`paraphrase-${sentenceId}`)}
+              />
+            </CollapsibleSection>
+          </section>
+        )}
 
         {/* Week 1 Hour 1: Restructured Course Introduction */}
         {weekNumber === 1 && hourNumber === 1 && (
