@@ -119,6 +119,27 @@ export default function HourPage() {
           </div>
         </section>
 
+        {/* Learning Goals - moved to top */}
+        <Card className="border-primary/20 bg-primary/5">
+          <CardHeader className="pb-2">
+            <div className="flex items-center gap-2">
+              <Target className="h-5 w-5 text-primary" />
+              <CardTitle className="text-lg">Learning Goals</CardTitle>
+            </div>
+            <CardDescription>What you'll achieve in this hour</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              {hourData.learningGoals.map((goal, idx) => (
+                <li key={idx} className="flex items-start gap-2 text-sm">
+                  <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                  {goal}
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+
         {/* Week 1 Hour 1: Restructured Course Introduction */}
         {weekNumber === 1 && hourNumber === 1 && (
           <section className="space-y-6">
@@ -682,22 +703,6 @@ export default function HourPage() {
           </section>
         )}
 
-        {/* Learning Goals */}
-        <CollapsibleSection
-          title="Learning Goals"
-          description="What you'll achieve in this hour"
-          icon={<Target className="h-4 w-4 text-primary" />}
-          defaultOpen={true}
-        >
-          <ul className="space-y-2">
-            {hourData.learningGoals.map((goal, idx) => (
-              <li key={idx} className="flex items-start gap-2 text-sm">
-                <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-                {goal}
-              </li>
-            ))}
-          </ul>
-        </CollapsibleSection>
 
         {/* Key Concepts - hide for Week 1 Hour 1 (custom content) */}
         {!(weekNumber === 1 && hourNumber === 1) && hourData.keyConcepts && hourData.keyConcepts.length > 0 && (
