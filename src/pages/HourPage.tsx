@@ -12,9 +12,11 @@ import { StudentLoginReminder } from "@/components/StudentLoginReminder";
 import { QuickCheckMC } from "@/components/lessons/QuickCheckMC";
 import { LectureOutline, useSectionProgress, generateSectionId } from "@/features/lecture-mode";
 import type { AgendaSectionEnhanced } from "@/features/lecture-mode";
-import { ArrowLeft, ArrowRight, Clock, Target, BookOpen, PenLine, CheckCircle2, Lightbulb, FileText, Sparkles, ExternalLink, AlertCircle, Calendar, GraduationCap, ScrollText, ChevronDown } from "lucide-react";
-import { useState, useMemo, useCallback } from "react";
+import { ArrowLeft, ArrowRight, Clock, Target, BookOpen, PenLine, CheckCircle2, Lightbulb, FileText, Sparkles, ExternalLink, AlertCircle, Calendar, GraduationCap, ScrollText, ChevronDown, Download, LogIn, Loader2 } from "lucide-react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import {
   Select,
   SelectContent,
@@ -52,8 +54,151 @@ const PRACTICE_PARAGRAPHS = [
   }
 ];
 
-// Micro-level practice component with paragraph selector
-function MicroLevelPractice() {
+// Week 1 Hour 1 has 10 MC questions + 2 writing tasks = 12 total tasks
+const WEEK1_HOUR1_TOTAL_TASKS = 12;
+
+// Local storage key for progress
+const getProgressKey = (weekNumber: number, hourNumber: number) => 
+  `ue1_progress_w${weekNumber}h${hourNumber}`;
+
+// Writing task with AI feedback component
+function WritingTaskWithFeedback({ 
+  taskId, 
+  placeholder, 
+  onComplete,
+  studentId
+}: { 
+  taskId: string; 
+  placeholder: string; 
+  onComplete: (taskId: string) => void;
+  studentId?: string;
+}) {
+  const [text, setText] = useState("");
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleSubmit = async () => {
+    if (!text.trim()) return;
+    
+    setIsLoading(true);
+    try {
+      const response = await supabase.functions.invoke("chat", {
+        body: {
+          messages: [
+            {
+              role: "user",
+              content: `You are a concise, critical academic writing tutor. Provide brief feedback (2-3 sentences max) on this student's micro-level outline attempt. Be direct about what's missing or incorrect, and give one specific improvement suggestion.
+
+Student's response:
+${text}
+
+Give critical but constructive feedback. Focus on: Did they correctly identify the topic sentence? Are supporting details specific? Is the structure clear?`
+            }
+          ],
+          studentId: studentId || "anonymous",
+          meta: {
+            weekTitle: "Week 1 Hour 1",
+            theme: "Outlining Practice",
+            aiPromptHint: "Be a critical but supportive tutor. Keep feedback to 2-3 sentences."
+          }
+        }
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message || "Failed to get feedback");
+      }
+
+      // Handle streaming response
+      const reader = response.data?.getReader?.();
+      if (reader) {
+        let fullText = "";
+        const decoder = new TextDecoder();
+        
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          
+          const chunk = decoder.decode(value, { stream: true });
+          const lines = chunk.split("\n");
+          
+          for (const line of lines) {
+            if (line.startsWith("data: ") && line !== "data: [DONE]") {
+              try {
+                const json = JSON.parse(line.slice(6));
+                const content = json.choices?.[0]?.delta?.content;
+                if (content) fullText += content;
+              } catch {}
+            }
+          }
+        }
+        
+        setFeedback(fullText);
+      } else if (typeof response.data === "string") {
+        setFeedback(response.data);
+      }
+      
+      onComplete(taskId);
+    } catch (err) {
+      console.error("AI feedback error:", err);
+      toast({
+        title: "Feedback unavailable",
+        description: "Could not get AI feedback. Your work has been saved locally.",
+        variant: "destructive"
+      });
+      onComplete(taskId);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-3">
+      <textarea 
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        className="w-full min-h-[150px] p-3 rounded-lg border bg-background text-sm resize-y placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+        placeholder={placeholder}
+      />
+      
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-muted-foreground italic">
+          💡 Remember to save your work externally.
+        </p>
+        <Button 
+          size="sm" 
+          onClick={handleSubmit} 
+          disabled={!text.trim() || isLoading}
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+              Getting Feedback...
+            </>
+          ) : (
+            "Submit for Feedback"
+          )}
+        </Button>
+      </div>
+
+      {feedback && (
+        <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/30 space-y-2">
+          <p className="text-xs font-medium text-blue-700 flex items-center gap-1">
+            <Sparkles className="h-3 w-3" />
+            AI Feedback
+          </p>
+          <p className="text-sm text-muted-foreground">{feedback}</p>
+          <p className="text-xs text-amber-600 italic">
+            ⚠️ AI feedback may contain errors. Always consult your teacher for authoritative guidance.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Micro-level practice component with paragraph selector and AI feedback
+function MicroLevelPractice({ onComplete, studentId }: { onComplete: (taskId: string) => void; studentId?: string }) {
   const [selectedParagraph, setSelectedParagraph] = useState(PRACTICE_PARAGRAPHS[0].id);
   const currentParagraph = PRACTICE_PARAGRAPHS.find(p => p.id === selectedParagraph) || PRACTICE_PARAGRAPHS[0];
 
@@ -89,21 +234,29 @@ function MicroLevelPractice() {
         </p>
       </div>
       
-      {/* Writing area */}
+      {/* Writing area with AI feedback */}
       <div className="space-y-2">
         <p className="text-xs text-muted-foreground">
           Create a micro-level outline for the paragraph above. Identify the topic sentence, supporting details, and concluding thought:
         </p>
-        <textarea 
-          className="w-full min-h-[150px] p-3 rounded-lg border bg-background text-sm resize-y placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+        <WritingTaskWithFeedback
+          taskId="micro-outline"
           placeholder={"Topic Sentence:\n...\n\nSupporting Details:\n• ...\n• ...\n\nConcluding Thought:\n..."}
+          onComplete={onComplete}
+          studentId={studentId}
         />
-        <p className="text-xs text-muted-foreground italic">
-          💡 Remember to save your work externally – copy and paste to a document as backup.
-        </p>
       </div>
     </div>
   );
+}
+
+// Helper to get student ID from localStorage
+function getStoredStudentId(): string | undefined {
+  try {
+    return localStorage.getItem("ue1_student_id") || undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 export default function HourPage() {
@@ -111,11 +264,65 @@ export default function HourPage() {
   const weekNumber = parseInt(weekId || "1");
   const hourNumber = parseInt(hourId || "1");
   const { user } = useAuth();
+  const { toast } = useToast();
   
   const hourData = getHourData(weekNumber, hourNumber);
   const [completedTasks, setCompletedTasks] = useState<Set<string>>(new Set());
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const [completedSectionIndices, setCompletedSectionIndices] = useState<number[]>([]);
+  const [hasUnsavedWork, setHasUnsavedWork] = useState(false);
+
+  const studentId = getStoredStudentId();
+  const isLoggedIn = !!user || !!studentId;
+
+  // Calculate total tasks for Week 1 Hour 1 (10 MC + 2 writing)
+  const totalTasks = weekNumber === 1 && hourNumber === 1 
+    ? WEEK1_HOUR1_TOTAL_TASKS 
+    : hourData?.tasks.length + (hourData?.writingTask ? 1 : 0) || 0;
+
+  // Load saved progress from localStorage
+  useEffect(() => {
+    if (!hourData) return;
+    const key = getProgressKey(weekNumber, hourNumber);
+    try {
+      const saved = localStorage.getItem(key);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.completedTasks) {
+          setCompletedTasks(new Set(parsed.completedTasks));
+        }
+      }
+    } catch (e) {
+      console.error("Error loading progress:", e);
+    }
+  }, [weekNumber, hourNumber, hourData]);
+
+  // Save progress to localStorage
+  useEffect(() => {
+    if (!hourData || completedTasks.size === 0) return;
+    const key = getProgressKey(weekNumber, hourNumber);
+    try {
+      localStorage.setItem(key, JSON.stringify({
+        completedTasks: Array.from(completedTasks),
+        savedAt: new Date().toISOString()
+      }));
+    } catch (e) {
+      console.error("Error saving progress:", e);
+    }
+  }, [completedTasks, weekNumber, hourNumber, hourData]);
+
+  // Warn before leaving with unsaved work
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedWork) {
+        e.preventDefault();
+        e.returnValue = "You have unsaved work. Are you sure you want to leave?";
+        return e.returnValue;
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [hasUnsavedWork]);
 
   // Section progress for students
   const { progress, updateNotes } = useSectionProgress({ weekNumber, hourNumber });
@@ -148,11 +355,47 @@ export default function HourPage() {
     updateNotes(sectionId, notes);
   }, [updateNotes]);
 
+  // Generate progress report as Markdown
+  const generateReport = useCallback(() => {
+    const date = new Date().toLocaleString();
+    const completedList = Array.from(completedTasks).join("\n- ");
+    
+    const report = `# Week ${weekNumber} Hour ${hourNumber} Progress Report
+Generated: ${date}
+Student ID: ${studentId || "Not logged in"}
+
+## Completed Tasks (${completedTasks.size}/${totalTasks})
+${completedList ? `- ${completedList}` : "No tasks completed yet"}
+
+## Notes
+Remember to also save any written responses separately.
+
+---
+*This report was generated from UE1 Learning Platform*
+`;
+    return report;
+  }, [completedTasks, weekNumber, hourNumber, studentId, totalTasks]);
+
+  // Download report as MD file
+  const downloadReport = useCallback(() => {
+    const report = generateReport();
+    const blob = new Blob([report], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `week${weekNumber}_hour${hourNumber}_progress.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast({ title: "Report downloaded", description: "Check your downloads folder." });
+  }, [generateReport, weekNumber, hourNumber, toast]);
+
   if (!hourData) {
     return (
       <div className="text-center py-12">
         <h2 className="text-xl font-semibold mb-2">Hour not found</h2>
-        <p className="text-muted-foreground mb-4">This lesson hour doesn't exist yet.</p>
+        <p className="text-muted-foreground mb-4">This lesson hour does not exist yet.</p>
         <Button asChild>
           <Link to={`/week/${weekNumber}`}>Back to Week {weekNumber}</Link>
         </Button>
@@ -162,6 +405,7 @@ export default function HourPage() {
 
   const handleTaskComplete = (taskId: string) => {
     setCompletedTasks(prev => new Set([...prev, taskId]));
+    setHasUnsavedWork(false); // Mark as saved when completing
   };
 
   const objectiveTasks = hourData.tasks.filter(t => 
@@ -744,7 +988,7 @@ export default function HourPage() {
                 </div>
 
                 {/* Student Practice with Paragraph Selector */}
-                <MicroLevelPractice />
+                <MicroLevelPractice onComplete={handleTaskComplete} studentId={getStoredStudentId()} />
               </div>
             </CollapsibleSection>
           </section>
@@ -900,15 +1144,19 @@ export default function HourPage() {
         )}
 
         {/* Progress & Navigation */}
-        <div className="bg-muted/30 rounded-lg p-4 border">
+        <div className="bg-muted/30 rounded-lg p-4 border space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div>
               <p className="font-medium text-sm">Progress</p>
               <p className="text-xs text-muted-foreground">
-                {completedTasks.size} / {hourData.tasks.length + (hourData.writingTask ? 1 : 0)} tasks completed
+                {completedTasks.size} / {totalTasks} tasks completed
               </p>
             </div>
             <div className="flex gap-2 flex-wrap">
+              <Button variant="outline" size="sm" onClick={downloadReport}>
+                <Download className="h-4 w-4 mr-1" />
+                Download Report
+              </Button>
               {prevHour && (
                 <Button variant="outline" size="sm" asChild>
                   <Link to={`/week/${weekNumber}/hour/${prevHour}`}>
@@ -939,6 +1187,27 @@ export default function HourPage() {
               )}
             </div>
           </div>
+          
+          {/* Guest user prompt */}
+          {!isLoggedIn && (
+            <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/30">
+              <div className="flex items-start gap-3">
+                <LogIn className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
+                <div className="space-y-2">
+                  <p className="text-sm text-blue-700">
+                    <strong>Not logged in?</strong> Your progress is saved temporarily in this browser. 
+                    To keep your progress across devices, register for a student ID.
+                  </p>
+                  <Button size="sm" variant="outline" asChild>
+                    <Link to="/auth">
+                      <LogIn className="h-4 w-4 mr-1" />
+                      Register / Login
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
