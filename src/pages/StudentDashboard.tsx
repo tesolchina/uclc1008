@@ -32,8 +32,10 @@ interface StudentQuestion {
 interface TaskResponse {
   id: string;
   task_id: string;
+  response: string;
   is_correct: boolean | null;
   score: number | null;
+  ai_feedback: string | null;
   submitted_at: string;
 }
 
@@ -165,9 +167,13 @@ export default function StudentDashboard() {
             <TrendingUp className="h-4 w-4" />
             Progress
           </TabsTrigger>
-          <TabsTrigger value="questions" className="gap-1">
+        <TabsTrigger value="questions" className="gap-1">
             <MessageCircle className="h-4 w-4" />
             My Questions
+          </TabsTrigger>
+          <TabsTrigger value="responses" className="gap-1">
+            <BookOpen className="h-4 w-4" />
+            My Responses
           </TabsTrigger>
         </TabsList>
 
@@ -285,6 +291,52 @@ export default function StudentDashboard() {
                         <div className="mt-2 p-2 bg-primary/5 rounded text-sm">
                           <p className="text-xs font-medium text-primary mb-1">Teacher's Response:</p>
                           <p>{q.teacher_response}</p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="responses" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">My Submitted Responses & AI Feedback</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {responses.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <BookOpen className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p>No responses submitted yet.</p>
+                  <p className="text-xs mt-1">Complete tasks during lessons to see your history here.</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {responses.map(r => (
+                    <div key={r.id} className="p-3 rounded-lg border space-y-2">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="space-y-1 flex-1">
+                          <p className="text-xs text-muted-foreground">Task: {r.task_id}</p>
+                          <p className="text-sm">{r.response}</p>
+                        </div>
+                        <Badge 
+                          variant={r.is_correct ? "default" : r.is_correct === false ? "destructive" : "secondary"}
+                          className="text-xs shrink-0"
+                        >
+                          {r.is_correct ? "Correct" : r.is_correct === false ? "Incorrect" : "Submitted"}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(r.submitted_at).toLocaleString()}
+                        {r.score !== null && ` • Score: ${r.score}`}
+                      </p>
+                      {r.ai_feedback && (
+                        <div className="mt-2 p-2 bg-blue-500/10 rounded text-sm">
+                          <p className="text-xs font-medium text-blue-700 mb-1">AI Feedback:</p>
+                          <p className="text-muted-foreground">{r.ai_feedback}</p>
                         </div>
                       )}
                     </div>

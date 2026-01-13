@@ -134,8 +134,30 @@ Give critical but constructive feedback. Focus on: Did they correctly identify t
         }
         
         setFeedback(fullText);
+        
+        // Save response to database
+        if (studentId) {
+          await supabase.from("student_task_responses").insert({
+            student_id: studentId,
+            task_id: taskId,
+            response: text,
+            ai_feedback: fullText,
+            is_correct: null,
+          });
+        }
       } else if (typeof response.data === "string") {
         setFeedback(response.data);
+        
+        // Save response to database
+        if (studentId) {
+          await supabase.from("student_task_responses").insert({
+            student_id: studentId,
+            task_id: taskId,
+            response: text,
+            ai_feedback: response.data,
+            is_correct: null,
+          });
+        }
       }
       
       onComplete(taskId);
