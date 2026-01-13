@@ -151,18 +151,137 @@ function MyComponent() {
 
 ## Teacher/Staff Authentication
 
-### Email/Password Flow
+### Sign Up Flow (Email/Password)
 
 1. User navigates to `/auth`
 2. Selects "Teacher / Staff" option
-3. Enters email, password, and name (for signup)
-4. Supabase Auth creates user in `auth.users`
-5. Profile auto-created via trigger (or manual creation)
-6. `AuthContext` fetches profile and roles
+3. Clicks "Sign Up" tab
+4. Enters:
+   - Display Name (required, non-empty)
+   - Email (validated: valid email format)
+   - Password (validated: minimum 6 characters)
+5. Supabase Auth creates user in `auth.users`
+6. Database trigger auto-creates profile in `profiles` table
+7. User sees success message and can sign in
 
-### HKBU OAuth Flow
+**Code Example (AuthPage.tsx):**
 
-1. User clicks "Sign in with HKBU" (currently disabled in UI)
+```tsx
+const handleSignUp = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError(null);
+
+  // Validate with Zod
+  try {
+    emailSchema.parse(email);
+    passwordSchema.parse(password);
+    if (!displayName.trim()) {
+      setError('Please enter your name');
+      return;
+    }
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      setError(err.errors[0].message);
+      return;
+    }
+  }
+
+  setIsSubmitting(true);
+  const { error: signUpError } = await signUp(email, password, displayName.trim());
+  setIsSubmitting(false);
+
+  if (signUpError) {
+    if (signUpError.message.includes('User already registered')) {
+      setError('An account with this email already exists. Please sign in instead.');
+    } else {
+      setError(signUpError.message);
+    }
+  } else {
+    setSuccess('Account created! You can now sign in.');
+    setActiveTab('signin');
+  }
+};
+```
+
+**Code Example (AuthContext.tsx):**
+
+```tsx
+const signUp = async (email: string, password: string, displayName: string) => {
+  const redirectUrl = `${window.location.origin}/`;
+  
+  const { error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: redirectUrl,
+      data: {
+        display_name: displayName,
+      },
+    },
+  });
+
+  return { error: error as Error | null };
+};
+```
+
+### Sign In Flow (Email/Password)
+
+1. User navigates to `/auth`
+2. Selects "Teacher / Staff" option
+3. Enters email and password
+4. Supabase validates credentials
+5. Session established automatically
+6. `onAuthStateChange` triggers profile/roles fetch
+7. User redirected to home page
+
+**Code Example (AuthPage.tsx):**
+
+```tsx
+const handleSignIn = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError(null);
+
+  try {
+    emailSchema.parse(email);
+    passwordSchema.parse(password);
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      setError(err.errors[0].message);
+      return;
+    }
+  }
+
+  setIsSubmitting(true);
+  const { error: signInError } = await signIn(email, password);
+  setIsSubmitting(false);
+
+  if (signInError) {
+    if (signInError.message.includes('Invalid login credentials')) {
+      setError('Invalid email or password. Please try again.');
+    } else {
+      setError(signInError.message);
+    }
+  }
+  // Success: onAuthStateChange handles redirect
+};
+```
+
+**Code Example (AuthContext.tsx):**
+
+```tsx
+const signIn = async (email: string, password: string) => {
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  return { error: error as Error | null };
+};
+```
+
+### HKBU OAuth Flow (SSO)
+
+1. User clicks "Sign in with HKBU" (currently placeholder in UI)
 2. `loginWithHkbu()` redirects to `/functions/v1/oauth-init`
 3. Edge function redirects to HKBU OAuth server
 4. User authenticates at HKBU
@@ -174,6 +293,28 @@ function MyComponent() {
    - Creates session in `user_sessions` table
 7. User redirected to `/auth/callback` with session token
 8. Frontend sets Supabase session
+
+**Code Example (AuthContext.tsx):**
+
+```tsx
+const loginWithHkbu = useCallback(() => {
+  const returnUrl = window.location.href;
+  window.location.href = `${SUPABASE_URL}/functions/v1/oauth-init?return_url=${encodeURIComponent(returnUrl)}`;
+}, []);
+```
+
+### Sign Out Flow
+
+```tsx
+const signOut = async () => {
+  await supabase.auth.signOut();
+  setUser(null);
+  setSession(null);
+  setProfile(null);
+  // Clean up legacy HKBU session if any
+  localStorage.removeItem('hkbu_session');
+  localStorage.removeItem('oauth_state');
+};
 
 ---
 
