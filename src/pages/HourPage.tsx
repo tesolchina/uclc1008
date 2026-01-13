@@ -119,10 +119,10 @@ export default function HourPage() {
           </div>
         </section>
 
-        {/* Week 1 Hour 1: Restructured Course Introduction with Skimming Practice */}
+        {/* Week 1 Hour 1: Restructured Course Introduction */}
         {weekNumber === 1 && hourNumber === 1 && (
-          <section className="space-y-4">
-            {/* Part 1: Course Overview Link */}
+          <section className="space-y-6">
+            {/* Part 1: Course Introduction */}
             <Card className="border-2 border-primary/30 bg-primary/5">
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-2">
@@ -147,18 +147,19 @@ export default function HourPage() {
               </CardContent>
             </Card>
 
-            {/* Part 2: Skimming Technique Introduction */}
+            {/* Part 2: Introduction to Skimming & Scanning + Practice */}
             <Card className="border-2 border-green-500/30 bg-green-500/5">
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-2">
                   <BookOpen className="h-5 w-5 text-green-600" />
-                  <CardTitle className="text-lg">Part 2: Introduction to Skimming</CardTitle>
+                  <CardTitle className="text-lg">Part 2: Skimming & Scanning</CardTitle>
                 </div>
                 <CardDescription>
-                  Learn how to quickly identify key information in academic texts
+                  Learn essential reading techniques for academic texts, then practice with a real article
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Skimming Introduction */}
                 <div className="p-4 rounded-lg bg-background/80 space-y-3">
                   <h4 className="font-medium flex items-center gap-2">
                     <Lightbulb className="h-4 w-4 text-amber-500" />
@@ -187,104 +188,173 @@ export default function HourPage() {
                     </div>
                   </div>
                 </div>
+
+                {/* Scanning Introduction */}
+                <div className="p-4 rounded-lg bg-background/80 space-y-3">
+                  <h4 className="font-medium flex items-center gap-2">
+                    <Lightbulb className="h-4 w-4 text-blue-500" />
+                    What is Scanning?
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    <strong>Scanning</strong> is used to find specific information quickly. You move your eyes rapidly 
+                    over text looking for particular words, numbers, or phrases.
+                  </p>
+                  <div className="grid gap-2 text-sm">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
+                      <span>Know what you're looking for before you start</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
+                      <span>Move eyes quickly in zigzag pattern</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
+                      <span>Look for keywords, names, dates, or numbers</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
+                      <span>Use visual cues like formatting and layout</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Practice Source */}
+                <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/30 space-y-3">
+                  <h4 className="font-medium flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-blue-600" />
+                    Practice: Explore an Academic Source
+                  </h4>
+                  <div className="text-sm space-y-2">
+                    <p className="text-muted-foreground">Practice skimming and scanning with this article you'll use for Pre-course Writing:</p>
+                    <p className="font-medium text-xs">
+                      Mark Andrejevic & Neil Selwyn (2020) Facial recognition technology in schools: critical questions and concerns, 
+                      <em> Learning, Media and Technology</em>, 45:2, 115-128
+                    </p>
+                  </div>
+                  <Button className="w-full" variant="outline" size="sm" asChild>
+                    <a 
+                      href="https://www.tandfonline.com/doi/full/10.1080/17439884.2020.1686014#d1e380" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      Open Article (Taylor & Francis Online)
+                    </a>
+                  </Button>
+                </div>
+
+                {/* Quick Check Questions */}
+                <div className="space-y-3 pt-2">
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    <Target className="h-4 w-4 text-primary" />
+                    Quick Check: Source Exploration
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    Answer these questions by skimming/scanning the article page. Click an option to check your answer.
+                  </p>
+                  
+                  <QuickCheckMC
+                    questionNumber={1}
+                    question="Who is the publisher of this article?"
+                    options={[
+                      { label: "A", text: "Elsevier" },
+                      { label: "B", text: "Taylor & Francis" },
+                      { label: "C", text: "Springer Nature" },
+                      { label: "D", text: "SAGE Publications" },
+                    ]}
+                    correctAnswer="B"
+                    explanation="Taylor & Francis publishes the journal 'Learning, Media and Technology'. You can see the T&F logo at the top of the article page."
+                  />
+
+                  <QuickCheckMC
+                    questionNumber={2}
+                    question="What is the journal name?"
+                    options={[
+                      { label: "A", text: "Educational Technology Research" },
+                      { label: "B", text: "Learning, Media and Technology" },
+                      { label: "C", text: "Computers & Education" },
+                      { label: "D", text: "Journal of Digital Learning" },
+                    ]}
+                    correctAnswer="B"
+                    explanation="The journal name appears in the article header and citation information. It's 'Learning, Media and Technology', Volume 45, Issue 2."
+                  />
+
+                  <QuickCheckMC
+                    questionNumber={3}
+                    question="Which universities do the authors come from?"
+                    options={[
+                      { label: "A", text: "Harvard University & MIT" },
+                      { label: "B", text: "Monash University (both authors)" },
+                      { label: "C", text: "University of Melbourne & University of Sydney" },
+                      { label: "D", text: "University of Oxford & Cambridge" },
+                    ]}
+                    correctAnswer="B"
+                    explanation="Both Mark Andrejevic and Neil Selwyn are affiliated with Monash University in Australia. This is shown in the author information section."
+                  />
+                </div>
               </CardContent>
             </Card>
 
-            {/* Part 3: Practice with Real Academic Article */}
-            <Card className="border-2 border-blue-500/30 bg-blue-500/5">
+            {/* Part 3a: Outlining - Macro Level */}
+            <Card className="border-2 border-purple-500/30 bg-purple-500/5">
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-blue-600" />
-                  <CardTitle className="text-lg">Part 3: Skimming Practice - Exploring an Academic Source</CardTitle>
+                  <FileText className="h-5 w-5 text-purple-600" />
+                  <CardTitle className="text-lg">Part 3a: Outlining – Macro Level</CardTitle>
                 </div>
                 <CardDescription>
-                  Practice skimming with a real academic article you'll use for Pre-course Writing
+                  Learn to identify the overall structure of academic papers
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="p-4 rounded-lg bg-background/80 border">
-                  <p className="text-xs text-muted-foreground mb-2">Source Article:</p>
-                  <p className="text-sm font-medium mb-2">
-                    Mark Andrejevic & Neil Selwyn (2020) Facial recognition technology in schools: critical questions and concerns, 
-                    <em> Learning, Media and Technology</em>, 45:2, 115-128
+                <div className="p-4 rounded-lg bg-background/80 space-y-3">
+                  <h4 className="font-medium flex items-center gap-2">
+                    <Lightbulb className="h-4 w-4 text-purple-500" />
+                    What is Macro-Level Outlining?
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    <strong>Macro-level outlining</strong> involves identifying the major sections and overall structure of an academic text. 
+                    This helps you understand how the author has organized their argument and how different parts relate to each other.
                   </p>
-                  <p className="text-xs text-muted-foreground">DOI: 10.1080/17439884.2020.1686014</p>
                 </div>
-                
-                <Button className="w-full" variant="outline" asChild>
-                  <a 
-                    href="https://www.tandfonline.com/doi/full/10.1080/17439884.2020.1686014#d1e380" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                    Open Article (Taylor & Francis Online)
-                  </a>
-                </Button>
 
-                <Alert className="bg-amber-500/10 border-amber-500/30">
-                  <AlertCircle className="h-4 w-4 text-amber-600" />
-                  <AlertTitle className="text-sm">Activity Instructions</AlertTitle>
-                  <AlertDescription className="text-xs">
-                    Open the article link above and <strong>skim</strong> the page (don't read everything!). 
-                    Answer the questions below to test your skimming skills.
-                  </AlertDescription>
-                </Alert>
-              </CardContent>
-            </Card>
+                {/* Example 1: Full Paper Structure */}
+                <div className="p-4 rounded-lg border bg-muted/30 space-y-3">
+                  <h4 className="font-medium text-sm">Example 1: Overall Structure of the Full Paper</h4>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Based on the article headings, here is the macro-level outline:
+                  </p>
+                  <div className="text-sm space-y-1 pl-4 border-l-2 border-purple-500/50">
+                    <p className="font-medium">1. ABSTRACT</p>
+                    <p className="font-medium">2. Introduction</p>
+                    <p className="font-medium">3. The emergence of facial recognition technology across society</p>
+                    <p className="font-medium">4. Problematising the rise of facial recognition</p>
+                    <p className="font-medium">5. Facial recognition technologies in education</p>
+                    <p className="font-medium">6. Making sense of the take-up of facial recognition technology in schools</p>
+                    <p className="font-medium">7. Challenging the take-up of facial recognition in schools</p>
+                    <p className="font-medium">8. Discussion</p>
+                    <p className="font-medium">9. Conclusion</p>
+                    <p className="text-muted-foreground">10. Disclosure statement</p>
+                    <p className="text-muted-foreground">11. References</p>
+                  </div>
+                </div>
 
-            {/* Quick Check MC Questions */}
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Target className="h-4 w-4 text-primary" />
-                  Quick Check: Source Exploration
-                </CardTitle>
-                <CardDescription>
-                  Answer these questions by skimming the article page (not reading the full text). Click an option to check your answer.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <QuickCheckMC
-                  questionNumber={1}
-                  question="Who is the publisher of this article?"
-                  options={[
-                    { label: "A", text: "Elsevier" },
-                    { label: "B", text: "Taylor & Francis" },
-                    { label: "C", text: "Springer Nature" },
-                    { label: "D", text: "SAGE Publications" },
-                  ]}
-                  correctAnswer="B"
-                  explanation="Taylor & Francis publishes the journal 'Learning, Media and Technology'. You can see the T&F logo at the top of the article page."
-                />
+                {/* Example 2: Excerpt Structure */}
+                <div className="p-4 rounded-lg border bg-muted/30 space-y-3">
+                  <h4 className="font-medium text-sm">Example 2: Overall Structure of the Excerpt (Pre-course Writing)</h4>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    The excerpt provided for your assignment covers a specific section. Its structure:
+                  </p>
+                  <div className="text-sm space-y-1 pl-4 border-l-2 border-purple-500/50">
+                    <p className="font-medium">1. Context: Introduction to facial recognition in schools</p>
+                    <p className="font-medium">2. Main argument: Concerns about surveillance</p>
+                    <p className="font-medium">3. Supporting evidence: Examples and implications</p>
+                  </div>
+                </div>
 
-                <QuickCheckMC
-                  questionNumber={2}
-                  question="What is the journal name?"
-                  options={[
-                    { label: "A", text: "Educational Technology Research" },
-                    { label: "B", text: "Learning, Media and Technology" },
-                    { label: "C", text: "Computers & Education" },
-                    { label: "D", text: "Journal of Digital Learning" },
-                  ]}
-                  correctAnswer="B"
-                  explanation="The journal name appears in the article header and citation information. It's 'Learning, Media and Technology', Volume 45, Issue 2."
-                />
-
-                <QuickCheckMC
-                  questionNumber={3}
-                  question="Which universities do the authors come from?"
-                  options={[
-                    { label: "A", text: "Harvard University & MIT" },
-                    { label: "B", text: "Monash University (both authors)" },
-                    { label: "C", text: "University of Melbourne & University of Sydney" },
-                    { label: "D", text: "University of Oxford & Cambridge" },
-                  ]}
-                  correctAnswer="B"
-                  explanation="Both Mark Andrejevic and Neil Selwyn are affiliated with Monash University in Australia. This is shown in the author information section."
-                />
-
+                {/* Quick Check */}
                 <QuickCheckMC
                   questionNumber={4}
                   question="Based on the article headings, what is the overall structure of this paper?"
@@ -297,6 +367,96 @@ export default function HourPage() {
                   correctAnswer="B"
                   explanation="The article follows: Abstract → Introduction → 'The emergence of facial recognition technology' → 'Problematising the rise of facial recognition' → 'Facial recognition technologies in education' → 'Making sense of the take-up' → 'Challenging the take-up' → Discussion → Conclusion."
                 />
+
+                {/* Writing Practice */}
+                <div className="p-4 rounded-lg bg-purple-500/10 border border-purple-500/30 space-y-3">
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    <PenLine className="h-4 w-4 text-purple-600" />
+                    Writing Practice: Create a Macro-Level Outline
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    Find another academic article in your field and create a macro-level outline listing all major sections. 
+                    Identify how the sections work together to build the author's argument.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Part 3b: Outlining - Micro Level */}
+            <Card className="border-2 border-indigo-500/30 bg-indigo-500/5">
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-indigo-600" />
+                  <CardTitle className="text-lg">Part 3b: Outlining – Micro Level</CardTitle>
+                </div>
+                <CardDescription>
+                  Learn to identify key points within paragraphs
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="p-4 rounded-lg bg-background/80 space-y-3">
+                  <h4 className="font-medium flex items-center gap-2">
+                    <Lightbulb className="h-4 w-4 text-indigo-500" />
+                    What is Micro-Level Outlining?
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    <strong>Micro-level outlining</strong> focuses on identifying the key points within individual paragraphs. 
+                    This includes finding the topic sentence, supporting details, and concluding thought.
+                  </p>
+                  <div className="grid gap-2 text-sm">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-indigo-500 mt-0.5 shrink-0" />
+                      <span><strong>Topic sentence:</strong> The main idea (usually first sentence)</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-indigo-500 mt-0.5 shrink-0" />
+                      <span><strong>Supporting details:</strong> Evidence, examples, explanations</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-indigo-500 mt-0.5 shrink-0" />
+                      <span><strong>Concluding thought:</strong> Summary or transition</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Example: Paragraph Outline */}
+                <div className="p-4 rounded-lg border bg-muted/30 space-y-3">
+                  <h4 className="font-medium text-sm">Example: Key Points in a Paragraph</h4>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Consider the first paragraph of the excerpt. A micro-level outline might look like:
+                  </p>
+                  <div className="text-sm space-y-2 pl-4 border-l-2 border-indigo-500/50">
+                    <div>
+                      <p className="font-medium text-indigo-700">Topic Sentence:</p>
+                      <p className="text-muted-foreground text-xs">Introduces the main concern about FRT in schools</p>
+                    </div>
+                    <div>
+                      <p className="font-medium text-indigo-700">Supporting Details:</p>
+                      <p className="text-muted-foreground text-xs">• Specific examples of school implementations</p>
+                      <p className="text-muted-foreground text-xs">• Statistics or evidence of adoption</p>
+                    </div>
+                    <div>
+                      <p className="font-medium text-indigo-700">Concluding Thought:</p>
+                      <p className="text-muted-foreground text-xs">Raises questions that the paper will address</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Writing Practice */}
+                <div className="p-4 rounded-lg bg-indigo-500/10 border border-indigo-500/30 space-y-3">
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    <PenLine className="h-4 w-4 text-indigo-600" />
+                    Writing Practice: Create a Micro-Level Outline
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    Choose one paragraph from the article excerpt. Identify and write out:
+                  </p>
+                  <ul className="text-xs text-muted-foreground list-disc pl-4 space-y-1">
+                    <li>The topic sentence (main idea)</li>
+                    <li>2-3 supporting details or examples</li>
+                    <li>The concluding thought (if present)</li>
+                  </ul>
+                </div>
               </CardContent>
             </Card>
 
@@ -313,7 +473,7 @@ export default function HourPage() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <p className="text-sm text-muted-foreground">
-                  Now that you've explored the source, you're ready for the assignment! Write a 350-word essay based on the article excerpt.
+                  Now that you've learned skimming, scanning, and outlining, you're ready for the assignment! Write a 350-word essay based on the article excerpt.
                   You can get <strong>full credit</strong> as long as the similarity rate and AI detection rate are not too high.
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -332,7 +492,7 @@ export default function HourPage() {
               </CardContent>
             </Card>
 
-            {/* Key Milestones - Moved to end */}
+            {/* Key Milestones */}
             <Card className="border-amber-500/30 bg-amber-500/5">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
