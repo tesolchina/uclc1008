@@ -9,6 +9,7 @@ import { ObjectiveTask } from "@/components/tasks/ObjectiveTask";
 import { WritingTask } from "@/components/tasks/WritingTask";
 import { AskQuestionButton } from "@/components/tasks/AskQuestionButton";
 import { StudentLoginReminder } from "@/components/StudentLoginReminder";
+import { QuickCheckMC } from "@/components/lessons/QuickCheckMC";
 import { LectureOutline, useSectionProgress, generateSectionId } from "@/features/lecture-mode";
 import type { AgendaSectionEnhanced } from "@/features/lecture-mode";
 import { ArrowLeft, ArrowRight, Clock, Target, BookOpen, PenLine, CheckCircle2, Lightbulb, FileText, Sparkles, ExternalLink, AlertCircle, Calendar, GraduationCap } from "lucide-react";
@@ -241,101 +242,61 @@ export default function HourPage() {
                   Quick Check: Source Exploration
                 </CardTitle>
                 <CardDescription>
-                  Answer these questions by skimming the article page (not reading the full text)
+                  Answer these questions by skimming the article page (not reading the full text). Click an option to check your answer.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Question 1 */}
-                <div className="p-4 rounded-lg bg-muted/30 space-y-2">
-                  <p className="font-medium text-sm">1. Who is the publisher of this article?</p>
-                  <div className="grid gap-2 text-sm">
-                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
-                      <input type="radio" name="q1" className="h-4 w-4" />
-                      <span>A) Elsevier</span>
-                    </label>
-                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
-                      <input type="radio" name="q1" className="h-4 w-4" />
-                      <span>B) Taylor & Francis</span>
-                    </label>
-                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
-                      <input type="radio" name="q1" className="h-4 w-4" />
-                      <span>C) Springer Nature</span>
-                    </label>
-                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
-                      <input type="radio" name="q1" className="h-4 w-4" />
-                      <span>D) SAGE Publications</span>
-                    </label>
-                  </div>
-                </div>
+                <QuickCheckMC
+                  questionNumber={1}
+                  question="Who is the publisher of this article?"
+                  options={[
+                    { label: "A", text: "Elsevier" },
+                    { label: "B", text: "Taylor & Francis" },
+                    { label: "C", text: "Springer Nature" },
+                    { label: "D", text: "SAGE Publications" },
+                  ]}
+                  correctAnswer="B"
+                  explanation="Taylor & Francis publishes the journal 'Learning, Media and Technology'. You can see the T&F logo at the top of the article page."
+                />
 
-                {/* Question 2 */}
-                <div className="p-4 rounded-lg bg-muted/30 space-y-2">
-                  <p className="font-medium text-sm">2. What is the journal name?</p>
-                  <div className="grid gap-2 text-sm">
-                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
-                      <input type="radio" name="q2" className="h-4 w-4" />
-                      <span>A) Educational Technology Research</span>
-                    </label>
-                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
-                      <input type="radio" name="q2" className="h-4 w-4" />
-                      <span>B) Learning, Media and Technology</span>
-                    </label>
-                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
-                      <input type="radio" name="q2" className="h-4 w-4" />
-                      <span>C) Computers & Education</span>
-                    </label>
-                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
-                      <input type="radio" name="q2" className="h-4 w-4" />
-                      <span>D) Journal of Digital Learning</span>
-                    </label>
-                  </div>
-                </div>
+                <QuickCheckMC
+                  questionNumber={2}
+                  question="What is the journal name?"
+                  options={[
+                    { label: "A", text: "Educational Technology Research" },
+                    { label: "B", text: "Learning, Media and Technology" },
+                    { label: "C", text: "Computers & Education" },
+                    { label: "D", text: "Journal of Digital Learning" },
+                  ]}
+                  correctAnswer="B"
+                  explanation="The journal name appears in the article header and citation information. It's 'Learning, Media and Technology', Volume 45, Issue 2."
+                />
 
-                {/* Question 3 */}
-                <div className="p-4 rounded-lg bg-muted/30 space-y-2">
-                  <p className="font-medium text-sm">3. Which universities do the authors come from?</p>
-                  <div className="grid gap-2 text-sm">
-                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
-                      <input type="radio" name="q3" className="h-4 w-4" />
-                      <span>A) Harvard University & MIT</span>
-                    </label>
-                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
-                      <input type="radio" name="q3" className="h-4 w-4" />
-                      <span>B) Monash University (both authors)</span>
-                    </label>
-                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
-                      <input type="radio" name="q3" className="h-4 w-4" />
-                      <span>C) University of Melbourne & University of Sydney</span>
-                    </label>
-                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
-                      <input type="radio" name="q3" className="h-4 w-4" />
-                      <span>D) University of Oxford & Cambridge</span>
-                    </label>
-                  </div>
-                </div>
+                <QuickCheckMC
+                  questionNumber={3}
+                  question="Which universities do the authors come from?"
+                  options={[
+                    { label: "A", text: "Harvard University & MIT" },
+                    { label: "B", text: "Monash University (both authors)" },
+                    { label: "C", text: "University of Melbourne & University of Sydney" },
+                    { label: "D", text: "University of Oxford & Cambridge" },
+                  ]}
+                  correctAnswer="B"
+                  explanation="Both Mark Andrejevic and Neil Selwyn are affiliated with Monash University in Australia. This is shown in the author information section."
+                />
 
-                {/* Question 4 */}
-                <div className="p-4 rounded-lg bg-muted/30 space-y-2">
-                  <p className="font-medium text-sm">4. What are the main sections (overall structure) of this paper?</p>
-                  <div className="grid gap-2 text-sm">
-                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
-                      <input type="radio" name="q4" className="h-4 w-4" />
-                      <span>A) Abstract → Methods → Results → Discussion</span>
-                    </label>
-                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
-                      <input type="radio" name="q4" className="h-4 w-4" />
-                      <span>B) Introduction → Literature Review → Methodology → Findings → Conclusion</span>
-                    </label>
-                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
-                      <input type="radio" name="q4" className="h-4 w-4" />
-                      <span>C) Abstract → Introduction → Critical Questions/Concerns → Conclusion</span>
-                    </label>
-                    <label className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 cursor-pointer">
-                      <input type="radio" name="q4" className="h-4 w-4" />
-                      <span>D) Summary → Analysis → Recommendations</span>
-                    </label>
-                  </div>
-                </div>
+                <QuickCheckMC
+                  questionNumber={4}
+                  question="Based on the article headings, what is the overall structure of this paper?"
+                  options={[
+                    { label: "A", text: "Abstract → Methods → Results → Discussion → Conclusion" },
+                    { label: "B", text: "Abstract → Introduction → Context sections → Analysis sections → Discussion → Conclusion" },
+                    { label: "C", text: "Introduction → Literature Review → Methodology → Findings" },
+                    { label: "D", text: "Summary → Analysis → Recommendations → References" },
+                  ]}
+                  correctAnswer="B"
+                  explanation="The article follows: Abstract → Introduction → 'The emergence of facial recognition technology' → 'Problematising the rise of facial recognition' → 'Facial recognition technologies in education' → 'Making sense of the take-up' → 'Challenging the take-up' → Discussion → Conclusion."
+                />
               </CardContent>
             </Card>
 
