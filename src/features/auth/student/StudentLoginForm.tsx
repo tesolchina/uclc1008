@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,25 +18,61 @@ interface StudentLoginFormProps {
 export function StudentLoginForm({ onBack, onSwitchToRegister }: StudentLoginFormProps) {
   const navigate = useNavigate();
   const { loginAsStudent } = useAuth();
-  const [studentLoginId, setStudentLoginId] = useState('');
+  const [digits, setDigits] = useState('');
+  const [initials, setInitials] = useState('');
+  const [suffix, setSuffix] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
+  const initialsRef = useRef<HTMLInputElement>(null);
+  const suffixRef = useRef<HTMLInputElement>(null);
+
+  const handleDigitsChange = (value: string) => {
+    const cleaned = value.replace(/\D/g, '').slice(0, 4);
+    setDigits(cleaned);
+    if (cleaned.length === 4) {
+      initialsRef.current?.focus();
+    }
+  };
+
+  const handleInitialsChange = (value: string) => {
+    const cleaned = value.replace(/[^A-Za-z]/g, '').toUpperCase().slice(0, 2);
+    setInitials(cleaned);
+    if (cleaned.length === 2) {
+      suffixRef.current?.focus();
+    }
+  };
+
+  const handleSuffixChange = (value: string) => {
+    const cleaned = value.replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, 2);
+    setSuffix(cleaned);
+  };
+
+  const getFullId = () => {
+    if (digits && initials && suffix) {
+      return `${digits}-${initials}-${suffix}`;
+    }
+    return '';
+  };
+
   const handleLogin = () => {
     setError(null);
+    const fullId = getFullId();
     
-    if (!validateStudentIdFormat(studentLoginId)) {
+    if (!validateStudentIdFormat(fullId)) {
       setError(AUTH_ERROR_MESSAGES.invalid_id_format);
       return;
     }
     
-    loginAsStudent(studentLoginId.toUpperCase());
+    loginAsStudent(fullId.toUpperCase());
     setSuccess('Welcome back! Logging you in...');
     
     setTimeout(() => {
       navigate('/');
     }, 500);
   };
+
+  const isComplete = digits.length === 4 && initials.length === 2 && suffix.length === 2;
 
   return (
     <div className="min-h-[60vh] flex items-center justify-center p-4">
@@ -78,24 +114,62 @@ export function StudentLoginForm({ onBack, onSwitchToRegister }: StudentLoginFor
           <div className="space-y-4">
             <div className="text-center space-y-2">
               <p className="text-sm text-muted-foreground">
-                Enter your unique ID (e.g., <span className="font-mono font-medium">1234-JD-7X</span>)
+                Enter your unique ID in the boxes below
               </p>
               <p className="text-xs text-amber-600">
                 ⚠️ The last 2 characters are random — don't enter "XX"
               </p>
             </div>
-            <Input
-              type="text"
-              value={studentLoginId}
-              onChange={(e) => setStudentLoginId(e.target.value.toUpperCase())}
-              className="text-center text-2xl tracking-wider font-mono h-14"
-              placeholder="1234-JD-XX"
-              autoFocus
-            />
+            
+            {/* Segmented input boxes */}
+            <div className="flex items-center justify-center gap-2">
+              {/* 4 digits */}
+              <Input
+                type="text"
+                inputMode="numeric"
+                value={digits}
+                onChange={(e) => handleDigitsChange(e.target.value)}
+                className="text-center text-2xl tracking-wider font-mono h-14 w-24"
+                placeholder="1234"
+                maxLength={4}
+                autoFocus
+              />
+              <span className="text-2xl font-bold text-muted-foreground">-</span>
+              {/* 2 initials */}
+              <Input
+                ref={initialsRef}
+                type="text"
+                value={initials}
+                onChange={(e) => handleInitialsChange(e.target.value)}
+                className="text-center text-2xl tracking-wider font-mono h-14 w-16 uppercase"
+                placeholder="JD"
+                maxLength={2}
+              />
+              <span className="text-2xl font-bold text-muted-foreground">-</span>
+              {/* 2 character suffix */}
+              <Input
+                ref={suffixRef}
+                type="text"
+                value={suffix}
+                onChange={(e) => handleSuffixChange(e.target.value)}
+                className="text-center text-2xl tracking-wider font-mono h-14 w-16 uppercase"
+                placeholder="7X"
+                maxLength={2}
+              />
+            </div>
+
+            {/* Show assembled ID */}
+            {isComplete && (
+              <div className="text-center">
+                <p className="text-sm text-muted-foreground">Your ID:</p>
+                <p className="text-xl font-mono font-bold text-primary">{getFullId()}</p>
+              </div>
+            )}
+
             <Button 
               className="w-full" 
               onClick={handleLogin}
-              disabled={!studentLoginId}
+              disabled={!isComplete}
             >
               <LogIn className="h-4 w-4 mr-2" />
               Continue
