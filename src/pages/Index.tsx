@@ -373,7 +373,7 @@ const Index = () => {
                     {item.highlightType === "exam" && (
                       <Badge className="mr-2 bg-amber-500 text-white text-[10px]">In-class Test</Badge>
                     )}
-                    {item.assignmentLink ? (
+                    {item.highlightType === "exam" && item.assignmentLink ? (
                       <Link to={item.assignmentLink} className="text-primary hover:underline">
                         {item.activities}
                       </Link>
@@ -382,7 +382,7 @@ const Index = () => {
                     )}
                   </TableCell>
                   <TableCell className="text-sm">
-                    {item.assignmentLink && !item.activities.includes("In-class") ? (
+                    {item.assignmentLink && item.highlightType === "assignment" ? (
                       <Link to={item.assignmentLink} className="text-primary hover:underline">
                         {item.assignments}
                       </Link>
