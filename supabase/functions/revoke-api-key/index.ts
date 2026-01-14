@@ -20,7 +20,7 @@ serve(async (req) => {
   }
 
   try {
-    const { provider, accessToken } = await req.json();
+    const { provider, studentId, accessToken } = await req.json();
 
     if (!provider) {
       return new Response(
@@ -89,6 +89,7 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // Remove from api_keys table
     const { error } = await supabase
       .from("api_keys")
       .delete()
@@ -98,6 +99,20 @@ serve(async (req) => {
       console.error("Error deleting API key from local database:", error);
     } else {
       console.log(`API key deleted from local database for ${provider}`);
+    }
+
+    // Also remove from student record if studentId provided
+    if (studentId && provider === "hkbu") {
+      const { error: studentError } = await supabase
+        .from("students")
+        .update({ hkbu_api_key: null, updated_at: new Date().toISOString() })
+        .eq("student_id", studentId);
+
+      if (studentError) {
+        console.error("Error removing API key from student record:", studentError);
+      } else {
+        console.log(`API key removed from student record: ${studentId}`);
+      }
     }
 
     // If HKBU revoke failed but we have an access token, warn the user
