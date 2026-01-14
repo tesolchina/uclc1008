@@ -996,118 +996,119 @@ Remember to also save any written responses separately.
                   </Button>
                 </div>
 
-                {/* Scanning Tasks */}
-                <div className="space-y-3 pt-2">
-                  <h4 className="font-medium text-sm flex items-center gap-2">
-                    <Target className="h-4 w-4 text-blue-500" />
-                    Scanning Practice: Find Specific Information
-                  </h4>
-                  <p className="text-xs text-muted-foreground">
-                    Scan the article page to find these specific details. Don't read everything—just locate the information!
-                  </p>
-                  
-                  <QuickCheckMC
-                    questionNumber={1}
-                    question="Who is the publisher of this article?"
-                    options={[
-                      { label: "A", text: "Elsevier" },
-                      { label: "B", text: "Taylor & Francis" },
-                      { label: "C", text: "Springer Nature" },
-                      { label: "D", text: "SAGE Publications" },
-                    ]}
-                    correctAnswer="B"
-                    explanation="Taylor & Francis publishes the journal 'Learning, Media and Technology'. You can see the T&F logo at the top of the article page."
-                  />
+                {/* NOTE: All MC question sets should be wrapped in CollapsibleSection for better UX */}
+                {/* Scanning Tasks - Collapsible */}
+                <CollapsibleSection
+                  title="Scanning Practice: Find Specific Information"
+                  description="Scan the article page to find these specific details. Don't read everything—just locate the information!"
+                  icon={<Target className="h-4 w-4 text-blue-500" />}
+                  defaultOpen={false}
+                  className="border border-blue-500/20 bg-blue-500/5"
+                >
+                  <div className="space-y-3">
+                    <QuickCheckMC
+                      questionNumber={1}
+                      question="Who is the publisher of this article?"
+                      options={[
+                        { label: "A", text: "Elsevier" },
+                        { label: "B", text: "Taylor & Francis" },
+                        { label: "C", text: "Springer Nature" },
+                        { label: "D", text: "SAGE Publications" },
+                      ]}
+                      correctAnswer="B"
+                      explanation="Taylor & Francis publishes the journal 'Learning, Media and Technology'. You can see the T&F logo at the top of the article page."
+                    />
 
-                  <QuickCheckMC
-                    questionNumber={2}
-                    question="What is the journal name?"
-                    options={[
-                      { label: "A", text: "Educational Technology Research" },
-                      { label: "B", text: "Learning, Media and Technology" },
-                      { label: "C", text: "Computers & Education" },
-                      { label: "D", text: "Journal of Digital Learning" },
-                    ]}
-                    correctAnswer="B"
-                    explanation="The journal name appears in the article header and citation information. It's 'Learning, Media and Technology', Volume 45, Issue 2."
-                  />
+                    <QuickCheckMC
+                      questionNumber={2}
+                      question="What is the journal name?"
+                      options={[
+                        { label: "A", text: "Educational Technology Research" },
+                        { label: "B", text: "Learning, Media and Technology" },
+                        { label: "C", text: "Computers & Education" },
+                        { label: "D", text: "Journal of Digital Learning" },
+                      ]}
+                      correctAnswer="B"
+                      explanation="The journal name appears in the article header and citation information. It's 'Learning, Media and Technology', Volume 45, Issue 2."
+                    />
 
-                  <QuickCheckMC
-                    questionNumber={3}
-                    question="Which universities do the authors come from?"
-                    options={[
-                      { label: "A", text: "Harvard University & MIT" },
-                      { label: "B", text: "Monash University (both authors)" },
-                      { label: "C", text: "University of Melbourne & University of Sydney" },
-                      { label: "D", text: "University of Oxford & Cambridge" },
-                    ]}
-                    correctAnswer="B"
-                    explanation="Both Mark Andrejevic and Neil Selwyn are affiliated with Monash University in Australia. This is shown in the author information section."
-                  />
+                    <QuickCheckMC
+                      questionNumber={3}
+                      question="Which universities do the authors come from?"
+                      options={[
+                        { label: "A", text: "Harvard University & MIT" },
+                        { label: "B", text: "Monash University (both authors)" },
+                        { label: "C", text: "University of Melbourne & University of Sydney" },
+                        { label: "D", text: "University of Oxford & Cambridge" },
+                      ]}
+                      correctAnswer="B"
+                      explanation="Both Mark Andrejevic and Neil Selwyn are affiliated with Monash University in Australia. This is shown in the author information section."
+                    />
 
-                  <QuickCheckMC
-                    questionNumber={4}
-                    question="When was this article published online?"
-                    options={[
-                      { label: "A", text: "05 November 2019" },
-                      { label: "B", text: "27 January 2020" },
-                      { label: "C", text: "14 February 2020" },
-                      { label: "D", text: "3 March 2020" },
-                    ]}
-                    correctAnswer="A"
-                    explanation="The article shows 'Published online: 05 Nov 2019' in the publication information section on the Taylor & Francis website."
-                  />
-                </div>
+                    <QuickCheckMC
+                      questionNumber={4}
+                      question="When was this article published online?"
+                      options={[
+                        { label: "A", text: "05 November 2019" },
+                        { label: "B", text: "27 January 2020" },
+                        { label: "C", text: "14 February 2020" },
+                        { label: "D", text: "3 March 2020" },
+                      ]}
+                      correctAnswer="A"
+                      explanation="The article shows 'Published online: 05 Nov 2019' in the publication information section on the Taylor & Francis website."
+                    />
+                  </div>
+                </CollapsibleSection>
 
-                {/* Skimming Tasks */}
-                <div className="space-y-3 pt-4 border-t">
-                  <h4 className="font-medium text-sm flex items-center gap-2">
-                    <Target className="h-4 w-4 text-green-500" />
-                    Skimming Practice: Understand the Big Picture
-                  </h4>
-                  <p className="text-xs text-muted-foreground">
-                    Skim the article by reading headings, the abstract, and the first sentence of each section. Don't read in detail!
-                  </p>
-                  
-                  <QuickCheckMC
-                    questionNumber={5}
-                    question="What is the main topic of this article?"
-                    options={[
-                      { label: "A", text: "How to implement facial recognition systems in schools" },
-                      { label: "B", text: "Critical examination of facial recognition technology use in educational settings" },
-                      { label: "C", text: "The benefits of surveillance technology for student safety" },
-                      { label: "D", text: "A comparison of different facial recognition software vendors" },
-                    ]}
-                    correctAnswer="B"
-                    explanation="The title and abstract clearly indicate this is a critical examination of FRT in schools, raising 'critical questions and concerns' rather than promoting its use."
-                  />
+                {/* Skimming Tasks - Collapsible */}
+                <CollapsibleSection
+                  title="Skimming Practice: Understand the Big Picture"
+                  description="Skim the article by reading headings, the abstract, and the first sentence of each section. Don't read in detail!"
+                  icon={<Target className="h-4 w-4 text-green-500" />}
+                  defaultOpen={false}
+                  className="border border-green-500/20 bg-green-500/5"
+                >
+                  <div className="space-y-3">
+                    <QuickCheckMC
+                      questionNumber={5}
+                      question="What is the main topic of this article?"
+                      options={[
+                        { label: "A", text: "How to implement facial recognition systems in schools" },
+                        { label: "B", text: "Critical examination of facial recognition technology use in educational settings" },
+                        { label: "C", text: "The benefits of surveillance technology for student safety" },
+                        { label: "D", text: "A comparison of different facial recognition software vendors" },
+                      ]}
+                      correctAnswer="B"
+                      explanation="The title and abstract clearly indicate this is a critical examination of FRT in schools, raising 'critical questions and concerns' rather than promoting its use."
+                    />
 
-                  <QuickCheckMC
-                    questionNumber={6}
-                    question="Based on the headings, what is the authors' overall stance on FRT in schools?"
-                    options={[
-                      { label: "A", text: "Strongly supportive of widespread adoption" },
-                      { label: "B", text: "Neutral, presenting only facts without opinion" },
-                      { label: "C", text: "Critical and questioning, highlighting concerns" },
-                      { label: "D", text: "Focused only on technical implementation details" },
-                    ]}
-                    correctAnswer="C"
-                    explanation="Headings like 'Problematising the rise of facial recognition' and 'Challenging the take-up of facial recognition in schools' indicate a critical, questioning stance."
-                  />
+                    <QuickCheckMC
+                      questionNumber={6}
+                      question="Based on the headings, what is the authors' overall stance on FRT in schools?"
+                      options={[
+                        { label: "A", text: "Strongly supportive of widespread adoption" },
+                        { label: "B", text: "Neutral, presenting only facts without opinion" },
+                        { label: "C", text: "Critical and questioning, highlighting concerns" },
+                        { label: "D", text: "Focused only on technical implementation details" },
+                      ]}
+                      correctAnswer="C"
+                      explanation="Headings like 'Problematising the rise of facial recognition' and 'Challenging the take-up of facial recognition in schools' indicate a critical, questioning stance."
+                    />
 
-                  <QuickCheckMC
-                    questionNumber={7}
-                    question="What type of article structure does this paper follow?"
-                    options={[
-                      { label: "A", text: "Experimental study with methods, results, and statistics" },
-                      { label: "B", text: "Argumentative/analytical essay discussing issues and concerns" },
-                      { label: "C", text: "Case study of a specific school implementation" },
-                      { label: "D", text: "Literature review summarizing other research only" },
-                    ]}
-                    correctAnswer="B"
-                    explanation="The structure (Introduction → Context → Analysis → Discussion → Conclusion) with no 'Methods' or 'Results' sections indicates this is an argumentative/analytical piece rather than an empirical study."
-                  />
-                </div>
+                    <QuickCheckMC
+                      questionNumber={7}
+                      question="What type of article structure does this paper follow?"
+                      options={[
+                        { label: "A", text: "Experimental study with methods, results, and statistics" },
+                        { label: "B", text: "Argumentative/analytical essay discussing issues and concerns" },
+                        { label: "C", text: "Case study of a specific school implementation" },
+                        { label: "D", text: "Literature review summarizing other research only" },
+                      ]}
+                      correctAnswer="B"
+                      explanation="The structure (Introduction → Context → Analysis → Discussion → Conclusion) with no 'Methods' or 'Results' sections indicates this is an argumentative/analytical piece rather than an empirical study."
+                    />
+                  </div>
+                </CollapsibleSection>
               </div>
             </CollapsibleSection>
 
