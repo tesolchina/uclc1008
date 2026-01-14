@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown, ChevronRight, Save, CheckCircle2, Loader2 } from "lucide-react";
+import { ChevronDown, ChevronRight, CheckCircle2, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -23,8 +23,9 @@ export function ParagraphWithNotes({
   const [isOpen, setIsOpen] = useState(false);
   const [notes, setNotes] = useState("");
   const [savedNotes, setSavedNotes] = useState("");
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<"idle" | "saved" | "unsaved">("idle");
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
+  
+  const autoSaveTimer = useRef<NodeJS.Timeout | null>(null);
 
   // Load saved notes
   useEffect(() => {
@@ -48,19 +49,35 @@ export function ParagraphWithNotes({
     loadNotes();
   }, [studentId, paragraphKey]);
 
-  // Track unsaved changes
+  // Autosave notes when they change
   useEffect(() => {
-    if (notes === savedNotes && savedNotes !== "") {
-      setSaveStatus("saved");
-    } else if (notes !== savedNotes && notes !== "") {
-      setSaveStatus("unsaved");
+    if (!studentId || notes === savedNotes) return;
+    
+    if (notes.trim() === "") {
+      setSaveStatus("idle");
+      return;
     }
-  }, [notes, savedNotes]);
+
+    setSaveStatus("saving");
+    
+    if (autoSaveTimer.current) {
+      clearTimeout(autoSaveTimer.current);
+    }
+
+    autoSaveTimer.current = setTimeout(() => {
+      handleSave();
+    }, 1500);
+
+    return () => {
+      if (autoSaveTimer.current) {
+        clearTimeout(autoSaveTimer.current);
+      }
+    };
+  }, [notes, savedNotes, studentId]);
 
   const handleSave = useCallback(async () => {
     if (!studentId || !notes.trim()) return;
 
-    setIsSaving(true);
     try {
       const { error } = await supabase
         .from("paragraph_notes")
@@ -79,8 +96,7 @@ export function ParagraphWithNotes({
       }
     } catch (err) {
       console.error("Error saving notes:", err);
-    } finally {
-      setIsSaving(false);
+      setSaveStatus("idle");
     }
   }, [studentId, paragraphKey, notes]);
 
@@ -101,10 +117,13 @@ export function ParagraphWithNotes({
             ) : (
               <ChevronRight className="h-4 w-4 text-purple-600 shrink-0" />
             )}
-            <p className="font-bold text-purple-700 text-xs">
+            <p className="font-bold text-purple-700 text-xs flex items-center gap-2">
               Paragraph {paragraphNumber}
               {hasNotes && !isOpen && (
-                <span className="ml-2 text-muted-foreground font-normal">(has notes)</span>
+                <span className="text-xs bg-green-500/20 text-green-700 dark:text-green-400 px-1.5 py-0.5 rounded flex items-center gap-1 font-normal">
+                  <CheckCircle2 className="h-3 w-3" />
+                  Notes saved
+                </span>
               )}
             </p>
           </div>
@@ -127,34 +146,24 @@ export function ParagraphWithNotes({
             className="w-full min-h-[80px] p-2 rounded-lg border bg-background text-sm resize-y placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
           />
           <div className="flex items-center justify-between">
-            <p className="text-xs text-muted-foreground">
-              {!studentId && "Sign in to save notes"}
-            </p>
-            {studentId && (
-              <Button
-                size="sm"
-                variant={saveStatus === "saved" ? "outline" : "default"}
-                onClick={handleSave}
-                disabled={isSaving || !notes.trim() || saveStatus === "saved"}
-                className="gap-1"
-              >
-                {isSaving ? (
+            {studentId ? (
+              <p className="text-xs text-muted-foreground flex items-center gap-1">
+                {saveStatus === "saving" && (
                   <>
                     <Loader2 className="h-3 w-3 animate-spin" />
                     Saving...
                   </>
-                ) : saveStatus === "saved" ? (
+                )}
+                {saveStatus === "saved" && (
                   <>
                     <CheckCircle2 className="h-3 w-3 text-green-500" />
-                    Saved
-                  </>
-                ) : (
-                  <>
-                    <Save className="h-3 w-3" />
-                    Save
+                    Saved automatically
                   </>
                 )}
-              </Button>
+                {saveStatus === "idle" && notes.trim() === "" && "Notes save automatically"}
+              </p>
+            ) : (
+              <p className="text-xs text-muted-foreground">Sign in to save notes</p>
             )}
           </div>
         </div>

@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { CheckCircle2, XCircle, HelpCircle, RotateCcw, StickyNote, Save } from "lucide-react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { CheckCircle2, XCircle, HelpCircle, RotateCcw, StickyNote, Sparkles, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -14,9 +14,10 @@ interface QuickCheckMCProps {
   options: { label: string; text: string }[];
   correctAnswer: string;
   explanation?: string;
-  questionId?: string; // Unique ID for saving responses
+  questionId?: string;
   weekNumber?: number;
   hourNumber?: number;
+  enableAiFeedback?: boolean;
 }
 
 export const QuickCheckMC = ({
@@ -28,29 +29,59 @@ export const QuickCheckMC = ({
   questionId,
   weekNumber,
   hourNumber,
+  enableAiFeedback = false,
 }: QuickCheckMCProps) => {
   const { studentId, isStudent } = useAuth();
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [attempts, setAttempts] = useState<string[]>([]);
   const [notes, setNotes] = useState("");
+  const [savedNotes, setSavedNotes] = useState("");
   const [isNotesOpen, setIsNotesOpen] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
+  const [aiFeedback, setAiFeedback] = useState<string | null>(null);
+  const [isGettingAiFeedback, setIsGettingAiFeedback] = useState(false);
+  
+  const autoSaveTimer = useRef<NodeJS.Timeout | null>(null);
 
   const isCorrect = selectedAnswer === correctAnswer;
   
-  // Include week/hour in the question key for linking back from teacher dashboard
   const baseId = questionId || `q${questionNumber}-${question.slice(0, 20).replace(/\s/g, '-')}`;
   const uniqueQuestionId = weekNumber && hourNumber 
     ? `week${weekNumber}-hour${hourNumber}-${baseId}`
     : baseId;
 
-  // Load saved notes on mount
   useEffect(() => {
     if (studentId && isStudent) {
       loadSavedData();
     }
   }, [studentId, isStudent]);
+
+  // Autosave notes when they change
+  useEffect(() => {
+    if (!studentId || !isStudent || notes === savedNotes) return;
+    
+    if (notes.trim() === "") {
+      setSaveStatus("idle");
+      return;
+    }
+
+    setSaveStatus("saving");
+    
+    if (autoSaveTimer.current) {
+      clearTimeout(autoSaveTimer.current);
+    }
+
+    autoSaveTimer.current = setTimeout(() => {
+      saveResponse(isCorrect && showFeedback, attempts);
+    }, 1500);
+
+    return () => {
+      if (autoSaveTimer.current) {
+        clearTimeout(autoSaveTimer.current);
+      }
+    };
+  }, [notes, savedNotes, studentId, isStudent]);
 
   const loadSavedData = async () => {
     if (!studentId) return;
@@ -66,14 +97,19 @@ export const QuickCheckMC = ({
       if (data) {
         try {
           const responseData = JSON.parse(data.response as string) as { notes?: string; attempts?: string[]; isCorrect?: boolean };
-          if (responseData.notes) setNotes(responseData.notes);
+          if (responseData.notes) {
+            setNotes(responseData.notes);
+            setSavedNotes(responseData.notes);
+            setSaveStatus("saved");
+          }
           if (responseData.attempts) setAttempts(responseData.attempts);
           if (responseData.isCorrect) {
             setSelectedAnswer(correctAnswer);
             setShowFeedback(true);
           }
-        } catch {
-          // Response might not be JSON
+        } catch {}
+        if (data.ai_feedback) {
+          setAiFeedback(data.ai_feedback);
         }
       }
     } catch (error) {
@@ -82,7 +118,7 @@ export const QuickCheckMC = ({
   };
 
   const handleSelect = (label: string) => {
-    if (showFeedback && isCorrect) return; // Only prevent if already correct
+    if (showFeedback && isCorrect) return;
     
     setSelectedAnswer(label);
     setShowFeedback(true);
@@ -90,7 +126,6 @@ export const QuickCheckMC = ({
     const newAttempts = [...attempts, label];
     setAttempts(newAttempts);
     
-    // Auto-save attempt
     if (studentId && isStudent) {
       saveResponse(label === correctAnswer, newAttempts);
     }
@@ -101,7 +136,7 @@ export const QuickCheckMC = ({
     setShowFeedback(false);
   };
 
-  const saveResponse = async (correct: boolean, attemptsList: string[]) => {
+  const saveResponse = useCallback(async (correct: boolean, attemptsList: string[]) => {
     if (!studentId) return;
     
     try {
@@ -115,7 +150,6 @@ export const QuickCheckMC = ({
         question,
       });
 
-      // Check if record exists
       const { data: existing } = await supabase
         .from('student_task_responses')
         .select('id')
@@ -124,7 +158,6 @@ export const QuickCheckMC = ({
         .maybeSingle();
 
       if (existing) {
-        // Update existing record
         await supabase
           .from('student_task_responses')
           .update({
@@ -135,7 +168,6 @@ export const QuickCheckMC = ({
           })
           .eq('id', existing.id);
       } else {
-        // Insert new record
         await supabase
           .from('student_task_responses')
           .insert({
@@ -146,25 +178,78 @@ export const QuickCheckMC = ({
             score: correct ? 1 : 0,
           });
       }
+      
+      setSavedNotes(notes);
+      setSaveStatus("saved");
     } catch (error) {
       console.error('Error saving response:', error);
+      setSaveStatus("idle");
     }
-  };
+  }, [studentId, uniqueQuestionId, notes, weekNumber, hourNumber, question]);
 
-  const handleSaveNotes = async () => {
-    if (!studentId) {
-      toast.error('Please log in to save notes');
-      return;
-    }
+  const handleGetAiFeedback = async () => {
+    if (!studentId || !isCorrect) return;
     
-    setIsSaving(true);
+    setIsGettingAiFeedback(true);
     try {
-      await saveResponse(isCorrect && showFeedback, attempts);
-      toast.success('Notes saved!');
-    } catch (error) {
-      toast.error('Failed to save notes');
+      const response = await supabase.functions.invoke("chat", {
+        body: {
+          messages: [
+            {
+              role: "user",
+              content: `You are a brief, encouraging academic tutor. A student correctly answered this question:
+
+Question: ${question}
+Correct answer: ${correctAnswer}) ${options.find(o => o.label === correctAnswer)?.text}
+Student's attempts: ${attempts.join(' → ')}
+
+Give a 1-2 sentence response: affirm their answer and add one quick insight about why this is correct or what they should remember.`,
+            },
+          ],
+          studentId,
+          meta: { taskKey: uniqueQuestionId, type: "mc-feedback" },
+        },
+      });
+
+      let feedback = "";
+      if (response.data) {
+        const reader = response.data?.getReader?.();
+        if (reader) {
+          const decoder = new TextDecoder();
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const chunk = decoder.decode(value, { stream: true });
+            const lines = chunk.split("\n");
+            for (const line of lines) {
+              if (line.startsWith("data: ") && line !== "data: [DONE]") {
+                try {
+                  const json = JSON.parse(line.slice(6));
+                  const delta = json.choices?.[0]?.delta?.content;
+                  if (delta) feedback += delta;
+                } catch {}
+              }
+            }
+          }
+        } else if (typeof response.data === "string") {
+          feedback = response.data;
+        }
+      }
+
+      if (feedback) {
+        setAiFeedback(feedback);
+        // Save feedback to database
+        await supabase
+          .from("student_task_responses")
+          .update({ ai_feedback: feedback })
+          .eq("student_id", studentId)
+          .eq("question_key", uniqueQuestionId);
+      }
+    } catch (err) {
+      console.error("Error getting AI feedback:", err);
+      toast.error("Couldn't get AI feedback");
     } finally {
-      setIsSaving(false);
+      setIsGettingAiFeedback(false);
     }
   };
 
@@ -199,11 +284,8 @@ export const QuickCheckMC = ({
               className={cn(
                 "flex items-center gap-2 p-2 rounded text-left transition-all",
                 !showFeedback && "hover:bg-muted/50 cursor-pointer",
-                // Only show green for correct when answered correctly
                 showFeedback && isCorrect && isCorrectOption && "bg-green-500/20 border border-green-500/50",
-                // Show red for currently wrong answer
                 showFeedback && isSelected && !isCorrect && "bg-red-500/20 border border-red-500/50",
-                // Dim previously tried wrong answers
                 !showFeedback && wasAttempted && "opacity-60 bg-red-500/5",
                 showFeedback && isCorrect && "cursor-default"
               )}
@@ -264,13 +346,53 @@ export const QuickCheckMC = ({
         </div>
       )}
 
+      {/* AI Feedback Section */}
+      {showFeedback && isCorrect && enableAiFeedback && (
+        <div className="space-y-2">
+          {aiFeedback ? (
+            <div className="p-3 bg-purple-500/10 border border-purple-500/20 rounded-lg">
+              <div className="flex items-center gap-2 text-xs font-medium text-purple-700 dark:text-purple-400 mb-1">
+                <Sparkles className="h-3 w-3" />
+                AI Tutor Insight
+              </div>
+              <p className="text-sm text-muted-foreground">{aiFeedback}</p>
+            </div>
+          ) : (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleGetAiFeedback}
+              disabled={isGettingAiFeedback}
+              className="gap-1"
+            >
+              {isGettingAiFeedback ? (
+                <>
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  Getting insight...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-3 w-3" />
+                  Get AI insight
+                </>
+              )}
+            </Button>
+          )}
+        </div>
+      )}
+
       {/* Notes Section */}
       <Collapsible open={isNotesOpen} onOpenChange={setIsNotesOpen}>
         <CollapsibleTrigger asChild>
           <Button variant="ghost" size="sm" className="w-full justify-start text-muted-foreground">
             <StickyNote className="h-4 w-4 mr-2" />
             {isNotesOpen ? "Hide Notes" : "Add Notes"}
-            {notes && !isNotesOpen && <span className="ml-2 text-xs bg-primary/10 px-1.5 py-0.5 rounded">Saved</span>}
+            {savedNotes && !isNotesOpen && (
+              <span className="ml-2 text-xs bg-green-500/20 text-green-700 dark:text-green-400 px-1.5 py-0.5 rounded flex items-center gap-1">
+                <CheckCircle2 className="h-3 w-3" />
+                Saved
+              </span>
+            )}
           </Button>
         </CollapsibleTrigger>
         <CollapsibleContent className="mt-2 space-y-2">
@@ -280,21 +402,29 @@ export const QuickCheckMC = ({
             onChange={(e) => setNotes(e.target.value)}
             className="min-h-[80px] text-sm"
           />
-          <div className="flex justify-end">
-            <Button 
-              size="sm" 
-              onClick={handleSaveNotes}
-              disabled={isSaving || !isStudent}
-            >
-              <Save className="h-3 w-3 mr-1" />
-              {isSaving ? "Saving..." : "Save Notes"}
-            </Button>
+          <div className="flex items-center justify-between">
+            {isStudent ? (
+              <p className="text-xs text-muted-foreground flex items-center gap-1">
+                {saveStatus === "saving" && (
+                  <>
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    Saving...
+                  </>
+                )}
+                {saveStatus === "saved" && (
+                  <>
+                    <CheckCircle2 className="h-3 w-3 text-green-500" />
+                    Saved automatically
+                  </>
+                )}
+                {saveStatus === "idle" && notes.trim() === "" && "Notes save automatically"}
+              </p>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Log in as a student to save your notes
+              </p>
+            )}
           </div>
-          {!isStudent && (
-            <p className="text-xs text-muted-foreground">
-              Log in as a student to save your notes
-            </p>
-          )}
         </CollapsibleContent>
       </Collapsible>
     </div>

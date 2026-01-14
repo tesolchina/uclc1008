@@ -184,11 +184,11 @@ serve(async (req) => {
         );
       }
 
-      // Use Lovable AI endpoint
+      // Use Lovable AI endpoint (correct URL)
       apiConfig = {
         key: lovableApiKey,
         provider: "lovable",
-        endpoint: "https://ai-gateway.lovable.dev/chat/completions",
+        endpoint: "https://ai.gateway.lovable.dev/v1/chat/completions",
       };
       source = "shared";
       usageInfo = { used: sharedAccess.used, limit: sharedAccess.limit };
