@@ -921,6 +921,7 @@ export type Database = {
           created_at: string
           display_name: string | null
           email: string | null
+          hkbu_api_key: string | null
           id: string
           is_active: boolean
           notes: string | null
@@ -932,6 +933,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           email?: string | null
+          hkbu_api_key?: string | null
           id?: string
           is_active?: boolean
           notes?: string | null
@@ -943,6 +945,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           email?: string | null
+          hkbu_api_key?: string | null
           id?: string
           is_active?: boolean
           notes?: string | null

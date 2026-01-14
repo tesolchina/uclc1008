@@ -8,7 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import { SharedApiUsageIndicator } from '@/components/api/SharedApiUsageIndicator';
-import { Loader2, Settings, CheckCircle2, XCircle, ExternalLink, User, Key } from 'lucide-react';
+import { Loader2, Settings, CheckCircle2, XCircle, ExternalLink, User, Key, AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 // Get or create browser session ID for anonymous tracking
 function getBrowserSessionId(): string {
@@ -35,7 +36,7 @@ function setStoredStudentId(id: string): void {
 
 export default function SettingsPage() {
   const { toast } = useToast();
-  const { isAuthenticated, profile, accessToken, loginWithHkbu } = useAuth();
+  const { isAuthenticated, profile, loginWithHkbu } = useAuth();
   
   const [isLoading, setIsLoading] = useState(true);
   const [isSavingKey, setIsSavingKey] = useState(false);
@@ -49,9 +50,12 @@ export default function SettingsPage() {
   // API status
   const [hasHkbuKey, setHasHkbuKey] = useState(false);
   const [maskedKey, setMaskedKey] = useState<string | null>(null);
+  const [keySource, setKeySource] = useState<string | null>(null);
   
   // Form
   const [apiKey, setApiKey] = useState('');
+  const [validationStatus, setValidationStatus] = useState<'idle' | 'validating' | 'success' | 'error'>('idle');
+  const [validationError, setValidationError] = useState<string | null>(null);
   
   // Shared API status
   const [sharedApiEnabled, setSharedApiEnabled] = useState(true);
@@ -71,7 +75,7 @@ export default function SettingsPage() {
 
       // Run all async operations in parallel
       const [apiResponse, settingsResponse, usageResponse] = await Promise.all([
-        supabase.functions.invoke('check-api-status', { body: { accessToken } }),
+        supabase.functions.invoke('check-api-status', { body: { studentId: storedId } }),
         supabase.from('system_settings').select('key, value'),
         supabase
           .from('student_api_usage')
@@ -86,6 +90,7 @@ export default function SettingsPage() {
         const hkbuStatus = apiResponse.data.statuses.find((s: any) => s.provider === 'hkbu');
         setHasHkbuKey(hkbuStatus?.available ?? false);
         setMaskedKey(hkbuStatus?.maskedKey ?? null);
+        setKeySource(hkbuStatus?.source ?? null);
       }
 
       // Process settings
@@ -111,7 +116,7 @@ export default function SettingsPage() {
 
   useEffect(() => {
     loadStatus();
-  }, [accessToken, profile]);
+  }, [profile]);
 
   const handleSaveStudentId = () => {
     setIsSavingId(true);
@@ -119,6 +124,8 @@ export default function SettingsPage() {
       setStoredStudentId(studentId);
       setSavedStudentId(studentId);
       toast({ title: 'Student ID saved' });
+      // Reload status to check if student has saved API key
+      loadStatus();
     } catch (error) {
       toast({ variant: 'destructive', title: 'Failed to save Student ID' });
     } finally {
@@ -135,26 +142,57 @@ export default function SettingsPage() {
       return;
     }
 
+    if (!savedStudentId) {
+      toast({
+        variant: 'destructive',
+        title: 'Please set your Student ID first',
+        description: 'Your API key will be saved to your student profile.',
+      });
+      return;
+    }
+
     setIsSavingKey(true);
+    setValidationStatus('validating');
+    setValidationError(null);
+
     try {
-      const { error } = await supabase.functions.invoke('save-api-key', {
+      const { data, error } = await supabase.functions.invoke('save-api-key', {
         body: {
           provider: 'hkbu',
           apiKey: apiKey.trim(),
-          accessToken,
+          studentId: savedStudentId,
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        throw new Error(error.message || 'Failed to save API key');
+      }
 
-      toast({ title: 'API key saved successfully' });
-      setApiKey('');
-      loadStatus();
-    } catch (error) {
+      if (data?.success && data?.validated) {
+        setValidationStatus('success');
+        toast({ 
+          title: '✓ API key validated and saved!',
+          description: 'Your key has been saved to your profile. You won\'t need to enter it again.',
+        });
+        setApiKey('');
+        loadStatus();
+      } else if (data?.error) {
+        setValidationStatus('error');
+        setValidationError(data.error);
+        toast({
+          variant: 'destructive',
+          title: 'Invalid API Key',
+          description: data.error,
+        });
+      }
+    } catch (error: any) {
       console.error('Error saving key:', error);
+      setValidationStatus('error');
+      setValidationError(error.message || 'Failed to save API key');
       toast({
         variant: 'destructive',
         title: 'Failed to save API key',
+        description: error.message,
       });
     } finally {
       setIsSavingKey(false);
@@ -170,7 +208,7 @@ export default function SettingsPage() {
       const { error } = await supabase.functions.invoke('revoke-api-key', {
         body: {
           provider: 'hkbu',
-          accessToken,
+          studentId: savedStudentId,
         },
       });
 
@@ -273,7 +311,9 @@ export default function SettingsPage() {
           </CardTitle>
           <CardDescription>
             {hasHkbuKey 
-              ? 'You have your own HKBU API key configured for unlimited access.'
+              ? keySource === 'student'
+                ? 'You have your own HKBU API key saved to your profile.'
+                : 'Using system HKBU API key.'
               : sharedApiEnabled
                 ? 'Using shared API with daily limits.'
                 : 'No API access available.'}
@@ -289,16 +329,21 @@ export default function SettingsPage() {
                   {maskedKey && (
                     <p className="text-xs text-muted-foreground font-mono">{maskedKey}</p>
                   )}
+                  {keySource === 'student' && (
+                    <Badge variant="secondary" className="mt-1 text-xs">Saved to your profile</Badge>
+                  )}
                 </div>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="ml-auto"
-                  onClick={handleRevokeKey}
-                  disabled={isRevoking}
-                >
-                  {isRevoking ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Remove'}
-                </Button>
+                {keySource === 'student' && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="ml-auto"
+                    onClick={handleRevokeKey}
+                    disabled={isRevoking}
+                  >
+                    {isRevoking ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Remove'}
+                  </Button>
+                )}
               </>
             ) : sharedApiEnabled ? (
               <>
@@ -328,10 +373,20 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle className="text-base">Add Your HKBU API Key</CardTitle>
             <CardDescription>
-              Get unlimited AI tutor access by adding your personal HKBU GenAI API key.
+              Get unlimited AI tutor access by adding your personal HKBU GenAI API key. 
+              Your key will be validated and saved to your profile.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {!savedStudentId && (
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  Please set your Student ID above first. Your API key will be saved to your profile so you don't need to enter it again.
+                </AlertDescription>
+              </Alert>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="apiKey">HKBU API Key</Label>
               <Input
@@ -339,7 +394,12 @@ export default function SettingsPage() {
                 type="password"
                 placeholder="Enter your HKBU GenAI API key"
                 value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
+                onChange={(e) => {
+                  setApiKey(e.target.value);
+                  setValidationStatus('idle');
+                  setValidationError(null);
+                }}
+                disabled={!savedStudentId}
               />
               <p className="text-xs text-muted-foreground">
                 Get your API key from the{' '}
@@ -355,9 +415,34 @@ export default function SettingsPage() {
               </p>
             </div>
 
-            <Button onClick={handleSaveKey} disabled={isSavingKey || !apiKey.trim()}>
-              {isSavingKey && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Save API Key
+            {validationStatus === 'error' && validationError && (
+              <Alert variant="destructive">
+                <XCircle className="h-4 w-4" />
+                <AlertDescription>{validationError}</AlertDescription>
+              </Alert>
+            )}
+
+            {validationStatus === 'success' && (
+              <Alert className="border-green-500 bg-green-500/10">
+                <CheckCircle2 className="h-4 w-4 text-green-500" />
+                <AlertDescription className="text-green-700">
+                  API key validated and saved successfully!
+                </AlertDescription>
+              </Alert>
+            )}
+
+            <Button 
+              onClick={handleSaveKey} 
+              disabled={isSavingKey || !apiKey.trim() || !savedStudentId}
+            >
+              {isSavingKey ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {validationStatus === 'validating' ? 'Validating...' : 'Saving...'}
+                </>
+              ) : (
+                'Validate & Save API Key'
+              )}
             </Button>
           </CardContent>
         </Card>

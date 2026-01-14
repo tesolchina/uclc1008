@@ -6,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const HKBU_PLATFORM_URL = "https://auth.hkbu.tech";
+const HKBU_API_URL = "https://genai.hkbu.edu.hk/general/rest";
 
 // Inline logger
 async function logProcess(entry: {
@@ -36,6 +36,42 @@ async function logProcess(entry: {
   }
 }
 
+// Validate HKBU API key by making a test request
+async function validateHkbuApiKey(apiKey: string): Promise<{ valid: boolean; error?: string }> {
+  try {
+    const response = await fetch(HKBU_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        messages: [{ role: "user", content: "Hi" }],
+        model: "gpt-4o-mini",
+        max_tokens: 5,
+      }),
+    });
+
+    if (response.ok) {
+      return { valid: true };
+    }
+
+    const errorText = await response.text();
+    if (response.status === 401 || response.status === 403) {
+      return { valid: false, error: "Invalid API key" };
+    }
+    
+    // Rate limit or other errors - key might still be valid
+    if (response.status === 429) {
+      return { valid: true }; // Rate limited but key works
+    }
+
+    return { valid: false, error: `API error: ${response.status} - ${errorText}` };
+  } catch (err) {
+    return { valid: false, error: `Connection error: ${err}` };
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -44,14 +80,14 @@ serve(async (req) => {
   const operation = "save-api-key";
 
   try {
-    const { provider, apiKey, accessToken, sessionId } = await req.json();
+    const { provider, apiKey, studentId, sessionId } = await req.json();
 
     await logProcess({
       operation,
       step: "start",
       status: "info",
       message: `Saving API key for ${provider}`,
-      details: { provider, hasAccessToken: !!accessToken },
+      details: { provider, hasStudentId: !!studentId },
       sessionId,
     });
 
@@ -65,6 +101,20 @@ serve(async (req) => {
       });
       return new Response(
         JSON.stringify({ error: "Provider and API key are required" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (!studentId) {
+      await logProcess({
+        operation,
+        step: "validation-error",
+        status: "error",
+        message: "Student ID is required to save API key",
+        sessionId,
+      });
+      return new Response(
+        JSON.stringify({ error: "Please set your Student ID first in Settings" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -84,119 +134,97 @@ serve(async (req) => {
       );
     }
 
-    // If we have an access token, save to HKBU platform
-    if (accessToken) {
+    // Validate the API key first
+    if (provider === "hkbu") {
       await logProcess({
         operation,
-        step: "save-remote",
+        step: "validating",
         status: "info",
-        message: `Saving ${provider} key to HKBU platform...`,
+        message: "Testing HKBU API key...",
         sessionId,
       });
+
+      const validation = await validateHkbuApiKey(apiKey);
       
-      try {
-        const response = await fetch(`${HKBU_PLATFORM_URL}/api/user/api-keys`, {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            keyType: provider,
-            apiKey: apiKey,
-          }),
-        });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          await logProcess({
-            operation,
-            step: "remote-error",
-            status: "error",
-            message: `HKBU platform error: ${response.status}`,
-            details: { status: response.status, error: errorText },
-            sessionId,
-          });
-          return new Response(
-            JSON.stringify({ 
-              error: `Failed to save to HKBU platform: ${response.status}`,
-              details: errorText 
-            }),
-            { status: response.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-
+      if (!validation.valid) {
         await logProcess({
           operation,
-          step: "remote-success",
-          status: "success",
-          message: `API key saved to HKBU platform for ${provider}`,
+          step: "validation-failed",
+          status: "error",
+          message: `API key validation failed: ${validation.error}`,
           sessionId,
         });
-
         return new Response(
           JSON.stringify({ 
-            success: true, 
-            validated: true,
-            savedToHkbu: true,
-            message: `API key saved to HKBU platform for ${provider}` 
+            success: false, 
+            validated: false,
+            error: validation.error || "Invalid API key. Please check and try again." 
           }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      } catch (err) {
-        await logProcess({
-          operation,
-          step: "remote-exception",
-          status: "error",
-          message: `Failed to connect to HKBU platform: ${err}`,
-          sessionId,
-        });
-        return new Response(
-          JSON.stringify({ error: "Failed to connect to HKBU platform" }),
-          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
+
+      await logProcess({
+        operation,
+        step: "validation-success",
+        status: "success",
+        message: "API key validated successfully",
+        sessionId,
+      });
     }
 
-    // Fallback: save locally to database if no access token
-    await logProcess({
-      operation,
-      step: "save-local",
-      status: "warning",
-      message: `No access token provided, saving ${provider} key to local database...`,
-      sessionId,
-    });
-    
+    // Save to student database
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { error } = await supabase
+    await logProcess({
+      operation,
+      step: "saving-to-student",
+      status: "info",
+      message: `Saving ${provider} key to student record: ${studentId}`,
+      sessionId,
+    });
+
+    // Upsert student record with API key
+    const { error: studentError } = await supabase
+      .from("students")
+      .upsert(
+        { 
+          student_id: studentId, 
+          hkbu_api_key: provider === "hkbu" ? apiKey : null,
+          updated_at: new Date().toISOString() 
+        },
+        { onConflict: "student_id" }
+      );
+
+    if (studentError) {
+      await logProcess({
+        operation,
+        step: "student-save-error",
+        status: "error",
+        message: `Failed to save to student record: ${studentError.message}`,
+        sessionId,
+      });
+      return new Response(
+        JSON.stringify({ error: "Failed to save API key to your profile" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Also save to api_keys table for backwards compatibility
+    await supabase
       .from("api_keys")
       .upsert(
         { provider, api_key: apiKey, updated_at: new Date().toISOString() },
         { onConflict: "provider" }
       );
 
-    if (error) {
-      await logProcess({
-        operation,
-        step: "local-error",
-        status: "error",
-        message: `Failed to save API key locally: ${error.message}`,
-        sessionId,
-      });
-      return new Response(
-        JSON.stringify({ error: "Failed to save API key" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
     await logProcess({
       operation,
-      step: "local-success",
+      step: "complete",
       status: "success",
-      message: `API key saved locally for ${provider}`,
+      message: `API key validated and saved for student ${studentId}`,
       sessionId,
     });
 
@@ -204,8 +232,7 @@ serve(async (req) => {
       JSON.stringify({ 
         success: true, 
         validated: true,
-        savedToHkbu: false,
-        message: `API key saved locally for ${provider}` 
+        message: `API key validated and saved successfully!` 
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
