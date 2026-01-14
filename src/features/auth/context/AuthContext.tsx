@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
 import type { Profile, AuthContextType } from '../types';
 import { STORAGE_KEYS } from '../constants';
+import { getStoredStudentId, setStoredStudentId, clearStoredStudentId } from '../utils/studentId';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -14,6 +15,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [userRoles, setUserRoles] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [studentId, setStudentId] = useState<string | null>(() => getStoredStudentId());
 
   const fetchProfile = useCallback(async (userId: string) => {
     const { data, error } = await supabase
@@ -144,21 +146,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     window.location.href = `${SUPABASE_URL}/functions/v1/oauth-init?return_url=${encodeURIComponent(returnUrl)}`;
   }, []);
 
+  const loginAsStudent = useCallback((id: string) => {
+    setStoredStudentId(id);
+    setStudentId(id.trim().toUpperCase());
+  }, []);
+
+  const logoutStudent = useCallback(() => {
+    clearStoredStudentId();
+    setStudentId(null);
+  }, []);
+
   const value: AuthContextType = {
     user,
     session,
     profile,
     accessToken: session?.access_token ?? null,
     isLoading,
-    isAuthenticated: !!user,
+    isAuthenticated: !!user || !!studentId,
     isTeacher: userRoles.includes('teacher') || userRoles.includes('admin'),
     isAdmin: userRoles.includes('admin'),
+    isStudent: !!studentId && !user,
+    studentId,
     signUp,
     signIn,
     signOut,
     login,
     logout: signOut,
     loginWithHkbu,
+    loginAsStudent,
+    logoutStudent,
     refreshProfile,
   };
 
