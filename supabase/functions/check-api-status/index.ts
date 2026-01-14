@@ -189,13 +189,22 @@ serve(async (req) => {
 
     const localKeyMap = new Map(storedKeys?.map(k => [k.provider, k.api_key]) || []);
 
-    // Check HKBU GenAI
-    const hkbuKey = hkbuPlatformKeys.hkbu || localKeyMap.get("hkbu");
+    // Check HKBU GenAI - prioritize: student key > HKBU platform > local
+    const hkbuKey = studentHkbuKey || hkbuPlatformKeys.hkbu || localKeyMap.get("hkbu");
+    let hkbuSource: string | null = null;
+    if (studentHkbuKey) {
+      hkbuSource = "student";
+    } else if (hkbuPlatformKeys.hkbu) {
+      hkbuSource = "hkbu_platform";
+    } else if (localKeyMap.get("hkbu")) {
+      hkbuSource = "local";
+    }
+    
     statuses.push({
       provider: "hkbu",
       available: !!hkbuKey,
       name: "HKBU GenAI",
-      source: hkbuPlatformKeys.hkbu ? "hkbu_platform" : (localKeyMap.get("hkbu") ? "local" : null),
+      source: hkbuSource,
       maskedKey: maskApiKey(hkbuKey),
     });
 
