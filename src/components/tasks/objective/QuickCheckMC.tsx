@@ -38,7 +38,12 @@ export const QuickCheckMC = ({
   const [isSaving, setIsSaving] = useState(false);
 
   const isCorrect = selectedAnswer === correctAnswer;
-  const uniqueQuestionId = questionId || `q${questionNumber}-${question.slice(0, 20).replace(/\s/g, '-')}`;
+  
+  // Include week/hour in the question key for linking back from teacher dashboard
+  const baseId = questionId || `q${questionNumber}-${question.slice(0, 20).replace(/\s/g, '-')}`;
+  const uniqueQuestionId = weekNumber && hourNumber 
+    ? `week${weekNumber}-hour${hourNumber}-${baseId}`
+    : baseId;
 
   // Load saved notes on mount
   useEffect(() => {

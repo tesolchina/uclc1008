@@ -240,6 +240,23 @@ export default function TeacherDashboard() {
     return null;
   };
 
+  // Try to get week/hour from response JSON (for old data that doesn't have it in the key)
+  const getTaskLinkFromResponse = (response: StudentResponse): { week: number; hour: number } | null => {
+    // First try the question_key
+    const fromKey = parseTaskKey(response.question_key);
+    if (fromKey) return fromKey;
+    
+    // Try parsing the response JSON for weekNumber/hourNumber
+    try {
+      const parsed = JSON.parse(response.response);
+      if (parsed.weekNumber && parsed.hourNumber) {
+        return { week: parsed.weekNumber, hour: parsed.hourNumber };
+      }
+    } catch {}
+    
+    return null;
+  };
+
   const handleRespond = async (questionId: string) => {
     const response = responseText[questionId];
     if (!response?.trim()) {
@@ -478,7 +495,7 @@ export default function TeacherDashboard() {
             ) : studentMc.map(r => {
               let parsed: { question?: string; attempts?: string[] } = {};
               try { parsed = JSON.parse(r.response); } catch {}
-              const taskInfo = parseTaskKey(r.question_key);
+              const taskInfo = getTaskLinkFromResponse(r);
               const responseFeedback = getFeedbackForResponse(r.id);
               
               return (
