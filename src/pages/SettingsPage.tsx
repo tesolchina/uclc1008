@@ -36,7 +36,7 @@ function setStoredStudentId(id: string): void {
 
 export default function SettingsPage() {
   const { toast } = useToast();
-  const { isAuthenticated, profile, loginWithHkbu } = useAuth();
+  const { isAuthenticated, profile, accessToken, loginWithHkbu } = useAuth();
   
   const [isLoading, setIsLoading] = useState(true);
   const [isSavingKey, setIsSavingKey] = useState(false);
@@ -75,7 +75,7 @@ export default function SettingsPage() {
 
       // Run all async operations in parallel
       const [apiResponse, settingsResponse, usageResponse] = await Promise.all([
-        supabase.functions.invoke('check-api-status', { body: { studentId: storedId } }),
+        supabase.functions.invoke('check-api-status', { body: { accessToken, studentId: effectiveStudentId } }),
         supabase.from('system_settings').select('key, value'),
         supabase
           .from('student_api_usage')
@@ -142,11 +142,13 @@ export default function SettingsPage() {
       return;
     }
 
-    if (!savedStudentId) {
+    const effectiveStudentId = savedStudentId || profile?.hkbu_user_id;
+
+    if (!effectiveStudentId) {
       toast({
         variant: 'destructive',
-        title: 'Please set your Student ID first',
-        description: 'Your API key will be saved to your student profile.',
+        title: 'Please set your Unique ID first',
+        description: 'Your API key will be saved to your profile so you don\'t need to enter it again.',
       });
       return;
     }
@@ -160,7 +162,7 @@ export default function SettingsPage() {
         body: {
           provider: 'hkbu',
           apiKey: apiKey.trim(),
-          studentId: savedStudentId,
+          studentId: effectiveStudentId,
         },
       });
 

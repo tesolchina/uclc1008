@@ -187,39 +187,87 @@ serve(async (req) => {
       sessionId,
     });
 
-    // Upsert student record with API key
-    const { error: studentError } = await supabase
-      .from("students")
-      .upsert(
-        { 
-          student_id: studentId, 
-          hkbu_api_key: provider === "hkbu" ? apiKey : null,
-          updated_at: new Date().toISOString() 
-        },
-        { onConflict: "student_id" }
-      );
+    // Save to student database
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    if (studentError) {
-      await logProcess({
-        operation,
-        step: "student-save-error",
-        status: "error",
-        message: `Failed to save to student record: ${studentError.message}`,
-        sessionId,
-      });
-      return new Response(
-        JSON.stringify({ error: "Failed to save API key to your profile" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    await logProcess({
+      operation,
+      step: "saving-to-student",
+      status: "info",
+      message: `Saving ${provider} key to student record: ${studentId}`,
+      sessionId,
+    });
+
+    if (provider === "hkbu") {
+      // Avoid relying on a DB unique constraint (onConflict). Do update-or-insert.
+      const { data: existingStudent, error: findErr } = await supabase
+        .from("students")
+        .select("id")
+        .eq("student_id", studentId)
+        .maybeSingle();
+
+      if (findErr) {
+        await logProcess({
+          operation,
+          step: "student-lookup-error",
+          status: "error",
+          message: `Failed to lookup student record: ${findErr.message}`,
+          sessionId,
+        });
+        return new Response(
+          JSON.stringify({ error: "Failed to save API key to your profile" }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      if (existingStudent?.id) {
+        const { error: updateErr } = await supabase
+          .from("students")
+          .update({ hkbu_api_key: apiKey, updated_at: new Date().toISOString() })
+          .eq("id", existingStudent.id);
+
+        if (updateErr) {
+          await logProcess({
+            operation,
+            step: "student-save-error",
+            status: "error",
+            message: `Failed to update student record: ${updateErr.message}`,
+            sessionId,
+          });
+          return new Response(
+            JSON.stringify({ error: "Failed to save API key to your profile" }),
+            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+      } else {
+        const { error: insertErr } = await supabase
+          .from("students")
+          .insert({
+            student_id: studentId,
+            hkbu_api_key: apiKey,
+            is_active: true,
+            updated_at: new Date().toISOString(),
+          });
+
+        if (insertErr) {
+          await logProcess({
+            operation,
+            step: "student-save-error",
+            status: "error",
+            message: `Failed to insert student record: ${insertErr.message}`,
+            sessionId,
+          });
+          return new Response(
+            JSON.stringify({ error: "Failed to save API key to your profile" }),
+            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+      }
     }
 
-    // Also save to api_keys table for backwards compatibility
-    await supabase
-      .from("api_keys")
-      .upsert(
-        { provider, api_key: apiKey, updated_at: new Date().toISOString() },
-        { onConflict: "provider" }
-      );
+    // IMPORTANT: Do not store user keys in the shared api_keys table (that would leak keys across users).
 
     await logProcess({
       operation,
