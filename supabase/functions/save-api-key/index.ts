@@ -186,20 +186,6 @@ serve(async (req) => {
       message: `Saving ${provider} key to student record: ${studentId}`,
       sessionId,
     });
-
-    // Save to student database
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    await logProcess({
-      operation,
-      step: "saving-to-student",
-      status: "info",
-      message: `Saving ${provider} key to student record: ${studentId}`,
-      sessionId,
-    });
-
     if (provider === "hkbu") {
       // Avoid relying on a DB unique constraint (onConflict). Do update-or-insert.
       const { data: existingStudent, error: findErr } = await supabase

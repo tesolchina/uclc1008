@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import { SharedApiUsageIndicator } from '@/components/api/SharedApiUsageIndicator';
-import { Loader2, Settings, CheckCircle2, XCircle, ExternalLink, User, Key, AlertCircle } from 'lucide-react';
+import { Loader2, Settings, CheckCircle2, XCircle, ExternalLink, User, Key, AlertCircle, Sparkles } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 // Get or create browser session ID for anonymous tracking
@@ -314,11 +314,11 @@ export default function SettingsPage() {
           <CardDescription>
             {hasHkbuKey 
               ? keySource === 'student'
-                ? 'You have your own HKBU API key saved to your profile.'
+                ? 'You have your own HKBU API key saved to your profile. Unlimited usage!'
                 : 'Using system HKBU API key.'
               : sharedApiEnabled
-                ? 'Using shared API with daily limits.'
-                : 'No API access available.'}
+                ? 'Using shared API with daily limits. Add your own key for unlimited access.'
+                : 'No API access available. Please add your HKBU key below.'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -365,6 +365,17 @@ export default function SettingsPage() {
 
           {!hasHkbuKey && sharedApiEnabled && (
             <SharedApiUsageIndicator used={usedToday} limit={dailyLimit} />
+          )}
+
+          {/* Reminder to set up HKBU API key */}
+          {!hasHkbuKey && (
+            <Alert className="border-blue-500/50 bg-blue-500/10">
+              <Sparkles className="h-4 w-4 text-blue-500" />
+              <AlertDescription className="text-blue-700 dark:text-blue-300">
+                <strong>Tip:</strong> Add your HKBU API key below for <strong>unlimited</strong> AI tutor access.
+                Your personal usage is tracked by HKBU directly – no daily limits here!
+              </AlertDescription>
+            </Alert>
           )}
         </CardContent>
       </Card>
