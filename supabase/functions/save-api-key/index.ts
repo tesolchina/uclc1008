@@ -6,7 +6,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const HKBU_API_URL = "https://genai.hkbu.edu.hk/general/rest";
+// Azure OpenAI compatible endpoint for HKBU GenAI
+const HKBU_API_URL = "https://genai.hkbu.edu.hk/general/rest/deployments/gpt-4o-mini/chat/completions?api-version=2024-10-21";
 
 // Inline logger
 async function logProcess(entry: {
@@ -36,18 +37,18 @@ async function logProcess(entry: {
   }
 }
 
-// Validate HKBU API key by making a test request
+// Validate HKBU API key using Azure OpenAI compatible API
 async function validateHkbuApiKey(apiKey: string): Promise<{ valid: boolean; error?: string }> {
   try {
+    // Use Azure OpenAI format with api-key header
     const response = await fetch(HKBU_API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`,
+        "api-key": apiKey,
       },
       body: JSON.stringify({
         messages: [{ role: "user", content: "Hi" }],
-        model: "gpt-4o-mini",
         max_tokens: 5,
       }),
     });
