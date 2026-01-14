@@ -33,6 +33,13 @@ interface TeacherProfile {
   display_name: string | null;
   created_at: string;
   roles: string[];
+  sections?: string[];
+}
+
+interface TeacherSection {
+  id: string;
+  teacher_id: string;
+  section_number: string;
 }
 
 function AdminDashboardContent() {
@@ -63,6 +70,11 @@ function AdminDashboardContent() {
   const [teachers, setTeachers] = useState<TeacherProfile[]>([]);
   const [pendingUsers, setPendingUsers] = useState<TeacherProfile[]>([]);
   const [updatingRole, setUpdatingRole] = useState<string | null>(null);
+  
+  // Section management
+  const [teacherSections, setTeacherSections] = useState<TeacherSection[]>([]);
+  const [newSection, setNewSection] = useState<{ teacherId: string; section: string }>({ teacherId: "", section: "" });
+  const [savingSection, setSavingSection] = useState(false);
 
   const loadSettings = async () => {
     setIsLoading(true);
@@ -119,6 +131,13 @@ function AdminDashboardContent() {
         .from('user_roles')
         .select('profile_id, role');
 
+      // Load teacher sections
+      const { data: sectionsData } = await supabase
+        .from('teacher_sections')
+        .select('*');
+      
+      setTeacherSections(sectionsData || []);
+
       if (profiles) {
         const roleMap = new Map<string, string[]>();
         userRoles?.forEach(ur => {
@@ -127,12 +146,21 @@ function AdminDashboardContent() {
           roleMap.set(ur.profile_id, existing);
         });
 
+        // Build section map for teachers
+        const sectionMap = new Map<string, string[]>();
+        sectionsData?.forEach(s => {
+          const existing = sectionMap.get(s.teacher_id) || [];
+          existing.push(s.section_number);
+          sectionMap.set(s.teacher_id, existing);
+        });
+
         const allUsers: TeacherProfile[] = profiles.map(p => ({
           id: p.id,
           email: p.email,
           display_name: p.display_name,
           created_at: p.created_at,
-          roles: roleMap.get(p.id) || ['student']
+          roles: roleMap.get(p.id) || ['student'],
+          sections: sectionMap.get(p.id) || []
         }));
 
         // Separate teachers/admins from pending users
@@ -154,6 +182,50 @@ function AdminDashboardContent() {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleAddSection = async (teacherId: string, sectionNumber: string) => {
+    if (!sectionNumber.trim()) return;
+    setSavingSection(true);
+    try {
+      const { error } = await supabase
+        .from('teacher_sections')
+        .insert({ teacher_id: teacherId, section_number: sectionNumber.trim() });
+
+      if (error) throw error;
+
+      toast({ title: 'Section assigned successfully' });
+      setNewSection({ teacherId: "", section: "" });
+      loadSettings();
+    } catch (error: any) {
+      console.error('Error assigning section:', error);
+      toast({
+        variant: 'destructive',
+        title: error.code === '23505' ? 'Teacher already has this section' : 'Failed to assign section',
+      });
+    } finally {
+      setSavingSection(false);
+    }
+  };
+
+  const handleRemoveSection = async (sectionId: string) => {
+    try {
+      const { error } = await supabase
+        .from('teacher_sections')
+        .delete()
+        .eq('id', sectionId);
+
+      if (error) throw error;
+
+      toast({ title: 'Section removed' });
+      loadSettings();
+    } catch (error) {
+      console.error('Error removing section:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Failed to remove section',
+      });
     }
   };
 
@@ -328,42 +400,90 @@ function AdminDashboardContent() {
               {teachers.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-4">No teachers registered yet</p>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {teachers.map(teacher => (
                     <div 
                       key={teacher.id} 
-                      className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
+                      className="p-3 bg-muted/50 rounded-lg space-y-2"
                     >
-                      <div className="space-y-1">
-                        <p className="font-medium">{teacher.display_name || 'Unnamed'}</p>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <Mail className="h-3 w-3" />
-                          {teacher.email || 'No email'}
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <p className="font-medium">{teacher.display_name || 'Unnamed'}</p>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <Mail className="h-3 w-3" />
+                            {teacher.email || 'No email'}
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <Calendar className="h-3 w-3" />
-                          Joined {new Date(teacher.created_at).toLocaleDateString()}
+                        <div className="flex items-center gap-2">
+                          {teacher.roles.map(role => (
+                            <Badge key={role} variant={role === 'admin' ? 'default' : 'secondary'}>
+                              {role}
+                            </Badge>
+                          ))}
+                          {isAdmin && !teacher.roles.includes('admin') && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleRevokeTeacherRole(teacher.id)}
+                              disabled={updatingRole === teacher.id}
+                            >
+                              {updatingRole === teacher.id ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <UserX className="h-4 w-4 text-destructive" />
+                              )}
+                            </Button>
+                          )}
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        {teacher.roles.map(role => (
-                          <Badge key={role} variant={role === 'admin' ? 'default' : 'secondary'}>
-                            {role}
-                          </Badge>
-                        ))}
-                        {isAdmin && !teacher.roles.includes('admin') && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleRevokeTeacherRole(teacher.id)}
-                            disabled={updatingRole === teacher.id}
-                          >
-                            {updatingRole === teacher.id ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <UserX className="h-4 w-4 text-destructive" />
-                            )}
-                          </Button>
+                      
+                      {/* Section Management */}
+                      <div className="flex flex-wrap items-center gap-2 pt-2 border-t">
+                        <span className="text-xs text-muted-foreground">Sections:</span>
+                        {teacher.sections?.map(section => {
+                          const sectionRecord = teacherSections.find(
+                            s => s.teacher_id === teacher.id && s.section_number === section
+                          );
+                          return (
+                            <Badge key={section} variant="outline" className="gap-1">
+                              {section}
+                              {isAdmin && sectionRecord && (
+                                <button
+                                  onClick={() => handleRemoveSection(sectionRecord.id)}
+                                  className="ml-1 hover:text-destructive"
+                                >
+                                  ×
+                                </button>
+                              )}
+                            </Badge>
+                          );
+                        })}
+                        {(!teacher.sections || teacher.sections.length === 0) && (
+                          <span className="text-xs text-muted-foreground italic">None assigned</span>
+                        )}
+                        {isAdmin && (
+                          <div className="flex items-center gap-1 ml-2">
+                            <Input
+                              placeholder="Add section..."
+                              className="h-7 w-24 text-xs"
+                              value={newSection.teacherId === teacher.id ? newSection.section : ""}
+                              onChange={(e) => setNewSection({ teacherId: teacher.id, section: e.target.value })}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' && newSection.section) {
+                                  handleAddSection(teacher.id, newSection.section);
+                                }
+                              }}
+                            />
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-7 px-2"
+                              disabled={savingSection || !newSection.section || newSection.teacherId !== teacher.id}
+                              onClick={() => handleAddSection(teacher.id, newSection.section)}
+                            >
+                              {savingSection ? <Loader2 className="h-3 w-3 animate-spin" /> : "+"}
+                            </Button>
+                          </div>
                         )}
                       </div>
                     </div>

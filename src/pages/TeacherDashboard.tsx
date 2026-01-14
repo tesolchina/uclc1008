@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -26,7 +27,9 @@ import {
   MessageSquarePlus,
   NotebookPen,
   Save,
-  Key
+  Key,
+  Search,
+  Filter
 } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
@@ -92,6 +95,7 @@ interface TaskFeedback {
 
 interface StudentSummary {
   student_id: string;
+  section_number: string | null;
   mcResponses: number;
   mcCorrect: number;
   writingDrafts: number;
@@ -99,6 +103,11 @@ interface StudentSummary {
   notes: number;
   questions: number;
   lastActive: string;
+}
+
+interface StudentRecord {
+  student_id: string;
+  section_number: string | null;
 }
 
 export default function TeacherDashboard() {
@@ -123,10 +132,31 @@ export default function TeacherDashboard() {
   const [feedbackText, setFeedbackText] = useState("");
   const [savingFeedback, setSavingFeedback] = useState(false);
 
+  // Section and search state
+  const [teacherSections, setTeacherSections] = useState<string[]>([]);
+  const [studentRecords, setStudentRecords] = useState<StudentRecord[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sectionFilter, setSectionFilter] = useState<string>("all");
+
+  // Fetch teacher's assigned sections
+  const fetchTeacherSections = async () => {
+    if (!user?.id) return;
+    try {
+      const { data } = await supabase
+        .from("teacher_sections")
+        .select("section_number")
+        .eq("teacher_id", user.id);
+      
+      setTeacherSections(data?.map(s => s.section_number) || []);
+    } catch (err) {
+      console.error("Error fetching teacher sections:", err);
+    }
+  };
+
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [questionsRes, responsesRes, draftsRes, notesRes, teacherNotesRes, feedbackRes] = await Promise.all([
+      const [questionsRes, responsesRes, draftsRes, notesRes, teacherNotesRes, feedbackRes, studentsRes] = await Promise.all([
         supabase
           .from("student_questions")
           .select("*")
@@ -153,7 +183,10 @@ export default function TeacherDashboard() {
         supabase
           .from("task_feedback")
           .select("*")
-          .order("created_at", { ascending: false })
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("students")
+          .select("student_id, section_number")
       ]);
 
       if (questionsRes.error) throw questionsRes.error;
@@ -163,6 +196,7 @@ export default function TeacherDashboard() {
       setParagraphNotes(notesRes.data || []);
       setTeacherNotes(teacherNotesRes.data || []);
       setTaskFeedback(feedbackRes.data || []);
+      setStudentRecords(studentsRes.data || []);
     } catch (err) {
       console.error("Error fetching data:", err);
       toast.error("Failed to load data");
@@ -173,6 +207,7 @@ export default function TeacherDashboard() {
 
   useEffect(() => {
     fetchData();
+    fetchTeacherSections();
 
     const channel = supabase
       .channel("teacher-dashboard-updates")
@@ -184,7 +219,15 @@ export default function TeacherDashboard() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [user?.id]);
+
+  // Get student section from records
+  const getStudentSection = (studentId: string): string | null => {
+    return studentRecords.find(s => s.student_id === studentId)?.section_number || null;
+  };
+
+  // Get unique sections from student records
+  const availableSections = [...new Set(studentRecords.map(s => s.section_number).filter(Boolean))] as string[];
 
   // Build student summaries
   const studentSummaries: StudentSummary[] = (() => {
@@ -200,6 +243,7 @@ export default function TeacherDashboard() {
       const studentDrafts = writingDrafts.filter(d => d.student_id === studentId);
       const studentNotes = paragraphNotes.filter(n => n.student_id === studentId);
       const studentQuestions = questions.filter(q => q.student_id === studentId);
+      const sectionNumber = getStudentSection(studentId);
 
       const allDates = [
         ...studentMc.map(r => new Date(r.submitted_at)),
@@ -213,6 +257,7 @@ export default function TeacherDashboard() {
 
       return {
         student_id: studentId,
+        section_number: sectionNumber,
         mcResponses: studentMc.length,
         mcCorrect: studentMc.filter(r => r.is_correct).length,
         writingDrafts: studentDrafts.length,
@@ -223,6 +268,20 @@ export default function TeacherDashboard() {
       };
     }).sort((a, b) => new Date(b.lastActive).getTime() - new Date(a.lastActive).getTime());
   })();
+
+  // Filter students by search and section
+  const filteredStudents = studentSummaries.filter(student => {
+    // Search filter
+    const matchesSearch = searchQuery === "" || 
+      student.student_id.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // Section filter
+    const matchesSection = sectionFilter === "all" || 
+      student.section_number === sectionFilter ||
+      (sectionFilter === "unassigned" && !student.section_number);
+    
+    return matchesSearch && matchesSection;
+  });
 
   // Get teacher's note for a student
   const getTeacherNote = (studentId: string) => {
@@ -773,10 +832,52 @@ export default function TeacherDashboard() {
 
       {/* Student List */}
       <div>
-        <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-          <Users className="h-5 w-5" />
-          Students ({studentSummaries.length})
-        </h2>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            Students ({filteredStudents.length}{filteredStudents.length !== studentSummaries.length ? ` of ${studentSummaries.length}` : ""})
+          </h2>
+          
+          {/* Teacher's Assigned Sections */}
+          {teacherSections.length > 0 && !isAdmin && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>Your sections:</span>
+              {teacherSections.map(s => (
+                <Badge key={s} variant="secondary">{s}</Badge>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Search and Filter */}
+        <div className="flex flex-wrap gap-3 mb-4">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search by student ID..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+          
+          {availableSections.length > 0 && (
+            <div className="flex items-center gap-2">
+              <Filter className="h-4 w-4 text-muted-foreground" />
+              <select
+                value={sectionFilter}
+                onChange={(e) => setSectionFilter(e.target.value)}
+                className="h-9 px-3 rounded-md border border-input bg-background text-sm"
+              >
+                <option value="all">All Sections</option>
+                {availableSections.map(s => (
+                  <option key={s} value={s}>Section {s}</option>
+                ))}
+                <option value="unassigned">Unassigned</option>
+              </select>
+            </div>
+          )}
+        </div>
         
         {loading ? (
           <Card>
@@ -785,16 +886,29 @@ export default function TeacherDashboard() {
               <p className="text-muted-foreground">Loading students...</p>
             </CardContent>
           </Card>
-        ) : studentSummaries.length === 0 ? (
+        ) : filteredStudents.length === 0 ? (
           <Card>
             <CardContent className="py-8 text-center text-muted-foreground">
               <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p>No student activity yet</p>
+              {searchQuery || sectionFilter !== "all" ? (
+                <div>
+                  <p>No students found matching your filters</p>
+                  <Button 
+                    variant="link" 
+                    size="sm" 
+                    onClick={() => { setSearchQuery(""); setSectionFilter("all"); }}
+                  >
+                    Clear filters
+                  </Button>
+                </div>
+              ) : (
+                <p>No student activity yet</p>
+              )}
             </CardContent>
           </Card>
         ) : (
           <div className="space-y-2">
-            {studentSummaries.map(student => {
+            {filteredStudents.map(student => {
               const totalActivities = student.mcResponses + student.writingDrafts + student.notes;
               const mcAccuracy = student.mcResponses > 0 
                 ? Math.round((student.mcCorrect / student.mcResponses) * 100) 
@@ -812,6 +926,11 @@ export default function TeacherDashboard() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-3 mb-2">
                           <span className="font-medium truncate">{student.student_id}</span>
+                          {student.section_number && (
+                            <Badge variant="secondary" className="text-xs">
+                              Section {student.section_number}
+                            </Badge>
+                          )}
                           {hasTeacherNote && (
                             <Badge variant="outline" className="text-xs gap-1">
                               <NotebookPen className="h-3 w-3" />
