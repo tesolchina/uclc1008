@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { StudentApiUsageTable } from "@/components/admin/StudentApiUsageTable";
 import { 
   MessageCircle, 
   Users, 
@@ -24,7 +25,8 @@ import {
   ExternalLink,
   MessageSquarePlus,
   NotebookPen,
-  Save
+  Save,
+  Key
 } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
@@ -765,6 +767,9 @@ export default function TeacherDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Student API Usage */}
+      <StudentApiUsageTable />
 
       {/* Student List */}
       <div>
