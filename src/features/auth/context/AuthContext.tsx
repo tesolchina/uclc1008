@@ -127,10 +127,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
+    // Clear Supabase auth
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
     setProfile(null);
+    setUserRoles([]);
+    
+    // Clear student ID session
+    clearStoredStudentId();
+    setStudentId(null);
+    
     // Clean up legacy HKBU session if any
     localStorage.removeItem(STORAGE_KEYS.HKBU_SESSION);
     localStorage.removeItem(STORAGE_KEYS.OAUTH_STATE);
