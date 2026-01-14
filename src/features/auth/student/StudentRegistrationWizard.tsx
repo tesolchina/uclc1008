@@ -4,12 +4,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle, ArrowLeft, UserPlus } from 'lucide-react';
+import { AlertCircle, ArrowLeft, UserPlus, CheckCircle, Copy, ArrowRight } from 'lucide-react';
 import { RegistrationStep1 } from './RegistrationStep1';
 import { RegistrationStep2 } from './RegistrationStep2';
 import { RegistrationStep3 } from './RegistrationStep3';
 import { setStoredStudentId, buildStudentId, generateRandomSuffix } from '../utils/studentId';
 import { STUDENT_ID_MAX_ATTEMPTS, AUTH_ERROR_MESSAGES } from '../constants';
+import { toast } from 'sonner';
 
 interface StudentRegistrationWizardProps {
   onBack: () => void;
@@ -23,7 +24,7 @@ export function StudentRegistrationWizard({ onBack }: StudentRegistrationWizardP
   const [lastInitial, setLastInitial] = useState('');
   const [sectionNumber, setSectionNumber] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [generatedId, setGeneratedId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleBack = () => {
@@ -32,6 +33,13 @@ export function StudentRegistrationWizard({ onBack }: StudentRegistrationWizardP
       setStep(step - 1);
     } else {
       onBack();
+    }
+  };
+
+  const handleCopyId = () => {
+    if (generatedId) {
+      navigator.clipboard.writeText(generatedId);
+      toast.success('ID copied to clipboard!');
     }
   };
 
@@ -75,14 +83,59 @@ export function StudentRegistrationWizard({ onBack }: StudentRegistrationWizardP
       }
       
       setStoredStudentId(uniqueId);
-      setSuccess(`Your ID is: ${uniqueId}`);
-      setTimeout(() => navigate('/'), 1500);
+      setGeneratedId(uniqueId);
+      setStep(4);
     } catch {
       setError('An error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  // Success screen - Step 4
+  if (step === 4 && generatedId) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <div className="flex justify-center mb-2">
+              <div className="p-3 rounded-full bg-green-100">
+                <CheckCircle className="h-8 w-8 text-green-600" />
+              </div>
+            </div>
+            <CardTitle className="text-2xl text-center text-green-700">Registration Complete!</CardTitle>
+            <CardDescription className="text-center">
+              Save your unique ID — you'll need it to log in
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="bg-primary/5 border-2 border-primary rounded-lg p-6 text-center">
+              <p className="text-sm text-muted-foreground mb-2">Your Unique ID</p>
+              <p className="text-4xl font-mono font-bold text-primary tracking-wider mb-4">
+                {generatedId}
+              </p>
+              <Button onClick={handleCopyId} variant="outline" size="sm">
+                <Copy className="h-4 w-4 mr-2" />
+                Copy to Clipboard
+              </Button>
+            </div>
+
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+              <p className="font-semibold text-amber-700 mb-1">⚠️ Important!</p>
+              <p className="text-sm text-amber-600">
+                <strong>Write this down or take a screenshot.</strong> If you lose this ID, you won't be able to access your previous work.
+              </p>
+            </div>
+
+            <Button className="w-full" size="lg" onClick={() => navigate('/')}>
+              <ArrowRight className="h-4 w-4 mr-2" />
+              Continue to Homepage
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[60vh] flex items-center justify-center p-4">
@@ -92,7 +145,9 @@ export function StudentRegistrationWizard({ onBack }: StudentRegistrationWizardP
             <ArrowLeft className="h-4 w-4 mr-1" />Back
           </Button>
           <div className="flex justify-center mb-2">
-            <div className="p-3 rounded-full bg-blue-100"><UserPlus className="h-8 w-8 text-blue-600" /></div>
+            <div className="p-3 rounded-full bg-blue-100">
+              <UserPlus className="h-8 w-8 text-blue-600" />
+            </div>
           </div>
           <CardTitle className="text-2xl text-center">Student Registration</CardTitle>
           <CardDescription className="text-center">Step {step} of 3</CardDescription>
@@ -103,12 +158,42 @@ export function StudentRegistrationWizard({ onBack }: StudentRegistrationWizardP
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {error && <Alert variant="destructive"><AlertCircle className="h-4 w-4" /><AlertDescription>{error}</AlertDescription></Alert>}
-          {success && <Alert className="border-green-500 bg-green-50 text-green-700"><AlertDescription>{success}</AlertDescription></Alert>}
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
           
-          {step === 1 && <RegistrationStep1 value={lastFourDigits} onChange={setLastFourDigits} onNext={() => setStep(2)} onError={setError} />}
-          {step === 2 && <RegistrationStep2 firstInitial={firstInitial} lastInitial={lastInitial} onChangeFirst={setFirstInitial} onChangeLast={setLastInitial} onNext={() => setStep(3)} onError={setError} />}
-          {step === 3 && <RegistrationStep3 lastFourDigits={lastFourDigits} firstInitial={firstInitial} lastInitial={lastInitial} sectionNumber={sectionNumber} onChangeSectionNumber={setSectionNumber} onComplete={handleComplete} isSubmitting={isSubmitting} />}
+          {step === 1 && (
+            <RegistrationStep1 
+              value={lastFourDigits} 
+              onChange={setLastFourDigits} 
+              onNext={() => setStep(2)} 
+              onError={setError} 
+            />
+          )}
+          {step === 2 && (
+            <RegistrationStep2 
+              firstInitial={firstInitial} 
+              lastInitial={lastInitial} 
+              onChangeFirst={setFirstInitial} 
+              onChangeLast={setLastInitial} 
+              onNext={() => setStep(3)} 
+              onError={setError} 
+            />
+          )}
+          {step === 3 && (
+            <RegistrationStep3 
+              lastFourDigits={lastFourDigits} 
+              firstInitial={firstInitial} 
+              lastInitial={lastInitial} 
+              sectionNumber={sectionNumber} 
+              onChangeSectionNumber={setSectionNumber} 
+              onComplete={handleComplete} 
+              isSubmitting={isSubmitting} 
+            />
+          )}
         </CardContent>
       </Card>
     </div>
