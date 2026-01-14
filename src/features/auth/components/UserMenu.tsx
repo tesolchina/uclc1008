@@ -10,11 +10,11 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { LogIn, LogOut, GraduationCap, BookOpen } from 'lucide-react';
+import { LogIn, LogOut, GraduationCap, BookOpen, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export function UserMenu() {
-  const { user, profile, isAuthenticated, isTeacher, signOut, isLoading } = useAuth();
+  const { user, profile, studentId, isAuthenticated, isTeacher, isStudent, signOut, isLoading } = useAuth();
   const navigate = useNavigate();
 
   if (isLoading) {
@@ -46,49 +46,67 @@ export function UserMenu() {
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Avatar className="h-8 w-8">
-            <AvatarFallback className="bg-primary/10 text-primary text-xs">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
-        <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">
-              {displayName || 'User'}
-            </p>
-            <p className="text-xs leading-none text-muted-foreground">
-              {user?.email}
-            </p>
-            <Badge 
-              variant="outline" 
-              className={`mt-1.5 w-fit ${isTeacher ? 'border-blue-500 text-blue-600' : 'border-green-500 text-green-600'}`}
-            >
-              {isTeacher ? (
-                <>
-                  <GraduationCap className="h-3 w-3 mr-1" />
-                  Teacher
-                </>
-              ) : (
-                <>
-                  <BookOpen className="h-3 w-3 mr-1" />
-                  Student
-                </>
+    <div className="flex items-center gap-2">
+      {/* Show Student ID badge for students */}
+      {isStudent && studentId && (
+        <Badge variant="secondary" className="text-xs font-mono hidden sm:flex">
+          ID: {studentId}
+        </Badge>
+      )}
+      
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+            <Avatar className="h-8 w-8">
+              <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-56" align="end" forceMount>
+          <DropdownMenuLabel className="font-normal">
+            <div className="flex flex-col space-y-1">
+              <p className="text-sm font-medium leading-none">
+                {displayName || 'User'}
+              </p>
+              {isStudent && studentId && (
+                <p className="text-xs font-mono text-primary/80">
+                  {studentId}
+                </p>
               )}
-            </Badge>
-          </div>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleSignOut} className="text-red-600 focus:text-red-600">
-          <LogOut className="h-4 w-4 mr-2" />
-          Sign Out
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+              <p className="text-xs leading-none text-muted-foreground">
+                {user?.email}
+              </p>
+              <Badge 
+                variant="outline" 
+                className={`mt-1.5 w-fit ${isTeacher ? 'border-blue-500 text-blue-600' : 'border-green-500 text-green-600'}`}
+              >
+                {isTeacher ? (
+                  <>
+                    <GraduationCap className="h-3 w-3 mr-1" />
+                    Teacher
+                  </>
+                ) : (
+                  <>
+                    <BookOpen className="h-3 w-3 mr-1" />
+                    Student
+                  </>
+                )}
+              </Badge>
+            </div>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => navigate('/settings')}>
+            <Settings className="h-4 w-4 mr-2" />
+            Settings
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleSignOut} className="text-red-600 focus:text-red-600">
+            <LogOut className="h-4 w-4 mr-2" />
+            Sign Out
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 }
