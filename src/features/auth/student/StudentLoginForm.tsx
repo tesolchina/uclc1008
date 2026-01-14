@@ -76,7 +76,10 @@ export function StudentLoginForm({ onBack, onSwitchToRegister }: StudentLoginFor
           <div className="space-y-4">
             <div className="text-center space-y-2">
               <p className="text-sm text-muted-foreground">
-                Your unique ID looks like: <span className="font-mono font-medium">1234-JD-7X</span>
+                Enter your unique ID (e.g., <span className="font-mono font-medium">1234-JD-7X</span>)
+              </p>
+              <p className="text-xs text-amber-600">
+                ⚠️ The last 2 characters are random — don't enter "XX"
               </p>
             </div>
             <Input
