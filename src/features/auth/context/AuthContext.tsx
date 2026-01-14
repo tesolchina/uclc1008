@@ -14,8 +14,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [userRoles, setUserRoles] = useState<string[]>([]);
+  const [activeRole, setActiveRoleState] = useState<'admin' | 'teacher' | 'student'>('student');
   const [isLoading, setIsLoading] = useState(true);
   const [studentId, setStudentId] = useState<string | null>(() => getStoredStudentId());
+
+  // Persist active role preference
+  const setActiveRole = useCallback((role: 'admin' | 'teacher' | 'student') => {
+    if (userRoles.includes(role) || role === 'student') {
+      setActiveRoleState(role);
+      localStorage.setItem('ue1_active_role', role);
+    }
+  }, [userRoles]);
 
   const fetchProfile = useCallback(async (userId: string) => {
     const { data, error } = await supabase
@@ -69,6 +78,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               setUserRoles(roles);
               const primaryRole = roles.includes('admin') ? 'admin' : roles.includes('teacher') ? 'teacher' : 'student';
               setProfile({ ...profileData, role: primaryRole });
+              
+              // Restore saved active role or use primary
+              const savedRole = localStorage.getItem('ue1_active_role') as 'admin' | 'teacher' | 'student' | null;
+              if (savedRole && roles.includes(savedRole)) {
+                setActiveRoleState(savedRole);
+              } else {
+                setActiveRoleState(primaryRole as 'admin' | 'teacher' | 'student');
+              }
             }
             setIsLoading(false);
           }, 0);
@@ -92,6 +109,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUserRoles(roles);
           const primaryRole = roles.includes('admin') ? 'admin' : roles.includes('teacher') ? 'teacher' : 'student';
           setProfile({ ...profileData, role: primaryRole });
+          
+          // Restore saved active role or use primary
+          const savedRole = localStorage.getItem('ue1_active_role') as 'admin' | 'teacher' | 'student' | null;
+          if (savedRole && roles.includes(savedRole)) {
+            setActiveRoleState(savedRole);
+          } else {
+            setActiveRoleState(primaryRole as 'admin' | 'teacher' | 'student');
+          }
         }
       }
       setIsLoading(false);
@@ -170,10 +195,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     accessToken: session?.access_token ?? null,
     isLoading,
     isAuthenticated: !!user || !!studentId,
-    isTeacher: userRoles.includes('teacher') || userRoles.includes('admin'),
-    isAdmin: userRoles.includes('admin'),
+    isTeacher: activeRole === 'teacher' || activeRole === 'admin' || userRoles.includes('teacher') || userRoles.includes('admin'),
+    isAdmin: activeRole === 'admin' || userRoles.includes('admin'),
     isStudent: !!studentId && !user,
     studentId,
+    userRoles,
+    activeRole,
+    setActiveRole,
     signUp,
     signIn,
     signOut,

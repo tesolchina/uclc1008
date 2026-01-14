@@ -22,6 +22,9 @@ export interface AuthContextType {
   isAdmin: boolean;
   isStudent: boolean;
   studentId: string | null;
+  userRoles: string[];
+  activeRole: 'admin' | 'teacher' | 'student';
+  setActiveRole: (role: 'admin' | 'teacher' | 'student') => void;
   signUp: (email: string, password: string, displayName: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
