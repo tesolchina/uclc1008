@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { CollapsibleSection } from "@/components/CollapsibleSection";
-import { ObjectiveTask, QuickCheckMC, WritingTask, ParaphraseCoach, AskQuestionButton } from "@/components/tasks";
+import { ObjectiveTask, QuickCheckMC, WritingTask, ParaphraseCoach, AskQuestionButton, ParagraphWithNotes, WritingPracticeWithHistory } from "@/components/tasks";
 import { StudentLoginReminder } from "@/components/StudentLoginReminder";
 import { LectureOutline, useSectionProgress, generateSectionId } from "@/features/lecture-mode";
 import type { AgendaSectionEnhanced } from "@/features/lecture-mode";
@@ -1191,73 +1191,69 @@ Remember to also save any written responses separately.
                 {/* Toggled Source Text with Numbered Paragraphs */}
                 <CollapsibleSection
                   title="Source Text (6 Paragraphs)"
-                  description="The excerpt from the article – read and identify the macro structure"
+                  description="Click each paragraph to read and add notes"
                   icon={<ScrollText className="h-4 w-4 text-purple-500" />}
                   defaultOpen={false}
                   className="border-purple-500/20"
                 >
-                  <div className="space-y-4 text-sm leading-relaxed text-muted-foreground">
-                    <div className="p-3 rounded-lg bg-purple-500/5 border border-purple-500/20">
-                      <p className="font-bold text-purple-700 text-xs mb-1">Paragraph 1</p>
-                      <p>
-                        Against this contentious background, then, we need to consider how these technologies are being applied to the specific context of education. While rarely foregrounded in debates about facial recognition in society, the school sector is one of the public settings where this technology is beginning to be taken up and implemented at scale. This is perhaps not surprising given, on the one hand, the role played by the classroom in the development of monitoring and disciplinary practices and, on the other, the increasing normalisation of surveillance in the name of protecting and securing young people.
-                      </p>
-                    </div>
-                    <div className="p-3 rounded-lg bg-purple-500/5 border border-purple-500/20">
-                      <p className="font-bold text-purple-700 text-xs mb-1">Paragraph 2</p>
-                      <p>
-                        One prominent educational application of facial recognition technology is campus security. This form of facial recognition is most prevalent in the US, where school shooting incidents have prompted school authorities to annually spend $2.7 billion on-campus security products and services (Doffman, 2018). Facial recognition systems have now been sold to thousands of US schools, with vendors "pitching the technology as an all-seeing shield against school shootings" (Harwell, 2018, n.p). As well as purporting to identify unauthorised intruders, systems have been developed to make use of video object classification trained to detect gun-shaped objects, alongside more subtle forms of 'anomaly detection' such as students arriving at school in different-than-usual clothes, bags and other apparel (Harwell, 2018).
-                      </p>
-                    </div>
-                    <div className="p-3 rounded-lg bg-purple-500/5 border border-purple-500/20">
-                      <p className="font-bold text-purple-700 text-xs mb-1">Paragraph 3</p>
-                      <p>
-                        Another application of facial recognition in schools is attendance monitoring – promising to put an end to the inevitable gaps and omissions that arise when human teachers are tasked with repeatedly conducting roll-calls of large student groups (Puthea et al., 2017). This application of facial recognition is proving popular in countries such as the UK and Australia where school shootings and unauthorised campus incursions are rare. For example, the Australian 'Loop-Learn' facial recognition roll-call system has been marketed amidst estimates of saving up to 2.5 hours of teacher time per week.
-                      </p>
-                    </div>
-                    <div className="p-3 rounded-lg bg-purple-500/5 border border-purple-500/20">
-                      <p className="font-bold text-purple-700 text-xs mb-1">Paragraph 4</p>
-                      <p>
-                        Beyond campus-based security and tracking physical bodies, facial recognition is also being used in a number of 'virtual learning' contexts. For example, facial recognition systems are now being developed as a means of ensuring the integrity of various aspects of online courses. This includes controlling access to online educational content (Montgomery & Marais, 2014), as well as using webcam-based facial recognition to authenticate online learners (Valera et al., 2015). Similarly, there is a growing interest in using facial recognition technology for so-called e-assessment security.
-                      </p>
-                    </div>
-                    <div className="p-3 rounded-lg bg-purple-500/5 border border-purple-500/20">
-                      <p className="font-bold text-purple-700 text-xs mb-1">Paragraph 5</p>
-                      <p>
-                        Finally, there is a growing interest in facial detection techniques as an indicator of student 'engagement' and learning. For example, research and development in this area have reported that detecting brief 'facial actions' can prove an accurate indicator of students' (non)engagement with online learning environments – highlighting episodes of boredom, confusion, delight, flow, frustration, and surprise (Dewan et al., 2019). Particularly insightful facial actions with regards to learning are reckoned to include brow-raising, eyelid tightening, and mouth dimpling.
-                      </p>
-                    </div>
-                    <div className="p-3 rounded-lg bg-purple-500/5 border border-purple-500/20">
-                      <p className="font-bold text-purple-700 text-xs mb-1">Paragraph 6</p>
-                      <p>
-                        These largely experimental developments have led some educationalists to enthusiastically anticipate facial learning detection being deployed on a mass scale. As Timms (2016, p. 712) reasons, it might soon be possible to gain a 'real-time' sense of which groups of students are in a 'productive state' and other instances 'where the overall activity is not productive'. The promise of customisation that characterises the development of automated learning systems encourages their incorporation into student learning interfaces.
-                      </p>
-                    </div>
+                  <div className="space-y-3">
+                    <p className="text-xs text-muted-foreground">
+                      Click on each paragraph to expand it and add your notes. Your notes are saved automatically.
+                    </p>
+                    
+                    <ParagraphWithNotes
+                      paragraphNumber={1}
+                      paragraphKey="w1h1-p1"
+                      content="Against this contentious background, then, we need to consider how these technologies are being applied to the specific context of education. While rarely foregrounded in debates about facial recognition in society, the school sector is one of the public settings where this technology is beginning to be taken up and implemented at scale. This is perhaps not surprising given, on the one hand, the role played by the classroom in the development of monitoring and disciplinary practices and, on the other, the increasing normalisation of surveillance in the name of protecting and securing young people."
+                      studentId={studentId || undefined}
+                    />
+
+                    <ParagraphWithNotes
+                      paragraphNumber={2}
+                      paragraphKey="w1h1-p2"
+                      content="One prominent educational application of facial recognition technology is campus security. This form of facial recognition is most prevalent in the US, where school shooting incidents have prompted school authorities to annually spend $2.7 billion on-campus security products and services (Doffman, 2018). Facial recognition systems have now been sold to thousands of US schools, with vendors 'pitching the technology as an all-seeing shield against school shootings' (Harwell, 2018, n.p). As well as purporting to identify unauthorised intruders, systems have been developed to make use of video object classification trained to detect gun-shaped objects, alongside more subtle forms of 'anomaly detection' such as students arriving at school in different-than-usual clothes, bags and other apparel (Harwell, 2018)."
+                      studentId={studentId || undefined}
+                    />
+
+                    <ParagraphWithNotes
+                      paragraphNumber={3}
+                      paragraphKey="w1h1-p3"
+                      content="Another application of facial recognition in schools is attendance monitoring – promising to put an end to the inevitable gaps and omissions that arise when human teachers are tasked with repeatedly conducting roll-calls of large student groups (Puthea et al., 2017). This application of facial recognition is proving popular in countries such as the UK and Australia where school shootings and unauthorised campus incursions are rare. For example, the Australian 'Loop-Learn' facial recognition roll-call system has been marketed amidst estimates of saving up to 2.5 hours of teacher time per week."
+                      studentId={studentId || undefined}
+                    />
+
+                    <ParagraphWithNotes
+                      paragraphNumber={4}
+                      paragraphKey="w1h1-p4"
+                      content="Beyond campus-based security and tracking physical bodies, facial recognition is also being used in a number of 'virtual learning' contexts. For example, facial recognition systems are now being developed as a means of ensuring the integrity of various aspects of online courses. This includes controlling access to online educational content (Montgomery & Marais, 2014), as well as using webcam-based facial recognition to authenticate online learners (Valera et al., 2015). Similarly, there is a growing interest in using facial recognition technology for so-called e-assessment security."
+                      studentId={studentId || undefined}
+                    />
+
+                    <ParagraphWithNotes
+                      paragraphNumber={5}
+                      paragraphKey="w1h1-p5"
+                      content="Finally, there is a growing interest in facial detection techniques as an indicator of student 'engagement' and learning. For example, research and development in this area have reported that detecting brief 'facial actions' can prove an accurate indicator of students' (non)engagement with online learning environments – highlighting episodes of boredom, confusion, delight, flow, frustration, and surprise (Dewan et al., 2019). Particularly insightful facial actions with regards to learning are reckoned to include brow-raising, eyelid tightening, and mouth dimpling."
+                      studentId={studentId || undefined}
+                    />
+
+                    <ParagraphWithNotes
+                      paragraphNumber={6}
+                      paragraphKey="w1h1-p6"
+                      content="These largely experimental developments have led some educationalists to enthusiastically anticipate facial learning detection being deployed on a mass scale. As Timms (2016, p. 712) reasons, it might soon be possible to gain a 'real-time' sense of which groups of students are in a 'productive state' and other instances 'where the overall activity is not productive'. The promise of customisation that characterises the development of automated learning systems encourages their incorporation into student learning interfaces."
+                      studentId={studentId || undefined}
+                    />
                   </div>
                 </CollapsibleSection>
 
                 {/* Writing Practice - placed above MC for easier reference to source text */}
-                <div className="p-4 rounded-lg bg-purple-500/10 border border-purple-500/30 space-y-3">
-                  <h4 className="font-medium text-sm flex items-center gap-2">
-                    <PenLine className="h-4 w-4 text-purple-600" />
-                    Writing Practice: Narrate the Excerpt Structure
-                  </h4>
-                  <p className="text-xs text-muted-foreground">
-                    Write <strong>3 sentences</strong> that summarize what the excerpt covers at the macro level. 
-                    Do not summarize the content in detail – just describe the <em>structure</em> and <em>progression</em> of ideas.
-                  </p>
-                  <div className="p-3 rounded bg-background/80 text-xs text-muted-foreground space-y-2">
-                    <p className="font-medium">Example format:</p>
-                    <p className="italic">"The excerpt begins by... Then, it moves on to discuss... Finally, it explores..."</p>
-                  </div>
-                  <textarea 
-                    className="w-full min-h-[120px] p-3 rounded-lg border bg-background text-sm resize-y placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
-                    placeholder="Write your 3 sentences here describing the structure and progression of the excerpt..."
-                  />
-                  <p className="text-xs text-muted-foreground italic">
-                    💡 Tip: Your work is saved locally in this browser. Remember to copy your writing to a separate document as backup.
-                  </p>
-                </div>
+                <WritingPracticeWithHistory
+                  taskKey="w1h1-macro-structure"
+                  title="Writing Practice: Narrate the Excerpt Structure"
+                  instructions="Write <strong>3 sentences</strong> that summarize what the excerpt covers at the macro level. Do not summarize the content in detail – just describe the <em>structure</em> and <em>progression</em> of ideas."
+                  exampleFormat='"The excerpt begins by... Then, it moves on to discuss... Finally, it explores..."'
+                  placeholder="Write your 3 sentences here describing the structure and progression of the excerpt..."
+                  studentId={studentId || undefined}
+                />
 
                 {/* MC Questions on Excerpt Structure */}
                 <div className="space-y-3">

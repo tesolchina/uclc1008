@@ -304,6 +304,33 @@ export type Database = {
           },
         ]
       }
+      paragraph_notes: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string
+          paragraph_key: string
+          student_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string
+          paragraph_key: string
+          student_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string
+          paragraph_key?: string
+          student_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       process_logs: {
         Row: {
           created_at: string
@@ -1051,6 +1078,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      writing_drafts: {
+        Row: {
+          ai_feedback: string | null
+          content: string
+          created_at: string
+          id: string
+          is_submitted: boolean
+          student_id: string
+          task_key: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          ai_feedback?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          is_submitted?: boolean
+          student_id: string
+          task_key: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          ai_feedback?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          is_submitted?: boolean
+          student_id?: string
+          task_key?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: []
       }
     }
     Views: {
