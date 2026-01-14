@@ -158,7 +158,7 @@ serve(async (req) => {
     let source: "user" | "shared" = "user";
     let usageInfo: { used: number; limit: number } | null = null;
 
-    // If no user key, try shared POE API
+    // If no user key, try shared Lovable AI
     if (!apiConfig) {
       const effectiveStudentId = studentId || "anonymous";
       const sharedAccess = await checkSharedApiAccess(effectiveStudentId, supabase);
@@ -175,20 +175,20 @@ serve(async (req) => {
         );
       }
 
-      // Use POE API key as fallback
-      const poeApiKey = Deno.env.get("POE_API_KEY");
-      if (!poeApiKey) {
+      // Use Lovable AI as fallback (no API key required)
+      const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
+      if (!lovableApiKey) {
         return new Response(
           JSON.stringify({ error: "No AI service available. Please configure an API key in Settings." }),
           { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
 
-      // Use OpenRouter with POE key
+      // Use Lovable AI endpoint
       apiConfig = {
-        key: poeApiKey,
-        provider: "openrouter",
-        endpoint: "https://openrouter.ai/api/v1/chat/completions",
+        key: lovableApiKey,
+        provider: "lovable",
+        endpoint: "https://ai-gateway.lovable.dev/chat/completions",
       };
       source = "shared";
       usageInfo = { used: sharedAccess.used, limit: sharedAccess.limit };
@@ -212,15 +212,13 @@ serve(async (req) => {
         stream: true,
       };
     } else {
-      // OpenRouter (for shared POE key)
+      // Lovable AI (for shared API - uses OpenAI-compatible format)
       headers = {
         "Authorization": `Bearer ${apiConfig.key}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": supabaseUrl,
-        "X-Title": "UE1 AI Tutor",
       };
       body = {
-        model: "openai/gpt-4o-mini",
+        model: "google/gemini-2.5-flash",  // Fast and cost-effective for chat
         messages: [systemMessage, ...messages],
         stream: true,
       };
