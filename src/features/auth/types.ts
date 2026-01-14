@@ -20,12 +20,16 @@ export interface AuthContextType {
   isAuthenticated: boolean;
   isTeacher: boolean;
   isAdmin: boolean;
+  isStudent: boolean;
+  studentId: string | null;
   signUp: (email: string, password: string, displayName: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   login: () => void;
   logout: () => Promise<void>;
   loginWithHkbu: () => void;
+  loginAsStudent: (studentId: string) => void;
+  logoutStudent: () => void;
   refreshProfile: () => Promise<void>;
 }
 

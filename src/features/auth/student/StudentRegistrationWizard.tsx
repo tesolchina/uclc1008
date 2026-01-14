@@ -8,9 +8,10 @@ import { AlertCircle, ArrowLeft, UserPlus, CheckCircle, Copy, ArrowRight } from 
 import { RegistrationStep1 } from './RegistrationStep1';
 import { RegistrationStep2 } from './RegistrationStep2';
 import { RegistrationStep3 } from './RegistrationStep3';
-import { setStoredStudentId, buildStudentId, generateRandomSuffix } from '../utils/studentId';
+import { buildStudentId, generateRandomSuffix } from '../utils/studentId';
 import { STUDENT_ID_MAX_ATTEMPTS, AUTH_ERROR_MESSAGES } from '../constants';
 import { toast } from 'sonner';
+import { useAuth } from '../context/AuthContext';
 
 interface StudentRegistrationWizardProps {
   onBack: () => void;
@@ -18,6 +19,7 @@ interface StudentRegistrationWizardProps {
 
 export function StudentRegistrationWizard({ onBack }: StudentRegistrationWizardProps) {
   const navigate = useNavigate();
+  const { loginAsStudent } = useAuth();
   const [step, setStep] = useState(1);
   const [lastFourDigits, setLastFourDigits] = useState('');
   const [firstInitial, setFirstInitial] = useState('');
@@ -82,7 +84,7 @@ export function StudentRegistrationWizard({ onBack }: StudentRegistrationWizardP
         return;
       }
       
-      setStoredStudentId(uniqueId);
+      loginAsStudent(uniqueId);
       setGeneratedId(uniqueId);
       setStep(4);
     } catch {

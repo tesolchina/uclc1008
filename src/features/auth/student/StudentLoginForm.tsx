@@ -6,8 +6,9 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { AlertCircle, ArrowLeft, KeyRound, LogIn } from 'lucide-react';
-import { setStoredStudentId, validateStudentIdFormat } from '../utils/studentId';
+import { validateStudentIdFormat } from '../utils/studentId';
 import { AUTH_ERROR_MESSAGES } from '../constants';
+import { useAuth } from '../context/AuthContext';
 
 interface StudentLoginFormProps {
   onBack: () => void;
@@ -16,6 +17,7 @@ interface StudentLoginFormProps {
 
 export function StudentLoginForm({ onBack, onSwitchToRegister }: StudentLoginFormProps) {
   const navigate = useNavigate();
+  const { loginAsStudent } = useAuth();
   const [studentLoginId, setStudentLoginId] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -28,12 +30,12 @@ export function StudentLoginForm({ onBack, onSwitchToRegister }: StudentLoginFor
       return;
     }
     
-    setStoredStudentId(studentLoginId.toUpperCase());
+    loginAsStudent(studentLoginId.toUpperCase());
     setSuccess('Welcome back! Logging you in...');
     
     setTimeout(() => {
       navigate('/');
-    }, 1000);
+    }, 500);
   };
 
   return (
