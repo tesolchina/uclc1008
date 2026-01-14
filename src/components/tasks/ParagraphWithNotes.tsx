@@ -27,22 +27,36 @@ export function ParagraphWithNotes({
   
   const autoSaveTimer = useRef<NodeJS.Timeout | null>(null);
 
-  // Load saved notes
+  // Load saved notes - reset state first when studentId changes
   useEffect(() => {
+    // Reset state when studentId changes
+    setNotes("");
+    setSavedNotes("");
+    setSaveStatus("idle");
+    
     if (!studentId) return;
 
     const loadNotes = async () => {
-      const { data } = await supabase
-        .from("paragraph_notes")
-        .select("notes")
-        .eq("student_id", studentId)
-        .eq("paragraph_key", paragraphKey)
-        .maybeSingle();
+      try {
+        const { data, error } = await supabase
+          .from("paragraph_notes")
+          .select("notes")
+          .eq("student_id", studentId)
+          .eq("paragraph_key", paragraphKey)
+          .maybeSingle();
 
-      if (data?.notes) {
-        setNotes(data.notes);
-        setSavedNotes(data.notes);
-        setSaveStatus("saved");
+        if (error) {
+          console.error("Error loading paragraph notes:", error);
+          return;
+        }
+
+        if (data?.notes) {
+          setNotes(data.notes);
+          setSavedNotes(data.notes);
+          setSaveStatus("saved");
+        }
+      } catch (err) {
+        console.error("Error loading notes:", err);
       }
     };
 
