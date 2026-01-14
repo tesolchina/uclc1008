@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
 import { 
   MessageCircle, 
   Users, 
@@ -16,7 +17,9 @@ import {
   Loader2,
   FileText,
   StickyNote,
-  ClipboardList
+  ClipboardList,
+  ChevronRight,
+  ArrowLeft
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -61,6 +64,17 @@ interface ParagraphNote {
   updated_at: string;
 }
 
+interface StudentSummary {
+  student_id: string;
+  mcResponses: number;
+  mcCorrect: number;
+  writingDrafts: number;
+  submittedDrafts: number;
+  notes: number;
+  questions: number;
+  lastActive: string;
+}
+
 export default function TeacherDashboard() {
   const { user, isTeacher, isAdmin } = useAuth();
   const [questions, setQuestions] = useState<StudentQuestion[]>([]);
@@ -70,11 +84,11 @@ export default function TeacherDashboard() {
   const [loading, setLoading] = useState(true);
   const [responding, setResponding] = useState<string | null>(null);
   const [responseText, setResponseText] = useState<Record<string, string>>({});
+  const [selectedStudent, setSelectedStudent] = useState<string | null>(null);
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      // Fetch all data in parallel
       const [questionsRes, responsesRes, draftsRes, notesRes] = await Promise.all([
         supabase
           .from("student_questions")
@@ -84,17 +98,17 @@ export default function TeacherDashboard() {
           .from("student_task_responses")
           .select("*")
           .order("submitted_at", { ascending: false })
-          .limit(100),
+          .limit(500),
         supabase
           .from("writing_drafts")
           .select("*")
           .order("created_at", { ascending: false })
-          .limit(100),
+          .limit(500),
         supabase
           .from("paragraph_notes")
           .select("*")
           .order("updated_at", { ascending: false })
-          .limit(100)
+          .limit(500)
       ]);
 
       if (questionsRes.error) throw questionsRes.error;
@@ -113,15 +127,22 @@ export default function TeacherDashboard() {
   useEffect(() => {
     fetchData();
 
-    // Subscribe to realtime updates
     const channel = supabase
-      .channel("student-questions")
+      .channel("teacher-dashboard-updates")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "student_questions" },
-        () => {
-          fetchData();
-        }
+        () => fetchData()
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "student_task_responses" },
+        () => fetchData()
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "writing_drafts" },
+        () => fetchData()
       )
       .subscribe();
 
@@ -129,6 +150,44 @@ export default function TeacherDashboard() {
       supabase.removeChannel(channel);
     };
   }, []);
+
+  // Build student summaries
+  const studentSummaries: StudentSummary[] = (() => {
+    const allStudentIds = new Set([
+      ...studentResponses.map(r => r.student_id),
+      ...writingDrafts.map(d => d.student_id),
+      ...paragraphNotes.map(n => n.student_id),
+      ...questions.map(q => q.student_id)
+    ]);
+
+    return Array.from(allStudentIds).map(studentId => {
+      const studentMc = studentResponses.filter(r => r.student_id === studentId);
+      const studentDrafts = writingDrafts.filter(d => d.student_id === studentId);
+      const studentNotes = paragraphNotes.filter(n => n.student_id === studentId);
+      const studentQuestions = questions.filter(q => q.student_id === studentId);
+
+      const allDates = [
+        ...studentMc.map(r => new Date(r.submitted_at)),
+        ...studentDrafts.map(d => new Date(d.created_at)),
+        ...studentNotes.map(n => new Date(n.updated_at)),
+        ...studentQuestions.map(q => new Date(q.created_at))
+      ];
+      const lastActive = allDates.length > 0 
+        ? new Date(Math.max(...allDates.map(d => d.getTime()))).toISOString()
+        : "";
+
+      return {
+        student_id: studentId,
+        mcResponses: studentMc.length,
+        mcCorrect: studentMc.filter(r => r.is_correct).length,
+        writingDrafts: studentDrafts.length,
+        submittedDrafts: studentDrafts.filter(d => d.is_submitted).length,
+        notes: studentNotes.length,
+        questions: studentQuestions.length,
+        lastActive
+      };
+    }).sort((a, b) => new Date(b.lastActive).getTime() - new Date(a.lastActive).getTime());
+  })();
 
   const handleRespond = async (questionId: string) => {
     const response = responseText[questionId];
@@ -188,15 +247,177 @@ export default function TeacherDashboard() {
   }
 
   const pendingQuestions = questions.filter(q => q.status === "pending");
-  const answeredQuestions = questions.filter(q => q.status === "answered");
 
+  // Student detail view
+  if (selectedStudent) {
+    const studentMc = studentResponses.filter(r => r.student_id === selectedStudent);
+    const studentDrafts = writingDrafts.filter(d => d.student_id === selectedStudent);
+    const studentNotes = paragraphNotes.filter(n => n.student_id === selectedStudent);
+    const studentQuestions = questions.filter(q => q.student_id === selectedStudent);
+
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="sm" onClick={() => setSelectedStudent(null)}>
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            Back to List
+          </Button>
+          <div>
+            <h1 className="text-2xl font-semibold">Student: {selectedStudent}</h1>
+            <p className="text-sm text-muted-foreground">Detailed progress view</p>
+          </div>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-4">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">MC Responses</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{studentMc.length}</div>
+              <p className="text-xs text-muted-foreground">
+                {studentMc.filter(r => r.is_correct).length} correct
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Writing</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{studentDrafts.length}</div>
+              <p className="text-xs text-muted-foreground">
+                {studentDrafts.filter(d => d.is_submitted).length} submitted
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Notes</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{studentNotes.length}</div>
+              <p className="text-xs text-muted-foreground">paragraphs annotated</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Questions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{studentQuestions.length}</div>
+              <p className="text-xs text-muted-foreground">asked</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Tabs defaultValue="mc">
+          <TabsList>
+            <TabsTrigger value="mc">MC Responses ({studentMc.length})</TabsTrigger>
+            <TabsTrigger value="writing">Writing ({studentDrafts.length})</TabsTrigger>
+            <TabsTrigger value="notes">Notes ({studentNotes.length})</TabsTrigger>
+            <TabsTrigger value="questions">Questions ({studentQuestions.length})</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="mc" className="space-y-3 mt-4">
+            {studentMc.length === 0 ? (
+              <Card><CardContent className="py-6 text-center text-muted-foreground">No MC responses</CardContent></Card>
+            ) : studentMc.map(r => {
+              let parsed: { question?: string; attempts?: string[] } = {};
+              try { parsed = JSON.parse(r.response); } catch {}
+              return (
+                <Card key={r.id}>
+                  <CardContent className="pt-4 space-y-2">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="text-sm font-medium">{parsed.question || r.question_key || 'Task'}</p>
+                        {parsed.attempts && <p className="text-xs text-muted-foreground">Answers: {parsed.attempts.join(' → ')}</p>}
+                      </div>
+                      <Badge variant={r.is_correct ? "default" : "destructive"}>
+                        {r.is_correct ? "Correct" : "Incorrect"}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground">{new Date(r.submitted_at).toLocaleString()}</p>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </TabsContent>
+
+          <TabsContent value="writing" className="space-y-3 mt-4">
+            {studentDrafts.length === 0 ? (
+              <Card><CardContent className="py-6 text-center text-muted-foreground">No writing drafts</CardContent></Card>
+            ) : studentDrafts.map(d => (
+              <Card key={d.id}>
+                <CardContent className="pt-4 space-y-2">
+                  <div className="flex justify-between items-start">
+                    <p className="text-xs text-muted-foreground">{d.task_key} • Version {d.version}</p>
+                    <Badge variant={d.is_submitted ? "default" : "secondary"}>
+                      {d.is_submitted ? "Submitted" : "Draft"}
+                    </Badge>
+                  </div>
+                  <p className="text-sm bg-muted/50 p-2 rounded whitespace-pre-wrap">{d.content}</p>
+                  {d.ai_feedback && (
+                    <div className="p-2 bg-blue-500/10 rounded text-sm">
+                      <p className="text-xs font-medium text-blue-700 mb-1">AI Feedback:</p>
+                      <p className="text-muted-foreground">{d.ai_feedback}</p>
+                    </div>
+                  )}
+                  <p className="text-xs text-muted-foreground">{new Date(d.created_at).toLocaleString()}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </TabsContent>
+
+          <TabsContent value="notes" className="space-y-3 mt-4">
+            {studentNotes.length === 0 ? (
+              <Card><CardContent className="py-6 text-center text-muted-foreground">No notes taken</CardContent></Card>
+            ) : studentNotes.map(n => (
+              <Card key={n.id}>
+                <CardContent className="pt-4 space-y-2">
+                  <p className="text-xs text-muted-foreground font-medium">{n.paragraph_key}</p>
+                  <p className="text-sm bg-muted/50 p-2 rounded">{n.notes}</p>
+                  <p className="text-xs text-muted-foreground">{new Date(n.updated_at).toLocaleString()}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </TabsContent>
+
+          <TabsContent value="questions" className="space-y-3 mt-4">
+            {studentQuestions.length === 0 ? (
+              <Card><CardContent className="py-6 text-center text-muted-foreground">No questions asked</CardContent></Card>
+            ) : studentQuestions.map(q => (
+              <Card key={q.id}>
+                <CardContent className="pt-4 space-y-2">
+                  <div className="flex justify-between items-start">
+                    <p className="text-sm font-medium">{q.question}</p>
+                    <Badge variant={q.status === "answered" ? "default" : q.status === "pending" ? "secondary" : "outline"}>
+                      {q.status}
+                    </Badge>
+                  </div>
+                  {q.teacher_response && (
+                    <div className="p-2 bg-primary/5 rounded">
+                      <p className="text-xs font-medium text-primary mb-1">Response:</p>
+                      <p className="text-sm">{q.teacher_response}</p>
+                    </div>
+                  )}
+                  <p className="text-xs text-muted-foreground">{new Date(q.created_at).toLocaleString()}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </TabsContent>
+        </Tabs>
+      </div>
+    );
+  }
+
+  // Main view: student list
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Teacher Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Manage student questions and monitor progress</p>
+          <p className="text-sm text-muted-foreground">Manage students and monitor progress</p>
         </div>
         <Button variant="outline" size="sm" onClick={fetchData} disabled={loading}>
           <RefreshCw className={`h-4 w-4 mr-1 ${loading ? "animate-spin" : ""}`} />
@@ -209,13 +430,25 @@ export default function TeacherDashboard() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              Total Students
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{studentSummaries.length}</div>
+            <p className="text-xs text-muted-foreground">unique students</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <ClipboardList className="h-4 w-4" />
               MC Responses
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{studentResponses.length}</div>
-            <p className="text-xs text-muted-foreground">Quiz answers submitted</p>
+            <p className="text-xs text-muted-foreground">total submissions</p>
           </CardContent>
         </Card>
         <Card>
@@ -227,72 +460,118 @@ export default function TeacherDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{writingDrafts.length}</div>
-            <p className="text-xs text-muted-foreground">Writing submissions</p>
+            <p className="text-xs text-muted-foreground">{writingDrafts.filter(d => d.is_submitted).length} submitted</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <StickyNote className="h-4 w-4" />
-              Student Notes
+              <Clock className="h-4 w-4" />
+              Pending Questions
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{paragraphNotes.length}</div>
-            <p className="text-xs text-muted-foreground">Notes taken</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Active Students
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {new Set([
-                ...studentResponses.map(r => r.student_id),
-                ...writingDrafts.map(d => d.student_id),
-                ...paragraphNotes.map(n => n.student_id)
-              ]).size}
-            </div>
-            <p className="text-xs text-muted-foreground">Unique students</p>
+            <div className="text-2xl font-bold">{pendingQuestions.length}</div>
+            <p className="text-xs text-muted-foreground">awaiting response</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Content Tabs */}
-      <Tabs defaultValue="responses">
-        <TabsList className="flex-wrap">
-          <TabsTrigger value="responses" className="gap-1">
-            <ClipboardList className="h-4 w-4" />
-            MC Responses ({studentResponses.length})
-          </TabsTrigger>
-          <TabsTrigger value="drafts" className="gap-1">
-            <FileText className="h-4 w-4" />
-            Writing ({writingDrafts.length})
-          </TabsTrigger>
-          <TabsTrigger value="notes" className="gap-1">
-            <StickyNote className="h-4 w-4" />
-            Notes ({paragraphNotes.length})
-          </TabsTrigger>
-          <TabsTrigger value="pending" className="gap-1">
-            <Clock className="h-4 w-4" />
-            Questions ({pendingQuestions.length})
-          </TabsTrigger>
-        </TabsList>
+      {/* Student List */}
+      <div>
+        <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+          <Users className="h-5 w-5" />
+          Students ({studentSummaries.length})
+        </h2>
+        
+        {loading ? (
+          <Card>
+            <CardContent className="py-8 text-center">
+              <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" />
+              <p className="text-muted-foreground">Loading students...</p>
+            </CardContent>
+          </Card>
+        ) : studentSummaries.length === 0 ? (
+          <Card>
+            <CardContent className="py-8 text-center text-muted-foreground">
+              <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              <p>No student activity yet</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="space-y-2">
+            {studentSummaries.map(student => {
+              const totalActivities = student.mcResponses + student.writingDrafts + student.notes;
+              const mcAccuracy = student.mcResponses > 0 
+                ? Math.round((student.mcCorrect / student.mcResponses) * 100) 
+                : 0;
+              
+              return (
+                <Card 
+                  key={student.student_id} 
+                  className="cursor-pointer hover:bg-muted/50 transition-colors"
+                  onClick={() => setSelectedStudent(student.student_id)}
+                >
+                  <CardContent className="py-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-3 mb-2">
+                          <span className="font-medium truncate">{student.student_id}</span>
+                          {student.questions > 0 && (
+                            <Badge variant="outline" className="text-xs">
+                              {student.questions} question{student.questions > 1 ? 's' : ''}
+                            </Badge>
+                          )}
+                        </div>
+                        
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <ClipboardList className="h-3 w-3" />
+                            {student.mcResponses} MC ({mcAccuracy}% correct)
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <FileText className="h-3 w-3" />
+                            {student.writingDrafts} drafts ({student.submittedDrafts} submitted)
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <StickyNote className="h-3 w-3" />
+                            {student.notes} notes
+                          </span>
+                        </div>
+                        
+                        {totalActivities > 0 && (
+                          <div className="mt-2">
+                            <Progress value={Math.min(totalActivities * 10, 100)} className="h-1.5" />
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="flex items-center gap-3 ml-4">
+                        <div className="text-right text-xs text-muted-foreground">
+                          {student.lastActive && (
+                            <span>Last active: {new Date(student.lastActive).toLocaleDateString()}</span>
+                          )}
+                        </div>
+                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+      </div>
 
-        <TabsContent value="pending" className="space-y-4">
-          {pendingQuestions.length === 0 ? (
-            <Card>
-              <CardContent className="py-8 text-center text-muted-foreground">
-                <MessageCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p>No pending questions</p>
-              </CardContent>
-            </Card>
-          ) : (
-            pendingQuestions.map(q => (
+      {/* Pending Questions Section */}
+      {pendingQuestions.length > 0 && (
+        <div>
+          <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+            <MessageCircle className="h-5 w-5" />
+            Pending Questions ({pendingQuestions.length})
+          </h2>
+          <div className="space-y-3">
+            {pendingQuestions.map(q => (
               <Card key={q.id}>
                 <CardContent className="pt-4 space-y-3">
                   <div className="flex items-start justify-between gap-2">
@@ -302,7 +581,12 @@ export default function TeacherDashboard() {
                         <Badge variant="outline" className="text-xs">
                           Week {q.week_number}{q.hour_number ? `.${q.hour_number}` : ""}
                         </Badge>
-                        <span>Student: {q.student_id}</span>
+                        <span 
+                          className="cursor-pointer hover:underline"
+                          onClick={() => setSelectedStudent(q.student_id)}
+                        >
+                          Student: {q.student_id}
+                        </span>
                         <span>{new Date(q.created_at).toLocaleString()}</span>
                       </div>
                     </div>
@@ -345,170 +629,10 @@ export default function TeacherDashboard() {
                   </div>
                 </CardContent>
               </Card>
-            ))
-          )}
-        </TabsContent>
-
-        <TabsContent value="answered" className="space-y-4">
-          {answeredQuestions.length === 0 ? (
-            <Card>
-              <CardContent className="py-8 text-center text-muted-foreground">
-                <CheckCircle2 className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p>No answered questions yet</p>
-              </CardContent>
-            </Card>
-          ) : (
-            answeredQuestions.map(q => (
-              <Card key={q.id}>
-                <CardContent className="pt-4 space-y-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="space-y-1">
-                      <p className="font-medium">{q.question}</p>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <Badge variant="outline" className="text-xs">
-                          Week {q.week_number}{q.hour_number ? `.${q.hour_number}` : ""}
-                        </Badge>
-                        <span>Student: {q.student_id}</span>
-                      </div>
-                    </div>
-                    <Badge className="shrink-0">Answered</Badge>
-                  </div>
-                  
-                  {q.teacher_response && (
-                    <div className="p-3 bg-primary/5 rounded-lg">
-                      <p className="text-xs font-medium text-primary mb-1">Your Response:</p>
-                      <p className="text-sm">{q.teacher_response}</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </TabsContent>
-
-        <TabsContent value="responses" className="space-y-4">
-          {studentResponses.length === 0 ? (
-            <Card>
-              <CardContent className="py-8 text-center text-muted-foreground">
-                <MessageCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p>No student work submitted yet</p>
-              </CardContent>
-            </Card>
-          ) : (
-            studentResponses.map(r => {
-              // Parse the response JSON
-              let parsedResponse: { question?: string; notes?: string; attempts?: string[] } = {};
-              try {
-                parsedResponse = JSON.parse(r.response);
-              } catch {}
-              
-              return (
-              <Card key={r.id}>
-                <CardContent className="pt-4 space-y-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="space-y-1 flex-1">
-                      <p className="text-xs text-muted-foreground">
-                        Student: {r.student_id} • {parsedResponse.question || r.question_key || 'Task'}
-                      </p>
-                      {parsedResponse.attempts && (
-                        <p className="text-sm">Answers: {parsedResponse.attempts.join(' → ')}</p>
-                      )}
-                      {parsedResponse.notes && (
-                        <p className="text-sm bg-muted/50 p-2 rounded mt-1">{parsedResponse.notes}</p>
-                      )}
-                    </div>
-                    <Badge 
-                      variant={r.is_correct ? "default" : r.is_correct === false ? "destructive" : "secondary"}
-                      className="shrink-0"
-                    >
-                      {r.is_correct ? "Correct" : r.is_correct === false ? "Incorrect" : "Written"}
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Submitted: {new Date(r.submitted_at).toLocaleString()}
-                  </p>
-                  {r.ai_feedback && (
-                    <div className="p-3 bg-blue-500/10 rounded-lg">
-                      <p className="text-xs font-medium text-blue-700 mb-1">AI Feedback Given:</p>
-                      <p className="text-sm text-muted-foreground">{r.ai_feedback}</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-              );
-            })
-          )}
-        </TabsContent>
-
-        {/* Writing Drafts Tab */}
-        <TabsContent value="drafts" className="space-y-4">
-          {writingDrafts.length === 0 ? (
-            <Card>
-              <CardContent className="py-8 text-center text-muted-foreground">
-                <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p>No writing drafts submitted yet</p>
-              </CardContent>
-            </Card>
-          ) : (
-            writingDrafts.map(d => (
-              <Card key={d.id}>
-                <CardContent className="pt-4 space-y-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="space-y-1 flex-1">
-                      <p className="text-xs text-muted-foreground">
-                        Student: {d.student_id} • {d.task_key} • Version {d.version}
-                      </p>
-                      <p className="text-sm bg-muted/50 p-2 rounded whitespace-pre-wrap">{d.content}</p>
-                    </div>
-                    <Badge variant={d.is_submitted ? "default" : "secondary"} className="shrink-0">
-                      {d.is_submitted ? "Submitted" : "Draft"}
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Created: {new Date(d.created_at).toLocaleString()}
-                  </p>
-                  {d.ai_feedback && (
-                    <div className="p-3 bg-blue-500/10 rounded-lg">
-                      <p className="text-xs font-medium text-blue-700 mb-1">AI Feedback:</p>
-                      <p className="text-sm text-muted-foreground whitespace-pre-wrap">{d.ai_feedback}</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </TabsContent>
-
-        {/* Paragraph Notes Tab */}
-        <TabsContent value="notes" className="space-y-4">
-          {paragraphNotes.length === 0 ? (
-            <Card>
-              <CardContent className="py-8 text-center text-muted-foreground">
-                <StickyNote className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p>No student notes taken yet</p>
-              </CardContent>
-            </Card>
-          ) : (
-            paragraphNotes.map(n => (
-              <Card key={n.id}>
-                <CardContent className="pt-4 space-y-2">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="space-y-1 flex-1">
-                      <p className="text-xs text-muted-foreground">
-                        Student: {n.student_id} • Paragraph: {n.paragraph_key}
-                      </p>
-                      <p className="text-sm bg-muted/50 p-2 rounded whitespace-pre-wrap">{n.notes}</p>
-                    </div>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Updated: {new Date(n.updated_at).toLocaleString()}
-                  </p>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </TabsContent>
-      </Tabs>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
