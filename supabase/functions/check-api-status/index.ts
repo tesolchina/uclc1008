@@ -50,100 +50,111 @@ serve(async (req) => {
   const operation = "check-api-status";
 
   try {
-    const { accessToken, sessionId } = await req.json().catch(() => ({}));
-    
+    const { accessToken, studentId, sessionId } = await req.json().catch(() => ({}));
+
     await logProcess({
       operation,
       step: "start",
       status: "info",
-      message: `Checking API status (authenticated: ${!!accessToken})`,
+      message: `Checking API status (authenticated: ${!!accessToken}, hasStudentId: ${!!studentId})`,
       sessionId,
     });
 
     const statuses = [];
 
-    // If not authenticated, show all services as unavailable
-    if (!accessToken) {
-      await logProcess({
-        operation,
-        step: "no-auth",
-        status: "warning",
-        message: "No access token provided - showing limited status",
-        sessionId,
-      });
-      
-      // All user-configured providers show as unavailable without auth
-      statuses.push({ provider: "hkbu", available: false, name: "HKBU GenAI", source: null });
-      statuses.push({ provider: "openrouter", available: false, name: "OpenRouter", source: null });
-      statuses.push({ provider: "bolatu", available: false, name: "Bolatu (BLT)", source: null });
-      statuses.push({ provider: "kimi", available: false, name: "Kimi", source: null });
-
-      return new Response(JSON.stringify({ statuses, authenticated: false }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
     let hkbuPlatformKeys: Record<string, string> = {};
 
-    // Fetch keys from HKBU platform
-    try {
-      await logProcess({
-        operation,
-        step: "fetch-remote",
-        status: "info",
-        message: "Fetching API keys from HKBU platform...",
-        sessionId,
-      });
-
-      const response = await fetch(`${HKBU_PLATFORM_URL}/api/user/api-keys`, {
-        headers: {
-          "Authorization": `Bearer ${accessToken}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const rawKeys = data.api_keys || {};
-        // Normalize key names (blt -> bolatu)
-        hkbuPlatformKeys = {};
-        for (const [key, value] of Object.entries(rawKeys)) {
-          const normalizedKey = key === "blt" ? "bolatu" : key;
-          hkbuPlatformKeys[normalizedKey] = value as string;
-        }
-        const foundKeys = Object.keys(hkbuPlatformKeys);
-        
+    // Fetch keys from HKBU platform (only if authenticated)
+    if (accessToken) {
+      try {
         await logProcess({
           operation,
-          step: "remote-success",
-          status: "success",
-          message: `HKBU platform returned ${foundKeys.length} keys`,
-          details: { keys: foundKeys },
+          step: "fetch-remote",
+          status: "info",
+          message: "Fetching API keys from HKBU platform...",
           sessionId,
         });
-      } else {
+
+        const response = await fetch(`${HKBU_PLATFORM_URL}/api/user/api-keys`, {
+          headers: {
+            "Authorization": `Bearer ${accessToken}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const rawKeys = data.api_keys || {};
+          // Normalize key names (blt -> bolatu)
+          hkbuPlatformKeys = {};
+          for (const [key, value] of Object.entries(rawKeys)) {
+            const normalizedKey = key === "blt" ? "bolatu" : key;
+            hkbuPlatformKeys[normalizedKey] = value as string;
+          }
+          const foundKeys = Object.keys(hkbuPlatformKeys);
+
+          await logProcess({
+            operation,
+            step: "remote-success",
+            status: "success",
+            message: `HKBU platform returned ${foundKeys.length} keys`,
+            details: { keys: foundKeys },
+            sessionId,
+          });
+        } else {
+          await logProcess({
+            operation,
+            step: "remote-error",
+            status: "error",
+            message: `HKBU platform error: ${response.status}`,
+            details: { status: response.status },
+            sessionId,
+          });
+        }
+      } catch (err) {
         await logProcess({
           operation,
-          step: "remote-error",
+          step: "remote-exception",
           status: "error",
-          message: `HKBU platform error: ${response.status}`,
-          details: { status: response.status },
+          message: `Error fetching from HKBU platform: ${err}`,
           sessionId,
         });
       }
-    } catch (err) {
+    } else {
       await logProcess({
         operation,
-        step: "remote-exception",
-        status: "error",
-        message: `Error fetching from HKBU platform: ${err}`,
+        step: "remote-skip",
+        status: "warning",
+        message: "No access token provided - skipping HKBU platform check",
         sessionId,
       });
     }
 
-    // Also check local database as fallback
+    // Local database (system settings / shared keys) + per-student key
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Read per-student HKBU key (if studentId provided)
+    let studentHkbuKey: string | null = null;
+    if (studentId) {
+      const { data: studentRow, error: studentErr } = await supabase
+        .from("students")
+        .select("hkbu_api_key")
+        .eq("student_id", studentId)
+        .maybeSingle();
+
+      if (studentErr) {
+        await logProcess({
+          operation,
+          step: "student-key-error",
+          status: "warning",
+          message: `Could not read student key: ${studentErr.message}`,
+          sessionId,
+        });
+      } else {
+        studentHkbuKey = (studentRow?.hkbu_api_key as string | null) ?? null;
+      }
+    }
 
     await logProcess({
       operation,
@@ -228,7 +239,7 @@ serve(async (req) => {
       sessionId,
     });
 
-    return new Response(JSON.stringify({ statuses, authenticated: true }), {
+    return new Response(JSON.stringify({ statuses, authenticated: !!accessToken }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {

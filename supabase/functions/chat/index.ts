@@ -24,8 +24,12 @@ type RequestPayload = {
   };
 };
 
-// Get API key from HKBU platform or local database
-async function getUserApiKey(accessToken: string | undefined, supabase: any): Promise<{ key: string; provider: string; endpoint: string } | null> {
+// Get API key from HKBU platform, per-student record, or local database
+async function getUserApiKey(
+  accessToken: string | undefined,
+  studentId: string | undefined,
+  supabase: any
+): Promise<{ key: string; provider: string; endpoint: string } | null> {
   // Try HKBU platform first if we have an access token
   if (accessToken) {
     try {
@@ -36,12 +40,12 @@ async function getUserApiKey(accessToken: string | undefined, supabase: any): Pr
       if (response.ok) {
         const data = await response.json();
         const keys = data.api_keys || {};
-        
+
         if (keys.hkbu) {
-          return { 
+          return {
             key: keys.hkbu,
-            provider: "hkbu", 
-            endpoint: "https://genai.hkbu.edu.hk/api/v0/rest/deployments/gpt-4.1/chat/completions"
+            provider: "hkbu",
+            endpoint: "https://genai.hkbu.edu.hk/api/v0/rest/deployments/gpt-4.1/chat/completions",
           };
         }
       }
@@ -50,7 +54,29 @@ async function getUserApiKey(accessToken: string | undefined, supabase: any): Pr
     }
   }
 
-  // Fallback to local database - only HKBU keys
+  // Next: check per-student saved key (if studentId provided)
+  if (studentId) {
+    try {
+      const { data: studentRow } = await supabase
+        .from("students")
+        .select("hkbu_api_key")
+        .eq("student_id", studentId)
+        .maybeSingle();
+
+      const key = studentRow?.hkbu_api_key;
+      if (key) {
+        return {
+          key,
+          provider: "hkbu",
+          endpoint: "https://genai.hkbu.edu.hk/api/v0/rest/deployments/gpt-4.1/chat/completions",
+        };
+      }
+    } catch (err) {
+      console.error("Error fetching student HKBU key:", err);
+    }
+  }
+
+  // Fallback to local database (system-level keys)
   const { data: storedKeys } = await supabase
     .from("api_keys")
     .select("provider, api_key")
@@ -59,10 +85,10 @@ async function getUserApiKey(accessToken: string | undefined, supabase: any): Pr
     .limit(1);
 
   if (storedKeys && storedKeys.length > 0 && storedKeys[0].api_key) {
-    return { 
-      key: storedKeys[0].api_key, 
+    return {
+      key: storedKeys[0].api_key,
       provider: "hkbu",
-      endpoint: "https://genai.hkbu.edu.hk/api/v0/rest/deployments/gpt-4.1/chat/completions"
+      endpoint: "https://genai.hkbu.edu.hk/api/v0/rest/deployments/gpt-4.1/chat/completions",
     };
   }
 
@@ -152,7 +178,7 @@ serve(async (req) => {
     };
 
     // Get user's configured API key (HKBU only now)
-    const userApiConfig = await getUserApiKey(accessToken, supabase);
+    const userApiConfig = await getUserApiKey(accessToken, studentId, supabase);
     
     let apiConfig = userApiConfig;
     let source: "user" | "shared" = "user";
