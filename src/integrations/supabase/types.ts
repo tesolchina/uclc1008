@@ -847,6 +847,7 @@ export type Database = {
           ai_feedback: string | null
           id: string
           is_correct: boolean | null
+          question_key: string | null
           response: string
           score: number | null
           student_id: string
@@ -858,6 +859,7 @@ export type Database = {
           ai_feedback?: string | null
           id?: string
           is_correct?: boolean | null
+          question_key?: string | null
           response: string
           score?: number | null
           student_id: string
@@ -869,6 +871,7 @@ export type Database = {
           ai_feedback?: string | null
           id?: string
           is_correct?: boolean | null
+          question_key?: string | null
           response?: string
           score?: number | null
           student_id?: string
