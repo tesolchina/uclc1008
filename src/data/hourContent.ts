@@ -239,96 +239,117 @@ export const week1Hours: HourData[] = [
       }
     ],
     tasks: [
+      // Part 2: Scanning Practice Questions 1-4
       {
-        id: "w1h1-mc1",
+        id: "w1h1-scan1",
         type: "mc",
-        question: "You are skimming Article A by Hong et al. (2022). Where would you find the GIST (main point) of the article?",
-        options: [
-          "In the title only",
-          "In the last sentence of the Abstract",
-          "In the Methods section",
-          "In the References list"
-        ],
+        question: "Who is the publisher of this article?",
+        options: ["Elsevier", "Taylor & Francis", "Springer Nature", "SAGE Publications"],
         correctAnswer: 1,
-        explanation: "The gist is typically found in the LAST sentence of the Abstract. For Hong et al., it's: 'Parents support the use of face recognition systems in elementary school.' This tells you the main finding.",
-        skillFocus: ["skimming", "abstract-reading"]
-      },
-      {
-        id: "w1h1-tf1",
-        type: "true-false",
-        question: "Hong et al. (2022) is an EMPIRICAL paper because it collected survey data from 380 parents.",
-        correctAnswer: "true",
-        explanation: "Correct! Empirical papers collect and analyze data. Hong et al. surveyed 380 parents using questionnaires - this is data collection. They have Methods, Results, and statistical analysis. Conceptual papers theorize WITHOUT collecting new data.",
-        skillFocus: ["article-structure", "empirical-conceptual"]
-      },
-      {
-        id: "w1h1-mc2",
-        type: "mc",
-        question: "When SCANNING Article A for the sample size, which section would you look in and what words would you search for?",
-        options: [
-          "Abstract - look for 'participants' or 'sample'",
-          "Method/Participants section - look for 'n=', 'N=', numbers, 'participants'",
-          "Discussion - look for 'implications'",
-          "References - look for author names"
-        ],
-        correctAnswer: 1,
-        explanation: "Sample size is found in the METHOD section, specifically under 'Participants'. Scan for numbers and words like 'participants', 'sample', 'n=' or 'N='. In Hong et al.: 'A total of 394 valid data were collected.'",
+        explanation: "Taylor & Francis publishes the journal 'Learning, Media and Technology'. You can see the T&F logo at the top of the article page.",
         skillFocus: ["scanning"]
       },
       {
-        id: "w1h1-fb1",
-        type: "fill-blank",
-        question: "The IMRaD structure stands for: Introduction, _______, Results, and Discussion.",
-        correctAnswer: "Methods",
-        explanation: "IMRaD = Introduction, Methods, Results, Discussion. This is the standard structure for EMPIRICAL papers. The Methods section describes how data was collected (e.g., surveys, experiments).",
-        skillFocus: ["article-structure"]
-      },
-      {
-        id: "w1h1-mc3",
+        id: "w1h1-scan2",
         type: "mc",
-        question: "Read this from Hong et al.'s Method: 'The questionnaire used a 5-point Likert scale, with options strongly disagree, disagree, neutral, agree, and strongly agree.' This is an example of:",
-        options: [
-          "A research gap",
-          "A limitation",
-          "A data collection instrument",
-          "A statistical result"
-        ],
+        question: "What is the journal name?",
+        options: ["Educational Technology Research", "Learning, Media and Technology", "Computers & Education", "Journal of Digital Learning"],
+        correctAnswer: 1,
+        explanation: "The journal name appears in the article header and citation information. It's 'Learning, Media and Technology', Volume 45, Issue 2.",
+        skillFocus: ["scanning"]
+      },
+      {
+        id: "w1h1-scan3",
+        type: "mc",
+        question: "Which universities do the authors come from?",
+        options: ["Harvard University & MIT", "Monash University (both authors)", "University of Melbourne & University of Sydney", "University of Oxford & Cambridge"],
+        correctAnswer: 1,
+        explanation: "Both Mark Andrejevic and Neil Selwyn are affiliated with Monash University in Australia. This is shown in the author information section.",
+        skillFocus: ["scanning"]
+      },
+      {
+        id: "w1h1-scan4",
+        type: "mc",
+        question: "When was this article published online?",
+        options: ["05 November 2019", "27 January 2020", "14 February 2020", "3 March 2020"],
+        correctAnswer: 0,
+        explanation: "The article shows 'Published online: 05 Nov 2019' in the publication information section on the Taylor & Francis website.",
+        skillFocus: ["scanning"]
+      },
+      // Part 2: Skimming Practice Questions 5-7
+      {
+        id: "w1h1-skim1",
+        type: "mc",
+        question: "What is the main topic of this article?",
+        options: ["How to implement facial recognition systems in schools", "Critical examination of facial recognition technology use in educational settings", "The benefits of surveillance technology for student safety", "A comparison of different facial recognition software vendors"],
+        correctAnswer: 1,
+        explanation: "The title and abstract clearly indicate this is a critical examination of FRT in schools, raising 'critical questions and concerns' rather than promoting its use.",
+        skillFocus: ["skimming"]
+      },
+      {
+        id: "w1h1-skim2",
+        type: "mc",
+        question: "Based on the headings, what is the authors' overall stance on FRT in schools?",
+        options: ["Strongly supportive of widespread adoption", "Neutral, presenting only facts without opinion", "Critical and questioning, highlighting concerns", "Focused only on technical implementation details"],
         correctAnswer: 2,
-        explanation: "A 5-point Likert scale is a DATA COLLECTION INSTRUMENT - the tool used to measure participants' responses. When scanning for instruments, look for words like 'scale', 'questionnaire', 'survey', 'measure'.",
-        skillFocus: ["scanning", "article-structure"]
+        explanation: "Headings like 'Problematising the rise of facial recognition' and 'Challenging the take-up of facial recognition in schools' indicate a critical, questioning stance.",
+        skillFocus: ["skimming"]
       },
       {
-        id: "w1h1-sa1",
-        type: "short-answer",
-        question: "Why is peer review important for academic credibility? Give ONE reason with a brief explanation.",
-        hints: ["Think about quality control", "Consider what happens without expert checking"],
-        wordLimit: 40,
-        skillFocus: ["critical-thinking"],
-        modelAnswer: "Peer review ensures quality control by having experts evaluate the methodology and conclusions before publication. This means readers can trust that the research has been checked for errors and validity.",
-        demoSteps: [
-          { title: "Identify the core question", content: "What does peer review actually DO?", highlight: "quality control" },
-          { title: "Give a reason", content: "It catches errors before publication", highlight: "evaluate methodology" },
-          { title: "Explain why this matters", content: "Readers can trust the research more", highlight: "validity" }
-        ]
+        id: "w1h1-skim3",
+        type: "mc",
+        question: "What type of article structure does this paper follow?",
+        options: ["Experimental study with methods, results, and statistics", "Argumentative/analytical essay discussing issues and concerns", "Case study of a specific school implementation", "Literature review summarizing other research only"],
+        correctAnswer: 1,
+        explanation: "The structure (Introduction → Context → Analysis → Discussion → Conclusion) with no 'Methods' or 'Results' sections indicates this is an argumentative/analytical piece rather than an empirical study.",
+        skillFocus: ["skimming", "article-structure"]
+      },
+      // Part 3a: Macro-Level Outlining Question 8
+      {
+        id: "w1h1-macro1",
+        type: "mc",
+        question: "What is the logical flow among sections 4-7 of the article?",
+        options: ["General concerns → Educational applications → Explaining adoption → Critiquing adoption", "History → Benefits → Costs → Recommendations", "Problem → Solution → Implementation → Evaluation", "Theory → Methodology → Results → Discussion"],
+        correctAnswer: 0,
+        explanation: "The sections follow a logical progression: Section 4 raises general concerns about FRT → Section 5 describes how FRT is being applied in education → Section 6 explains WHY schools are adopting it → Section 7 challenges and critiques this adoption.",
+        skillFocus: ["outlining", "article-structure"]
+      },
+      // Part 3a: Writing Practice
+      {
+        id: "w1h1-macro-structure",
+        type: "paragraph",
+        question: "Write 3 sentences that summarize what the excerpt covers at the macro level. Do not summarize the content in detail – just describe the structure and progression of ideas.",
+        wordLimit: 80,
+        hints: ["The excerpt begins by...", "Then, it moves on to discuss...", "Finally, it explores..."],
+        skillFocus: ["outlining", "summary-writing"]
+      },
+      // Part 3a: Macro Structure MC Questions 9-10
+      {
+        id: "w1h1-macro2",
+        type: "mc",
+        question: "What is the main focus of each paragraph in the excerpt?",
+        options: ["P1: Introduction → P2-4: Three types of applications → P5-6: Engagement monitoring", "P1: History → P2: Benefits → P3: Costs → P4-6: Conclusions", "P1-3: Problem → P4-5: Solution → P6: Implementation", "All paragraphs discuss the same application in different countries"],
+        correctAnswer: 0,
+        explanation: "P1 introduces FRT in education. P2 covers security, P3 covers attendance, P4 covers online/virtual learning. P5-6 discuss engagement/emotion detection. This shows 4 distinct applications organized logically.",
+        skillFocus: ["outlining", "reading-comprehension"]
       },
       {
-        id: "w1h1-sentence1",
-        type: "sentence",
-        question: "Write ONE sentence that identifies Hong et al. (2022) as an academic source. Mention at least TWO features that make it academic.",
-        wordLimit: 35,
-        hints: ["Consider: peer-reviewed, university authors, citations, methodology"],
-        skillFocus: ["academic-discourse", "citation"],
-        modelAnswer: "Hong et al. (2022) is an academic source because it was published in a peer-reviewed journal and includes systematic data collection from 380 participants.",
-        examples: [
-          {
-            original: "Hong et al. (2022) is academic because it has citations.",
-            analysis: "Good start, but only mentions ONE feature. Add another for a complete answer."
-          },
-          {
-            original: "Hong et al. (2022) is an academic source as it appears in a peer-reviewed journal with university-affiliated authors conducting systematic research.",
-            analysis: "Excellent! Mentions peer review, author expertise, and methodology - three features."
-          }
-        ]
+        id: "w1h1-macro3",
+        type: "mc",
+        question: "How are the four applications (security, attendance, online authentication, engagement detection) organized in the excerpt?",
+        options: ["From most expensive to least expensive", "From physical/visible surveillance to invisible/emotional surveillance", "Chronologically by when they were invented", "Alphabetically by application name"],
+        correctAnswer: 1,
+        explanation: "The excerpt moves from visible/physical applications (security cameras, attendance tracking) to increasingly invisible/intimate forms of surveillance (online authentication, then emotion/engagement detection from facial expressions).",
+        skillFocus: ["outlining", "reading-comprehension"]
+      },
+      // Part 3b: Micro-Level Outlining Practice
+      {
+        id: "w1h1-micro-outline",
+        type: "paragraph",
+        question: "Choose a paragraph from the excerpt and create a micro-level outline identifying the topic sentence, supporting details, and concluding thought.",
+        wordLimit: 100,
+        hints: ["Topic Sentence: [main idea]", "Supporting Details: [specific points]", "Concluding Thought: [wrap-up]"],
+        skillFocus: ["outlining", "paragraph-analysis"]
       }
     ],
     writingTask: {

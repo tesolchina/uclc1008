@@ -47,23 +47,52 @@ interface StudentTasksByWeekProps {
 }
 
 // Get the task key format used in responses
-const getTaskKeyPatterns = (weekNum: number, hourNum: number, taskId: string): string[] => {
-  return [
-    taskId, // Original task id like "w1h1-mc1"
+const getTaskKeyPatterns = (weekNum: number, hourNum: number, taskId: string, taskIndex?: number): string[] => {
+  const patterns = [
+    taskId, // Original task id like "w1h1-scan1"
     `week${weekNum}_hour${hourNum}_${taskId}`,
     `week${weekNum}-hour${hourNum}_${taskId}`,
     `w${weekNum}h${hourNum}_${taskId}`,
     `w${weekNum}-h${hourNum}_${taskId}`,
+    `week${weekNum}-hour${hourNum}-${taskId}`,
   ];
+  
+  // Add question number patterns for QuickCheckMC
+  // These may or may not have week/hour prefix depending on how they were saved
+  if (taskIndex !== undefined) {
+    patterns.push(`week${weekNum}-hour${hourNum}-q${taskIndex + 1}`);
+    patterns.push(`q${taskIndex + 1}-`); // Simple pattern without week/hour
+  }
+  
+  return patterns;
+};
+
+// Check if a response matches a task based on question text similarity
+const matchesByQuestionText = (responseJson: string, taskQuestion: string): boolean => {
+  try {
+    const parsed = JSON.parse(responseJson);
+    if (parsed.question) {
+      // Check if the first 30 chars of questions match
+      const responseQ = parsed.question.toLowerCase().slice(0, 30);
+      const taskQ = taskQuestion.toLowerCase().slice(0, 30);
+      return responseQ === taskQ;
+    }
+  } catch {}
+  return false;
 };
 
 // Check if a response matches a task
-const responseMatchesTask = (response: StudentResponse, taskId: string, weekNum: number, hourNum: number): boolean => {
+const responseMatchesTask = (response: StudentResponse, taskId: string, weekNum: number, hourNum: number, taskIndex?: number, taskQuestion?: string): boolean => {
   const questionKey = response.question_key?.toLowerCase() || "";
-  const patterns = getTaskKeyPatterns(weekNum, hourNum, taskId).map(p => p.toLowerCase());
+  const patterns = getTaskKeyPatterns(weekNum, hourNum, taskId, taskIndex).map(p => p.toLowerCase());
   
-  // Check if question_key contains the task id
-  if (patterns.some(p => questionKey.includes(p) || questionKey.includes(taskId.toLowerCase()))) {
+  // Check if question_key contains any pattern
+  if (patterns.some(p => questionKey.includes(p) || questionKey.startsWith(p))) {
+    return true;
+  }
+  
+  // Check if taskId is contained in questionKey
+  if (questionKey.includes(taskId.toLowerCase())) {
     return true;
   }
   
@@ -73,19 +102,30 @@ const responseMatchesTask = (response: StudentResponse, taskId: string, weekNum:
     if (parsed.taskId === taskId || parsed.questionId === taskId) {
       return true;
     }
-    // Check weekNumber/hourNumber match and question text similarity
+    // Check weekNumber/hourNumber match
     if (parsed.weekNumber === weekNum && parsed.hourNumber === hourNum) {
-      return true;
+      // If we have taskIndex, check if this is the right question
+      if (taskIndex !== undefined) {
+        const qNumMatch = questionKey.match(/q(\d+)/);
+        if (qNumMatch && parseInt(qNumMatch[1]) === taskIndex + 1) {
+          return true;
+        }
+      }
     }
   } catch {}
+  
+  // Check by question text similarity if provided
+  if (taskQuestion && matchesByQuestionText(response.response, taskQuestion)) {
+    return true;
+  }
   
   return false;
 };
 
 // Check if a writing draft matches a task
-const draftMatchesTask = (draft: WritingDraft, taskId: string, weekNum: number, hourNum: number): boolean => {
+const draftMatchesTask = (draft: WritingDraft, taskId: string, weekNum: number, hourNum: number, taskIndex?: number): boolean => {
   const taskKey = draft.task_key?.toLowerCase() || "";
-  const patterns = getTaskKeyPatterns(weekNum, hourNum, taskId).map(p => p.toLowerCase());
+  const patterns = getTaskKeyPatterns(weekNum, hourNum, taskId, taskIndex).map(p => p.toLowerCase());
   
   return patterns.some(p => taskKey.includes(p) || taskKey.includes(taskId.toLowerCase()));
 };
@@ -149,13 +189,13 @@ export function StudentTasksByWeek({
   }, {} as Record<number, HourData[]>);
 
   // Get attempt status for a task
-  const getTaskAttemptInfo = (task: HourTask, weekNum: number, hourNum: number) => {
+  const getTaskAttemptInfo = (task: HourTask, weekNum: number, hourNum: number, taskIndex: number) => {
     const matchingResponses = studentResponses.filter(r => 
-      responseMatchesTask(r, task.id, weekNum, hourNum)
+      responseMatchesTask(r, task.id, weekNum, hourNum, taskIndex)
     );
     
     const matchingDrafts = writingDrafts.filter(d =>
-      draftMatchesTask(d, task.id, weekNum, hourNum)
+      draftMatchesTask(d, task.id, weekNum, hourNum, taskIndex)
     );
 
     const feedback = taskFeedback.filter(f => 
@@ -199,8 +239,8 @@ export function StudentTasksByWeek({
     let attempted = 0;
     let correct = 0;
     
-    tasks.forEach(task => {
-      const info = getTaskAttemptInfo(task, hour.weekNumber, hour.hourNumber);
+    tasks.forEach((task, taskIndex) => {
+      const info = getTaskAttemptInfo(task, hour.weekNumber, hour.hourNumber, taskIndex);
       if (info.attempted) {
         attempted++;
         if (info.type === 'response' && info.isCorrect) {
@@ -300,7 +340,7 @@ export function StudentTasksByWeek({
                         <CollapsibleContent>
                           <div className="ml-6 mt-2 space-y-2">
                             {hour.tasks.map((task, idx) => {
-                              const attemptInfo = getTaskAttemptInfo(task, hour.weekNumber, hour.hourNumber);
+                              const attemptInfo = getTaskAttemptInfo(task, hour.weekNumber, hour.hourNumber, idx);
                               
                               return (
                                 <div 
