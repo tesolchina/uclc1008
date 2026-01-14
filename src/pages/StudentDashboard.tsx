@@ -67,6 +67,13 @@ export default function StudentDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Reset all state when studentId changes
+    setQuestions([]);
+    setResponses([]);
+    setWritingDrafts([]);
+    setParagraphNotes([]);
+    setLoading(true);
+
     const fetchData = async () => {
       if (!studentId) {
         setLoading(false);
@@ -90,7 +97,6 @@ export default function StudentDashboard() {
             .from("writing_drafts")
             .select("*")
             .eq("student_id", studentId)
-            .eq("is_submitted", true)
             .order("created_at", { ascending: false }),
           supabase
             .from("paragraph_notes")
