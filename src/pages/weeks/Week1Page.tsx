@@ -4,20 +4,20 @@ import { WeekOverviewTemplate } from "./WeekOverviewTemplate";
 const classHours = [
   { 
     hour: 1, 
-    title: "Reading with Purpose", 
-    theme: "Scanning, skimming, and outlining academic texts",
+    title: "Skimming, Scanning & Outlining Academic Texts", 
+    theme: "Strategic Reading for Academic Articles",
     unitCount: 3
   },
   { 
     hour: 2, 
     title: "Paraphrasing Fundamentals", 
-    theme: "4 strategies for effective paraphrasing",
+    theme: "4 Core Strategies with AI-Guided Practice",
     unitCount: 4
   },
   { 
     hour: 3, 
-    title: "Claims vs Evidence", 
-    theme: "Topic sentences, distinguishing what to keep vs skip",
+    title: "Practice, Feedback & Reflection", 
+    theme: "Consolidate Week 1 Skills Through Guided Practice",
     unitCount: 2
   },
 ];
