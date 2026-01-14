@@ -61,29 +61,36 @@ export default function SettingsPage() {
   const loadStatus = async () => {
     setIsLoading(true);
     try {
-      // Load stored student ID
+      // Load stored student ID (sync, no await needed)
       const storedId = getStoredStudentId();
       setStudentId(storedId);
       setSavedStudentId(storedId);
       
-      // Check API status
-      const { data: apiData } = await supabase.functions.invoke('check-api-status', {
-        body: { accessToken },
-      });
-      
-      if (apiData?.statuses) {
-        const hkbuStatus = apiData.statuses.find((s: any) => s.provider === 'hkbu');
+      const effectiveStudentId = storedId || profile?.hkbu_user_id || getBrowserSessionId();
+      const today = new Date().toISOString().split('T')[0];
+
+      // Run all async operations in parallel
+      const [apiResponse, settingsResponse, usageResponse] = await Promise.all([
+        supabase.functions.invoke('check-api-status', { body: { accessToken } }),
+        supabase.from('system_settings').select('key, value'),
+        supabase
+          .from('student_api_usage')
+          .select('request_count')
+          .eq('student_id', effectiveStudentId)
+          .eq('usage_date', today)
+          .maybeSingle(),
+      ]);
+
+      // Process API status
+      if (apiResponse.data?.statuses) {
+        const hkbuStatus = apiResponse.data.statuses.find((s: any) => s.provider === 'hkbu');
         setHasHkbuKey(hkbuStatus?.available ?? false);
         setMaskedKey(hkbuStatus?.maskedKey ?? null);
       }
 
-      // Load shared API settings
-      const { data: settings } = await supabase
-        .from('system_settings')
-        .select('key, value');
-
-      if (settings) {
-        for (const setting of settings) {
+      // Process settings
+      if (settingsResponse.data) {
+        for (const setting of settingsResponse.data) {
           if (setting.key === 'shared_api_enabled') {
             setSharedApiEnabled((setting.value as { enabled: boolean }).enabled ?? true);
           }
@@ -93,18 +100,8 @@ export default function SettingsPage() {
         }
       }
 
-      // Load user's usage today
-      const effectiveStudentId = storedId || profile?.hkbu_user_id || getBrowserSessionId();
-      const today = new Date().toISOString().split('T')[0];
-      
-      const { data: usageData } = await supabase
-        .from('student_api_usage')
-        .select('request_count')
-        .eq('student_id', effectiveStudentId)
-        .eq('usage_date', today)
-        .maybeSingle();
-
-      setUsedToday(usageData?.request_count ?? 0);
+      // Process usage
+      setUsedToday(usageResponse.data?.request_count ?? 0);
     } catch (error) {
       console.error('Error loading status:', error);
     } finally {

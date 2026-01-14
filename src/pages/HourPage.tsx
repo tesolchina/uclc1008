@@ -1236,6 +1236,29 @@ Remember to also save any written responses separately.
                   </div>
                 </CollapsibleSection>
 
+                {/* Writing Practice - placed above MC for easier reference to source text */}
+                <div className="p-4 rounded-lg bg-purple-500/10 border border-purple-500/30 space-y-3">
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    <PenLine className="h-4 w-4 text-purple-600" />
+                    Writing Practice: Narrate the Excerpt Structure
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    Write <strong>3 sentences</strong> that summarize what the excerpt covers at the macro level. 
+                    Do not summarize the content in detail – just describe the <em>structure</em> and <em>progression</em> of ideas.
+                  </p>
+                  <div className="p-3 rounded bg-background/80 text-xs text-muted-foreground space-y-2">
+                    <p className="font-medium">Example format:</p>
+                    <p className="italic">"The excerpt begins by... Then, it moves on to discuss... Finally, it explores..."</p>
+                  </div>
+                  <textarea 
+                    className="w-full min-h-[120px] p-3 rounded-lg border bg-background text-sm resize-y placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                    placeholder="Write your 3 sentences here describing the structure and progression of the excerpt..."
+                  />
+                  <p className="text-xs text-muted-foreground italic">
+                    💡 Tip: Your work is saved locally in this browser. Remember to copy your writing to a separate document as backup.
+                  </p>
+                </div>
+
                 {/* MC Questions on Excerpt Structure */}
                 <div className="space-y-3">
                   <h4 className="font-medium text-sm flex items-center gap-2">
@@ -1268,29 +1291,6 @@ Remember to also save any written responses separately.
                     correctAnswer="B"
                     explanation="The excerpt moves from visible/physical applications (security cameras, attendance tracking) to increasingly invisible/intimate forms of surveillance (online authentication, then emotion/engagement detection from facial expressions)."
                   />
-                </div>
-
-                {/* Writing Practice */}
-                <div className="p-4 rounded-lg bg-purple-500/10 border border-purple-500/30 space-y-3">
-                  <h4 className="font-medium text-sm flex items-center gap-2">
-                    <PenLine className="h-4 w-4 text-purple-600" />
-                    Writing Practice: Narrate the Excerpt Structure
-                  </h4>
-                  <p className="text-xs text-muted-foreground">
-                    Write <strong>3 sentences</strong> that summarize what the excerpt covers at the macro level. 
-                    Do not summarize the content in detail – just describe the <em>structure</em> and <em>progression</em> of ideas.
-                  </p>
-                  <div className="p-3 rounded bg-background/80 text-xs text-muted-foreground space-y-2">
-                    <p className="font-medium">Example format:</p>
-                    <p className="italic">"The excerpt begins by... Then, it moves on to discuss... Finally, it explores..."</p>
-                  </div>
-                  <textarea 
-                    className="w-full min-h-[120px] p-3 rounded-lg border bg-background text-sm resize-y placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
-                    placeholder="Write your 3 sentences here describing the structure and progression of the excerpt..."
-                  />
-                  <p className="text-xs text-muted-foreground italic">
-                    💡 Tip: Your work is saved locally in this browser. Remember to copy your writing to a separate document as backup.
-                  </p>
                 </div>
               </div>
             </CollapsibleSection>

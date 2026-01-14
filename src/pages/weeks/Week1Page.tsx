@@ -4,15 +4,15 @@ import { WeekOverviewTemplate } from "./WeekOverviewTemplate";
 const classHours = [
   { 
     hour: 1, 
-    title: "Strategic Reading Foundations", 
-    theme: "Title analysis, skimming & scanning techniques",
+    title: "Reading with Purpose", 
+    theme: "Scanning, skimming, and outlining academic texts",
     unitCount: 3
   },
   { 
     hour: 2, 
-    title: "Decoding Abstracts & IMRaD", 
-    theme: "Abstract structure, empirical vs conceptual papers",
-    unitCount: 3
+    title: "Paraphrasing Fundamentals", 
+    theme: "4 strategies for effective paraphrasing",
+    unitCount: 4
   },
   { 
     hour: 3, 

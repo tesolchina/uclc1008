@@ -31,14 +31,9 @@ export function ArticleExcerptDisplay({
           <div className="space-y-1">
             <h3 className="font-semibold text-lg leading-tight">{title}</h3>
             <p className="text-sm text-muted-foreground">{authors}</p>
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-xs">
-                {source}
-              </Badge>
-              <Badge variant="secondary" className="text-xs">
-                Conceptual Article
-              </Badge>
-            </div>
+            <Badge variant="secondary" className="text-xs">
+              Conceptual Article
+            </Badge>
           </div>
         </div>
       </div>
