@@ -1,18 +1,14 @@
 import { useParams, Link } from "react-router-dom";
 import { getHourData } from "@/data/hourContent";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/features/auth";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { CollapsibleSection } from "@/components/CollapsibleSection";
-import { ObjectiveTask } from "@/components/tasks/ObjectiveTask";
-import { WritingTask } from "@/components/tasks/WritingTask";
-import { AskQuestionButton } from "@/components/tasks/AskQuestionButton";
+import { ObjectiveTask, QuickCheckMC, WritingTask, ParaphraseCoach, AskQuestionButton } from "@/components/tasks";
 import { StudentLoginReminder } from "@/components/StudentLoginReminder";
-import { QuickCheckMC } from "@/components/lessons/QuickCheckMC";
 import { LectureOutline, useSectionProgress, generateSectionId } from "@/features/lecture-mode";
 import type { AgendaSectionEnhanced } from "@/features/lecture-mode";
-import { ParaphraseCoach } from "@/components/lessons/ParaphraseCoach";
 import { ArrowLeft, ArrowRight, Clock, Target, BookOpen, PenLine, CheckCircle2, Lightbulb, FileText, Sparkles, ExternalLink, AlertCircle, Calendar, GraduationCap, ScrollText, ChevronDown, Download, LogIn, Loader2 } from "lucide-react";
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -286,7 +282,7 @@ export default function HourPage() {
   const { weekId, hourId } = useParams();
   const weekNumber = parseInt(weekId || "1");
   const hourNumber = parseInt(hourId || "1");
-  const { user } = useAuth();
+  const { user, studentId, isAuthenticated } = useAuth();
   const { toast } = useToast();
   
   const hourData = getHourData(weekNumber, hourNumber);
@@ -295,8 +291,7 @@ export default function HourPage() {
   const [completedSectionIndices, setCompletedSectionIndices] = useState<number[]>([]);
   const [hasUnsavedWork, setHasUnsavedWork] = useState(false);
 
-  const studentId = getStoredStudentId();
-  const isLoggedIn = !!user || !!studentId;
+  const isLoggedIn = isAuthenticated;
 
   // Calculate total tasks for Week 1 Hour 1 (10 MC + 2 writing)
   const totalTasks = weekNumber === 1 && hourNumber === 1 
