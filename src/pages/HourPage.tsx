@@ -1554,10 +1554,19 @@ Remember to also save any written responses separately.
               </p>
             </div>
             <div className="flex gap-2 flex-wrap">
-              <Button variant="outline" size="sm" onClick={downloadReport}>
-                <Download className="h-4 w-4 mr-1" />
-                Download Report
-              </Button>
+              {isLoggedIn ? (
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/my-progress">
+                    <Target className="h-4 w-4 mr-1" />
+                    View My Progress
+                  </Link>
+                </Button>
+              ) : (
+                <Button variant="outline" size="sm" onClick={downloadReport}>
+                  <Download className="h-4 w-4 mr-1" />
+                  Download Report
+                </Button>
+              )}
               {prevHour && (
                 <Button variant="outline" size="sm" asChild>
                   <Link to={`/week/${weekNumber}/hour/${prevHour}`}>

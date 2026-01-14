@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/features/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,7 +32,7 @@ interface StudentQuestion {
 interface StudentResponse {
   id: string;
   student_id: string;
-  task_id: string;
+  question_key: string | null;
   response: string;
   is_correct: boolean | null;
   ai_feedback: string | null;
@@ -339,13 +339,27 @@ export default function TeacherDashboard() {
               </CardContent>
             </Card>
           ) : (
-            studentResponses.map(r => (
+            studentResponses.map(r => {
+              // Parse the response JSON
+              let parsedResponse: { question?: string; notes?: string; attempts?: string[] } = {};
+              try {
+                parsedResponse = JSON.parse(r.response);
+              } catch {}
+              
+              return (
               <Card key={r.id}>
                 <CardContent className="pt-4 space-y-3">
                   <div className="flex items-start justify-between gap-2">
                     <div className="space-y-1 flex-1">
-                      <p className="text-xs text-muted-foreground">Student: {r.student_id} • Task: {r.task_id}</p>
-                      <p className="text-sm">{r.response}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Student: {r.student_id} • {parsedResponse.question || r.question_key || 'Task'}
+                      </p>
+                      {parsedResponse.attempts && (
+                        <p className="text-sm">Answers: {parsedResponse.attempts.join(' → ')}</p>
+                      )}
+                      {parsedResponse.notes && (
+                        <p className="text-sm bg-muted/50 p-2 rounded mt-1">{parsedResponse.notes}</p>
+                      )}
                     </div>
                     <Badge 
                       variant={r.is_correct ? "default" : r.is_correct === false ? "destructive" : "secondary"}
@@ -365,7 +379,8 @@ export default function TeacherDashboard() {
                   )}
                 </CardContent>
               </Card>
-            ))
+              );
+            })
           )}
         </TabsContent>
       </Tabs>
