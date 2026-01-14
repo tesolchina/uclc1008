@@ -1,6 +1,7 @@
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { GraduationCap, Loader2 } from 'lucide-react';
+import { GraduationCap, Loader2, Copy } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface RegistrationStep3Props {
   lastFourDigits: string;
@@ -21,6 +22,13 @@ export function RegistrationStep3({
   onComplete,
   isSubmitting
 }: RegistrationStep3Props) {
+  const previewId = `${lastFourDigits}-${firstInitial}${lastInitial}-XX`;
+
+  const handleCopyPreview = () => {
+    navigator.clipboard.writeText(previewId);
+    toast.success('ID format copied! (Note: XX will be replaced with random characters)');
+  };
+
   return (
     <div className="space-y-4">
       <div className="text-center space-y-2">
@@ -42,11 +50,20 @@ export function RegistrationStep3({
       </div>
       <div className="bg-muted/50 rounded-lg p-4 text-center">
         <p className="text-sm text-muted-foreground mb-1">Your unique ID will be:</p>
-        <p className="text-2xl font-mono font-bold text-primary">
-          {lastFourDigits}-{firstInitial}{lastInitial}-XX
+        <p className="text-2xl font-mono font-bold text-primary mb-2">
+          {previewId}
         </p>
-        <p className="text-xs text-muted-foreground mt-2">
-          (XX will be generated randomly)
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={handleCopyPreview}
+          className="mb-2"
+        >
+          <Copy className="h-4 w-4 mr-2" />
+          Copy ID Format
+        </Button>
+        <p className="text-xs text-muted-foreground">
+          (XX will be generated randomly after registration)
         </p>
       </div>
       
