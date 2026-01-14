@@ -43,8 +43,22 @@ interface StudentTaskProgressProps {
   paragraphNotes: ParagraphNote[];
 }
 
+// Check if a response matches a task based on question text similarity
+const matchesByQuestionText = (responseJson: string, taskQuestion: string): boolean => {
+  try {
+    const parsed = JSON.parse(responseJson);
+    if (parsed.question) {
+      // Check if the first 30 chars of questions match
+      const responseQ = parsed.question.toLowerCase().slice(0, 30);
+      const taskQ = taskQuestion.toLowerCase().slice(0, 30);
+      return responseQ === taskQ;
+    }
+  } catch {}
+  return false;
+};
+
 // Check if a response matches a task
-const responseMatchesTask = (response: TaskResponse, taskId: string, weekNum: number, hourNum: number): boolean => {
+const responseMatchesTask = (response: TaskResponse, taskId: string, weekNum: number, hourNum: number, taskIndex?: number, taskQuestion?: string): boolean => {
   const questionKey = response.question_key?.toLowerCase() || "";
   const patterns = [
     taskId.toLowerCase(),
@@ -54,7 +68,17 @@ const responseMatchesTask = (response: TaskResponse, taskId: string, weekNum: nu
     `week${weekNum}-hour${hourNum}-${taskId}`.toLowerCase(),
   ];
   
-  if (patterns.some(p => questionKey.includes(p) || questionKey.includes(taskId.toLowerCase()))) {
+  // Add question number patterns for QuickCheckMC
+  if (taskIndex !== undefined) {
+    patterns.push(`week${weekNum}-hour${hourNum}-q${taskIndex + 1}`.toLowerCase());
+    patterns.push(`q${taskIndex + 1}-`); // Simple pattern without week/hour
+  }
+  
+  if (patterns.some(p => questionKey.includes(p) || questionKey.startsWith(p))) {
+    return true;
+  }
+  
+  if (questionKey.includes(taskId.toLowerCase())) {
     return true;
   }
   
@@ -64,9 +88,19 @@ const responseMatchesTask = (response: TaskResponse, taskId: string, weekNum: nu
       return true;
     }
     if (parsed.weekNumber === weekNum && parsed.hourNumber === hourNum) {
-      return true;
+      if (taskIndex !== undefined) {
+        const qNumMatch = questionKey.match(/q(\d+)/);
+        if (qNumMatch && parseInt(qNumMatch[1]) === taskIndex + 1) {
+          return true;
+        }
+      }
     }
   } catch {}
+  
+  // Check by question text similarity if provided
+  if (taskQuestion && matchesByQuestionText(response.response, taskQuestion)) {
+    return true;
+  }
   
   return false;
 };
@@ -80,7 +114,7 @@ const draftMatchesTask = (draft: WritingDraft, taskId: string, weekNum: number, 
     `w${weekNum}h${hourNum}`.toLowerCase(),
   ];
   
-  return patterns.some(p => taskKey.includes(p));
+  return patterns.some(p => taskKey.includes(p) || taskKey.includes(taskId.toLowerCase()));
 };
 
 const getTaskTypeIcon = (type: string) => {
@@ -133,8 +167,8 @@ export function StudentTaskProgress({
   }, {} as Record<number, HourData[]>);
 
   // Check if task is completed
-  const isTaskCompleted = (task: HourTask, weekNum: number, hourNum: number): boolean => {
-    return responses.some(r => responseMatchesTask(r, task.id, weekNum, hourNum));
+  const isTaskCompleted = (task: HourTask, weekNum: number, hourNum: number, taskIndex: number): boolean => {
+    return responses.some(r => responseMatchesTask(r, task.id, weekNum, hourNum, taskIndex));
   };
 
   // Check if writing task is completed
@@ -149,8 +183,8 @@ export function StudentTaskProgress({
     const tasks = hour.tasks || [];
     let completed = 0;
     
-    tasks.forEach(task => {
-      if (isTaskCompleted(task, hour.weekNumber, hour.hourNumber)) {
+    tasks.forEach((task, taskIndex) => {
+      if (isTaskCompleted(task, hour.weekNumber, hour.hourNumber, taskIndex)) {
         completed++;
       }
     });
@@ -184,7 +218,7 @@ export function StudentTaskProgress({
 
     hours.forEach(hour => {
       hour.tasks.forEach((task, idx) => {
-        if (!isTaskCompleted(task, hour.weekNumber, hour.hourNumber)) {
+        if (!isTaskCompleted(task, hour.weekNumber, hour.hourNumber, idx)) {
           incomplete.push({ hour, task, index: idx });
         }
       });
@@ -276,7 +310,7 @@ export function StudentTaskProgress({
                         {/* Task list */}
                         <div className="ml-4 grid gap-1.5">
                           {hour.tasks.map((task, idx) => {
-                            const completed = isTaskCompleted(task, hour.weekNumber, hour.hourNumber);
+                            const completed = isTaskCompleted(task, hour.weekNumber, hour.hourNumber, idx);
                             
                             return (
                               <Link
