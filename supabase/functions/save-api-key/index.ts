@@ -6,8 +6,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Azure OpenAI compatible endpoint for HKBU GenAI
-const HKBU_API_URL = "https://genai.hkbu.edu.hk/general/rest/deployments/gpt-4o-mini/chat/completions?api-version=2024-10-21";
+// Azure OpenAI compatible endpoint for HKBU GenAI - use gpt-4.1 deployment
+const HKBU_API_URL = "https://genai.hkbu.edu.hk/api/v0/rest/deployments/gpt-4.1/chat/completions";
 
 // Inline logger
 async function logProcess(entry: {
