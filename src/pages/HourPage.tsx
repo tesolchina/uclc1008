@@ -253,18 +253,16 @@ function MicroLevelPractice({ onComplete, studentId }: { onComplete: (taskId: st
         </p>
       </div>
       
-      {/* Writing area with AI feedback */}
-      <div className="space-y-2">
-        <p className="text-xs text-muted-foreground">
-          Create a micro-level outline for the paragraph above. Identify the topic sentence, supporting details, and concluding thought:
-        </p>
-        <WritingTaskWithFeedback
-          taskId="micro-outline"
-          placeholder={"Topic Sentence:\n...\n\nSupporting Details:\n• ...\n• ...\n\nConcluding Thought:\n..."}
-          onComplete={onComplete}
-          studentId={studentId}
-        />
-      </div>
+      {/* Writing area with AI feedback and autosave */}
+      <WritingPracticeWithHistory
+        taskKey={`w1h1-micro-outline-${selectedParagraph}`}
+        title="Create a Micro-Level Outline"
+        instructions="Identify the topic sentence, supporting details, and concluding thought for the paragraph above."
+        exampleFormat="Topic Sentence: [main idea]&#10;Supporting Details:&#10;• [detail 1]&#10;• [detail 2]&#10;Concluding Thought: [wrap-up]"
+        placeholder={"Topic Sentence:\n...\n\nSupporting Details:\n• ...\n• ...\n\nConcluding Thought:\n..."}
+        studentId={studentId}
+        className="bg-transparent border-0 p-0"
+      />
     </div>
   );
 }
