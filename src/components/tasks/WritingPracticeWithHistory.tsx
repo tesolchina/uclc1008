@@ -60,27 +60,52 @@ export function WritingPracticeWithHistory({
   const [isFollowUpLoading, setIsFollowUpLoading] = useState(false);
   const [followUpRoundsUsed, setFollowUpRoundsUsed] = useState(0);
 
-  // Load drafts
+  // Load drafts - reset state first when studentId changes
   useEffect(() => {
+    // Reset all state when studentId changes
+    setContent("");
+    setSavedContent("");
+    setAiFeedback(null);
+    setDrafts([]);
+    setCurrentVersion(1);
+    setSaveStatus("idle");
+    setLastSubmittedContent("");
+    setFollowUpMessages([]);
+    setFollowUpInput("");
+    setFollowUpRoundsUsed(0);
+    
     if (!studentId) return;
 
     const loadDrafts = async () => {
-      const { data } = await supabase
-        .from("writing_drafts")
-        .select("*")
-        .eq("student_id", studentId)
-        .eq("task_key", taskKey)
-        .order("version", { ascending: false });
+      try {
+        const { data, error } = await supabase
+          .from("writing_drafts")
+          .select("*")
+          .eq("student_id", studentId)
+          .eq("task_key", taskKey)
+          .order("version", { ascending: false });
 
-      if (data && data.length > 0) {
-        setDrafts(data as WritingDraft[]);
-        // Load latest draft
-        const latest = data[0] as WritingDraft;
-        setContent(latest.content);
-        setSavedContent(latest.content);
-        setAiFeedback(latest.ai_feedback);
-        setCurrentVersion(latest.version);
-        setSaveStatus("saved");
+        if (error) {
+          console.error("Error loading drafts:", error);
+          return;
+        }
+
+        if (data && data.length > 0) {
+          setDrafts(data as WritingDraft[]);
+          // Load latest draft
+          const latest = data[0] as WritingDraft;
+          setContent(latest.content);
+          setSavedContent(latest.content);
+          setAiFeedback(latest.ai_feedback);
+          setCurrentVersion(latest.version);
+          setSaveStatus("saved");
+          // Mark as already submitted if has feedback
+          if (latest.ai_feedback) {
+            setLastSubmittedContent(latest.content);
+          }
+        }
+      } catch (err) {
+        console.error("Error loading drafts:", err);
       }
     };
 

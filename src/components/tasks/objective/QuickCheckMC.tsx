@@ -51,11 +51,21 @@ export const QuickCheckMC = ({
     ? `week${weekNumber}-hour${hourNumber}-${baseId}`
     : baseId;
 
+  // Reset and reload data when studentId changes
   useEffect(() => {
+    // Reset state when studentId changes
+    setSelectedAnswer(null);
+    setShowFeedback(false);
+    setAttempts([]);
+    setNotes("");
+    setSavedNotes("");
+    setSaveStatus("idle");
+    setAiFeedback("");
+    
     if (studentId && isStudent) {
       loadSavedData();
     }
-  }, [studentId, isStudent]);
+  }, [studentId, isStudent, uniqueQuestionId]);
 
   // Autosave notes when they change
   useEffect(() => {
