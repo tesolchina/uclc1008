@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/features/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,9 @@ import {
   Target,
   TrendingUp,
   Calendar,
-  ArrowRight
+  ArrowRight,
+  FileText,
+  Download
 } from "lucide-react";
 import { getWeekHours } from "@/data/hourContent";
 
@@ -31,7 +33,7 @@ interface StudentQuestion {
 
 interface TaskResponse {
   id: string;
-  task_id: string;
+  question_key: string | null;
   response: string;
   is_correct: boolean | null;
   score: number | null;
@@ -40,8 +42,7 @@ interface TaskResponse {
 }
 
 export default function StudentDashboard() {
-  const { user, isLoading } = useAuth();
-  const [studentId] = useState(() => localStorage.getItem("student_id") || "");
+  const { isLoading, isAuthenticated, studentId, isStudent } = useAuth();
   const [questions, setQuestions] = useState<StudentQuestion[]>([]);
   const [responses, setResponses] = useState<TaskResponse[]>([]);
   const [loading, setLoading] = useState(true);
@@ -95,9 +96,9 @@ export default function StudentDashboard() {
     };
   });
 
-  // Redirect to settings if not logged in
-  if (!isLoading && !user && !studentId) {
-    return <Navigate to="/settings" replace />;
+  // Redirect to auth if not logged in
+  if (!isLoading && !isAuthenticated) {
+    return <Navigate to="/auth" replace />;
   }
 
   return (
@@ -315,12 +316,28 @@ export default function StudentDashboard() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {responses.map(r => (
+                  {responses.map(r => {
+                    // Parse the response JSON to get question info
+                    let parsedResponse: { question?: string; notes?: string; attempts?: string[] } = {};
+                    try {
+                      parsedResponse = JSON.parse(r.response);
+                    } catch {}
+                    
+                    return (
                     <div key={r.id} className="p-3 rounded-lg border space-y-2">
                       <div className="flex items-start justify-between gap-2">
                         <div className="space-y-1 flex-1">
-                          <p className="text-xs text-muted-foreground">Task: {r.task_id}</p>
-                          <p className="text-sm">{r.response}</p>
+                          <p className="text-xs text-muted-foreground font-medium">
+                            {parsedResponse.question || r.question_key || 'Question'}
+                          </p>
+                          {parsedResponse.notes && (
+                            <p className="text-sm bg-muted/50 p-2 rounded">{parsedResponse.notes}</p>
+                          )}
+                          {parsedResponse.attempts && (
+                            <p className="text-xs text-muted-foreground">
+                              Attempts: {parsedResponse.attempts.join(' → ')}
+                            </p>
+                          )}
                         </div>
                         <Badge 
                           variant={r.is_correct ? "default" : r.is_correct === false ? "destructive" : "secondary"}
@@ -340,7 +357,8 @@ export default function StudentDashboard() {
                         </div>
                       )}
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </CardContent>
