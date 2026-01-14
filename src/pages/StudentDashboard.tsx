@@ -17,7 +17,8 @@ import {
   Calendar,
   ArrowRight,
   FileText,
-  Download
+  Download,
+  PenLine
 } from "lucide-react";
 import { getWeekHours } from "@/data/hourContent";
 
@@ -41,10 +42,28 @@ interface TaskResponse {
   submitted_at: string;
 }
 
+interface WritingDraft {
+  id: string;
+  task_key: string;
+  content: string;
+  ai_feedback: string | null;
+  version: number;
+  is_submitted: boolean;
+  created_at: string;
+}
+
+interface ParagraphNote {
+  id: string;
+  paragraph_key: string;
+  notes: string;
+}
+
 export default function StudentDashboard() {
   const { isLoading, isAuthenticated, studentId, isStudent } = useAuth();
   const [questions, setQuestions] = useState<StudentQuestion[]>([]);
   const [responses, setResponses] = useState<TaskResponse[]>([]);
+  const [writingDrafts, setWritingDrafts] = useState<WritingDraft[]>([]);
+  const [paragraphNotes, setParagraphNotes] = useState<ParagraphNote[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -55,23 +74,34 @@ export default function StudentDashboard() {
       }
 
       try {
-        // Fetch student questions
-        const { data: questionsData } = await supabase
-          .from("student_questions")
-          .select("*")
-          .eq("student_id", studentId)
-          .order("created_at", { ascending: false });
+        // Fetch all data in parallel
+        const [questionsRes, responsesRes, draftsRes, notesRes] = await Promise.all([
+          supabase
+            .from("student_questions")
+            .select("*")
+            .eq("student_id", studentId)
+            .order("created_at", { ascending: false }),
+          supabase
+            .from("student_task_responses")
+            .select("*")
+            .eq("student_id", studentId)
+            .order("submitted_at", { ascending: false }),
+          supabase
+            .from("writing_drafts")
+            .select("*")
+            .eq("student_id", studentId)
+            .eq("is_submitted", true)
+            .order("created_at", { ascending: false }),
+          supabase
+            .from("paragraph_notes")
+            .select("*")
+            .eq("student_id", studentId)
+        ]);
 
-        if (questionsData) setQuestions(questionsData);
-
-        // Fetch task responses
-        const { data: responsesData } = await supabase
-          .from("student_task_responses")
-          .select("*")
-          .eq("student_id", studentId)
-          .order("submitted_at", { ascending: false });
-
-        if (responsesData) setResponses(responsesData);
+        if (questionsRes.data) setQuestions(questionsRes.data);
+        if (responsesRes.data) setResponses(responsesRes.data);
+        if (draftsRes.data) setWritingDrafts(draftsRes.data as WritingDraft[]);
+        if (notesRes.data) setParagraphNotes(notesRes.data as ParagraphNote[]);
       } catch (err) {
         console.error("Error fetching data:", err);
       } finally {
@@ -82,17 +112,55 @@ export default function StudentDashboard() {
     fetchData();
   }, [studentId]);
 
-  // Calculate progress per week
+  // Helper to extract week/hour from task keys like "w1h1-macro-structure" or "w1h1-p1"
+  const parseTaskKey = (key: string): { week: number; hour: number } | null => {
+    const match = key.match(/w(\d+)h(\d+)/);
+    if (match) {
+      return { week: parseInt(match[1]), hour: parseInt(match[2]) };
+    }
+    return null;
+  };
+
+  // Calculate progress per week including all task types
   const weekProgress = [1, 2, 3, 4, 5].map(weekNum => {
     const weekHours = getWeekHours(weekNum);
-    const totalTasks = weekHours.reduce((sum, h) => sum + h.tasks.length + (h.writingTask ? 1 : 0), 0);
-    // This would need actual tracking - placeholder for now
-    const completedTasks = 0;
+    
+    // Count total expected tasks
+    const totalMcTasks = weekHours.reduce((sum, h) => sum + h.tasks.length, 0);
+    const totalWritingTasks = weekHours.reduce((sum, h) => sum + (h.writingTask ? 1 : 0), 0);
+    // Assume 6 paragraphs per hour for notes (can be adjusted)
+    const totalParagraphNotes = weekHours.length * 6;
+    
+    const totalTasks = totalMcTasks + totalWritingTasks + totalParagraphNotes;
+    
+    // Count completed tasks for this week
+    const completedMcTasks = responses.filter(r => {
+      const parsed = parseTaskKey(r.question_key || "");
+      return parsed && parsed.week === weekNum;
+    }).length;
+    
+    const completedWritingTasks = writingDrafts.filter(d => {
+      const parsed = parseTaskKey(d.task_key);
+      return parsed && parsed.week === weekNum && d.is_submitted;
+    }).length;
+    
+    const completedParagraphNotes = paragraphNotes.filter(n => {
+      const parsed = parseTaskKey(n.paragraph_key);
+      return parsed && parsed.week === weekNum && n.notes.trim().length > 0;
+    }).length;
+    
+    const completedTasks = completedMcTasks + completedWritingTasks + completedParagraphNotes;
+    
     return {
       week: weekNum,
       total: totalTasks,
       completed: completedTasks,
-      percentage: totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0
+      percentage: totalTasks > 0 ? Math.min(100, (completedTasks / totalTasks) * 100) : 0,
+      breakdown: {
+        mc: { completed: completedMcTasks, total: totalMcTasks },
+        writing: { completed: completedWritingTasks, total: totalWritingTasks },
+        notes: { completed: completedParagraphNotes, total: totalParagraphNotes }
+      }
     };
   });
 
@@ -116,19 +184,54 @@ export default function StudentDashboard() {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-5">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Tasks Completed</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">MC Tasks</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{responses.length}</div>
-            <p className="text-xs text-muted-foreground">All time</p>
+            <p className="text-xs text-muted-foreground">
+              {responses.filter(r => r.is_correct).length} correct
+            </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Questions Asked</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Writing Tasks</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{writingDrafts.length}</div>
+            <p className="text-xs text-muted-foreground">
+              {writingDrafts.filter(d => d.ai_feedback).length} with feedback
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Notes Taken</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{paragraphNotes.filter(n => n.notes.trim()).length}</div>
+            <p className="text-xs text-muted-foreground">Paragraphs annotated</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">MC Accuracy</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {responses.filter(r => r.is_correct !== null).length > 0 
+                ? Math.round((responses.filter(r => r.is_correct === true).length / responses.filter(r => r.is_correct !== null).length) * 100)
+                : 0}%
+            </div>
+            <p className="text-xs text-muted-foreground">Objective tasks</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Questions</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{questions.length}</div>
@@ -137,44 +240,26 @@ export default function StudentDashboard() {
             </p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Accuracy</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {responses.length > 0 
-                ? Math.round((responses.filter(r => r.is_correct).length / responses.length) * 100)
-                : 0}%
-            </div>
-            <p className="text-xs text-muted-foreground">Objective tasks</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Current Week</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">Week 1</div>
-            <p className="text-xs text-muted-foreground">In progress</p>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Main Content */}
       <Tabs defaultValue="progress">
-        <TabsList>
+        <TabsList className="flex-wrap h-auto gap-1">
           <TabsTrigger value="progress" className="gap-1">
             <TrendingUp className="h-4 w-4" />
             Progress
           </TabsTrigger>
-        <TabsTrigger value="questions" className="gap-1">
+          <TabsTrigger value="writing" className="gap-1">
+            <PenLine className="h-4 w-4" />
+            Writing Tasks
+          </TabsTrigger>
+          <TabsTrigger value="questions" className="gap-1">
             <MessageCircle className="h-4 w-4" />
-            My Questions
+            Questions
           </TabsTrigger>
           <TabsTrigger value="responses" className="gap-1">
             <BookOpen className="h-4 w-4" />
-            My Responses
+            MC Responses
           </TabsTrigger>
         </TabsList>
 
@@ -183,10 +268,13 @@ export default function StudentDashboard() {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Weekly Progress</CardTitle>
+              <p className="text-xs text-muted-foreground">
+                Tracks MC questions, writing tasks, and paragraph notes
+              </p>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {weekProgress.map(({ week, total, completed, percentage }) => (
-                <div key={week} className="space-y-2">
+            <CardContent className="space-y-6">
+              {weekProgress.map(({ week, total, completed, percentage, breakdown }) => (
+                <div key={week} className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Link 
                       to={`/week/${week}`} 
@@ -195,10 +283,27 @@ export default function StudentDashboard() {
                       Week {week}
                     </Link>
                     <span className="text-xs text-muted-foreground">
-                      {completed} / {total} tasks
+                      {completed} / {total} activities
                     </span>
                   </div>
                   <Progress value={percentage} className="h-2" />
+                  
+                  {/* Breakdown by type */}
+                  <div className="flex flex-wrap gap-3 text-xs">
+                    <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-blue-500/10 text-blue-700">
+                      <CheckCircle2 className="h-3 w-3" />
+                      <span>MC: {breakdown.mc.completed}/{breakdown.mc.total}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-purple-500/10 text-purple-700">
+                      <PenLine className="h-3 w-3" />
+                      <span>Writing: {breakdown.writing.completed}/{breakdown.writing.total}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-green-500/10 text-green-700">
+                      <FileText className="h-3 w-3" />
+                      <span>Notes: {breakdown.notes.completed}/{breakdown.notes.total}</span>
+                    </div>
+                  </div>
+                  
                   <div className="flex gap-2">
                     {[1, 2, 3].map(hour => (
                       <Button 
@@ -255,6 +360,57 @@ export default function StudentDashboard() {
                   </div>
                 ))}
               </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Writing Tasks Tab */}
+        <TabsContent value="writing" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">My Writing Tasks & AI Feedback</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {writingDrafts.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <PenLine className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p>No writing tasks submitted yet.</p>
+                  <p className="text-xs mt-1">Complete writing exercises during lessons to see your drafts here.</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {writingDrafts.map(draft => {
+                    const parsed = parseTaskKey(draft.task_key);
+                    return (
+                      <div key={draft.id} className="p-3 rounded-lg border space-y-2">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="space-y-1 flex-1">
+                            <p className="text-xs text-muted-foreground font-medium">
+                              {draft.task_key}
+                              {parsed && ` (Week ${parsed.week}, Hour ${parsed.hour})`}
+                            </p>
+                            <p className="text-sm bg-muted/50 p-2 rounded line-clamp-3">
+                              {draft.content}
+                            </p>
+                          </div>
+                          <Badge variant="secondary" className="text-xs shrink-0">
+                            v{draft.version}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(draft.created_at).toLocaleString()}
+                        </p>
+                        {draft.ai_feedback && (
+                          <div className="mt-2 p-2 bg-blue-500/10 rounded text-sm">
+                            <p className="text-xs font-medium text-blue-700 mb-1">AI Feedback:</p>
+                            <p className="text-muted-foreground">{draft.ai_feedback}</p>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
