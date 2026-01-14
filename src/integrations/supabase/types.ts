@@ -706,26 +706,35 @@ export type Database = {
       }
       student_api_usage: {
         Row: {
+          completion_tokens: number
           created_at: string
           id: string
+          prompt_tokens: number
           request_count: number
           student_id: string
+          total_tokens: number
           updated_at: string
           usage_date: string
         }
         Insert: {
+          completion_tokens?: number
           created_at?: string
           id?: string
+          prompt_tokens?: number
           request_count?: number
           student_id: string
+          total_tokens?: number
           updated_at?: string
           usage_date?: string
         }
         Update: {
+          completion_tokens?: number
           created_at?: string
           id?: string
+          prompt_tokens?: number
           request_count?: number
           student_id?: string
+          total_tokens?: number
           updated_at?: string
           usage_date?: string
         }

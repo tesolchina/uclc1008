@@ -19,6 +19,8 @@ interface StudentApiInfo {
   has_own_key: boolean;
   requests_today: number;
   total_requests: number;
+  tokens_today: number;
+  total_tokens: number;
   last_active: string | null;
 }
 
@@ -43,43 +45,59 @@ export function StudentApiUsageTable() {
       // Fetch all API usage data
       const { data: usageData, error: usageError } = await supabase
         .from('student_api_usage')
-        .select('student_id, request_count, usage_date');
+        .select('student_id, request_count, total_tokens, usage_date');
 
       if (usageError) throw usageError;
 
       // Build usage maps
-      const todayUsageMap = new Map<string, number>();
-      const totalUsageMap = new Map<string, number>();
+      const todayUsageMap = new Map<string, { requests: number; tokens: number }>();
+      const totalUsageMap = new Map<string, { requests: number; tokens: number }>();
       const lastActiveMap = new Map<string, string>();
 
       usageData?.forEach(row => {
-        const total = totalUsageMap.get(row.student_id) || 0;
-        totalUsageMap.set(row.student_id, total + row.request_count);
+        // Total usage
+        const existing = totalUsageMap.get(row.student_id) || { requests: 0, tokens: 0 };
+        totalUsageMap.set(row.student_id, {
+          requests: existing.requests + (row.request_count || 0),
+          tokens: existing.tokens + (row.total_tokens || 0),
+        });
         
+        // Today's usage
         if (row.usage_date === today) {
-          todayUsageMap.set(row.student_id, row.request_count);
+          todayUsageMap.set(row.student_id, {
+            requests: row.request_count || 0,
+            tokens: row.total_tokens || 0,
+          });
         }
 
-        const existing = lastActiveMap.get(row.student_id);
-        if (!existing || row.usage_date > existing) {
+        // Last active
+        const existingDate = lastActiveMap.get(row.student_id);
+        if (!existingDate || row.usage_date > existingDate) {
           lastActiveMap.set(row.student_id, row.usage_date);
         }
       });
 
       // Combine data
-      const combined: StudentApiInfo[] = (studentsData || []).map(student => ({
-        student_id: student.student_id,
-        display_name: student.display_name,
-        has_own_key: !!student.hkbu_api_key,
-        requests_today: todayUsageMap.get(student.student_id) || 0,
-        total_requests: totalUsageMap.get(student.student_id) || 0,
-        last_active: lastActiveMap.get(student.student_id) || null,
-      }));
+      const combined: StudentApiInfo[] = (studentsData || []).map(student => {
+        const todayStats = todayUsageMap.get(student.student_id) || { requests: 0, tokens: 0 };
+        const totalStats = totalUsageMap.get(student.student_id) || { requests: 0, tokens: 0 };
+        
+        return {
+          student_id: student.student_id,
+          display_name: student.display_name,
+          has_own_key: !!student.hkbu_api_key,
+          requests_today: todayStats.requests,
+          total_requests: totalStats.requests,
+          tokens_today: todayStats.tokens,
+          total_tokens: totalStats.tokens,
+          last_active: lastActiveMap.get(student.student_id) || null,
+        };
+      });
 
-      // Sort: own key users first, then by total requests
+      // Sort: own key users first, then by total tokens
       combined.sort((a, b) => {
         if (a.has_own_key !== b.has_own_key) return a.has_own_key ? -1 : 1;
-        return b.total_requests - a.total_requests;
+        return b.total_tokens - a.total_tokens;
       });
 
       setStudents(combined);
@@ -102,7 +120,8 @@ export function StudentApiUsageTable() {
 
   const ownKeyCount = students.filter(s => s.has_own_key).length;
   const sharedApiCount = students.filter(s => !s.has_own_key).length;
-  const totalTodayRequests = students.reduce((sum, s) => sum + s.requests_today, 0);
+  const totalTodayTokens = students.reduce((sum, s) => sum + s.tokens_today, 0);
+  const totalAllTimeTokens = students.reduce((sum, s) => sum + s.total_tokens, 0);
 
   if (loading) {
     return (
@@ -138,14 +157,14 @@ export function StudentApiUsageTable() {
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Summary Stats */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-4 gap-3">
           <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
             <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
               <Sparkles className="h-4 w-4" />
               <span className="text-sm font-medium">Own Key</span>
             </div>
             <p className="text-2xl font-bold mt-1">{ownKeyCount}</p>
-            <p className="text-xs text-muted-foreground">unlimited usage</p>
+            <p className="text-xs text-muted-foreground">students</p>
           </div>
           <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
             <div className="flex items-center gap-2 text-yellow-700 dark:text-yellow-400">
@@ -153,15 +172,23 @@ export function StudentApiUsageTable() {
               <span className="text-sm font-medium">Shared API</span>
             </div>
             <p className="text-2xl font-bold mt-1">{sharedApiCount}</p>
-            <p className="text-xs text-muted-foreground">daily limited</p>
+            <p className="text-xs text-muted-foreground">students</p>
           </div>
           <div className="p-3 bg-muted/50 border rounded-lg">
             <div className="flex items-center gap-2 text-muted-foreground">
               <Users className="h-4 w-4" />
-              <span className="text-sm font-medium">Today's Requests</span>
+              <span className="text-sm font-medium">Today's Tokens</span>
             </div>
-            <p className="text-2xl font-bold mt-1">{totalTodayRequests}</p>
-            <p className="text-xs text-muted-foreground">across all students</p>
+            <p className="text-2xl font-bold mt-1">{totalTodayTokens.toLocaleString()}</p>
+            <p className="text-xs text-muted-foreground">all students</p>
+          </div>
+          <div className="p-3 bg-muted/50 border rounded-lg">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Key className="h-4 w-4" />
+              <span className="text-sm font-medium">Total Tokens</span>
+            </div>
+            <p className="text-2xl font-bold mt-1">{totalAllTimeTokens.toLocaleString()}</p>
+            <p className="text-xs text-muted-foreground">all time</p>
           </div>
         </div>
 
@@ -178,8 +205,9 @@ export function StudentApiUsageTable() {
                   <TableHead>Student ID</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>API Source</TableHead>
-                  <TableHead className="text-right">Today</TableHead>
-                  <TableHead className="text-right">Total</TableHead>
+                  <TableHead className="text-right">Today Tokens</TableHead>
+                  <TableHead className="text-right">Total Tokens</TableHead>
+                  <TableHead className="text-right">Requests</TableHead>
                   <TableHead>Last Active</TableHead>
                 </TableRow>
               </TableHeader>
@@ -208,9 +236,12 @@ export function StudentApiUsageTable() {
                       )}
                     </TableCell>
                     <TableCell className="text-right font-mono">
-                      {student.requests_today}
+                      {student.tokens_today.toLocaleString()}
                     </TableCell>
                     <TableCell className="text-right font-mono">
+                      {student.total_tokens.toLocaleString()}
+                    </TableCell>
+                    <TableCell className="text-right font-mono text-muted-foreground">
                       {student.total_requests}
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground">

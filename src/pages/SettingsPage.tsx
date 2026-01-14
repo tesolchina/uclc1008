@@ -61,6 +61,14 @@ export default function SettingsPage() {
   const [sharedApiEnabled, setSharedApiEnabled] = useState(true);
   const [dailyLimit, setDailyLimit] = useState(50);
   const [usedToday, setUsedToday] = useState(0);
+  
+  // Token usage for own key
+  const [tokenUsage, setTokenUsage] = useState<{
+    todayTokens: number;
+    totalTokens: number;
+    todayRequests: number;
+    totalRequests: number;
+  }>({ todayTokens: 0, totalTokens: 0, todayRequests: 0, totalRequests: 0 });
 
   const loadStatus = async () => {
     setIsLoading(true);
@@ -74,15 +82,19 @@ export default function SettingsPage() {
       const today = new Date().toISOString().split('T')[0];
 
       // Run all async operations in parallel
-      const [apiResponse, settingsResponse, usageResponse] = await Promise.all([
+      const [apiResponse, settingsResponse, todayUsageResponse, allUsageResponse] = await Promise.all([
         supabase.functions.invoke('check-api-status', { body: { accessToken, studentId: effectiveStudentId } }),
         supabase.from('system_settings').select('key, value'),
         supabase
           .from('student_api_usage')
-          .select('request_count')
+          .select('request_count, total_tokens')
           .eq('student_id', effectiveStudentId)
           .eq('usage_date', today)
           .maybeSingle(),
+        supabase
+          .from('student_api_usage')
+          .select('request_count, total_tokens')
+          .eq('student_id', effectiveStudentId),
       ]);
 
       // Process API status
@@ -105,8 +117,16 @@ export default function SettingsPage() {
         }
       }
 
-      // Process usage
-      setUsedToday(usageResponse.data?.request_count ?? 0);
+      // Process usage for shared API
+      setUsedToday(todayUsageResponse.data?.request_count ?? 0);
+      
+      // Process token usage for own key
+      const todayTokens = todayUsageResponse.data?.total_tokens ?? 0;
+      const todayRequests = todayUsageResponse.data?.request_count ?? 0;
+      const totalTokens = allUsageResponse.data?.reduce((sum: number, row: any) => sum + (row.total_tokens || 0), 0) ?? 0;
+      const totalRequests = allUsageResponse.data?.reduce((sum: number, row: any) => sum + (row.request_count || 0), 0) ?? 0;
+      
+      setTokenUsage({ todayTokens, totalTokens, todayRequests, totalRequests });
     } catch (error) {
       console.error('Error loading status:', error);
     } finally {
@@ -314,7 +334,7 @@ export default function SettingsPage() {
           <CardDescription>
             {hasHkbuKey 
               ? keySource === 'student'
-                ? 'You have your own HKBU API key saved to your profile. Unlimited usage!'
+                ? 'You have your own HKBU API key saved to your profile.'
                 : 'Using system HKBU API key.'
               : sharedApiEnabled
                 ? 'Using shared API with daily limits. Add your own key for unlimited access.'
@@ -363,6 +383,22 @@ export default function SettingsPage() {
             )}
           </div>
 
+          {/* Token Usage for own key users */}
+          {hasHkbuKey && keySource === 'student' && (
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3 bg-muted/50 rounded-lg">
+                <p className="text-xs text-muted-foreground">Today's Usage</p>
+                <p className="text-lg font-bold">{tokenUsage.todayTokens.toLocaleString()}</p>
+                <p className="text-xs text-muted-foreground">tokens ({tokenUsage.todayRequests} requests)</p>
+              </div>
+              <div className="p-3 bg-muted/50 rounded-lg">
+                <p className="text-xs text-muted-foreground">Total Usage</p>
+                <p className="text-lg font-bold">{tokenUsage.totalTokens.toLocaleString()}</p>
+                <p className="text-xs text-muted-foreground">tokens ({tokenUsage.totalRequests} requests)</p>
+              </div>
+            </div>
+          )}
+
           {!hasHkbuKey && sharedApiEnabled && (
             <SharedApiUsageIndicator used={usedToday} limit={dailyLimit} />
           )}
@@ -372,8 +408,8 @@ export default function SettingsPage() {
             <Alert className="border-blue-500/50 bg-blue-500/10">
               <Sparkles className="h-4 w-4 text-blue-500" />
               <AlertDescription className="text-blue-700 dark:text-blue-300">
-                <strong>Tip:</strong> Add your HKBU API key below for <strong>unlimited</strong> AI tutor access.
-                Your personal usage is tracked by HKBU directly – no daily limits here!
+                <strong>Tip:</strong> Add your HKBU API key below for unlimited AI tutor access.
+                Your usage will be tracked here so you can monitor your token consumption.
               </AlertDescription>
             </Alert>
           )}

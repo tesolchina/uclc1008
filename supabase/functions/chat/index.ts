@@ -129,7 +129,7 @@ async function checkSharedApiAccess(studentId: string, supabase: any): Promise<{
   return { allowed: used < limit, used, limit };
 }
 
-// Increment student usage
+// Increment student usage (request count only, tokens tracked separately)
 async function incrementUsage(studentId: string, supabase: any): Promise<void> {
   const today = new Date().toISOString().split("T")[0];
   
@@ -150,6 +150,46 @@ async function incrementUsage(studentId: string, supabase: any): Promise<void> {
     await supabase
       .from("student_api_usage")
       .insert({ student_id: studentId, usage_date: today, request_count: 1 });
+  }
+}
+
+// Track token usage for a student
+async function trackTokenUsage(
+  studentId: string, 
+  promptTokens: number, 
+  completionTokens: number, 
+  supabase: any
+): Promise<void> {
+  const today = new Date().toISOString().split("T")[0];
+  const totalTokens = promptTokens + completionTokens;
+  
+  const { data: existing } = await supabase
+    .from("student_api_usage")
+    .select("id, prompt_tokens, completion_tokens, total_tokens")
+    .eq("student_id", studentId)
+    .eq("usage_date", today)
+    .maybeSingle();
+
+  if (existing) {
+    await supabase
+      .from("student_api_usage")
+      .update({ 
+        prompt_tokens: (existing.prompt_tokens || 0) + promptTokens,
+        completion_tokens: (existing.completion_tokens || 0) + completionTokens,
+        total_tokens: (existing.total_tokens || 0) + totalTokens,
+      })
+      .eq("id", existing.id);
+  } else {
+    await supabase
+      .from("student_api_usage")
+      .insert({ 
+        student_id: studentId, 
+        usage_date: today, 
+        request_count: 0,
+        prompt_tokens: promptTokens,
+        completion_tokens: completionTokens,
+        total_tokens: totalTokens,
+      });
   }
 }
 
@@ -279,6 +319,76 @@ serve(async (req) => {
       );
     }
 
+    // For HKBU API with user's own key, we need to track tokens
+    // The HKBU API returns usage info in the final chunk or we estimate from content
+    const effectiveStudentId = studentId || "anonymous";
+    
+    // Create a TransformStream to intercept and track token usage
+    const { readable, writable } = new TransformStream();
+    const writer = writable.getWriter();
+    const reader = response.body!.getReader();
+    const decoder = new TextDecoder();
+    
+    let totalPromptTokens = 0;
+    let totalCompletionTokens = 0;
+    let hasTrackedTokens = false;
+
+    // Process stream in background
+    (async () => {
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          
+          // Pass through to client
+          await writer.write(value);
+          
+          // Try to extract token usage from SSE data
+          const text = decoder.decode(value, { stream: true });
+          const lines = text.split('\n');
+          
+          for (const line of lines) {
+            if (line.startsWith('data: ') && !line.includes('[DONE]')) {
+              try {
+                const jsonStr = line.slice(6).trim();
+                if (jsonStr) {
+                  const parsed = JSON.parse(jsonStr);
+                  // Check for usage info (appears in final chunk for some APIs)
+                  if (parsed.usage) {
+                    totalPromptTokens = parsed.usage.prompt_tokens || 0;
+                    totalCompletionTokens = parsed.usage.completion_tokens || 0;
+                    hasTrackedTokens = true;
+                  }
+                }
+              } catch {
+                // Ignore parse errors for partial JSON
+              }
+            }
+          }
+        }
+        
+        // Track token usage if we have it and using user's own key
+        if (source === "user" && apiConfig.provider === "hkbu") {
+          if (hasTrackedTokens && (totalPromptTokens > 0 || totalCompletionTokens > 0)) {
+            await trackTokenUsage(effectiveStudentId, totalPromptTokens, totalCompletionTokens, supabase);
+            console.log(`Tracked ${totalPromptTokens + totalCompletionTokens} tokens for ${effectiveStudentId}`);
+          } else {
+            // Estimate tokens if not provided (rough estimate: ~4 chars per token)
+            const inputChars = messages.reduce((sum, m) => sum + m.content.length, 0);
+            const estimatedPromptTokens = Math.ceil(inputChars / 4);
+            // We don't know completion tokens without buffering, so just track prompt
+            await trackTokenUsage(effectiveStudentId, estimatedPromptTokens, 0, supabase);
+            console.log(`Estimated and tracked ~${estimatedPromptTokens} prompt tokens for ${effectiveStudentId}`);
+          }
+        }
+        
+        await writer.close();
+      } catch (err) {
+        console.error("Stream processing error:", err);
+        await writer.abort(err);
+      }
+    })();
+
     // Add source info to response headers
     const responseHeaders: Record<string, string> = {
       ...corsHeaders,
@@ -291,7 +401,7 @@ serve(async (req) => {
       responseHeaders["X-Usage-Limit"] = String(usageInfo.limit);
     }
 
-    return new Response(response.body, { headers: responseHeaders });
+    return new Response(readable, { headers: responseHeaders });
   } catch (e) {
     console.error("chat error:", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {
