@@ -10,7 +10,10 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
-import { Loader2, Settings, Users, Key, RefreshCw, Shield } from 'lucide-react';
+import { 
+  Loader2, Settings, Users, Key, RefreshCw, Shield, 
+  UserCheck, UserX, Mail, Calendar, ChevronRight 
+} from 'lucide-react';
 
 interface SystemSetting {
   key: string;
@@ -23,9 +26,17 @@ interface UsageStats {
   todayRequests: number;
 }
 
+interface TeacherProfile {
+  id: string;
+  email: string | null;
+  display_name: string | null;
+  created_at: string;
+  roles: string[];
+}
+
 function AdminDashboardContent() {
   const { toast } = useToast();
-  const { profile } = useAuth();
+  const { profile, isAdmin } = useAuth();
   
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -46,6 +57,11 @@ function AdminDashboardContent() {
     hasKey: false,
     provider: null,
   });
+
+  // Teachers list
+  const [teachers, setTeachers] = useState<TeacherProfile[]>([]);
+  const [pendingUsers, setPendingUsers] = useState<TeacherProfile[]>([]);
+  const [updatingRole, setUpdatingRole] = useState<string | null>(null);
 
   const loadSettings = async () => {
     setIsLoading(true);
@@ -90,6 +106,44 @@ function AdminDashboardContent() {
           hasKey: hkbuStatus?.available ?? false,
           provider: hkbuStatus?.available ? 'hkbu' : null,
         });
+      }
+
+      // Load all profiles with their roles
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, email, display_name, created_at')
+        .order('created_at', { ascending: false });
+
+      const { data: userRoles } = await supabase
+        .from('user_roles')
+        .select('profile_id, role');
+
+      if (profiles) {
+        const roleMap = new Map<string, string[]>();
+        userRoles?.forEach(ur => {
+          const existing = roleMap.get(ur.profile_id) || [];
+          existing.push(ur.role);
+          roleMap.set(ur.profile_id, existing);
+        });
+
+        const allUsers: TeacherProfile[] = profiles.map(p => ({
+          id: p.id,
+          email: p.email,
+          display_name: p.display_name,
+          created_at: p.created_at,
+          roles: roleMap.get(p.id) || ['student']
+        }));
+
+        // Separate teachers/admins from pending users
+        const teachersList = allUsers.filter(u => 
+          u.roles.includes('teacher') || u.roles.includes('admin')
+        );
+        const pendingList = allUsers.filter(u => 
+          !u.roles.includes('teacher') && !u.roles.includes('admin')
+        );
+
+        setTeachers(teachersList);
+        setPendingUsers(pendingList);
       }
     } catch (error) {
       console.error('Error loading settings:', error);
@@ -155,6 +209,65 @@ function AdminDashboardContent() {
     }
   };
 
+  const handleGrantTeacherRole = async (userId: string) => {
+    if (!isAdmin) {
+      toast({ variant: 'destructive', title: 'Only admins can assign roles' });
+      return;
+    }
+
+    setUpdatingRole(userId);
+    try {
+      const { error } = await supabase
+        .from('user_roles')
+        .insert({ profile_id: userId, role: 'teacher' });
+
+      if (error) throw error;
+
+      toast({ title: 'Teacher role granted successfully' });
+      loadSettings();
+    } catch (error: any) {
+      console.error('Error granting role:', error);
+      toast({
+        variant: 'destructive',
+        title: error.code === '23505' ? 'User already has this role' : 'Failed to grant role',
+      });
+    } finally {
+      setUpdatingRole(null);
+    }
+  };
+
+  const handleRevokeTeacherRole = async (userId: string) => {
+    if (!isAdmin) {
+      toast({ variant: 'destructive', title: 'Only admins can revoke roles' });
+      return;
+    }
+
+    const confirmed = window.confirm('Remove teacher role from this user?');
+    if (!confirmed) return;
+
+    setUpdatingRole(userId);
+    try {
+      const { error } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('profile_id', userId)
+        .eq('role', 'teacher');
+
+      if (error) throw error;
+
+      toast({ title: 'Teacher role revoked' });
+      loadSettings();
+    } catch (error) {
+      console.error('Error revoking role:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Failed to revoke role',
+      });
+    } finally {
+      setUpdatingRole(null);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
@@ -174,12 +287,16 @@ function AdminDashboardContent() {
         </div>
         <h1 className="text-2xl font-semibold tracking-tight">System Administration</h1>
         <p className="text-sm text-muted-foreground">
-          Manage API settings, view usage statistics, and configure system-wide options.
+          Manage teachers, API settings, and system configuration.
         </p>
       </header>
 
-      <Tabs defaultValue="api" className="space-y-4">
+      <Tabs defaultValue="teachers" className="space-y-4">
         <TabsList>
+          <TabsTrigger value="teachers" className="gap-2">
+            <Users className="h-4 w-4" />
+            Teachers ({teachers.length})
+          </TabsTrigger>
           <TabsTrigger value="api" className="gap-2">
             <Key className="h-4 w-4" />
             API Management
@@ -193,6 +310,128 @@ function AdminDashboardContent() {
             Settings
           </TabsTrigger>
         </TabsList>
+
+        {/* Teachers Tab */}
+        <TabsContent value="teachers" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <UserCheck className="h-4 w-4" />
+                Registered Teachers ({teachers.length})
+              </CardTitle>
+              <CardDescription>
+                Users with teacher or admin access to the platform
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {teachers.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-4">No teachers registered yet</p>
+              ) : (
+                <div className="space-y-2">
+                  {teachers.map(teacher => (
+                    <div 
+                      key={teacher.id} 
+                      className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
+                    >
+                      <div className="space-y-1">
+                        <p className="font-medium">{teacher.display_name || 'Unnamed'}</p>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <Mail className="h-3 w-3" />
+                          {teacher.email || 'No email'}
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <Calendar className="h-3 w-3" />
+                          Joined {new Date(teacher.created_at).toLocaleDateString()}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {teacher.roles.map(role => (
+                          <Badge key={role} variant={role === 'admin' ? 'default' : 'secondary'}>
+                            {role}
+                          </Badge>
+                        ))}
+                        {isAdmin && !teacher.roles.includes('admin') && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleRevokeTeacherRole(teacher.id)}
+                            disabled={updatingRole === teacher.id}
+                          >
+                            {updatingRole === teacher.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <UserX className="h-4 w-4 text-destructive" />
+                            )}
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Pending Users (who signed up but don't have teacher role yet) */}
+          {isAdmin && pendingUsers.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  Pending Users ({pendingUsers.length})
+                </CardTitle>
+                <CardDescription>
+                  Users who have registered but don't have teacher access yet
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {pendingUsers.slice(0, 20).map(user => (
+                    <div 
+                      key={user.id} 
+                      className="flex items-center justify-between p-3 border rounded-lg"
+                    >
+                      <div className="space-y-1">
+                        <p className="font-medium">{user.display_name || 'Unnamed'}</p>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <Mail className="h-3 w-3" />
+                          {user.email || 'No email'}
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <Calendar className="h-3 w-3" />
+                          Registered {new Date(user.created_at).toLocaleDateString()}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline">student</Badge>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleGrantTeacherRole(user.id)}
+                          disabled={updatingRole === user.id}
+                        >
+                          {updatingRole === user.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <>
+                              <UserCheck className="h-4 w-4 mr-1" />
+                              Grant Teacher
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                  {pendingUsers.length > 20 && (
+                    <p className="text-xs text-muted-foreground text-center py-2">
+                      Showing first 20 of {pendingUsers.length} pending users
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
 
         <TabsContent value="api" className="space-y-4">
           <Card>
