@@ -163,9 +163,17 @@ export function WritingPracticeWithHistory({
           .single();
       }
 
-      // Get AI feedback
-      const response = await supabase.functions.invoke("chat", {
-        body: {
+      // Get AI feedback (streaming)
+      const chatUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
+
+      const resp = await fetch(chatUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
           messages: [
             {
               role: "user",
@@ -182,33 +190,85 @@ Provide constructive, specific feedback.`,
           ],
           studentId,
           meta: { taskKey, type: "writing-feedback" },
-        },
+        }),
       });
 
-      let feedback = "";
-      if (response.data) {
-        // Handle streaming response
-        const reader = response.data?.getReader?.();
-        if (reader) {
-          const decoder = new TextDecoder();
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            const chunk = decoder.decode(value, { stream: true });
-            const lines = chunk.split("\n");
-            for (const line of lines) {
-              if (line.startsWith("data: ") && line !== "data: [DONE]") {
-                try {
-                  const json = JSON.parse(line.slice(6));
-                  const delta = json.choices?.[0]?.delta?.content;
-                  if (delta) feedback += delta;
-                } catch {}
-              }
-            }
-          }
-        } else if (typeof response.data === "string") {
-          feedback = response.data;
+      if (!resp.ok) {
+        let msg = `AI request failed (${resp.status})`;
+        try {
+          const j = await resp.json();
+          msg = j?.error || msg;
+        } catch {
+          const t = await resp.text();
+          if (t) msg = t;
         }
+        throw new Error(msg);
+      }
+
+      if (!resp.body) {
+        throw new Error("AI stream unavailable");
+      }
+
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let feedback = "";
+      let streamDone = false;
+
+      while (!streamDone) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        let newlineIndex: number;
+        while ((newlineIndex = buffer.indexOf("\n")) !== -1) {
+          let line = buffer.slice(0, newlineIndex);
+          buffer = buffer.slice(newlineIndex + 1);
+
+          if (line.endsWith("\r")) line = line.slice(0, -1);
+          if (line.startsWith(":" ) || line.trim() === "") continue;
+          if (!line.startsWith("data: ")) continue;
+
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === "[DONE]") {
+            streamDone = true;
+            break;
+          }
+
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const delta = parsed?.choices?.[0]?.delta?.content as string | undefined;
+            if (delta) feedback += delta;
+          } catch {
+            // JSON can be split across chunks; put it back and wait for more data
+            buffer = line + "\n" + buffer;
+            break;
+          }
+        }
+      }
+
+      // Final flush
+      if (buffer.trim()) {
+        for (let raw of buffer.split("\n")) {
+          if (!raw) continue;
+          if (raw.endsWith("\r")) raw = raw.slice(0, -1);
+          if (raw.startsWith(":" ) || raw.trim() === "") continue;
+          if (!raw.startsWith("data: ")) continue;
+          const jsonStr = raw.slice(6).trim();
+          if (jsonStr === "[DONE]") continue;
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const delta = parsed?.choices?.[0]?.delta?.content as string | undefined;
+            if (delta) feedback += delta;
+          } catch {
+            // ignore
+          }
+        }
+      }
+
+      feedback = feedback.trim();
+      if (!feedback) {
+        throw new Error("No AI feedback returned");
       }
 
       setAiFeedback(feedback);
