@@ -1383,7 +1383,7 @@ Remember to also save any written responses separately.
                 </div>
 
                 {/* Student Practice with Paragraph Selector */}
-                <MicroLevelPractice onComplete={handleTaskComplete} studentId={getStoredStudentId()} />
+                <MicroLevelPractice onComplete={handleTaskComplete} studentId={studentId || getStoredStudentId()} />
               </div>
             </CollapsibleSection>
           </section>
