@@ -976,6 +976,47 @@ export type Database = {
         }
         Relationships: []
       }
+      task_feedback: {
+        Row: {
+          comment: string
+          created_at: string
+          id: string
+          response_id: string | null
+          student_id: string
+          task_key: string
+          teacher_id: string
+          updated_at: string
+        }
+        Insert: {
+          comment: string
+          created_at?: string
+          id?: string
+          response_id?: string | null
+          student_id: string
+          task_key: string
+          teacher_id: string
+          updated_at?: string
+        }
+        Update: {
+          comment?: string
+          created_at?: string
+          id?: string
+          response_id?: string | null
+          student_id?: string
+          task_key?: string
+          teacher_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_feedback_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       teacher_comments: {
         Row: {
           content: string
@@ -1011,6 +1052,41 @@ export type Database = {
           },
           {
             foreignKeyName: "teacher_comments_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teacher_student_notes: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string
+          student_id: string
+          teacher_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string
+          student_id: string
+          teacher_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string
+          student_id?: string
+          teacher_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teacher_student_notes_teacher_id_fkey"
             columns: ["teacher_id"]
             isOneToOne: false
             referencedRelation: "profiles"

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { 
   MessageCircle, 
   Users, 
@@ -19,9 +20,14 @@ import {
   StickyNote,
   ClipboardList,
   ChevronRight,
-  ArrowLeft
+  ArrowLeft,
+  ExternalLink,
+  MessageSquarePlus,
+  NotebookPen,
+  Save
 } from "lucide-react";
 import { toast } from "sonner";
+import { Link } from "react-router-dom";
 
 interface StudentQuestion {
   id: string;
@@ -64,6 +70,24 @@ interface ParagraphNote {
   updated_at: string;
 }
 
+interface TeacherStudentNote {
+  id: string;
+  teacher_id: string;
+  student_id: string;
+  notes: string;
+  updated_at: string;
+}
+
+interface TaskFeedback {
+  id: string;
+  teacher_id: string;
+  student_id: string;
+  task_key: string;
+  response_id: string | null;
+  comment: string;
+  created_at: string;
+}
+
 interface StudentSummary {
   student_id: string;
   mcResponses: number;
@@ -81,15 +105,26 @@ export default function TeacherDashboard() {
   const [studentResponses, setStudentResponses] = useState<StudentResponse[]>([]);
   const [writingDrafts, setWritingDrafts] = useState<WritingDraft[]>([]);
   const [paragraphNotes, setParagraphNotes] = useState<ParagraphNote[]>([]);
+  const [teacherNotes, setTeacherNotes] = useState<TeacherStudentNote[]>([]);
+  const [taskFeedback, setTaskFeedback] = useState<TaskFeedback[]>([]);
   const [loading, setLoading] = useState(true);
   const [responding, setResponding] = useState<string | null>(null);
   const [responseText, setResponseText] = useState<Record<string, string>>({});
   const [selectedStudent, setSelectedStudent] = useState<string | null>(null);
+  
+  // Notes & feedback state
+  const [editingNote, setEditingNote] = useState<string | null>(null);
+  const [noteText, setNoteText] = useState("");
+  const [savingNote, setSavingNote] = useState(false);
+  const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
+  const [feedbackTarget, setFeedbackTarget] = useState<{ studentId: string; taskKey: string; responseId?: string } | null>(null);
+  const [feedbackText, setFeedbackText] = useState("");
+  const [savingFeedback, setSavingFeedback] = useState(false);
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [questionsRes, responsesRes, draftsRes, notesRes] = await Promise.all([
+      const [questionsRes, responsesRes, draftsRes, notesRes, teacherNotesRes, feedbackRes] = await Promise.all([
         supabase
           .from("student_questions")
           .select("*")
@@ -108,7 +143,15 @@ export default function TeacherDashboard() {
           .from("paragraph_notes")
           .select("*")
           .order("updated_at", { ascending: false })
-          .limit(500)
+          .limit(500),
+        supabase
+          .from("teacher_student_notes")
+          .select("*")
+          .order("updated_at", { ascending: false }),
+        supabase
+          .from("task_feedback")
+          .select("*")
+          .order("created_at", { ascending: false })
       ]);
 
       if (questionsRes.error) throw questionsRes.error;
@@ -116,6 +159,8 @@ export default function TeacherDashboard() {
       setStudentResponses(responsesRes.data || []);
       setWritingDrafts(draftsRes.data || []);
       setParagraphNotes(notesRes.data || []);
+      setTeacherNotes(teacherNotesRes.data || []);
+      setTaskFeedback(feedbackRes.data || []);
     } catch (err) {
       console.error("Error fetching data:", err);
       toast.error("Failed to load data");
@@ -129,21 +174,9 @@ export default function TeacherDashboard() {
 
     const channel = supabase
       .channel("teacher-dashboard-updates")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "student_questions" },
-        () => fetchData()
-      )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "student_task_responses" },
-        () => fetchData()
-      )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "writing_drafts" },
-        () => fetchData()
-      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "student_questions" }, () => fetchData())
+      .on("postgres_changes", { event: "*", schema: "public", table: "student_task_responses" }, () => fetchData())
+      .on("postgres_changes", { event: "*", schema: "public", table: "writing_drafts" }, () => fetchData())
       .subscribe();
 
     return () => {
@@ -189,6 +222,24 @@ export default function TeacherDashboard() {
     }).sort((a, b) => new Date(b.lastActive).getTime() - new Date(a.lastActive).getTime());
   })();
 
+  // Get teacher's note for a student
+  const getTeacherNote = (studentId: string) => {
+    return teacherNotes.find(n => n.student_id === studentId);
+  };
+
+  // Get feedback for a response
+  const getFeedbackForResponse = (responseId: string) => {
+    return taskFeedback.filter(f => f.response_id === responseId);
+  };
+
+  // Parse task key to get week/hour info
+  const parseTaskKey = (taskKey: string | null): { week: number; hour: number } | null => {
+    if (!taskKey) return null;
+    const match = taskKey.match(/week(\d+)[_-]hour(\d+)/i) || taskKey.match(/w(\d+)[_-]?h(\d+)/i);
+    if (match) return { week: parseInt(match[1]), hour: parseInt(match[2]) };
+    return null;
+  };
+
   const handleRespond = async (questionId: string) => {
     const response = responseText[questionId];
     if (!response?.trim()) {
@@ -209,7 +260,6 @@ export default function TeacherDashboard() {
         .eq("id", questionId);
 
       if (error) throw error;
-
       toast.success("Response sent!");
       setResponseText(prev => ({ ...prev, [questionId]: "" }));
       fetchData();
@@ -237,6 +287,67 @@ export default function TeacherDashboard() {
     }
   };
 
+  const handleSaveTeacherNote = async (studentId: string) => {
+    if (!user?.id) return;
+    setSavingNote(true);
+    try {
+      const existing = getTeacherNote(studentId);
+      if (existing) {
+        const { error } = await supabase
+          .from("teacher_student_notes")
+          .update({ notes: noteText })
+          .eq("id", existing.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from("teacher_student_notes")
+          .insert({ teacher_id: user.id, student_id: studentId, notes: noteText });
+        if (error) throw error;
+      }
+      toast.success("Note saved");
+      setEditingNote(null);
+      fetchData();
+    } catch (err) {
+      console.error("Error saving note:", err);
+      toast.error("Failed to save note");
+    } finally {
+      setSavingNote(false);
+    }
+  };
+
+  const handleAddFeedback = async () => {
+    if (!user?.id || !feedbackTarget || !feedbackText.trim()) return;
+    setSavingFeedback(true);
+    try {
+      const { error } = await supabase
+        .from("task_feedback")
+        .insert({
+          teacher_id: user.id,
+          student_id: feedbackTarget.studentId,
+          task_key: feedbackTarget.taskKey,
+          response_id: feedbackTarget.responseId || null,
+          comment: feedbackText.trim()
+        });
+      if (error) throw error;
+      toast.success("Feedback added - student can now view it");
+      setFeedbackDialogOpen(false);
+      setFeedbackText("");
+      setFeedbackTarget(null);
+      fetchData();
+    } catch (err) {
+      console.error("Error adding feedback:", err);
+      toast.error("Failed to add feedback");
+    } finally {
+      setSavingFeedback(false);
+    }
+  };
+
+  const openFeedbackDialog = (studentId: string, taskKey: string, responseId?: string) => {
+    setFeedbackTarget({ studentId, taskKey, responseId });
+    setFeedbackText("");
+    setFeedbackDialogOpen(true);
+  };
+
   if (!isTeacher && !isAdmin) {
     return (
       <div className="text-center py-12">
@@ -254,6 +365,8 @@ export default function TeacherDashboard() {
     const studentDrafts = writingDrafts.filter(d => d.student_id === selectedStudent);
     const studentNotes = paragraphNotes.filter(n => n.student_id === selectedStudent);
     const studentQuestions = questions.filter(q => q.student_id === selectedStudent);
+    const teacherNote = getTeacherNote(selectedStudent);
+    const studentFeedback = taskFeedback.filter(f => f.student_id === selectedStudent);
 
     return (
       <div className="space-y-6">
@@ -262,11 +375,55 @@ export default function TeacherDashboard() {
             <ArrowLeft className="h-4 w-4 mr-1" />
             Back to List
           </Button>
-          <div>
+          <div className="flex-1">
             <h1 className="text-2xl font-semibold">Student: {selectedStudent}</h1>
             <p className="text-sm text-muted-foreground">Detailed progress view</p>
           </div>
         </div>
+
+        {/* Teacher's Private Notes */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <NotebookPen className="h-4 w-4" />
+              My Notes (Private)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {editingNote === selectedStudent ? (
+              <div className="space-y-2">
+                <Textarea
+                  value={noteText}
+                  onChange={(e) => setNoteText(e.target.value)}
+                  placeholder="Write private notes about this student..."
+                  className="min-h-[100px]"
+                />
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={() => handleSaveTeacherNote(selectedStudent)} disabled={savingNote}>
+                    {savingNote ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Save className="h-4 w-4 mr-1" />}
+                    Save
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => setEditingNote(null)}>Cancel</Button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                {teacherNote?.notes ? (
+                  <p className="text-sm whitespace-pre-wrap mb-2">{teacherNote.notes}</p>
+                ) : (
+                  <p className="text-sm text-muted-foreground mb-2">No notes yet</p>
+                )}
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  onClick={() => { setEditingNote(selectedStudent); setNoteText(teacherNote?.notes || ""); }}
+                >
+                  {teacherNote?.notes ? "Edit Notes" : "Add Notes"}
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         <div className="grid gap-4 md:grid-cols-4">
           <Card>
@@ -275,9 +432,7 @@ export default function TeacherDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{studentMc.length}</div>
-              <p className="text-xs text-muted-foreground">
-                {studentMc.filter(r => r.is_correct).length} correct
-              </p>
+              <p className="text-xs text-muted-foreground">{studentMc.filter(r => r.is_correct).length} correct</p>
             </CardContent>
           </Card>
           <Card>
@@ -286,9 +441,7 @@ export default function TeacherDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{studentDrafts.length}</div>
-              <p className="text-xs text-muted-foreground">
-                {studentDrafts.filter(d => d.is_submitted).length} submitted
-              </p>
+              <p className="text-xs text-muted-foreground">{studentDrafts.filter(d => d.is_submitted).length} submitted</p>
             </CardContent>
           </Card>
           <Card>
@@ -302,11 +455,11 @@ export default function TeacherDashboard() {
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Questions</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">Feedback Given</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{studentQuestions.length}</div>
-              <p className="text-xs text-muted-foreground">asked</p>
+              <div className="text-2xl font-bold">{studentFeedback.length}</div>
+              <p className="text-xs text-muted-foreground">comments</p>
             </CardContent>
           </Card>
         </div>
@@ -325,19 +478,53 @@ export default function TeacherDashboard() {
             ) : studentMc.map(r => {
               let parsed: { question?: string; attempts?: string[] } = {};
               try { parsed = JSON.parse(r.response); } catch {}
+              const taskInfo = parseTaskKey(r.question_key);
+              const responseFeedback = getFeedbackForResponse(r.id);
+              
               return (
                 <Card key={r.id}>
                   <CardContent className="pt-4 space-y-2">
                     <div className="flex justify-between items-start">
-                      <div>
-                        <p className="text-sm font-medium">{parsed.question || r.question_key || 'Task'}</p>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="text-sm font-medium">{parsed.question || r.question_key || 'Task'}</p>
+                          {taskInfo && (
+                            <Link 
+                              to={`/week/${taskInfo.week}/hour/${taskInfo.hour}`}
+                              className="text-xs text-primary hover:underline flex items-center gap-1"
+                            >
+                              <ExternalLink className="h-3 w-3" />
+                              View Task
+                            </Link>
+                          )}
+                        </div>
                         {parsed.attempts && <p className="text-xs text-muted-foreground">Answers: {parsed.attempts.join(' → ')}</p>}
                       </div>
-                      <Badge variant={r.is_correct ? "default" : "destructive"}>
-                        {r.is_correct ? "Correct" : "Incorrect"}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={r.is_correct ? "default" : "destructive"}>
+                          {r.is_correct ? "Correct" : "Incorrect"}
+                        </Badge>
+                        <Button 
+                          size="sm" 
+                          variant="ghost"
+                          onClick={() => openFeedbackDialog(selectedStudent, r.question_key || 'mc', r.id)}
+                        >
+                          <MessageSquarePlus className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                     <p className="text-xs text-muted-foreground">{new Date(r.submitted_at).toLocaleString()}</p>
+                    
+                    {responseFeedback.length > 0 && (
+                      <div className="mt-2 space-y-1">
+                        {responseFeedback.map(f => (
+                          <div key={f.id} className="p-2 bg-green-500/10 rounded text-sm">
+                            <p className="text-xs font-medium text-green-700 mb-1">Your Feedback:</p>
+                            <p className="text-muted-foreground">{f.comment}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               );
@@ -347,40 +534,89 @@ export default function TeacherDashboard() {
           <TabsContent value="writing" className="space-y-3 mt-4">
             {studentDrafts.length === 0 ? (
               <Card><CardContent className="py-6 text-center text-muted-foreground">No writing drafts</CardContent></Card>
-            ) : studentDrafts.map(d => (
-              <Card key={d.id}>
-                <CardContent className="pt-4 space-y-2">
-                  <div className="flex justify-between items-start">
-                    <p className="text-xs text-muted-foreground">{d.task_key} • Version {d.version}</p>
-                    <Badge variant={d.is_submitted ? "default" : "secondary"}>
-                      {d.is_submitted ? "Submitted" : "Draft"}
-                    </Badge>
-                  </div>
-                  <p className="text-sm bg-muted/50 p-2 rounded whitespace-pre-wrap">{d.content}</p>
-                  {d.ai_feedback && (
-                    <div className="p-2 bg-blue-500/10 rounded text-sm">
-                      <p className="text-xs font-medium text-blue-700 mb-1">AI Feedback:</p>
-                      <p className="text-muted-foreground">{d.ai_feedback}</p>
+            ) : studentDrafts.map(d => {
+              const taskInfo = parseTaskKey(d.task_key);
+              const draftFeedback = taskFeedback.filter(f => f.task_key === d.task_key && f.student_id === d.student_id);
+              
+              return (
+                <Card key={d.id}>
+                  <CardContent className="pt-4 space-y-2">
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-center gap-2">
+                        <p className="text-xs text-muted-foreground">{d.task_key} • Version {d.version}</p>
+                        {taskInfo && (
+                          <Link 
+                            to={`/week/${taskInfo.week}/hour/${taskInfo.hour}`}
+                            className="text-xs text-primary hover:underline flex items-center gap-1"
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                            View Task
+                          </Link>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={d.is_submitted ? "default" : "secondary"}>
+                          {d.is_submitted ? "Submitted" : "Draft"}
+                        </Badge>
+                        <Button 
+                          size="sm" 
+                          variant="ghost"
+                          onClick={() => openFeedbackDialog(selectedStudent, d.task_key, d.id)}
+                        >
+                          <MessageSquarePlus className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
-                  )}
-                  <p className="text-xs text-muted-foreground">{new Date(d.created_at).toLocaleString()}</p>
-                </CardContent>
-              </Card>
-            ))}
+                    <p className="text-sm bg-muted/50 p-2 rounded whitespace-pre-wrap">{d.content}</p>
+                    {d.ai_feedback && (
+                      <div className="p-2 bg-blue-500/10 rounded text-sm">
+                        <p className="text-xs font-medium text-blue-700 mb-1">AI Feedback:</p>
+                        <p className="text-muted-foreground">{d.ai_feedback}</p>
+                      </div>
+                    )}
+                    {draftFeedback.length > 0 && (
+                      <div className="space-y-1">
+                        {draftFeedback.map(f => (
+                          <div key={f.id} className="p-2 bg-green-500/10 rounded text-sm">
+                            <p className="text-xs font-medium text-green-700 mb-1">Your Feedback:</p>
+                            <p className="text-muted-foreground">{f.comment}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <p className="text-xs text-muted-foreground">{new Date(d.created_at).toLocaleString()}</p>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </TabsContent>
 
           <TabsContent value="notes" className="space-y-3 mt-4">
             {studentNotes.length === 0 ? (
               <Card><CardContent className="py-6 text-center text-muted-foreground">No notes taken</CardContent></Card>
-            ) : studentNotes.map(n => (
-              <Card key={n.id}>
-                <CardContent className="pt-4 space-y-2">
-                  <p className="text-xs text-muted-foreground font-medium">{n.paragraph_key}</p>
-                  <p className="text-sm bg-muted/50 p-2 rounded">{n.notes}</p>
-                  <p className="text-xs text-muted-foreground">{new Date(n.updated_at).toLocaleString()}</p>
-                </CardContent>
-              </Card>
-            ))}
+            ) : studentNotes.map(n => {
+              const taskInfo = parseTaskKey(n.paragraph_key);
+              return (
+                <Card key={n.id}>
+                  <CardContent className="pt-4 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <p className="text-xs text-muted-foreground font-medium">{n.paragraph_key}</p>
+                      {taskInfo && (
+                        <Link 
+                          to={`/week/${taskInfo.week}/hour/${taskInfo.hour}`}
+                          className="text-xs text-primary hover:underline flex items-center gap-1"
+                        >
+                          <ExternalLink className="h-3 w-3" />
+                          View
+                        </Link>
+                      )}
+                    </div>
+                    <p className="text-sm bg-muted/50 p-2 rounded">{n.notes}</p>
+                    <p className="text-xs text-muted-foreground">{new Date(n.updated_at).toLocaleString()}</p>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </TabsContent>
 
           <TabsContent value="questions" className="space-y-3 mt-4">
@@ -390,7 +626,16 @@ export default function TeacherDashboard() {
               <Card key={q.id}>
                 <CardContent className="pt-4 space-y-2">
                   <div className="flex justify-between items-start">
-                    <p className="text-sm font-medium">{q.question}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium">{q.question}</p>
+                      <Link 
+                        to={`/week/${q.week_number}/hour/${q.hour_number || 1}`}
+                        className="text-xs text-primary hover:underline flex items-center gap-1"
+                      >
+                        <ExternalLink className="h-3 w-3" />
+                        Week {q.week_number}.{q.hour_number || 1}
+                      </Link>
+                    </div>
                     <Badge variant={q.status === "answered" ? "default" : q.status === "pending" ? "secondary" : "outline"}>
                       {q.status}
                     </Badge>
@@ -407,6 +652,33 @@ export default function TeacherDashboard() {
             ))}
           </TabsContent>
         </Tabs>
+
+        {/* Feedback Dialog */}
+        <Dialog open={feedbackDialogOpen} onOpenChange={setFeedbackDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add Feedback for Student</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                This feedback will be visible to the student: <strong>{feedbackTarget?.studentId}</strong>
+              </p>
+              <Textarea
+                value={feedbackText}
+                onChange={(e) => setFeedbackText(e.target.value)}
+                placeholder="Write your feedback..."
+                className="min-h-[120px]"
+              />
+              <div className="flex justify-end gap-2">
+                <Button variant="ghost" onClick={() => setFeedbackDialogOpen(false)}>Cancel</Button>
+                <Button onClick={handleAddFeedback} disabled={savingFeedback || !feedbackText.trim()}>
+                  {savingFeedback ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Send className="h-4 w-4 mr-1" />}
+                  Send Feedback
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
@@ -505,6 +777,7 @@ export default function TeacherDashboard() {
               const mcAccuracy = student.mcResponses > 0 
                 ? Math.round((student.mcCorrect / student.mcResponses) * 100) 
                 : 0;
+              const hasTeacherNote = !!getTeacherNote(student.student_id);
               
               return (
                 <Card 
@@ -517,6 +790,12 @@ export default function TeacherDashboard() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-3 mb-2">
                           <span className="font-medium truncate">{student.student_id}</span>
+                          {hasTeacherNote && (
+                            <Badge variant="outline" className="text-xs gap-1">
+                              <NotebookPen className="h-3 w-3" />
+                              Notes
+                            </Badge>
+                          )}
                           {student.questions > 0 && (
                             <Badge variant="outline" className="text-xs">
                               {student.questions} question{student.questions > 1 ? 's' : ''}
@@ -578,12 +857,17 @@ export default function TeacherDashboard() {
                     <div className="space-y-1">
                       <p className="font-medium">{q.question}</p>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <Badge variant="outline" className="text-xs">
-                          Week {q.week_number}{q.hour_number ? `.${q.hour_number}` : ""}
-                        </Badge>
+                        <Link 
+                          to={`/week/${q.week_number}/hour/${q.hour_number || 1}`}
+                          className="text-primary hover:underline flex items-center gap-1"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <ExternalLink className="h-3 w-3" />
+                          Week {q.week_number}.{q.hour_number || 1}
+                        </Link>
                         <span 
                           className="cursor-pointer hover:underline"
-                          onClick={() => setSelectedStudent(q.student_id)}
+                          onClick={(e) => { e.stopPropagation(); setSelectedStudent(q.student_id); }}
                         >
                           Student: {q.student_id}
                         </span>
