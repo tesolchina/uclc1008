@@ -404,7 +404,7 @@ export default function SettingsPage() {
               <p className="text-xs text-muted-foreground">
                 Get your API key from the{' '}
                 <a 
-                  href="https://genai.hkbu.edu.hk" 
+                  href="https://genai.hkbu.edu.hk/settings/api-docs" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-primary hover:underline inline-flex items-center gap-1"

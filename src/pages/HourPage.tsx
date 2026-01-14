@@ -991,7 +991,7 @@ Remember to also save any written responses separately.
                       className="flex items-center gap-2"
                     >
                       <ExternalLink className="h-4 w-4" />
-                      Open Article (Taylor & Francis Online)
+                      Open Article
                     </a>
                   </Button>
                 </div>
@@ -1049,13 +1049,13 @@ Remember to also save any written responses separately.
                     questionNumber={4}
                     question="When was this article published online?"
                     options={[
-                      { label: "A", text: "15 January 2020" },
+                      { label: "A", text: "05 November 2019" },
                       { label: "B", text: "27 January 2020" },
                       { label: "C", text: "14 February 2020" },
                       { label: "D", text: "3 March 2020" },
                     ]}
-                    correctAnswer="B"
-                    explanation="The article shows 'Published online: 27 Jan 2020' in the publication information section."
+                    correctAnswer="A"
+                    explanation="The article shows 'Published online: 05 Nov 2019' in the publication information section on the Taylor & Francis website."
                   />
                 </div>
 
