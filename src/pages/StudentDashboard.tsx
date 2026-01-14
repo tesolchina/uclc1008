@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { StudentTaskProgress } from "@/components/student/StudentTaskProgress";
 import { 
   BookOpen, 
   CheckCircle2, 
@@ -249,8 +250,12 @@ export default function StudentDashboard() {
       </div>
 
       {/* Main Content */}
-      <Tabs defaultValue="progress">
+      <Tabs defaultValue="all-tasks">
         <TabsList className="flex-wrap h-auto gap-1">
+          <TabsTrigger value="all-tasks" className="gap-1">
+            <Target className="h-4 w-4" />
+            All Tasks
+          </TabsTrigger>
           <TabsTrigger value="progress" className="gap-1">
             <TrendingUp className="h-4 w-4" />
             Progress
@@ -268,6 +273,14 @@ export default function StudentDashboard() {
             MC Responses
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="all-tasks" className="space-y-4 mt-4">
+          <StudentTaskProgress
+            responses={responses}
+            writingDrafts={writingDrafts}
+            paragraphNotes={paragraphNotes}
+          />
+        </TabsContent>
 
         <TabsContent value="progress" className="space-y-4">
           {/* Weekly Progress */}
