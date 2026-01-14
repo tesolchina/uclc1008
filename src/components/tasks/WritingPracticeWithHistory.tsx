@@ -16,6 +16,11 @@ interface WritingDraft {
   created_at: string;
 }
 
+interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
 interface WritingPracticeWithHistoryProps {
   taskKey: string; // e.g., "w1h1-macro-structure"
   title: string;
@@ -25,6 +30,8 @@ interface WritingPracticeWithHistoryProps {
   studentId?: string;
   className?: string;
 }
+
+const MAX_FOLLOWUP_ROUNDS = 3;
 
 export function WritingPracticeWithHistory({
   taskKey,
@@ -45,6 +52,13 @@ export function WritingPracticeWithHistory({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saved" | "unsaved">("idle");
   const [showHistory, setShowHistory] = useState(false);
+  // Track content that was last submitted for feedback to prevent duplicate submissions
+  const [lastSubmittedContent, setLastSubmittedContent] = useState<string>("");
+  // Follow-up chat state
+  const [followUpMessages, setFollowUpMessages] = useState<ChatMessage[]>([]);
+  const [followUpInput, setFollowUpInput] = useState("");
+  const [isFollowUpLoading, setIsFollowUpLoading] = useState(false);
+  const [followUpRoundsUsed, setFollowUpRoundsUsed] = useState(0);
 
   // Load drafts
   useEffect(() => {
@@ -130,6 +144,16 @@ export function WritingPracticeWithHistory({
   const handleSubmitForFeedback = useCallback(async () => {
     if (!studentId || !content.trim()) return;
 
+    // Prevent submitting the same content twice
+    if (content.trim() === lastSubmittedContent) {
+      toast({ 
+        variant: "destructive", 
+        title: "No changes detected", 
+        description: "Please make changes to your outline before requesting new feedback." 
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       // First save the draft
@@ -177,7 +201,11 @@ export function WritingPracticeWithHistory({
           messages: [
             {
               role: "user",
-              content: `You are a concise academic writing tutor. Provide brief feedback (3-4 sentences max) on this student's structural outline. Be direct about what's good and what could improve. Focus on: Does the summary correctly identify the structure and progression of ideas? Is it clear and accurate?
+              content: `You are a concise academic writing tutor. Provide brief feedback (3-4 sentences max) on this student's outline.
+
+FOCUS ONLY ON: Does the student accurately cover all the key points from the source text? Are the main ideas identified correctly?
+
+Do NOT evaluate: writing style, grammar, sentence structure, or how ideas are organized/progressed.
 
 Task: ${title}
 Instructions: ${instructions}
@@ -185,7 +213,7 @@ Instructions: ${instructions}
 Student's response:
 ${content}
 
-Provide constructive, specific feedback.`,
+Provide constructive, specific feedback on key point coverage and accuracy only.`,
             },
           ],
           studentId,
@@ -272,6 +300,10 @@ Provide constructive, specific feedback.`,
       }
 
       setAiFeedback(feedback);
+      setLastSubmittedContent(content.trim());
+      // Reset follow-up chat for new feedback
+      setFollowUpMessages([]);
+      setFollowUpRoundsUsed(0);
 
       // Save feedback to draft
       await supabase
@@ -301,7 +333,97 @@ Provide constructive, specific feedback.`,
     } finally {
       setIsSubmitting(false);
     }
-  }, [studentId, taskKey, content, currentVersion, title, instructions, toast]);
+  }, [studentId, taskKey, content, currentVersion, title, instructions, lastSubmittedContent, toast]);
+
+  // Follow-up chat handler
+  const handleFollowUpSubmit = useCallback(async () => {
+    if (!followUpInput.trim() || !aiFeedback || followUpRoundsUsed >= MAX_FOLLOWUP_ROUNDS) return;
+
+    const userMessage: ChatMessage = { role: "user", content: followUpInput.trim() };
+    setFollowUpMessages(prev => [...prev, userMessage]);
+    setFollowUpInput("");
+    setIsFollowUpLoading(true);
+
+    try {
+      const chatUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
+
+      // Build conversation history
+      const conversationHistory = [
+        {
+          role: "system" as const,
+          content: `You are a helpful academic writing tutor. The student submitted an outline and received feedback. Now they have a follow-up question. Keep responses brief (2-3 sentences). Focus only on key point coverage and accuracy, not writing style or progression.`
+        },
+        {
+          role: "user" as const,
+          content: `Student's outline:\n${content}\n\nInitial feedback:\n${aiFeedback}`
+        },
+        ...followUpMessages.map(m => ({ role: m.role as "user" | "assistant", content: m.content })),
+        { role: "user" as const, content: followUpInput.trim() }
+      ];
+
+      const resp = await fetch(chatUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
+          messages: conversationHistory,
+          studentId,
+          meta: { taskKey, type: "writing-followup" },
+        }),
+      });
+
+      if (!resp.ok || !resp.body) {
+        throw new Error("Failed to get response");
+      }
+
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let response = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        let newlineIndex: number;
+        while ((newlineIndex = buffer.indexOf("\n")) !== -1) {
+          let line = buffer.slice(0, newlineIndex);
+          buffer = buffer.slice(newlineIndex + 1);
+
+          if (line.endsWith("\r")) line = line.slice(0, -1);
+          if (line.startsWith(":") || line.trim() === "") continue;
+          if (!line.startsWith("data: ")) continue;
+
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === "[DONE]") break;
+
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const delta = parsed?.choices?.[0]?.delta?.content as string | undefined;
+            if (delta) response += delta;
+          } catch {
+            buffer = line + "\n" + buffer;
+            break;
+          }
+        }
+      }
+
+      response = response.trim();
+      if (response) {
+        setFollowUpMessages(prev => [...prev, { role: "assistant", content: response }]);
+        setFollowUpRoundsUsed(prev => prev + 1);
+      }
+    } catch (err) {
+      console.error("Follow-up error:", err);
+      toast({ variant: "destructive", title: "Failed to get response" });
+    } finally {
+      setIsFollowUpLoading(false);
+    }
+  }, [followUpInput, aiFeedback, followUpMessages, followUpRoundsUsed, content, studentId, taskKey, toast]);
 
   const handleStartOver = useCallback(() => {
     // Increment version to start a new draft while keeping history
@@ -310,6 +432,9 @@ Provide constructive, specific feedback.`,
     setContent("");
     setSavedContent("");
     setAiFeedback(null);
+    setLastSubmittedContent("");
+    setFollowUpMessages([]);
+    setFollowUpRoundsUsed(0);
     setSaveStatus("idle");
     toast({ title: "New draft started", description: `Version ${newVersion}` });
   }, [currentVersion, toast]);
@@ -319,6 +444,9 @@ Provide constructive, specific feedback.`,
     setSavedContent(draft.content);
     setAiFeedback(draft.ai_feedback);
     setCurrentVersion(draft.version);
+    setLastSubmittedContent(draft.is_submitted ? draft.content : "");
+    setFollowUpMessages([]);
+    setFollowUpRoundsUsed(0);
     setSaveStatus("saved");
     setShowHistory(false);
   }, []);
@@ -357,12 +485,69 @@ Provide constructive, specific feedback.`,
 
       {/* AI Feedback */}
       {aiFeedback && (
-        <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/30 space-y-2">
+        <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/30 space-y-3">
           <p className="text-xs font-medium text-blue-700 flex items-center gap-1">
             <Sparkles className="h-3 w-3" />
             AI Feedback
           </p>
           <p className="text-sm text-muted-foreground">{aiFeedback}</p>
+          
+          {/* Follow-up chat messages */}
+          {followUpMessages.length > 0 && (
+            <div className="space-y-2 pt-2 border-t border-blue-500/20">
+              {followUpMessages.map((msg, idx) => (
+                <div 
+                  key={idx} 
+                  className={cn(
+                    "text-sm p-2 rounded",
+                    msg.role === "user" 
+                      ? "bg-purple-500/10 ml-4" 
+                      : "bg-blue-500/5"
+                  )}
+                >
+                  <span className="text-xs font-medium text-muted-foreground">
+                    {msg.role === "user" ? "You:" : "AI:"}
+                  </span>
+                  <p className="mt-1">{msg.content}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Follow-up input */}
+          {followUpRoundsUsed < MAX_FOLLOWUP_ROUNDS ? (
+            <div className="flex gap-2 pt-2 border-t border-blue-500/20">
+              <input
+                type="text"
+                value={followUpInput}
+                onChange={(e) => setFollowUpInput(e.target.value)}
+                placeholder="Ask a follow-up question..."
+                className="flex-1 px-3 py-1.5 text-sm rounded border bg-background focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                onKeyDown={(e) => e.key === "Enter" && !isFollowUpLoading && handleFollowUpSubmit()}
+                disabled={isFollowUpLoading}
+              />
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleFollowUpSubmit}
+                disabled={isFollowUpLoading || !followUpInput.trim()}
+              >
+                {isFollowUpLoading ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : (
+                  "Ask"
+                )}
+              </Button>
+              <span className="text-xs text-muted-foreground self-center">
+                {MAX_FOLLOWUP_ROUNDS - followUpRoundsUsed} left
+              </span>
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground pt-2 border-t border-blue-500/20">
+              Follow-up limit reached ({MAX_FOLLOWUP_ROUNDS} rounds). Start a new draft for more feedback.
+            </p>
+          )}
+
           <p className="text-xs text-amber-600 italic">
             ⚠️ AI feedback may contain errors. Always consult your teacher for authoritative guidance.
           </p>
@@ -402,13 +587,19 @@ Provide constructive, specific feedback.`,
               size="sm"
               variant="secondary"
               onClick={handleSubmitForFeedback}
-              disabled={isSubmitting || !content.trim()}
+              disabled={isSubmitting || !content.trim() || content.trim() === lastSubmittedContent}
               className="gap-1"
+              title={content.trim() === lastSubmittedContent ? "Make changes before requesting new feedback" : ""}
             >
               {isSubmitting ? (
                 <>
                   <Loader2 className="h-3 w-3 animate-spin" />
                   Getting Feedback...
+                </>
+              ) : content.trim() === lastSubmittedContent && lastSubmittedContent ? (
+                <>
+                  <CheckCircle2 className="h-3 w-3" />
+                  Feedback Received
                 </>
               ) : (
                 <>
