@@ -448,7 +448,7 @@ Remember to also save any written responses separately.
       {/* Main Content */}
       <div className="flex-1 space-y-6 min-w-0">
         {/* Sign-in Reminder */}
-        {!user && <StudentLoginReminder />}
+        {!user && !studentId && <StudentLoginReminder />}
 
         {/* Navigation Header */}
         <div className="flex items-center justify-between">
