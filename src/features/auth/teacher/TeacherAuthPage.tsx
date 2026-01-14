@@ -7,7 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertCircle, ArrowLeft, ShieldCheck } from 'lucide-react';
 import { TeacherSignInForm } from './TeacherSignInForm';
-import { TeacherSignUpForm } from './TeacherSignUpForm';
+import { TeacherRequestForm } from './TeacherRequestForm';
 import { HkbuSsoButton } from './HkbuSsoButton';
 import { getErrorMessage } from '../utils/errorMessages';
 
@@ -81,15 +81,15 @@ export function TeacherAuthPage({ onBack }: TeacherAuthPageProps) {
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              <TabsTrigger value="request">Request Access</TabsTrigger>
             </TabsList>
 
             <TabsContent value="signin" className="space-y-4 mt-4">
               <TeacherSignInForm onError={handleError} />
             </TabsContent>
 
-            <TabsContent value="signup" className="space-y-4 mt-4">
-              <TeacherSignUpForm onError={handleError} onSuccess={handleSuccess} />
+            <TabsContent value="request" className="space-y-4 mt-4">
+              <TeacherRequestForm onError={handleError} onSuccess={handleSuccess} />
             </TabsContent>
           </Tabs>
 

@@ -11,9 +11,10 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { StudentApiUsageTable } from '@/components/admin/StudentApiUsageTable';
+import { PendingTeacherRequests } from '@/components/admin/PendingTeacherRequests';
 import { 
   Loader2, Settings, Users, Key, RefreshCw, Shield, 
-  UserCheck, UserX, Mail, Calendar, ChevronRight 
+  UserCheck, UserX, Mail, Calendar, ChevronRight, Clock
 } from 'lucide-react';
 
 interface SystemSetting {
@@ -386,6 +387,9 @@ function AdminDashboardContent() {
 
         {/* Teachers Tab */}
         <TabsContent value="teachers" className="space-y-4">
+          {/* Pending Teacher Requests - Admin only */}
+          {isAdmin && <PendingTeacherRequests />}
+
           <Card>
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
