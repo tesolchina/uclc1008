@@ -10,6 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
+import { StudentApiUsageTable } from '@/components/admin/StudentApiUsageTable';
 import { 
   Loader2, Settings, Users, Key, RefreshCw, Shield, 
   UserCheck, UserX, Mail, Calendar, ChevronRight 
@@ -525,6 +526,9 @@ function AdminDashboardContent() {
               </CardHeader>
             </Card>
           </div>
+
+          {/* Student API Usage Table */}
+          <StudentApiUsageTable />
 
           <Card>
             <CardHeader>
