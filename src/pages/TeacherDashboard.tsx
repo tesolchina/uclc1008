@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { StudentApiUsageTable } from "@/components/admin/StudentApiUsageTable";
+import { StudentTasksByWeek } from "@/components/teacher/StudentTasksByWeek";
 import { 
   MessageCircle, 
   Users, 
@@ -542,13 +543,24 @@ export default function TeacherDashboard() {
           </Card>
         </div>
 
-        <Tabs defaultValue="mc">
-          <TabsList>
+        <Tabs defaultValue="all-tasks">
+          <TabsList className="flex-wrap h-auto gap-1">
+            <TabsTrigger value="all-tasks">All Tasks by Week</TabsTrigger>
             <TabsTrigger value="mc">MC Responses ({studentMc.length})</TabsTrigger>
             <TabsTrigger value="writing">Writing ({studentDrafts.length})</TabsTrigger>
             <TabsTrigger value="notes">Notes ({studentNotes.length})</TabsTrigger>
             <TabsTrigger value="questions">Questions ({studentQuestions.length})</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="all-tasks" className="mt-4">
+            <StudentTasksByWeek
+              studentId={selectedStudent}
+              studentResponses={studentMc}
+              writingDrafts={studentDrafts}
+              taskFeedback={studentFeedback}
+              onAddFeedback={openFeedbackDialog}
+            />
+          </TabsContent>
 
           <TabsContent value="mc" className="space-y-3 mt-4">
             {studentMc.length === 0 ? (
