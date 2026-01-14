@@ -89,8 +89,8 @@ export function ObjectiveTask({
               key={idx}
               className={cn(
                 "flex items-center space-x-2 p-2 rounded-md border transition-colors",
-                submitted && idx === correctAnswer && "bg-green-50 border-green-300",
-                submitted && selectedAnswer === String(idx) && idx !== correctAnswer && "bg-red-50 border-red-300",
+                submitted && isCorrect && idx === correctAnswer && "bg-green-50 border-green-300",
+                submitted && selectedAnswer === String(idx) && !isCorrect && "bg-red-50 border-red-300",
                 !submitted && selectedAnswer === String(idx) && "bg-primary/5 border-primary/30"
               )}
             >
@@ -98,10 +98,10 @@ export function ObjectiveTask({
               <Label htmlFor={`${id}-${idx}`} className="text-sm cursor-pointer flex-1">
                 {option}
               </Label>
-              {submitted && idx === correctAnswer && (
+              {submitted && isCorrect && idx === correctAnswer && (
                 <CheckCircle2 className="h-4 w-4 text-green-600" />
               )}
-              {submitted && selectedAnswer === String(idx) && idx !== correctAnswer && (
+              {submitted && selectedAnswer === String(idx) && !isCorrect && (
                 <XCircle className="h-4 w-4 text-red-500" />
               )}
             </div>
@@ -121,8 +121,8 @@ export function ObjectiveTask({
               key={option}
               className={cn(
                 "flex items-center space-x-2 p-3 rounded-md border transition-colors flex-1",
-                submitted && option === correctAnswer && "bg-green-50 border-green-300",
-                submitted && selectedAnswer === option && option !== correctAnswer && "bg-red-50 border-red-300",
+                submitted && isCorrect && option === correctAnswer && "bg-green-50 border-green-300",
+                submitted && selectedAnswer === option && !isCorrect && "bg-red-50 border-red-300",
                 !submitted && selectedAnswer === option && "bg-primary/5 border-primary/30"
               )}
             >
@@ -174,7 +174,7 @@ export function ObjectiveTask({
               </>
             )}
           </div>
-          {explanation && <p className="text-muted-foreground">{explanation}</p>}
+          {isCorrect && explanation && <p className="text-muted-foreground">{explanation}</p>}
         </div>
       )}
 

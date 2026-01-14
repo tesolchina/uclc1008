@@ -331,6 +331,42 @@ export type Database = {
         }
         Relationships: []
       }
+      pending_teacher_requests: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          display_name: string
+          email: string
+          id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          sections: string[]
+          status: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          display_name: string
+          email: string
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sections?: string[]
+          status?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          display_name?: string
+          email?: string
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sections?: string[]
+          status?: string
+        }
+        Relationships: []
+      }
       process_logs: {
         Row: {
           created_at: string
