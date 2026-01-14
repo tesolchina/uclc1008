@@ -934,6 +934,7 @@ export type Database = {
           id: string
           is_active: boolean
           notes: string | null
+          section_number: string | null
           student_id: string
           student_number: string | null
           updated_at: string
@@ -946,6 +947,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           notes?: string | null
+          section_number?: string | null
           student_id: string
           student_number?: string | null
           updated_at?: string
@@ -958,6 +960,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           notes?: string | null
+          section_number?: string | null
           student_id?: string
           student_number?: string | null
           updated_at?: string
@@ -1064,6 +1067,35 @@ export type Database = {
           },
           {
             foreignKeyName: "teacher_comments_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teacher_sections: {
+        Row: {
+          created_at: string | null
+          id: string
+          section_number: string
+          teacher_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          section_number: string
+          teacher_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          section_number?: string
+          teacher_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teacher_sections_teacher_id_fkey"
             columns: ["teacher_id"]
             isOneToOne: false
             referencedRelation: "profiles"
