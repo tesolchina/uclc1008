@@ -4,7 +4,8 @@
 export { ObjectiveTask, QuickCheckMC } from './objective';
 
 // Open-ended tasks (writing, paraphrasing)
-export { WritingTask, ParaphraseCoach, IntegratedParaphraseTask, StrategyPracticeTask } from './open-ended';
+export { WritingTask, ParaphraseCoach, IntegratedParaphraseTask, StrategyPracticeTask, ConceptSelectTask } from './open-ended';
+export type { ConceptOption } from './open-ended';
 
 // Enhanced task components
 export { ParagraphWithNotes } from './ParagraphWithNotes';
