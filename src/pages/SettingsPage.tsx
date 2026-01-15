@@ -225,24 +225,36 @@ export default function SettingsPage() {
     const confirmed = window.confirm('Remove your HKBU API key? You will fall back to the shared API.');
     if (!confirmed) return;
 
+    const effectiveStudentId = savedStudentId || profile?.hkbu_user_id || getBrowserSessionId();
+
     setIsRevoking(true);
     try {
-      const { error } = await supabase.functions.invoke('revoke-api-key', {
+      const { data, error } = await supabase.functions.invoke('revoke-api-key', {
         body: {
           provider: 'hkbu',
-          studentId: savedStudentId,
+          studentId: effectiveStudentId,
+          accessToken: accessToken || undefined,
         },
       });
 
       if (error) throw error;
 
-      toast({ title: 'API key removed' });
+      if (data?.warning) {
+        toast({ 
+          title: 'API key removed locally',
+          description: data.warning,
+        });
+      } else {
+        toast({ title: 'API key removed successfully' });
+      }
+      
       loadStatus();
     } catch (error) {
       console.error('Error revoking key:', error);
       toast({
         variant: 'destructive',
         title: 'Failed to remove API key',
+        description: error instanceof Error ? error.message : 'Unknown error',
       });
     } finally {
       setIsRevoking(false);
