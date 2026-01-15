@@ -4,7 +4,7 @@
 export { ObjectiveTask, QuickCheckMC } from './objective';
 
 // Open-ended tasks (writing, paraphrasing)
-export { WritingTask, ParaphraseCoach } from './open-ended';
+export { WritingTask, ParaphraseCoach, IntegratedParaphraseTask } from './open-ended';
 
 // Enhanced task components
 export { ParagraphWithNotes } from './ParagraphWithNotes';

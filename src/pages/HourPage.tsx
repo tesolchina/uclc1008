@@ -5,11 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { CollapsibleSection } from "@/components/CollapsibleSection";
-import { ObjectiveTask, QuickCheckMC, WritingTask, ParaphraseCoach, AskQuestionButton, ParagraphWithNotes, WritingPracticeWithHistory } from "@/components/tasks";
+import { ObjectiveTask, QuickCheckMC, WritingTask, ParaphraseCoach, AskQuestionButton, ParagraphWithNotes, WritingPracticeWithHistory, IntegratedParaphraseTask } from "@/components/tasks";
 import { StudentLoginReminder } from "@/components/StudentLoginReminder";
 import { LectureOutline, useSectionProgress, generateSectionId } from "@/features/lecture-mode";
 import type { AgendaSectionEnhanced } from "@/features/lecture-mode";
-import { ArrowLeft, ArrowRight, Clock, Target, BookOpen, PenLine, CheckCircle2, Lightbulb, FileText, Sparkles, ExternalLink, AlertCircle, Calendar, GraduationCap, ScrollText, ChevronDown, Download, LogIn, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Clock, Target, BookOpen, PenLine, CheckCircle2, Lightbulb, FileText, Sparkles, ExternalLink, AlertCircle, Calendar, GraduationCap, ScrollText, ChevronDown, Download, LogIn, Loader2, Trophy } from "lucide-react";
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
@@ -577,6 +577,23 @@ Remember to also save any written responses separately.
                     explanation="AWQ requires PARAPHRASING with citations — no direct quotes allowed! Option B paraphrases correctly with a citation."
                   />
                 </div>
+
+                {/* AI Writing Task for Part 1 */}
+                <div className="space-y-3 pt-4 border-t">
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-blue-500" />
+                    Reflection Task
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    In your own words, explain WHY paraphrasing (not quoting) is required for the AWQ. What skills does it test that direct quotation doesn't?
+                  </p>
+                  <WritingTaskWithFeedback
+                    taskId="w1h2-part1-reflection"
+                    placeholder="Write 2-3 sentences explaining why paraphrasing is the required skill for AWQ..."
+                    onComplete={handleTaskComplete}
+                    studentId={studentId}
+                  />
+                </div>
               </div>
             </CollapsibleSection>
 
@@ -689,6 +706,26 @@ Remember to also save any written responses separately.
                     ]}
                     correctAnswer="C"
                     explanation="Option C uses multiple strategies: synonyms (elementary→primary, face recognition→facial identification), word form changes (support→approval), AND restructured the sentence. Options A and B are patchwriting."
+                  />
+                </div>
+
+                {/* AI Writing Task for Part 2 */}
+                <div className="space-y-3 pt-4 border-t">
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-green-500" />
+                    Strategy Practice
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    Paraphrase this sentence using at least 2 strategies. Then identify which strategies you used.
+                  </p>
+                  <div className="p-3 rounded-lg bg-muted/50 border text-sm italic">
+                    "Researchers collected data from 380 participants using a questionnaire." (Hong et al., 2022)
+                  </div>
+                  <WritingTaskWithFeedback
+                    taskId="w1h2-part2-strategy"
+                    placeholder="My paraphrase:&#10;[Write your paraphrase here with citation]&#10;&#10;Strategies used:&#10;• Strategy 1: [describe what you changed]&#10;• Strategy 2: [describe what you changed]"
+                    onComplete={handleTaskComplete}
+                    studentId={studentId}
                   />
                 </div>
               </div>
@@ -849,30 +886,87 @@ Remember to also save any written responses separately.
                     explanation="Author-prominent (narrative) puts the author's name as part of the sentence: 'Hong et al. (2022) argue...' Option A is info-prominent."
                   />
                 </div>
+
+                {/* AI Writing Task for Part 4 */}
+                <div className="space-y-3 pt-4 border-t">
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-purple-500" />
+                    Citation Practice
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    Write TWO versions of a paraphrase for the sentence below — one using author-prominent citation, one using info-prominent citation.
+                  </p>
+                  <div className="p-3 rounded-lg bg-muted/50 border text-sm italic">
+                    Original: "School authorities annually spend $2.7 billion on campus security products and services." (Doffman, 2018, as cited in Andrejevic & Selwyn, 2020)
+                  </div>
+                  <WritingTaskWithFeedback
+                    taskId="w1h2-part4-citation"
+                    placeholder="Author-Prominent Version:&#10;[e.g., According to Doffman (2018, as cited in Andrejevic & Selwyn, 2020), ...]&#10;&#10;Info-Prominent Version:&#10;[e.g., ...spending reaches billions annually (Doffman, 2018, as cited in Andrejevic & Selwyn, 2020).]"
+                    onComplete={handleTaskComplete}
+                    studentId={studentId}
+                  />
+                </div>
               </div>
             </CollapsibleSection>
 
-            {/* Part 5: AI-Guided Paraphrasing Practice (Learning App) */}
+            {/* Part 5: Comprehensive Integrated Assessment */}
             <CollapsibleSection
-              title="Part 5: AI Paraphrasing Coach (Learning App)"
-              description="Practice paraphrasing step-by-step with AI guidance"
-              icon={<Sparkles className="h-4 w-4 text-accent" />}
+              title="Part 5: Integrated Skills Assessment"
+              description="Test ALL your paraphrasing skills with comprehensive paragraph-level tasks"
+              icon={<Target className="h-4 w-4 text-accent" />}
               defaultOpen={true}
               className="border-2 border-accent/30 bg-gradient-to-r from-accent/10 to-transparent"
             >
-              <div className="space-y-3">
-                <div className="p-3 rounded-lg bg-accent/10 border border-accent/30">
+              <div className="space-y-4">
+                {/* Introduction */}
+                <div className="p-4 rounded-lg bg-accent/10 border border-accent/30">
                   <p className="text-sm font-medium text-accent-foreground flex items-center gap-2">
-                    <Sparkles className="h-4 w-4" />
-                    Interactive Learning App
+                    <Trophy className="h-4 w-4" />
+                    Comprehensive Assessment
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    This AI coach guides you through paraphrasing step-by-step: Read → Understand → Plan → Draft → Cite → Check.
+                  <p className="text-xs text-muted-foreground mt-2">
+                    This section tests your ability to apply ALL paraphrasing techniques together. You'll work with longer passages, use multiple strategies, handle different citation types, and receive detailed AI feedback on your work.
                   </p>
+                  <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-2">
+                    <div className="p-2 rounded bg-background text-center">
+                      <p className="text-xs font-medium text-green-600">Synonyms</p>
+                    </div>
+                    <div className="p-2 rounded bg-background text-center">
+                      <p className="text-xs font-medium text-blue-600">Word Forms</p>
+                    </div>
+                    <div className="p-2 rounded bg-background text-center">
+                      <p className="text-xs font-medium text-purple-600">Voice</p>
+                    </div>
+                    <div className="p-2 rounded bg-background text-center">
+                      <p className="text-xs font-medium text-amber-600">Structure</p>
+                    </div>
+                  </div>
                 </div>
-                <ParaphraseCoach 
-                  studentId={studentId} 
-                  onComplete={(sentenceId) => handleTaskComplete(`paraphrase-${sentenceId}`)}
+
+                {/* Step-by-Step Coach (optional warm-up) */}
+                <details className="group">
+                  <summary className="cursor-pointer p-3 rounded-lg bg-muted/30 border hover:bg-muted/50 transition-colors">
+                    <span className="text-sm font-medium flex items-center gap-2">
+                      <Lightbulb className="h-4 w-4 text-amber-500" />
+                      Need a warm-up? Try the Step-by-Step Coach first
+                      <ChevronDown className="h-4 w-4 ml-auto group-open:rotate-180 transition-transform" />
+                    </span>
+                  </summary>
+                  <div className="mt-3 p-3 rounded-lg border bg-background">
+                    <p className="text-xs text-muted-foreground mb-3">
+                      This guided coach walks you through each step: Read → Understand → Plan → Draft → Cite → Check
+                    </p>
+                    <ParaphraseCoach 
+                      studentId={studentId} 
+                      onComplete={(sentenceId) => handleTaskComplete(`paraphrase-${sentenceId}`)}
+                    />
+                  </div>
+                </details>
+
+                {/* Main Integrated Assessment */}
+                <IntegratedParaphraseTask
+                  studentId={studentId}
+                  onComplete={() => handleTaskComplete("w1h2-integrated-complete")}
                 />
               </div>
             </CollapsibleSection>
