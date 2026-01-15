@@ -5,7 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { CollapsibleSection } from "@/components/CollapsibleSection";
-import { ObjectiveTask, QuickCheckMC, WritingTask, ParaphraseCoach, AskQuestionButton, ParagraphWithNotes, WritingPracticeWithHistory, IntegratedParaphraseTask, StrategyPracticeTask } from "@/components/tasks";
+import { ObjectiveTask, QuickCheckMC, WritingTask, ParaphraseCoach, AskQuestionButton, ParagraphWithNotes, WritingPracticeWithHistory, IntegratedParaphraseTask, StrategyPracticeTask, ConceptSelectTask } from "@/components/tasks";
+import type { ConceptOption } from "@/components/tasks";
 import { StudentLoginReminder } from "@/components/StudentLoginReminder";
 import { LectureOutline, useSectionProgress, generateSectionId } from "@/features/lecture-mode";
 import type { AgendaSectionEnhanced } from "@/features/lecture-mode";
@@ -55,6 +56,41 @@ const PRACTICE_PARAGRAPHS = [
     label: "Paragraph 6: Future of Facial Learning Detection",
     text: "These largely experimental developments have led some educationalists to enthusiastically anticipate facial learning detection being deployed on a mass scale. As Timms (2016, p. 712) reasons, it might soon be possible to gain a 'real-time' sense of which groups of students are in a 'productive state' and other instances 'where the overall activity is not productive'. The promise of customisation that characterises the development of automated learning systems encourages their incorporation into student learning interfaces."
   }
+];
+
+// Concept options for different task types
+const PARAPHRASING_STRATEGIES: ConceptOption[] = [
+  { id: "synonyms", label: "Synonym Replacement", description: "Replace words with similar-meaning words", example: "introduced → implemented" },
+  { id: "wordforms", label: "Word Form Changes", description: "Change word forms (verb → noun, adjective → adverb)", example: "impacts → impact" },
+  { id: "voice", label: "Active ↔ Passive Voice", description: "Switch between active and passive voice", example: "Researchers collected → Data was collected" },
+  { id: "structure", label: "Sentence Structure", description: "Reorder, combine, or split sentences", example: "Because X, Y → Y resulted from X" }
+];
+
+const AWQ_SKILLS: ConceptOption[] = [
+  { id: "paraphrasing", label: "Paraphrasing Skills", description: "Restating ideas in your own words while keeping meaning" },
+  { id: "summarizing", label: "Summarizing Skills", description: "Condensing main ideas in shorter form" },
+  { id: "critical-thinking", label: "Critical Thinking", description: "Analyzing and evaluating ideas, not just repeating" },
+  { id: "comprehension", label: "Reading Comprehension", description: "Understanding complex academic texts accurately" }
+];
+
+const CITATION_CONCEPTS: ConceptOption[] = [
+  { id: "author-prominent", label: "Author-Prominent Citation", description: "Author name is part of the sentence", example: "Hong et al. (2022) argue that..." },
+  { id: "info-prominent", label: "Info-Prominent Citation", description: "Focus on information, author in parentheses", example: "...according to research (Hong et al., 2022)" },
+  { id: "secondary-source", label: "Secondary Source Citation", description: "Citing through another source", example: "(Smith, 2018, as cited in Jones, 2020)" }
+];
+
+const OUTLINING_CONCEPTS: ConceptOption[] = [
+  { id: "topic-sentence", label: "Topic Sentence", description: "Identify the main idea of each paragraph" },
+  { id: "logical-flow", label: "Logical Flow", description: "How ideas progress from one section to another" },
+  { id: "structural-patterns", label: "Structural Patterns", description: "Recognize patterns like problem-solution, cause-effect" },
+  { id: "transitions", label: "Transitions", description: "Words/phrases connecting ideas between paragraphs" }
+];
+
+const SKIMMING_SCANNING_CONCEPTS: ConceptOption[] = [
+  { id: "skimming", label: "Skimming", description: "Reading quickly for overall meaning and structure" },
+  { id: "scanning", label: "Scanning", description: "Searching for specific information quickly" },
+  { id: "headings", label: "Using Headings", description: "Leveraging titles and headers to understand structure" },
+  { id: "first-last", label: "First/Last Sentences", description: "Reading opening and closing sentences of paragraphs" }
 ];
 
 // Week 1 Hour 1 has 10 MC questions + 2 writing tasks = 12 total tasks
@@ -601,9 +637,28 @@ Remember to also save any written responses separately.
                   <p className="text-xs text-muted-foreground">
                     In your own words, explain WHY paraphrasing (not quoting) is required for the AWQ. What skills does it test that direct quotation doesn't?
                   </p>
-                  <WritingTaskWithFeedback
+                  <ConceptSelectTask
                     taskId="w1h2-part1-reflection"
-                    placeholder="Write 2-3 sentences explaining why paraphrasing is the required skill for AWQ..."
+                    concepts={AWQ_SKILLS}
+                    selectionTitle="Which skills does the AWQ test that direct quotation doesn't?"
+                    selectionDescription="Select the skills you think are being assessed through paraphrasing."
+                    writingTitle="Explain your reasoning"
+                    placeholder="In 2-3 sentences, explain WHY these skills matter for academic writing and why quoting wouldn't test them..."
+                    minSelection={1}
+                    aiPrompt={`You are an academic writing tutor for university students.
+
+STUDENT'S RESPONSE:
+{response}
+
+SKILLS THE STUDENT SELECTED:
+{concepts}
+
+The student was asked: "Why is paraphrasing (not quoting) required for the AWQ? What skills does it test that direct quotation doesn't?"
+
+Provide brief feedback (3-4 sentences):
+1. Are the selected skills relevant? Did they miss any important ones?
+2. Is their explanation clear and accurate?
+3. One suggestion to deepen their understanding.`}
                     onComplete={handleTaskComplete}
                     studentId={studentId}
                   />
@@ -827,9 +882,32 @@ Remember to also save any written responses separately.
                     <p>1. "Facial recognition technology is now being introduced across various aspects of public life." (Andrejevic & Selwyn, 2020)</p>
                     <p>2. "The research demonstrates that technology significantly impacts education." (Hong et al., 2022)</p>
                   </div>
-                  <WritingTaskWithFeedback
+                  <ConceptSelectTask
                     taskId="w1h2-paraphrase-practice"
-                    placeholder="Write your paraphrase here using at least 2 strategies. Don't forget the citation!"
+                    concepts={PARAPHRASING_STRATEGIES}
+                    contextText={`Choose ONE to paraphrase:\n1. "Facial recognition technology is now being introduced across various aspects of public life." (Andrejevic & Selwyn, 2020)\n2. "The research demonstrates that technology significantly impacts education." (Hong et al., 2022)`}
+                    contextLabel="Original Sentences:"
+                    selectionTitle="Step 1: Select the strategies you will use"
+                    selectionDescription="Choose at least 2 strategies before writing your paraphrase."
+                    writingTitle="Step 2: Write your paraphrase"
+                    placeholder="Write your paraphrase using the strategies you selected. Don't forget the citation!"
+                    minSelection={2}
+                    aiPrompt={`You are an expert academic writing tutor assessing paraphrasing practice.
+
+ORIGINAL SENTENCES:
+{context}
+
+STUDENT'S PARAPHRASE:
+{response}
+
+STRATEGIES THE STUDENT CLAIMS TO HAVE USED:
+{concepts}
+
+Provide feedback (4-6 sentences):
+1. **Strategy Verification**: Did the student actually apply each claimed strategy? Be specific about what changes you observe.
+2. **Patchwriting Check**: Is this acceptable or too close to the original?
+3. **Citation Check**: Is the citation included and formatted correctly?
+4. **Quick Tip**: One specific improvement suggestion.`}
                     onComplete={handleTaskComplete}
                     studentId={studentId}
                   />
@@ -911,9 +989,33 @@ Remember to also save any written responses separately.
                   <div className="p-3 rounded-lg bg-muted/50 border text-sm italic">
                     Original: "School authorities annually spend $2.7 billion on campus security products and services." (Doffman, 2018, as cited in Andrejevic & Selwyn, 2020)
                   </div>
-                  <WritingTaskWithFeedback
+                  <ConceptSelectTask
                     taskId="w1h2-part4-citation"
+                    concepts={CITATION_CONCEPTS}
+                    contextText={`"School authorities annually spend $2.7 billion on campus security products and services." (Doffman, 2018, as cited in Andrejevic & Selwyn, 2020)`}
+                    contextLabel="Original:"
+                    selectionTitle="Which citation styles will you demonstrate?"
+                    selectionDescription="Select the citation types you'll use in your response."
+                    writingTitle="Write both versions of your paraphrase"
                     placeholder="Author-Prominent Version:&#10;[e.g., According to Doffman (2018, as cited in Andrejevic & Selwyn, 2020), ...]&#10;&#10;Info-Prominent Version:&#10;[e.g., ...spending reaches billions annually (Doffman, 2018, as cited in Andrejevic & Selwyn, 2020).]"
+                    minSelection={2}
+                    aiPrompt={`You are an APA citation expert assessing a student's citation practice.
+
+ORIGINAL SENTENCE:
+{context}
+
+STUDENT'S PARAPHRASE VERSIONS:
+{response}
+
+CITATION STYLES THE STUDENT CLAIMS TO DEMONSTRATE:
+{concepts}
+
+Provide focused feedback (4-5 sentences):
+1. **Author-Prominent Version**: Is it formatted correctly? Is the author integrated into the sentence?
+2. **Info-Prominent Version**: Is the citation at the end in parentheses? Is punctuation correct?
+3. **Secondary Source**: Did they handle "as cited in" correctly?
+4. **Paraphrasing Quality**: Are both versions acceptable paraphrases (not patchwriting)?
+5. **Quick Fix**: One specific correction if needed.`}
                     onComplete={handleTaskComplete}
                     studentId={studentId}
                   />
@@ -1357,14 +1459,41 @@ Remember to also save any written responses separately.
                 </CollapsibleSection>
 
                 {/* Writing Practice - placed above MC for easier reference to source text */}
-                <WritingPracticeWithHistory
-                  taskKey="w1h1-macro-structure"
-                  title="Writing Practice: Narrate the Excerpt Structure"
-                  instructions="Write <strong>3 sentences</strong> that summarize what the excerpt covers at the macro level. Do not summarize the content in detail – just describe the <em>structure</em> and <em>progression</em> of ideas."
-                  exampleFormat='"The excerpt begins by... Then, it moves on to discuss... Finally, it explores..."'
-                  placeholder="Write your 3 sentences here describing the structure and progression of the excerpt..."
-                  studentId={studentId || undefined}
-                />
+                <div className="space-y-3">
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-purple-500" />
+                    Writing Practice: Narrate the Excerpt Structure
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    Write <strong>3 sentences</strong> that describe what the excerpt covers at the macro level. Focus on <em>structure and progression</em>, not detailed content.
+                  </p>
+                  <ConceptSelectTask
+                    taskId="w1h1-macro-structure"
+                    concepts={OUTLINING_CONCEPTS}
+                    selectionTitle="Which outlining techniques will you demonstrate?"
+                    selectionDescription="Select the techniques you used to analyze the excerpt's structure."
+                    writingTitle="Describe the excerpt's structure (3 sentences)"
+                    placeholder='Example: "The excerpt begins by... Then, it moves on to discuss... Finally, it explores..."'
+                    minSelection={2}
+                    aiPrompt={`You are an academic reading skills tutor assessing a student's macro-level outlining.
+
+The student analyzed an excerpt about Facial Recognition Technology in Education (6 paragraphs covering: Introduction → Security → Attendance → Online Learning → Engagement Detection → Future).
+
+STUDENT'S STRUCTURAL ANALYSIS:
+{response}
+
+OUTLINING TECHNIQUES THE STUDENT CLAIMS TO HAVE USED:
+{concepts}
+
+Provide focused feedback (4-5 sentences):
+1. **Accuracy**: Does the student correctly identify the excerpt's structure and progression?
+2. **Technique Application**: Did they demonstrate the outlining techniques they selected?
+3. **Completeness**: Did they capture the logical flow from physical to invisible surveillance?
+4. **Improvement**: One specific suggestion to strengthen their analysis.`}
+                    onComplete={handleTaskComplete}
+                    studentId={studentId}
+                  />
+                </div>
 
                 {/* MC Questions on Excerpt Structure */}
                 <div className="space-y-3">
