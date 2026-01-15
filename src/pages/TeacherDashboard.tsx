@@ -9,8 +9,12 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { StudentApiUsageTable } from "@/components/admin/StudentApiUsageTable";
 import { StudentTasksByWeek } from "@/components/teacher/StudentTasksByWeek";
+import { TeacherStudentModeSwitch } from "@/components/teacher/TeacherStudentModeSwitch";
+import { StudentProgressPieChart } from "@/components/teacher/StudentProgressPieChart";
+import { StudentProgressDetails } from "@/components/teacher/StudentProgressDetails";
 import { 
   MessageCircle, 
   Users, 
@@ -23,6 +27,7 @@ import {
   StickyNote,
   ClipboardList,
   ChevronRight,
+  ChevronDown,
   ArrowLeft,
   ExternalLink,
   MessageSquarePlus,
@@ -94,6 +99,13 @@ interface TaskFeedback {
   created_at: string;
 }
 
+interface WeekProgressData {
+  week: number;
+  completed: number;
+  total: number;
+  percentage: number;
+}
+
 interface StudentSummary {
   student_id: string;
   section_number: string | null;
@@ -104,6 +116,7 @@ interface StudentSummary {
   notes: number;
   questions: number;
   lastActive: string;
+  weekProgress: WeekProgressData[];
 }
 
 interface StudentRecord {
@@ -138,6 +151,10 @@ export default function TeacherDashboard() {
   const [studentRecords, setStudentRecords] = useState<StudentRecord[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [sectionFilter, setSectionFilter] = useState<string>("all");
+  
+  // Collapsible state
+  const [apiUsageOpen, setApiUsageOpen] = useState(false);
+  const [expandedStudents, setExpandedStudents] = useState<Set<string>>(new Set());
 
   // Fetch teacher's assigned sections
   const fetchTeacherSections = async () => {
@@ -230,6 +247,13 @@ export default function TeacherDashboard() {
   // Get unique sections from student records
   const availableSections = [...new Set(studentRecords.map(s => s.section_number).filter(Boolean))] as string[];
 
+  // Helper to parse week from key
+  const parseWeekFromKey = (key: string | null): number | null => {
+    if (!key) return null;
+    const match = key.match(/week(\d+)/i) || key.match(/w(\d+)/i);
+    return match ? parseInt(match[1]) : null;
+  };
+
   // Build student summaries
   const studentSummaries: StudentSummary[] = (() => {
     const allStudentIds = new Set([
@@ -256,6 +280,24 @@ export default function TeacherDashboard() {
         ? new Date(Math.max(...allDates.map(d => d.getTime()))).toISOString()
         : "";
 
+      // Calculate week progress
+      const weekProgress: WeekProgressData[] = [1, 2, 3, 4, 5].map(weekNum => {
+        const weekMc = studentMc.filter(r => parseWeekFromKey(r.question_key) === weekNum).length;
+        const weekDrafts = studentDrafts.filter(d => parseWeekFromKey(d.task_key) === weekNum && d.is_submitted).length;
+        const weekNotes = studentNotes.filter(n => parseWeekFromKey(n.paragraph_key) === weekNum && n.notes.trim()).length;
+        
+        // Estimated totals per week (adjust as needed)
+        const estimatedTotal = 36; // 15 MC + 3 writing + 18 notes
+        const completed = Math.min(weekMc, 15) + Math.min(weekDrafts, 3) + Math.min(weekNotes, 18);
+        
+        return {
+          week: weekNum,
+          completed,
+          total: estimatedTotal,
+          percentage: estimatedTotal > 0 ? (completed / estimatedTotal) * 100 : 0,
+        };
+      });
+
       return {
         student_id: studentId,
         section_number: sectionNumber,
@@ -265,7 +307,8 @@ export default function TeacherDashboard() {
         submittedDrafts: studentDrafts.filter(d => d.is_submitted).length,
         notes: studentNotes.length,
         questions: studentQuestions.length,
-        lastActive
+        lastActive,
+        weekProgress,
       };
     }).sort((a, b) => new Date(b.lastActive).getTime() - new Date(a.lastActive).getTime());
   })();
@@ -774,6 +817,20 @@ export default function TeacherDashboard() {
   }
 
   // Main view: student list
+  // Toggle expanded student
+  const toggleStudentExpanded = (studentId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setExpandedStudents(prev => {
+      const next = new Set(prev);
+      if (next.has(studentId)) {
+        next.delete(studentId);
+      } else {
+        next.add(studentId);
+      }
+      return next;
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -786,6 +843,9 @@ export default function TeacherDashboard() {
           Refresh
         </Button>
       </div>
+
+      {/* Teacher Student Mode Switch */}
+      <TeacherStudentModeSwitch />
 
       {/* Quick Stats */}
       <div className="grid gap-4 md:grid-cols-4">
@@ -839,8 +899,21 @@ export default function TeacherDashboard() {
         </Card>
       </div>
 
-      {/* Student API Usage */}
-      <StudentApiUsageTable />
+      {/* Student API Usage - Collapsible */}
+      <Collapsible open={apiUsageOpen} onOpenChange={setApiUsageOpen}>
+        <CollapsibleTrigger asChild>
+          <Button variant="outline" className="w-full justify-between">
+            <span className="flex items-center gap-2">
+              <Key className="h-4 w-4" />
+              Student API Usage
+            </span>
+            {apiUsageOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+          </Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="pt-4">
+          <StudentApiUsageTable />
+        </CollapsibleContent>
+      </Collapsible>
 
       {/* Student List */}
       <div>
@@ -921,22 +994,38 @@ export default function TeacherDashboard() {
         ) : (
           <div className="space-y-2">
             {filteredStudents.map(student => {
-              const totalActivities = student.mcResponses + student.writingDrafts + student.notes;
               const mcAccuracy = student.mcResponses > 0 
                 ? Math.round((student.mcCorrect / student.mcResponses) * 100) 
                 : 0;
               const hasTeacherNote = !!getTeacherNote(student.student_id);
+              const isExpanded = expandedStudents.has(student.student_id);
+              
+              // Get student's data for expanded view
+              const studentMcData = studentResponses.filter(r => r.student_id === student.student_id);
+              const studentDraftData = writingDrafts.filter(d => d.student_id === student.student_id);
+              const studentNoteData = paragraphNotes.filter(n => n.student_id === student.student_id);
               
               return (
                 <Card 
                   key={student.student_id} 
-                  className="cursor-pointer hover:bg-muted/50 transition-colors"
-                  onClick={() => setSelectedStudent(student.student_id)}
+                  className="hover:bg-muted/30 transition-colors"
                 >
                   <CardContent className="py-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-3 mb-2">
+                    <div className="flex items-center gap-4">
+                      {/* Pie Chart */}
+                      <div 
+                        className="shrink-0 cursor-pointer"
+                        onClick={(e) => toggleStudentExpanded(student.student_id, e)}
+                      >
+                        <StudentProgressPieChart weekProgress={student.weekProgress} size="sm" />
+                      </div>
+                      
+                      {/* Student Info */}
+                      <div 
+                        className="flex-1 min-w-0 cursor-pointer"
+                        onClick={() => setSelectedStudent(student.student_id)}
+                      >
+                        <div className="flex items-center gap-3 mb-1">
                           <span className="font-medium truncate">{student.student_id}</span>
                           {student.section_number && (
                             <Badge variant="secondary" className="text-xs">
@@ -951,7 +1040,7 @@ export default function TeacherDashboard() {
                           )}
                           {student.questions > 0 && (
                             <Badge variant="outline" className="text-xs">
-                              {student.questions} question{student.questions > 1 ? 's' : ''}
+                              {student.questions} Q
                             </Badge>
                           )}
                         </div>
@@ -959,34 +1048,57 @@ export default function TeacherDashboard() {
                         <div className="flex items-center gap-4 text-xs text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <ClipboardList className="h-3 w-3" />
-                            {student.mcResponses} MC ({mcAccuracy}% correct)
+                            {student.mcResponses} MC ({mcAccuracy}%)
                           </span>
                           <span className="flex items-center gap-1">
                             <FileText className="h-3 w-3" />
-                            {student.writingDrafts} drafts ({student.submittedDrafts} submitted)
+                            {student.submittedDrafts}/{student.writingDrafts}
                           </span>
                           <span className="flex items-center gap-1">
                             <StickyNote className="h-3 w-3" />
-                            {student.notes} notes
+                            {student.notes}
                           </span>
                         </div>
-                        
-                        {totalActivities > 0 && (
-                          <div className="mt-2">
-                            <Progress value={Math.min(totalActivities * 10, 100)} className="h-1.5" />
-                          </div>
-                        )}
                       </div>
                       
-                      <div className="flex items-center gap-3 ml-4">
-                        <div className="text-right text-xs text-muted-foreground">
+                      {/* Actions */}
+                      <div className="flex items-center gap-2 shrink-0">
+                        <div className="text-right text-xs text-muted-foreground hidden sm:block">
                           {student.lastActive && (
-                            <span>Last active: {new Date(student.lastActive).toLocaleDateString()}</span>
+                            <span>{new Date(student.lastActive).toLocaleDateString()}</span>
                           )}
                         </div>
-                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={(e) => toggleStudentExpanded(student.student_id, e)}
+                        >
+                          {isExpanded ? (
+                            <ChevronDown className="h-4 w-4" />
+                          ) : (
+                            <ChevronRight className="h-4 w-4" />
+                          )}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSelectedStudent(student.student_id)}
+                        >
+                          Details
+                        </Button>
                       </div>
                     </div>
+                    
+                    {/* Expanded Week Progress Details */}
+                    {isExpanded && (
+                      <StudentProgressDetails
+                        studentId={student.student_id}
+                        responses={studentMcData}
+                        drafts={studentDraftData}
+                        notes={studentNoteData}
+                      />
+                    )}
                   </CardContent>
                 </Card>
               );
