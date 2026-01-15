@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,16 +15,21 @@ import {
   Clock, 
   AlertTriangle,
   Sparkles,
-  MessageCircle
+  MessageCircle,
+  History
 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/features/auth";
+import { generateTeacherStudentId } from "@/components/teacher/TeacherStudentModeSwitch";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
 }
 
-const DUE_DATE = new Date("2026-01-23T18:00:00+08:00"); // 23 Jan 2026, 6pm HKT
+const ASSIGNMENT_KEY = "pre-course-writing";
+const DUE_DATE = new Date("2026-01-23T18:00:00+08:00");
 
 const SUGGESTED_QUESTIONS = [
   "What are the two tasks I need to complete?",
@@ -34,11 +40,18 @@ const SUGGESTED_QUESTIONS = [
 ];
 
 export function PreCourseAssistant() {
+  const { user, studentId: authStudentId, isTeacher, isAdmin } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Get effective student ID
+  const teacherStudentId = user?.id ? generateTeacherStudentId(user.id) : null;
+  const isInStudentMode = !!authStudentId && authStudentId === teacherStudentId;
+  const effectiveStudentId = authStudentId || (isInStudentMode ? teacherStudentId : null);
 
   // Calculate time remaining
   const now = new Date();
@@ -47,6 +60,13 @@ export function PreCourseAssistant() {
   const isPastDue = timeDiff <= 0;
   const isUrgent = daysRemaining <= 3 && !isPastDue;
 
+  // Load chat history when opened
+  useEffect(() => {
+    if (isOpen && effectiveStudentId && messages.length === 0) {
+      loadChatHistory();
+    }
+  }, [isOpen, effectiveStudentId]);
+
   // Auto-scroll to bottom
   useEffect(() => {
     if (scrollRef.current) {
@@ -54,11 +74,73 @@ export function PreCourseAssistant() {
     }
   }, [messages]);
 
+  const loadChatHistory = async () => {
+    if (!effectiveStudentId) return;
+    
+    setIsLoadingHistory(true);
+    try {
+      const { data, error } = await supabase
+        .from("assignment_chat_history")
+        .select("messages")
+        .eq("student_id", effectiveStudentId)
+        .eq("assignment_key", ASSIGNMENT_KEY)
+        .maybeSingle();
+
+      if (error) throw error;
+      if (data?.messages && Array.isArray(data.messages)) {
+        setMessages(data.messages as unknown as Message[]);
+      }
+    } catch (error) {
+      console.error("Failed to load chat history:", error);
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  };
+
+  const saveChatHistory = async (newMessages: Message[]) => {
+    if (!effectiveStudentId) return;
+
+    try {
+      // Check if record exists
+      const { data: existing } = await supabase
+        .from("assignment_chat_history")
+        .select("id")
+        .eq("student_id", effectiveStudentId)
+        .eq("assignment_key", ASSIGNMENT_KEY)
+        .maybeSingle();
+
+      if (existing) {
+        // Update existing
+        const { error } = await supabase
+          .from("assignment_chat_history")
+          .update({
+            messages: JSON.parse(JSON.stringify(newMessages)),
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", existing.id);
+        if (error) throw error;
+      } else {
+        // Insert new
+        const { error } = await supabase
+          .from("assignment_chat_history")
+          .insert([{
+            student_id: effectiveStudentId,
+            assignment_key: ASSIGNMENT_KEY,
+            messages: JSON.parse(JSON.stringify(newMessages)),
+          }]);
+        if (error) throw error;
+      }
+    } catch (error) {
+      console.error("Failed to save chat history:", error);
+    }
+  };
+
   const sendMessage = async (messageText: string) => {
     if (!messageText.trim() || isLoading) return;
 
     const userMessage: Message = { role: "user", content: messageText.trim() };
-    setMessages(prev => [...prev, userMessage]);
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
     setInput("");
     setIsLoading(true);
 
@@ -74,7 +156,7 @@ export function PreCourseAssistant() {
             Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
           },
           body: JSON.stringify({
-            messages: [...messages, userMessage],
+            messages: updatedMessages,
             currentTime: new Date().toISOString(),
           }),
         }
@@ -131,6 +213,11 @@ export function PreCourseAssistant() {
           }
         }
       }
+
+      // Save chat history after successful response
+      const finalMessages = [...updatedMessages, { role: "assistant" as const, content: assistantContent }];
+      await saveChatHistory(finalMessages);
+
     } catch (error) {
       console.error("Assistant error:", error);
       toast.error(error instanceof Error ? error.message : "Failed to get response");
@@ -150,6 +237,23 @@ export function PreCourseAssistant() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     sendMessage(input);
+  };
+
+  const clearHistory = async () => {
+    if (!effectiveStudentId) return;
+    
+    try {
+      await supabase
+        .from("assignment_chat_history")
+        .delete()
+        .eq("student_id", effectiveStudentId)
+        .eq("assignment_key", ASSIGNMENT_KEY);
+      
+      setMessages([]);
+      toast.success("Chat history cleared");
+    } catch (error) {
+      toast.error("Failed to clear history");
+    }
   };
 
   return (
@@ -236,55 +340,89 @@ export function PreCourseAssistant() {
             </div>
 
             {/* Chat area */}
-            <ScrollArea className="h-[300px] border rounded-lg p-3" ref={scrollRef}>
-              {messages.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-center p-4">
-                  <MessageCircle className="h-8 w-8 text-muted-foreground/50 mb-2" />
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Ask me about assignment requirements, format, or deadlines.
-                  </p>
-                  <div className="flex flex-wrap gap-2 justify-center">
-                    {SUGGESTED_QUESTIONS.slice(0, 3).map((q, i) => (
-                      <Button
-                        key={i}
-                        variant="outline"
-                        size="sm"
-                        className="text-xs"
-                        onClick={() => sendMessage(q)}
-                      >
-                        {q}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {messages.map((msg, i) => (
-                    <div
-                      key={i}
-                      className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-                    >
-                      <div
-                        className={`max-w-[85%] rounded-lg px-3 py-2 text-sm ${
-                          msg.role === "user"
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted"
-                        }`}
-                      >
-                        <p className="whitespace-pre-wrap">{msg.content || "..."}</p>
-                      </div>
-                    </div>
-                  ))}
-                  {isLoading && messages[messages.length - 1]?.role === "user" && (
-                    <div className="flex justify-start">
-                      <div className="bg-muted rounded-lg px-3 py-2">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      </div>
-                    </div>
-                  )}
-                </div>
+            <div className="relative">
+              {messages.length > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 -top-1 h-6 text-xs text-muted-foreground z-10"
+                  onClick={clearHistory}
+                >
+                  <History className="h-3 w-3 mr-1" />
+                  Clear
+                </Button>
               )}
-            </ScrollArea>
+              <ScrollArea className="h-[300px] border rounded-lg p-3" ref={scrollRef}>
+                {isLoadingHistory ? (
+                  <div className="h-full flex items-center justify-center">
+                    <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                  </div>
+                ) : messages.length === 0 ? (
+                  <div className="h-full flex flex-col items-center justify-center text-center p-4">
+                    <MessageCircle className="h-8 w-8 text-muted-foreground/50 mb-2" />
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Ask me about assignment requirements, format, or deadlines.
+                    </p>
+                    <div className="flex flex-wrap gap-2 justify-center">
+                      {SUGGESTED_QUESTIONS.slice(0, 3).map((q, i) => (
+                        <Button
+                          key={i}
+                          variant="outline"
+                          size="sm"
+                          className="text-xs"
+                          onClick={() => sendMessage(q)}
+                        >
+                          {q}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {messages.map((msg, i) => (
+                      <div
+                        key={i}
+                        className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                      >
+                        <div
+                          className={`max-w-[85%] rounded-lg px-3 py-2 text-sm ${
+                            msg.role === "user"
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted"
+                          }`}
+                        >
+                          {msg.role === "assistant" ? (
+                            <div className="prose prose-sm dark:prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+                              <ReactMarkdown
+                                components={{
+                                  p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                                  ul: ({ children }) => <ul className="mb-2 pl-4 list-disc">{children}</ul>,
+                                  ol: ({ children }) => <ol className="mb-2 pl-4 list-decimal">{children}</ol>,
+                                  li: ({ children }) => <li className="mb-1">{children}</li>,
+                                  strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                                  code: ({ children }) => <code className="bg-background/50 px-1 py-0.5 rounded text-xs">{children}</code>,
+                                }}
+                              >
+                                {msg.content || "..."}
+                              </ReactMarkdown>
+                            </div>
+                          ) : (
+                            <p className="whitespace-pre-wrap">{msg.content}</p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                    {isLoading && messages[messages.length - 1]?.role === "user" && (
+                      <div className="flex justify-start">
+                        <div className="bg-muted rounded-lg px-3 py-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </ScrollArea>
+            </div>
 
             {/* Suggested questions */}
             {messages.length > 0 && messages.length < 4 && (
@@ -328,6 +466,13 @@ export function PreCourseAssistant() {
                 )}
               </Button>
             </form>
+
+            {/* Student ID indicator */}
+            {effectiveStudentId && (
+              <p className="text-xs text-muted-foreground text-center">
+                Chat history saved for {effectiveStudentId.slice(0, 8)}...
+              </p>
+            )}
           </CardContent>
         </CollapsibleContent>
       </Collapsible>

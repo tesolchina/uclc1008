@@ -38,6 +38,33 @@ export type Database = {
         }
         Relationships: []
       }
+      assignment_chat_history: {
+        Row: {
+          assignment_key: string
+          created_at: string
+          id: string
+          messages: Json
+          student_id: string
+          updated_at: string
+        }
+        Insert: {
+          assignment_key: string
+          created_at?: string
+          id?: string
+          messages?: Json
+          student_id: string
+          updated_at?: string
+        }
+        Update: {
+          assignment_key?: string
+          created_at?: string
+          id?: string
+          messages?: Json
+          student_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       hour_tasks: {
         Row: {
           context: string | null
