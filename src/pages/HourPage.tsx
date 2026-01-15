@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { CollapsibleSection } from "@/components/CollapsibleSection";
-import { ObjectiveTask, QuickCheckMC, WritingTask, ParaphraseCoach, AskQuestionButton, ParagraphWithNotes, WritingPracticeWithHistory, IntegratedParaphraseTask } from "@/components/tasks";
+import { ObjectiveTask, QuickCheckMC, WritingTask, ParaphraseCoach, AskQuestionButton, ParagraphWithNotes, WritingPracticeWithHistory, IntegratedParaphraseTask, StrategyPracticeTask } from "@/components/tasks";
 import { StudentLoginReminder } from "@/components/StudentLoginReminder";
 import { LectureOutline, useSectionProgress, generateSectionId } from "@/features/lecture-mode";
 import type { AgendaSectionEnhanced } from "@/features/lecture-mode";
@@ -723,21 +723,19 @@ Remember to also save any written responses separately.
                   />
                 </div>
 
-                {/* AI Writing Task for Part 2 */}
+                {/* Strategy Practice with Multi-Select */}
                 <div className="space-y-3 pt-4 border-t">
                   <h4 className="font-medium text-sm flex items-center gap-2">
                     <Sparkles className="h-4 w-4 text-green-500" />
                     Strategy Practice
                   </h4>
                   <p className="text-xs text-muted-foreground">
-                    Paraphrase this sentence using at least 2 strategies. Then identify which strategies you used.
+                    Select the strategies you'll use, then write your paraphrase. The AI will verify if you applied them correctly.
                   </p>
-                  <div className="p-3 rounded-lg bg-muted/50 border text-sm italic">
-                    "Researchers collected data from 380 participants using a questionnaire." (Hong et al., 2022)
-                  </div>
-                  <WritingTaskWithFeedback
+                  <StrategyPracticeTask
                     taskId="w1h2-part2-strategy"
-                    placeholder="My paraphrase:&#10;[Write your paraphrase here with citation]&#10;&#10;Strategies used:&#10;• Strategy 1: [describe what you changed]&#10;• Strategy 2: [describe what you changed]"
+                    originalSentence="Researchers collected data from 380 participants using a questionnaire."
+                    citation="Hong et al., 2022"
                     onComplete={handleTaskComplete}
                     studentId={studentId}
                   />
