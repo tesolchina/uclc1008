@@ -274,55 +274,57 @@ export default function SettingsPage() {
         </p>
       </header>
 
-      {/* Unique ID Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <User className="h-4 w-4" />
-            Your Unique ID
-          </CardTitle>
-          <CardDescription>
-            This is <strong>not</strong> your student ID. Enter the unique anonymized ID assigned to you by your instructor, or create your own memorable code.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="studentId">Unique ID</Label>
-            <div className="flex gap-2">
-              <Input
-                id="studentId"
-                placeholder="e.g. bluefox42 or your assigned code"
-                value={studentId}
-                onChange={(e) => setStudentId(e.target.value)}
-                className="max-w-xs"
-              />
-              <Button 
-                onClick={handleSaveStudentId} 
-                disabled={isSavingId || !studentIdChanged}
-                variant={studentIdChanged ? "default" : "outline"}
-              >
-                {isSavingId ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Save'}
-              </Button>
+      {/* Unique ID Section - Only show for anonymous users */}
+      {!isAuthenticated && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <User className="h-4 w-4" />
+              Your Unique ID
+            </CardTitle>
+            <CardDescription>
+              This is <strong>not</strong> your student ID. Enter the unique anonymized ID assigned to you by your instructor, or create your own memorable code.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="studentId">Unique ID</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="studentId"
+                  placeholder="e.g. bluefox42 or your assigned code"
+                  value={studentId}
+                  onChange={(e) => setStudentId(e.target.value)}
+                  className="max-w-xs"
+                />
+                <Button 
+                  onClick={handleSaveStudentId} 
+                  disabled={isSavingId || !studentIdChanged}
+                  variant={studentIdChanged ? "default" : "outline"}
+                >
+                  {isSavingId ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Save'}
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Your progress and AI usage will be tracked under this ID. Keep it private and memorable.
+              </p>
+              {savedStudentId ? (
+                <p className="text-xs text-muted-foreground">
+                  Current ID: <span className="font-mono font-medium">{savedStudentId}</span>
+                </p>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  Don't have an ID yet?{' '}
+                  <a href="/auth" className="text-primary hover:underline font-medium">
+                    Sign up here
+                  </a>{' '}
+                  to get started.
+                </p>
+              )}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Your progress and AI usage will be tracked under this ID. Keep it private and memorable.
-            </p>
-            {savedStudentId ? (
-              <p className="text-xs text-muted-foreground">
-                Current ID: <span className="font-mono font-medium">{savedStudentId}</span>
-              </p>
-            ) : (
-              <p className="text-xs text-muted-foreground">
-                Don't have an ID yet?{' '}
-                <a href="/auth" className="text-primary hover:underline font-medium">
-                  Sign up here
-                </a>{' '}
-                to get started.
-              </p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {/* AI Status Section */}
       <Card>
@@ -346,7 +348,7 @@ export default function SettingsPage() {
             {hasHkbuKey ? (
               <>
                 <CheckCircle2 className="h-5 w-5 text-green-500" />
-                <div>
+                <div className="flex-1">
                   <p className="text-sm font-medium">HKBU API Key Active</p>
                   {maskedKey && (
                     <p className="text-xs text-muted-foreground font-mono">{maskedKey}</p>
@@ -357,13 +359,12 @@ export default function SettingsPage() {
                 </div>
                 {keySource === 'student' && (
                   <Button 
-                    variant="outline" 
+                    variant="destructive" 
                     size="sm" 
-                    className="ml-auto"
                     onClick={handleRevokeKey}
                     disabled={isRevoking}
                   >
-                    {isRevoking ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Remove'}
+                    {isRevoking ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Revoke Key'}
                   </Button>
                 )}
               </>
