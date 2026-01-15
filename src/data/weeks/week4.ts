@@ -9,16 +9,16 @@ import { lesson4_1, lesson4_2 } from "../lessons";
 export const week4: WeekData = {
   id: 4,
   title: "Week 4",
-  theme: "Synthesizing Skills & AWQ Structure",
+  theme: "Synthesizing Skills & Introduction to Argument",
   overview:
-    "Learn to synthesize information from multiple sources by identifying relationships between ideas. Master the 3-paragraph AWQ structure and practice connecting sources through comparison, contrast, and elaboration.",
+    "Learn to synthesize information from multiple sources by identifying relationships between ideas. Master the 3-paragraph AWQ structure and begin exploring argument construction fundamentals.",
   inClassActivities: [
     "Listing vs Synthesis: Why synthesis matters (Student A vs Student B comparison)",
     "Three Synthesis Relationships: Agreement, Contrast, Elaboration",
     "Using Connectives and Transitions for synthesis",
     "AWQ 3-Paragraph Structure: Introduction, Body, Conclusion",
     "Writing Thesis Statements that preview both sources",
-    "Sample AWQ Analysis: What makes an A-grade response?",
+    "Introduction to Argument Construction (topic to be updated)",
   ],
   learningOutcomes: [
     "Distinguish between listing (source-by-source) and true synthesis (idea-by-idea integration).",

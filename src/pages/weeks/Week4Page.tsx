@@ -4,20 +4,20 @@ import { WeekOverviewTemplate } from "./WeekOverviewTemplate";
 const classHours = [
   { 
     hour: 1, 
-    title: "Listing vs Synthesis", 
-    theme: "Why synthesis matters for AWQ success",
+    title: "Synthesizing Multiple Sources", 
+    theme: "Listing vs synthesis; agreement, contrast, elaboration",
     unitCount: 3
   },
   { 
     hour: 2, 
-    title: "Synthesis Relationships", 
-    theme: "Agreement, contrast, elaboration with connectives",
+    title: "AWQ Structure & Thesis Writing", 
+    theme: "3-paragraph model and sample analysis",
     unitCount: 4
   },
   { 
     hour: 3, 
-    title: "AWQ Structure & Practice", 
-    theme: "3-paragraph model and sample analysis",
+    title: "Introduction to Argument Construction", 
+    theme: "Topic to be updated",
     unitCount: 3
   },
 ];
