@@ -85,93 +85,107 @@ function WritingTaskWithFeedback({
     if (!text.trim()) return;
     
     setIsLoading(true);
+    setFeedback(null);
+    
     try {
-      const response = await supabase.functions.invoke("chat", {
-        body: {
+      const chatUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
+      
+      const resp = await fetch(chatUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
           messages: [
             {
               role: "user",
-              content: `You are a concise, critical academic writing tutor. Provide brief feedback (2-3 sentences max) on this student's micro-level outline attempt. Be direct about what's missing or incorrect, and give one specific improvement suggestion.
+              content: `You are a concise, critical academic writing tutor. Provide brief feedback (2-3 sentences max) on this student's response. Be direct about what's good and what could be improved.
 
 Student's response:
 ${text}
 
-Give critical but constructive feedback. Focus on: Did they correctly identify the topic sentence? Are supporting details specific? Is the structure clear?`
+Give critical but constructive feedback. Be specific and actionable.`
             }
           ],
           studentId: studentId || "anonymous",
           meta: {
-            weekTitle: "Week 1 Hour 1",
-            theme: "Outlining Practice",
-            aiPromptHint: "Be a critical but supportive tutor. Keep feedback to 2-3 sentences."
+            taskId,
+            type: "reflection-feedback"
           }
-        }
+        }),
       });
 
-      if (response.error) {
-        throw new Error(response.error.message || "Failed to get feedback");
+      if (!resp.ok) {
+        throw new Error(`AI request failed (${resp.status})`);
       }
 
-      // Handle streaming response
-      const reader = response.data?.getReader?.();
-      if (reader) {
-        let fullText = "";
-        const decoder = new TextDecoder();
-        
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          
-          const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split("\n");
-          
-          for (const line of lines) {
-            if (line.startsWith("data: ") && line !== "data: [DONE]") {
-              try {
-                const json = JSON.parse(line.slice(6));
-                const content = json.choices?.[0]?.delta?.content;
-                if (content) fullText += content;
-              } catch {}
+      if (!resp.body) {
+        throw new Error("AI stream unavailable");
+      }
+
+      // Stream the response
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let fullText = "";
+      let streamDone = false;
+
+      while (!streamDone) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        let newlineIndex: number;
+        while ((newlineIndex = buffer.indexOf("\n")) !== -1) {
+          let line = buffer.slice(0, newlineIndex);
+          buffer = buffer.slice(newlineIndex + 1);
+
+          if (line.endsWith("\r")) line = line.slice(0, -1);
+          if (line.startsWith(":") || line.trim() === "") continue;
+          if (!line.startsWith("data: ")) continue;
+
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === "[DONE]") {
+            streamDone = true;
+            break;
+          }
+
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed?.choices?.[0]?.delta?.content;
+            if (content) {
+              fullText += content;
+              setFeedback(fullText); // Update feedback progressively
             }
+          } catch {
+            // Incomplete JSON, put back in buffer
+            buffer = line + "\n" + buffer;
+            break;
           }
         }
-        
-        setFeedback(fullText);
-        
-        // Save response to database
-        if (studentId) {
-          await supabase.from("student_task_responses").insert({
-            student_id: studentId,
-            task_id: taskId,
-            response: text,
-            ai_feedback: fullText,
-            is_correct: null,
-          });
-        }
-      } else if (typeof response.data === "string") {
-        setFeedback(response.data);
-        
-        // Save response to database
-        if (studentId) {
-          await supabase.from("student_task_responses").insert({
-            student_id: studentId,
-            task_id: taskId,
-            response: text,
-            ai_feedback: response.data,
-            is_correct: null,
-          });
-        }
       }
-      
+
+      // Save to database
+      if (studentId && fullText) {
+        await supabase.from("student_task_responses").insert({
+          student_id: studentId,
+          question_key: taskId,
+          response: text,
+          ai_feedback: fullText,
+          is_correct: null,
+        });
+      }
+
       onComplete(taskId);
     } catch (err) {
       console.error("AI feedback error:", err);
       toast({
         title: "Feedback unavailable",
-        description: "Could not get AI feedback. Your work has been saved locally.",
+        description: "Could not get AI feedback. Please try again.",
         variant: "destructive"
       });
-      onComplete(taskId);
     } finally {
       setIsLoading(false);
     }
