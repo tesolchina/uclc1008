@@ -15,15 +15,22 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { LogIn, LogOut, GraduationCap, BookOpen, Settings, Shield, RefreshCw } from 'lucide-react';
+import { LogIn, LogOut, GraduationCap, BookOpen, Settings, Shield, RefreshCw, UserCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { generateTeacherStudentId } from '@/components/teacher/TeacherStudentModeSwitch';
+import { toast } from 'sonner';
 
 export function UserMenu() {
   const { 
     user, profile, studentId, isAuthenticated, isLoading,
-    userRoles, activeRole, setActiveRole, signOut
+    userRoles, activeRole, setActiveRole, signOut,
+    loginAsStudent, logoutStudent
   } = useAuth();
   const navigate = useNavigate();
+
+  // Generate teacher's student ID for student mode
+  const teacherStudentId = user?.id ? generateTeacherStudentId(user.id) : null;
+  const isInStudentMode = !!studentId && studentId === teacherStudentId;
 
   if (isLoading) {
     return (
@@ -53,10 +60,21 @@ export function UserMenu() {
     navigate('/');
   };
 
+  const handleToggleStudentMode = () => {
+    if (!teacherStudentId) return;
+    
+    if (isInStudentMode) {
+      logoutStudent();
+      toast.success('Switched back to teacher mode');
+    } else {
+      loginAsStudent(teacherStudentId);
+      toast.success('Switched to student mode - your progress will be tracked separately');
+    }
+  };
+
   // Check if user has multiple roles
   const hasMultipleRoles = userRoles.length > 1;
-  const isTeacherRole = activeRole === 'teacher' || activeRole === 'admin';
-  const isAdminRole = activeRole === 'admin';
+  const isTeacherOrAdmin = activeRole === 'teacher' || activeRole === 'admin';
 
   const getRoleIcon = (role: string) => {
     switch (role) {
@@ -82,6 +100,21 @@ export function UserMenu() {
     }
   };
 
+  // Determine display role (show student mode if active)
+  const displayRole = isInStudentMode ? 'student-mode' : activeRole;
+  const getDisplayRoleLabel = () => {
+    if (isInStudentMode) return 'Student Mode';
+    return getRoleLabel(activeRole);
+  };
+  const getDisplayRoleColor = () => {
+    if (isInStudentMode) return 'border-amber-500 text-amber-600';
+    return getRoleColor(activeRole);
+  };
+  const getDisplayRoleIcon = () => {
+    if (isInStudentMode) return <UserCircle className="h-3 w-3" />;
+    return getRoleIcon(activeRole);
+  };
+
   return (
     <div className="flex items-center gap-2">
       {/* Show Student ID badge for students */}
@@ -91,11 +124,11 @@ export function UserMenu() {
         </Badge>
       )}
       
-      {/* Show active role badge for users with multiple roles */}
-      {hasMultipleRoles && (
-        <Badge variant="outline" className={`text-xs hidden sm:flex gap-1 ${getRoleColor(activeRole)}`}>
-          {getRoleIcon(activeRole)}
-          {getRoleLabel(activeRole)}
+      {/* Show active role badge for users with multiple roles or in student mode */}
+      {(hasMultipleRoles || isInStudentMode) && (
+        <Badge variant="outline" className={`text-xs hidden sm:flex gap-1 ${getDisplayRoleColor()}`}>
+          {getDisplayRoleIcon()}
+          {getDisplayRoleLabel()}
         </Badge>
       )}
       
@@ -115,6 +148,11 @@ export function UserMenu() {
               <p className="text-sm font-medium leading-none">
                 {displayName || 'User'}
               </p>
+              {isInStudentMode && teacherStudentId && (
+                <p className="text-xs font-mono text-amber-600">
+                  {teacherStudentId}
+                </p>
+              )}
               {!user && studentId && (
                 <p className="text-xs font-mono text-primary/80">
                   {studentId}
@@ -127,11 +165,11 @@ export function UserMenu() {
               {/* Current role badge */}
               <Badge 
                 variant="outline" 
-                className={`mt-1.5 w-fit gap-1 ${getRoleColor(activeRole)}`}
+                className={`mt-1.5 w-fit gap-1 ${getDisplayRoleColor()}`}
               >
-                {getRoleIcon(activeRole)}
-                {getRoleLabel(activeRole)}
-                {hasMultipleRoles && (
+                {getDisplayRoleIcon()}
+                {getDisplayRoleLabel()}
+                {hasMultipleRoles && !isInStudentMode && (
                   <span className="text-muted-foreground ml-1">
                     ({userRoles.length} roles)
                   </span>
@@ -142,8 +180,8 @@ export function UserMenu() {
           
           <DropdownMenuSeparator />
           
-          {/* Role Switcher for users with multiple roles */}
-          {hasMultipleRoles && (
+          {/* Role Switcher for users with multiple roles OR teachers/admins who can use student mode */}
+          {(hasMultipleRoles || isTeacherOrAdmin) && (
             <>
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
@@ -151,7 +189,17 @@ export function UserMenu() {
                   Switch Role
                 </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent>
-                  <DropdownMenuRadioGroup value={activeRole} onValueChange={(v) => setActiveRole(v as 'admin' | 'teacher' | 'student')}>
+                  <DropdownMenuRadioGroup 
+                    value={isInStudentMode ? 'student-mode' : activeRole} 
+                    onValueChange={(v) => {
+                      if (v === 'student-mode') {
+                        if (!isInStudentMode) handleToggleStudentMode();
+                      } else {
+                        if (isInStudentMode) logoutStudent();
+                        setActiveRole(v as 'admin' | 'teacher' | 'student');
+                      }
+                    }}
+                  >
                     {userRoles.includes('admin') && (
                       <DropdownMenuRadioItem value="admin" className="gap-2">
                         <Shield className="h-4 w-4 text-purple-600" />
@@ -163,6 +211,20 @@ export function UserMenu() {
                         <GraduationCap className="h-4 w-4 text-blue-600" />
                         Teacher
                       </DropdownMenuRadioItem>
+                    )}
+                    {isTeacherOrAdmin && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuRadioItem value="student-mode" className="gap-2">
+                          <UserCircle className="h-4 w-4 text-amber-600" />
+                          <div className="flex flex-col">
+                            <span>Student Mode</span>
+                            <span className="text-xs text-muted-foreground font-mono">
+                              {teacherStudentId}
+                            </span>
+                          </div>
+                        </DropdownMenuRadioItem>
+                      </>
                     )}
                   </DropdownMenuRadioGroup>
                 </DropdownMenuSubContent>
