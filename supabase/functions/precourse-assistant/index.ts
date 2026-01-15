@@ -47,7 +47,10 @@ Andrejevic & Selwyn (2020). Facial recognition technology in schools: critical q
 7. You CAN encourage students and remind them about deadlines
 8. You CAN explain APA citation format with the article's author names
 9. If asked to help write, politely decline and remind them about academic integrity
-10. Always be encouraging but firm about not doing their work for them`;
+10. Always be encouraging but firm about not doing their work for them
+11. Keep your answers CONCISE and to the point - aim for 2-4 short sentences unless more detail is genuinely needed
+12. Use bullet points or numbered lists when explaining multiple items
+13. Avoid unnecessary preambles - get straight to answering the question`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
