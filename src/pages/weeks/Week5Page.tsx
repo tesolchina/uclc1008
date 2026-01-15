@@ -4,15 +4,15 @@ import { WeekOverviewTemplate } from "./WeekOverviewTemplate";
 const classHours = [
   { 
     hour: 1, 
-    title: "AWQ Structure Review", 
-    theme: "3-paragraph model: Introduction, Body, Conclusion",
+    title: "Argument Construction", 
+    theme: "Building claims, evidence, and warrants (topic to be updated)",
     unitCount: 3
   },
   { 
     hour: 2, 
-    title: "Timed Practice", 
-    theme: "Speed strategies and time management",
-    unitCount: 2
+    title: "Argument Evaluation", 
+    theme: "Assessing argument strength and validity (topic to be updated)",
+    unitCount: 3
   },
   { 
     hour: 3, 

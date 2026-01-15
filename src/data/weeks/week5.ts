@@ -9,14 +9,14 @@ import { lesson5_1, lesson5_2 } from "../lessons";
 export const week5: WeekData = {
   id: 5,
   title: "Week 5",
-  theme: "Academic Writing Quiz (AWQ) Preparation",
+  theme: "Argument Construction & Evaluation / AWQ",
   overview:
-    "Consolidate your skills in analyzing journal article excerpts and structuring a synthetic summary in preparation for the Academic Writing Quiz.",
+    "Develop skills in constructing and evaluating arguments using claims, evidence, and warrants. Complete the Academic Writing Quiz assessment.",
   inClassActivities: [
-    "AWQ Study Guide Part 1: How to Read and Select Main Ideas",
-    "AWQ Study Guide Part 2: How to Structure Your Summary",
-    "Practice: Analyzing Article A and Article B excerpts",
-    "Writing Drill: Drafting a thesis statement and body paragraph synthesis",
+    "Argument Construction: Claims, Evidence, and Warrants (topic to be updated)",
+    "Evaluating Argument Strength and Validity (topic to be updated)",
+    "Identifying Logical Fallacies (topic to be updated)",
+    "Academic Writing Quiz (AWQ) - 15% Assessment",
   ],
   learningOutcomes: [
     "Predict an author's stance from article titles and abstracts.",
