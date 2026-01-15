@@ -10,6 +10,7 @@ import type { ConceptOption } from "@/components/tasks";
 import { StudentLoginReminder } from "@/components/StudentLoginReminder";
 import { LectureOutline, useSectionProgress, generateSectionId } from "@/features/lecture-mode";
 import type { AgendaSectionEnhanced } from "@/features/lecture-mode";
+import { TeacherQuestionDashboard } from "@/components/teacher/TeacherQuestionDashboard";
 import { ArrowLeft, ArrowRight, Clock, Target, BookOpen, PenLine, CheckCircle2, Lightbulb, FileText, Sparkles, ExternalLink, AlertCircle, Calendar, GraduationCap, ScrollText, ChevronDown, Download, LogIn, Loader2, Trophy } from "lucide-react";
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -510,6 +511,9 @@ Remember to also save any written responses separately.
           </Button>
           <AskQuestionButton weekNumber={weekNumber} hourNumber={hourNumber} />
         </div>
+
+        {/* Teacher Dashboard - Hidden by default, for teachers only */}
+        <TeacherQuestionDashboard weekNumber={weekNumber} hourNumber={hourNumber} />
 
         {/* Hero Section */}
         <section className="rounded-xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border p-6">
