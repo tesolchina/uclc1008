@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, ClipboardEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,8 +6,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { AlertCircle, ArrowLeft, KeyRound, LogIn } from 'lucide-react';
-import { validateStudentIdFormat } from '../utils/studentId';
-import { AUTH_ERROR_MESSAGES } from '../constants';
+import { validateStudentIdFormat, getStoredStudentId } from '../utils/studentId';
+import { AUTH_ERROR_MESSAGES, STORAGE_KEYS } from '../constants';
 import { useAuth } from '../context/AuthContext';
 
 interface StudentLoginFormProps {
@@ -24,8 +24,45 @@ export function StudentLoginForm({ onBack, onSwitchToRegister }: StudentLoginFor
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
+  const digitsRef = useRef<HTMLInputElement>(null);
   const initialsRef = useRef<HTMLInputElement>(null);
   const suffixRef = useRef<HTMLInputElement>(null);
+
+  // Load previously stored student ID on mount
+  useEffect(() => {
+    const storedId = getStoredStudentId();
+    if (storedId) {
+      parseAndFillId(storedId);
+    }
+  }, []);
+
+  // Parse a full ID string (e.g., "1234-AB-7X") and fill the fields
+  const parseAndFillId = (fullId: string) => {
+    // Remove dashes and spaces, uppercase
+    const cleaned = fullId.replace(/[-\s]/g, '').toUpperCase();
+    
+    if (cleaned.length >= 8) {
+      // Expected format: 4 digits + 2 letters + 2 alphanumeric
+      const digitsMatch = cleaned.slice(0, 4).replace(/\D/g, '');
+      const initialsMatch = cleaned.slice(4, 6).replace(/[^A-Z]/g, '');
+      const suffixMatch = cleaned.slice(6, 8).replace(/[^A-Z0-9]/g, '');
+      
+      if (digitsMatch.length === 4) setDigits(digitsMatch);
+      if (initialsMatch.length === 2) setInitials(initialsMatch);
+      if (suffixMatch.length === 2) setSuffix(suffixMatch);
+    }
+  };
+
+  // Handle paste event to auto-fill all fields
+  const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
+    const pastedText = e.clipboardData.getData('text');
+    
+    // Check if it looks like a full student ID (contains dash or is 8+ chars)
+    if (pastedText.includes('-') || pastedText.replace(/\s/g, '').length >= 8) {
+      e.preventDefault();
+      parseAndFillId(pastedText);
+    }
+  };
 
   const handleDigitsChange = (value: string) => {
     const cleaned = value.replace(/\D/g, '').slice(0, 4);
@@ -125,10 +162,12 @@ export function StudentLoginForm({ onBack, onSwitchToRegister }: StudentLoginFor
             <div className="flex items-center justify-center gap-2">
               {/* 4 digits */}
               <Input
+                ref={digitsRef}
                 type="text"
                 inputMode="numeric"
                 value={digits}
                 onChange={(e) => handleDigitsChange(e.target.value)}
+                onPaste={handlePaste}
                 className="text-center text-2xl tracking-wider font-mono h-14 w-24"
                 placeholder="1234"
                 maxLength={4}
@@ -141,6 +180,7 @@ export function StudentLoginForm({ onBack, onSwitchToRegister }: StudentLoginFor
                 type="text"
                 value={initials}
                 onChange={(e) => handleInitialsChange(e.target.value)}
+                onPaste={handlePaste}
                 className="text-center text-2xl tracking-wider font-mono h-14 w-16 uppercase"
                 placeholder="JD"
                 maxLength={2}
@@ -152,6 +192,7 @@ export function StudentLoginForm({ onBack, onSwitchToRegister }: StudentLoginFor
                 type="text"
                 value={suffix}
                 onChange={(e) => handleSuffixChange(e.target.value)}
+                onPaste={handlePaste}
                 className="text-center text-2xl tracking-wider font-mono h-14 w-16 uppercase"
                 placeholder="7X"
                 maxLength={2}

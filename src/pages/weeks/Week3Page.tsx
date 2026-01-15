@@ -4,20 +4,20 @@ import { WeekOverviewTemplate } from "./WeekOverviewTemplate";
 const classHours = [
   { 
     hour: 1, 
-    title: "Paraphrasing vs Summarizing", 
-    theme: "Understanding the difference and when to use each skill",
+    title: "The Art of Summarising", 
+    theme: "Claims vs Evidence, Neutrality, The 'Delete' Method",
     unitCount: 3
   },
   { 
     hour: 2, 
-    title: "5 Paraphrasing Strategies", 
-    theme: "Synonyms, word forms, voice, structure, combining",
+    title: "Synthesis & Outlining", 
+    theme: "Combining sources thematically, The Synthesis Grid",
     unitCount: 4
   },
   { 
     hour: 3, 
-    title: "Summarizing from Abstracts", 
-    theme: "The Slasher Method: claims vs evidence",
+    title: "AWQ Structure Prep", 
+    theme: "3-Part Structure, Thesis Statements, Topic Sentences",
     unitCount: 3
   },
 ];
