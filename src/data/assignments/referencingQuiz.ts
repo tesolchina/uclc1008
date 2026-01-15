@@ -15,8 +15,8 @@ export const referencingQuiz: Assignment = {
   ],
   skillsAssessed: ["citation-recognition", "apa-referencing", "secondary-citations"],
   resources: [
-    { title: "Video 1: Citing Journal Articles in APA 7th Style", url: "https://www.youtube.com/watch?v=JpT1YwNcV04" },
-    { title: "Video 2: Citing Secondary Sources in APA 7th Style", url: "https://www.youtube.com/watch?v=qB6eFDNyz0E" },
+    { title: "Video 1: Citing Journal Articles in APA 7th Style (link coming soon)", url: "#" },
+    { title: "Video 2: Citing Secondary Sources in APA 7th Style (link coming soon)", url: "#" },
   ],
   detailedInfo: {
     exactDueDate: "30 January 2026, 6:00 PM",
