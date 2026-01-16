@@ -441,7 +441,6 @@ function TeacherLabView() {
 // ============ STUDENT VIEW ============
 function StudentLabView() {
   const { toast } = useToast();
-  const [sessionCode, setSessionCode] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [currentTask, setCurrentTask] = useState<LabTask | null>(null);
   const [response, setResponse] = useState('');
@@ -449,6 +448,15 @@ function StudentLabView() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [spotlight, setSpotlight] = useState<SpotlightResponse | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
+  const [liveSessions, setLiveSessions] = useState<Array<{
+    id: string;
+    session_code: string;
+    title: string | null;
+    status: string;
+    created_at: string;
+  }>>([]);
+  const [isLoadingSessions, setIsLoadingSessions] = useState(true);
+  const [joiningSessionId, setJoiningSessionId] = useState<string | null>(null);
 
   // Get student identifier
   const studentId = localStorage.getItem('studentIdentifier') || 
@@ -470,12 +478,28 @@ function StudentLabView() {
     dismissPrompt,
   } = useStudentSession(studentId);
 
-  // Handle URL code parameter
+  // Fetch live sessions
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get('code');
-    if (code && !session) {
-      setSessionCode(code.toUpperCase());
+    const fetchSessions = async () => {
+      setIsLoadingSessions(true);
+      const { data, error } = await supabase
+        .from('live_sessions')
+        .select('id, session_code, title, status, created_at')
+        .in('status', ['waiting', 'active', 'paused'])
+        .eq('session_type', 'lab-space')
+        .order('created_at', { ascending: false });
+      
+      if (!error && data) {
+        setLiveSessions(data);
+      }
+      setIsLoadingSessions(false);
+    };
+
+    if (!session) {
+      fetchSessions();
+      // Refresh every 5 seconds
+      const interval = setInterval(fetchSessions, 5000);
+      return () => clearInterval(interval);
     }
   }, [session]);
 
@@ -526,12 +550,10 @@ function StudentLabView() {
     return () => clearInterval(timer);
   }, [timeRemaining]);
 
-  const handleJoin = async () => {
-    if (sessionCode.length !== 6) {
-      toast({ title: 'Enter a valid 6-character code', variant: 'destructive' });
-      return;
-    }
-    await joinSession(sessionCode, displayName || undefined);
+  const handleJoinSession = async (sessionToJoin: typeof liveSessions[0]) => {
+    setJoiningSessionId(sessionToJoin.id);
+    await joinSession(sessionToJoin.session_code, displayName || undefined);
+    setJoiningSessionId(null);
   };
 
   const handleSubmit = async () => {
@@ -570,51 +592,91 @@ function StudentLabView() {
     );
   }
 
-  // Not joined yet
+  // Not joined yet - show list of live sessions
   if (!session) {
     return (
-      <div className="max-w-md mx-auto py-12">
+      <div className="max-w-xl mx-auto py-8 space-y-6">
+        {/* Display name input */}
         <Card>
-          <CardHeader className="text-center">
-            <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4">
-              <Users className="h-8 w-8 text-primary" />
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <div className="flex-1 space-y-1">
+                <label className="text-sm font-medium">Your Display Name</label>
+                <Input
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  placeholder="How should you appear? (optional)"
+                />
+              </div>
             </div>
-            <CardTitle className="text-2xl">Join Lab Session</CardTitle>
-            <CardDescription>
-              Enter the session code from your teacher
-            </CardDescription>
+          </CardContent>
+        </Card>
+
+        {/* Live sessions list */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Radio className="h-5 w-5 text-primary animate-pulse" />
+                  Live Sessions
+                </CardTitle>
+                <CardDescription>
+                  Join an active session from your teacher
+                </CardDescription>
+              </div>
+              {isLoadingSessions && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+            </div>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Session Code</label>
-              <Input
-                value={sessionCode}
-                onChange={(e) => setSessionCode(e.target.value.toUpperCase())}
-                placeholder="ABC123"
-                className="font-mono text-2xl tracking-[0.5em] text-center h-14"
-                maxLength={6}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Your Name (optional)</label>
-              <Input
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                placeholder="How should you appear?"
-              />
-            </div>
-            <Button 
-              onClick={handleJoin}
-              disabled={sessionCode.length !== 6 || isJoining}
-              className="w-full h-12"
-              size="lg"
-            >
-              {isJoining ? (
-                <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Joining...</>
-              ) : (
-                'Join Session'
-              )}
-            </Button>
+          <CardContent>
+            {isLoadingSessions && liveSessions.length === 0 ? (
+              <div className="py-8 text-center">
+                <Loader2 className="h-6 w-6 animate-spin mx-auto text-primary mb-3" />
+                <p className="text-muted-foreground">Looking for live sessions...</p>
+              </div>
+            ) : liveSessions.length === 0 ? (
+              <div className="py-8 text-center">
+                <Radio className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
+                <h3 className="font-medium mb-1">No Live Sessions</h3>
+                <p className="text-muted-foreground text-sm">
+                  Ask your teacher to start a session.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {liveSessions.map((s) => (
+                  <div 
+                    key={s.id}
+                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                  >
+                    <div className="space-y-1">
+                      <h3 className="font-semibold">{s.title || 'Lab Session'}</h3>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Badge 
+                          variant={s.status === 'active' ? 'default' : s.status === 'waiting' ? 'secondary' : 'outline'}
+                          className="text-xs"
+                        >
+                          {s.status === 'waiting' ? 'Starting soon' : s.status}
+                        </Badge>
+                        <span className="text-muted-foreground">
+                          Started {new Date(s.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                    </div>
+                    <Button 
+                      onClick={() => handleJoinSession(s)}
+                      disabled={isJoining || joiningSessionId === s.id}
+                    >
+                      {joiningSessionId === s.id ? (
+                        <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Joining...</>
+                      ) : (
+                        'Join'
+                      )}
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
