@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { StudentTaskProgress } from "@/components/student/StudentTaskProgress";
 import { 
   BookOpen, 
@@ -19,9 +20,21 @@ import {
   ArrowRight,
   FileText,
   Download,
-  PenLine
+  PenLine,
+  Sparkles,
+  ChevronDown
 } from "lucide-react";
 import { getWeekHours } from "@/data/hourContent";
+
+interface AiChatHistory {
+  id: string;
+  assignment_key: string;
+  context_type: string | null;
+  week_number: number | null;
+  hour_number: number | null;
+  messages: unknown; // JSON type from database
+  updated_at: string;
+}
 
 interface StudentQuestion {
   id: string;
@@ -65,6 +78,8 @@ export default function StudentDashboard() {
   const [responses, setResponses] = useState<TaskResponse[]>([]);
   const [writingDrafts, setWritingDrafts] = useState<WritingDraft[]>([]);
   const [paragraphNotes, setParagraphNotes] = useState<ParagraphNote[]>([]);
+  const [aiChats, setAiChats] = useState<AiChatHistory[]>([]);
+  const [expandedChats, setExpandedChats] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -73,6 +88,7 @@ export default function StudentDashboard() {
     setResponses([]);
     setWritingDrafts([]);
     setParagraphNotes([]);
+    setAiChats([]);
     setLoading(true);
 
     const fetchData = async () => {
@@ -83,7 +99,7 @@ export default function StudentDashboard() {
 
       try {
         // Fetch all data in parallel
-        const [questionsRes, responsesRes, draftsRes, notesRes] = await Promise.all([
+        const [questionsRes, responsesRes, draftsRes, notesRes, chatsRes] = await Promise.all([
           supabase
             .from("student_questions")
             .select("*")
@@ -102,13 +118,19 @@ export default function StudentDashboard() {
           supabase
             .from("paragraph_notes")
             .select("*")
+            .eq("student_id", studentId),
+          supabase
+            .from("assignment_chat_history")
+            .select("*")
             .eq("student_id", studentId)
+            .order("updated_at", { ascending: false })
         ]);
 
         if (questionsRes.data) setQuestions(questionsRes.data);
         if (responsesRes.data) setResponses(responsesRes.data);
         if (draftsRes.data) setWritingDrafts(draftsRes.data as WritingDraft[]);
         if (notesRes.data) setParagraphNotes(notesRes.data as ParagraphNote[]);
+        if (chatsRes.data) setAiChats(chatsRes.data as AiChatHistory[]);
       } catch (err) {
         console.error("Error fetching data:", err);
       } finally {
@@ -271,6 +293,10 @@ export default function StudentDashboard() {
           <TabsTrigger value="responses" className="gap-1">
             <BookOpen className="h-4 w-4" />
             MC Responses
+          </TabsTrigger>
+          <TabsTrigger value="ai-chats" className="gap-1">
+            <Sparkles className="h-4 w-4" />
+            AI Chats
           </TabsTrigger>
         </TabsList>
 
@@ -532,6 +558,82 @@ export default function StudentDashboard() {
                         </div>
                       )}
                     </div>
+                    );
+                  })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* AI Chats Tab */}
+        <TabsContent value="ai-chats" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-primary" />
+                My AI Tutor Conversations
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {aiChats.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Sparkles className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p>No AI conversations yet.</p>
+                  <p className="text-xs mt-1">Chat with the AI tutor during lessons to see your history here.</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {aiChats.map(chat => {
+                    const messages = Array.isArray(chat.messages) ? chat.messages as { role: string; content: string }[] : [];
+                    const isExpanded = expandedChats.has(chat.id);
+                    const toggleExpand = () => {
+                      setExpandedChats(prev => {
+                        const newSet = new Set(prev);
+                        if (newSet.has(chat.id)) {
+                          newSet.delete(chat.id);
+                        } else {
+                          newSet.add(chat.id);
+                        }
+                        return newSet;
+                      });
+                    };
+
+                    return (
+                      <Collapsible key={chat.id} open={isExpanded} onOpenChange={toggleExpand}>
+                        <div className="p-3 rounded-lg border space-y-2">
+                          <CollapsibleTrigger className="w-full">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="space-y-1 text-left">
+                                <p className="text-sm font-medium flex items-center gap-2">
+                                  {chat.context_type === 'lesson' && chat.week_number && chat.hour_number
+                                    ? `Week ${chat.week_number} Hour ${chat.hour_number} Tutor`
+                                    : chat.assignment_key}
+                                  <ChevronDown className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {messages.length} messages • {new Date(chat.updated_at).toLocaleString()}
+                                </p>
+                              </div>
+                              <Badge variant="secondary" className="text-xs shrink-0">
+                                {chat.context_type || 'chat'}
+                              </Badge>
+                            </div>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent>
+                            <div className="mt-3 space-y-2 pt-3 border-t">
+                              {messages.map((msg, idx) => (
+                                <div key={idx} className={`p-2 rounded text-sm ${msg.role === 'user' ? 'bg-primary/10' : 'bg-muted/50'}`}>
+                                  <p className="text-xs font-medium text-muted-foreground mb-1">
+                                    {msg.role === 'user' ? 'You' : 'AI Tutor'}
+                                  </p>
+                                  <p className="whitespace-pre-wrap">{msg.content}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </CollapsibleContent>
+                        </div>
+                      </Collapsible>
                     );
                   })}
                 </div>

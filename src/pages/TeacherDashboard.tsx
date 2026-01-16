@@ -99,6 +99,17 @@ interface TaskFeedback {
   created_at: string;
 }
 
+interface AiChatHistory {
+  id: string;
+  student_id: string;
+  assignment_key: string;
+  context_type: string | null;
+  week_number: number | null;
+  hour_number: number | null;
+  messages: unknown;
+  updated_at: string;
+}
+
 interface WeekProgressData {
   week: number;
   completed: number;
@@ -132,6 +143,7 @@ export default function TeacherDashboard() {
   const [paragraphNotes, setParagraphNotes] = useState<ParagraphNote[]>([]);
   const [teacherNotes, setTeacherNotes] = useState<TeacherStudentNote[]>([]);
   const [taskFeedback, setTaskFeedback] = useState<TaskFeedback[]>([]);
+  const [aiChats, setAiChats] = useState<AiChatHistory[]>([]);
   const [loading, setLoading] = useState(true);
   const [responding, setResponding] = useState<string | null>(null);
   const [responseText, setResponseText] = useState<Record<string, string>>({});
@@ -174,7 +186,7 @@ export default function TeacherDashboard() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [questionsRes, responsesRes, draftsRes, notesRes, teacherNotesRes, feedbackRes, studentsRes] = await Promise.all([
+      const [questionsRes, responsesRes, draftsRes, notesRes, teacherNotesRes, feedbackRes, studentsRes, chatsRes] = await Promise.all([
         supabase
           .from("student_questions")
           .select("*")
@@ -204,7 +216,12 @@ export default function TeacherDashboard() {
           .order("created_at", { ascending: false }),
         supabase
           .from("students")
-          .select("student_id, section_number")
+          .select("student_id, section_number"),
+        supabase
+          .from("assignment_chat_history")
+          .select("*")
+          .order("updated_at", { ascending: false })
+          .limit(500)
       ]);
 
       if (questionsRes.error) throw questionsRes.error;
@@ -215,6 +232,7 @@ export default function TeacherDashboard() {
       setTeacherNotes(teacherNotesRes.data || []);
       setTaskFeedback(feedbackRes.data || []);
       setStudentRecords(studentsRes.data || []);
+      setAiChats((chatsRes.data || []) as AiChatHistory[]);
     } catch (err) {
       console.error("Error fetching data:", err);
       toast.error("Failed to load data");

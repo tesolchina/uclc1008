@@ -11,6 +11,7 @@ import { StudentLoginReminder } from "@/components/StudentLoginReminder";
 import { LectureOutline, useSectionProgress, generateSectionId } from "@/features/lecture-mode";
 import type { AgendaSectionEnhanced } from "@/features/lecture-mode";
 import { TeacherQuestionDashboard } from "@/components/teacher/TeacherQuestionDashboard";
+import { Hour3PracticeSession } from "@/components/lessons/Hour3PracticeSession";
 import { ArrowLeft, ArrowRight, Clock, Target, BookOpen, PenLine, CheckCircle2, Lightbulb, FileText, Sparkles, ExternalLink, AlertCircle, Calendar, GraduationCap, ScrollText, ChevronDown, Download, LogIn, Loader2, Trophy } from "lucide-react";
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -1091,6 +1092,15 @@ Provide focused feedback (4-5 sentences):
           </section>
         )}
 
+        {/* Week 1 Hour 3: AI-Tutored Practice Session */}
+        {weekNumber === 1 && hourNumber === 3 && (
+          <Hour3PracticeSession
+            weekNumber={weekNumber}
+            studentId={studentId || "anonymous"}
+            onComplete={() => handleTaskComplete("w1h3-practice-complete")}
+          />
+        )}
+
         {/* Week 1 Hour 1: Restructured Course Introduction */}
         {weekNumber === 1 && hourNumber === 1 && (
           <section className="space-y-6">
@@ -1637,7 +1647,8 @@ Provide focused feedback (4-5 sentences):
 
 
         {/* Key Concepts - hide for Week 1 Hour 1 & 2 (custom content) */}
-        {!(weekNumber === 1 && (hourNumber === 1 || hourNumber === 2)) && hourData.keyConcepts && hourData.keyConcepts.length > 0 && (
+        {/* Key Concepts - hide for Week 1 all hours (custom content) */}
+        {!(weekNumber === 1 && (hourNumber === 1 || hourNumber === 2 || hourNumber === 3)) && hourData.keyConcepts && hourData.keyConcepts.length > 0 && (
           <CollapsibleSection
             title="Key Concepts"
             description="Essential terms and ideas for this hour"
@@ -1667,8 +1678,8 @@ Provide focused feedback (4-5 sentences):
           </CollapsibleSection>
         )}
 
-        {/* Article Excerpts - hide for Week 1 Hour 1 & 2 (custom content) */}
-        {!(weekNumber === 1 && (hourNumber === 1 || hourNumber === 2)) && hourData.articles && hourData.articles.length > 0 && (
+        {/* Article Excerpts - hide for Week 1 all hours (custom content) */}
+        {!(weekNumber === 1 && (hourNumber === 1 || hourNumber === 2 || hourNumber === 3)) && hourData.articles && hourData.articles.length > 0 && (
           <CollapsibleSection
             title="Article Excerpts"
             description="Source materials for this hour"
@@ -1708,8 +1719,8 @@ Provide focused feedback (4-5 sentences):
           </CollapsibleSection>
         )}
 
-        {/* Objective Tasks - hide for Week 1 Hour 1 & 2 (custom content) */}
-        {!(weekNumber === 1 && (hourNumber === 1 || hourNumber === 2)) && objectiveTasks.length > 0 && (
+        {/* Objective Tasks - hide for Week 1 all hours (custom content) */}
+        {!(weekNumber === 1 && (hourNumber === 1 || hourNumber === 2 || hourNumber === 3)) && objectiveTasks.length > 0 && (
           <CollapsibleSection
             title="Quick Check Tasks"
             description="Multiple choice, true/false, and fill-in-the-blank with instant feedback"
@@ -1737,8 +1748,8 @@ Provide focused feedback (4-5 sentences):
           </CollapsibleSection>
         )}
 
-        {/* Writing Tasks - hide for Week 1 Hour 1 & 2 (custom content) */}
-        {!(weekNumber === 1 && (hourNumber === 1 || hourNumber === 2)) && writingTasks.length > 0 && (
+        {/* Writing Tasks - hide for Week 1 all hours (custom content) */}
+        {!(weekNumber === 1 && (hourNumber === 1 || hourNumber === 2 || hourNumber === 3)) && writingTasks.length > 0 && (
           <CollapsibleSection
             title="Writing Tasks"
             description="Practice academic writing with AI feedback"
@@ -1763,8 +1774,8 @@ Provide focused feedback (4-5 sentences):
           </CollapsibleSection>
         )}
 
-        {/* Main Writing Task - hide for Week 1 Hour 1 & 2 (custom content) */}
-        {!(weekNumber === 1 && (hourNumber === 1 || hourNumber === 2)) && hourData.writingTask && (
+        {/* Main Writing Task - hide for Week 1 all hours (custom content) */}
+        {!(weekNumber === 1 && (hourNumber === 1 || hourNumber === 2 || hourNumber === 3)) && hourData.writingTask && (
           <CollapsibleSection
             title="Hour Writing Task"
             description="The main writing practice for this hour"
