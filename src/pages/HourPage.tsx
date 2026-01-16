@@ -1798,12 +1798,12 @@ Provide focused feedback (4-5 sentences):
         {/* Week 2 Hour 1: APA In-Text Citations */}
         {weekNumber === 2 && hourNumber === 1 && (
           <section className="space-y-6">
-            {/* Part 1: Citation Basics */}
+            {/* Part 1: Citation Basics with Integrated Practice */}
             <CollapsibleSection
               title="Part 1: Citation Basics - Author vs. Information Prominent"
-              description="Learn the two main ways to cite sources in your writing"
+              description="Learn the two main ways to cite sources and practice identifying them"
               icon={<BookOpen className="h-4 w-4 text-blue-600" />}
-              defaultOpen={false}
+              defaultOpen={true}
               className="border-2 border-blue-500/30 bg-blue-500/5"
             >
               <div className="space-y-4">
@@ -1832,13 +1832,20 @@ Provide focused feedback (4-5 sentences):
                   </div>
                 </div>
 
-                {/* AWQ Context */}
-                <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
-                  <p className="text-sm font-medium text-amber-700 mb-1">🎯 For the AWQ:</p>
-                  <p className="text-xs text-muted-foreground">
-                    Use <strong>Author-Prominent citations</strong> when synthesizing viewpoints from different authors. 
-                    This makes it clear whose ideas you're discussing.
-                  </p>
+                {/* Reading Passage */}
+                <div className="p-4 rounded-lg border bg-muted/30 space-y-3">
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-blue-500" />
+                    Read & Analyze
+                  </h4>
+                  <div className="p-3 bg-background rounded-lg text-sm leading-relaxed">
+                    <p className="mb-2">
+                      "The use of facial recognition technology in educational settings has increased dramatically. <span className="bg-blue-200/50 px-1 rounded">According to Andrejevic and Selwyn (2020)</span>, schools are among the public spaces where this technology is being implemented at scale. <span className="bg-green-200/50 px-1 rounded">This trend is particularly notable in the US, where security concerns have driven widespread adoption (Doffman, 2018)</span>."
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      <span className="bg-blue-200/50 px-1 rounded">Blue</span> = Author-Prominent | <span className="bg-green-200/50 px-1 rounded">Green</span> = Info-Prominent
+                    </p>
+                  </div>
                 </div>
 
                 {/* MC Questions */}
@@ -1874,13 +1881,34 @@ Provide focused feedback (4-5 sentences):
                     explanation="The authors' names are part of the sentence itself with year in brackets. This is Author-Prominent, emphasizing WHO is making the argument."
                   />
                 </div>
+
+                {/* Writing Task */}
+                <div className="space-y-3 pt-4 border-t">
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-amber-500" />
+                    Writing Practice: Convert Citation Styles
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    Convert this Info-Prominent citation to Author-Prominent. Keep the meaning the same but emphasize WHO said it:
+                  </p>
+                  <div className="p-3 rounded-lg bg-muted/50 text-sm">
+                    <strong>Original (Info-Prominent):</strong> "FRT is now commonly used for campus security (Doffman, 2018)."
+                  </div>
+                  <WritingPracticeWithHistory
+                    taskKey="w2h1-citation-convert-1"
+                    studentId={studentId || "anonymous"}
+                    title="Convert to Author-Prominent"
+                    instructions="Rewrite this sentence using Author-Prominent citation. The author's name should be part of the sentence, with the year in parentheses."
+                    placeholder="Doffman (2018) ..."
+                  />
+                </div>
               </div>
             </CollapsibleSection>
 
-            {/* Part 2: APA 7th Formatting Rules */}
+            {/* Part 2: APA 7th Formatting Rules with Integrated Practice */}
             <CollapsibleSection
               title="Part 2: APA 7th Formatting Rules"
-              description="Master the 'and' vs '&' rule and 'et al.' for multiple authors"
+              description="Master 'and' vs '&' and 'et al.' with hands-on practice"
               icon={<FileText className="h-4 w-4 text-green-600" />}
               defaultOpen={false}
               className="border-2 border-green-500/30 bg-green-500/5"
@@ -1914,10 +1942,7 @@ Provide focused feedback (4-5 sentences):
                     <strong>et al.</strong> = Latin for "and others". Use for sources with 3 or more authors.
                   </p>
                   <div className="p-3 rounded-lg border bg-muted/30">
-                    <p className="text-sm text-muted-foreground">
-                      <strong>First author + et al.</strong> from the very first citation:
-                    </p>
-                    <ul className="text-sm mt-2 space-y-1">
+                    <ul className="text-sm space-y-1">
                       <li>✅ <span className="italic">"Hong et al. (2022) found..."</span></li>
                       <li>✅ <span className="italic">"...parental support (Hong et al., 2022)."</span></li>
                       <li>❌ <span className="italic line-through">"Hong, Li, Kuo, and An (2022)..."</span></li>
@@ -1925,35 +1950,23 @@ Provide focused feedback (4-5 sentences):
                   </div>
                 </div>
 
-                {/* Number of Authors Summary */}
-                <div className="p-4 rounded-lg border bg-gradient-to-r from-blue-500/5 to-purple-500/5">
-                  <h4 className="font-medium text-sm mb-3">Quick Reference: How to Cite by Number of Authors</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-start gap-2">
-                      <Badge variant="outline" className="shrink-0">1 Author</Badge>
-                      <span className="text-muted-foreground">Smith (2020) OR (Smith, 2020)</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Badge variant="outline" className="shrink-0">2 Authors</Badge>
-                      <span className="text-muted-foreground">Smith and Jones (2020) OR (Smith & Jones, 2020)</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Badge variant="outline" className="shrink-0">3+ Authors</Badge>
-                      <span className="text-muted-foreground">Smith et al. (2020) OR (Smith et al., 2020)</span>
-                    </div>
+                {/* Reading Passage with Errors */}
+                <div className="p-4 rounded-lg border bg-red-500/5 border-red-500/30 space-y-3">
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4 text-red-500" />
+                    Spot the Errors
+                  </h4>
+                  <p className="text-xs text-muted-foreground">Read this passage and identify the citation formatting errors:</p>
+                  <div className="p-3 bg-background rounded-lg text-sm leading-relaxed">
+                    "According to Andrejevic & Selwyn (2020), FRT raises concerns. Their research shows that schools are adopting this technology rapidly (Andrejevic and Selwyn, 2020). Hong, Li, Kuo, and An (2022) also found similar patterns."
                   </div>
                 </div>
 
                 {/* MC Questions */}
                 <div className="space-y-3 pt-2">
-                  <h4 className="font-medium text-sm flex items-center gap-2">
-                    <Target className="h-4 w-4 text-green-500" />
-                    Quick Check
-                  </h4>
-
                   <QuickCheckMC
                     questionNumber={3}
-                    question="Which is the CORRECT APA 7th citation for a source by Hong, Li, Kuo, and An (2022) INSIDE parentheses?"
+                    question="Which is the CORRECT APA 7th citation for Hong, Li, Kuo, and An (2022) INSIDE parentheses?"
                     options={[
                       { label: "A", text: "(Hong, Li, Kuo and An, 2022)" },
                       { label: "B", text: "(Hong et al., 2022)" },
@@ -1961,42 +1974,50 @@ Provide focused feedback (4-5 sentences):
                       { label: "D", text: "(Hong, 2022)" },
                     ]}
                     correctAnswer="B"
-                    explanation="With 3+ authors, always use 'et al.' from the first citation. Full names are never listed in-text (only in the reference list)."
+                    explanation="With 3+ authors, always use 'et al.' from the first citation. Full names are never listed in-text."
                   />
 
                   <QuickCheckMC
                     questionNumber={4}
-                    question="Which sentence has CORRECT APA 7th formatting?"
+                    question="What's WRONG in this sentence?\n\n'According to Andrejevic & Selwyn (2020), schools are adopting FRT.'"
                     options={[
-                      { label: "A", text: "According to Andrejevic & Selwyn (2020), schools are adopting FRT." },
-                      { label: "B", text: "According to Andrejevic and Selwyn (2020), schools are adopting FRT." },
-                      { label: "C", text: "According to Andrejevic and Selwyn, 2020, schools are adopting FRT." },
-                      { label: "D", text: "According to (Andrejevic and Selwyn, 2020), schools are adopting FRT." },
+                      { label: "A", text: "Nothing - this is correct" },
+                      { label: "B", text: "Should use 'and' instead of '&' since it's in the sentence" },
+                      { label: "C", text: "Missing comma after 'Selwyn'" },
+                      { label: "D", text: "Year should come before names" },
                     ]}
                     correctAnswer="B"
-                    explanation="In the sentence, use 'and' (not &). The year goes in parentheses directly after the names. Option A incorrectly uses '&' outside parentheses."
+                    explanation="In the sentence, use 'and'. The ampersand (&) is ONLY used inside parentheses."
                   />
+                </div>
 
-                  <QuickCheckMC
-                    questionNumber={5}
-                    question="What's wrong with this citation?\n\n'The research (Hong, et al., 2022) supports...'"
-                    options={[
-                      { label: "A", text: "Nothing - this is correct APA format" },
-                      { label: "B", text: "The comma after 'Hong' is wrong" },
-                      { label: "C", text: "'et al.' should be capitalized" },
-                      { label: "D", text: "The year should come before 'et al.'" },
-                    ]}
-                    correctAnswer="B"
-                    explanation="In APA 7th, there is NO comma between the first author's name and 'et al.' Correct: (Hong et al., 2022)"
+                {/* Writing Task */}
+                <div className="space-y-3 pt-4 border-t">
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-amber-500" />
+                    Writing Practice: Fix the Citations
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    Rewrite this paragraph correcting ALL the APA 7th citation errors:
+                  </p>
+                  <div className="p-3 rounded-lg bg-muted/50 text-sm">
+                    <strong>Original (with errors):</strong> "According to Andrejevic & Selwyn (2020), FRT is concerning. Hong, Li, Kuo, and An (2022) support this view."
+                  </div>
+                  <WritingPracticeWithHistory
+                    taskKey="w2h1-fix-citations"
+                    studentId={studentId || "anonymous"}
+                    title="Fix the Citations"
+                    instructions="Rewrite this paragraph with correct APA 7th formatting. Remember: 'and' in sentences, '&' in parentheses, and 'et al.' for 3+ authors."
+                    placeholder="According to Andrejevic and Selwyn (2020), ..."
                   />
                 </div>
               </div>
             </CollapsibleSection>
 
-            {/* Part 3: Secondary Citations */}
+            {/* Part 3: Secondary Citations with Integrated Practice */}
             <CollapsibleSection
               title="Part 3: Secondary Citations"
-              description="Learn when and how to cite a source you found in another source"
+              description="Learn when and how to cite sources found within other sources"
               icon={<ScrollText className="h-4 w-4 text-purple-600" />}
               defaultOpen={false}
               className="border-2 border-purple-500/30 bg-purple-500/5"
@@ -2008,125 +2029,143 @@ Provide focused feedback (4-5 sentences):
                     What is a Secondary Citation?
                   </h4>
                   <p className="text-sm text-muted-foreground">
-                    A <strong>secondary citation</strong> is when you cite a source that you found mentioned in another source, 
-                    but haven't read the original yourself.
+                    A <strong>secondary citation</strong> is when you cite a source mentioned in another source 
+                    that you haven't read directly.
                   </p>
                   <div className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/30">
-                    <p className="text-sm font-medium text-purple-700 mb-2">Example:</p>
+                    <p className="text-sm font-medium text-purple-700 mb-2">Format:</p>
                     <p className="text-sm text-muted-foreground">
-                      You're reading Hong et al. (2022), and they mention research by Doffman (2018). 
-                      You want to use Doffman's statistic, but you haven't read Doffman's original paper.
+                      (Original Author, Year, as cited in Source You Read, Year)
                     </p>
                   </div>
                 </div>
 
+                {/* Reading Passage */}
                 <div className="p-4 rounded-lg border bg-muted/30 space-y-3">
-                  <h4 className="font-medium text-sm">How to Format Secondary Citations</h4>
-                  <div className="space-y-2">
-                    <div className="p-3 rounded-lg bg-background">
-                      <p className="text-xs font-medium text-purple-700 mb-1">In-Text:</p>
-                      <p className="text-sm italic">"Schools spend $2.7 billion annually (Doffman, 2018, as cited in Hong et al., 2022)."</p>
-                    </div>
-                    <div className="p-3 rounded-lg bg-background">
-                      <p className="text-xs font-medium text-green-700 mb-1">Reference List:</p>
-                      <p className="text-sm text-muted-foreground">Only list the source you <strong>actually read</strong> (Hong et al., 2022), NOT Doffman.</p>
-                    </div>
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-purple-500" />
+                    Read & Analyze
+                  </h4>
+                  <div className="p-3 bg-background rounded-lg text-sm leading-relaxed">
+                    <p>
+                      "In the excerpt from Andrejevic and Selwyn (2020), they mention research by Puthea et al. (2017) about attendance monitoring. 
+                      You haven't read Puthea's original paper, but you want to use this information."
+                    </p>
+                    <p className="mt-2 p-2 bg-purple-500/10 rounded">
+                      <strong>Correct citation:</strong> Attendance monitoring promises efficiency gains (Puthea et al., 2017, as cited in Andrejevic & Selwyn, 2020).
+                    </p>
                   </div>
                 </div>
 
-                <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
-                  <p className="text-sm font-medium text-amber-700 mb-1">⚠️ Important Note:</p>
-                  <p className="text-xs text-muted-foreground">
-                    For the AWQ, you're given the articles directly, so you typically won't need secondary citations. 
-                    But it's important to know this for future academic writing!
-                  </p>
-                </div>
+                {/* MC Question */}
+                <QuickCheckMC
+                  questionNumber={5}
+                  question="You read Hong et al. (2022), and they mention a study by Doffman (2018). You haven't read Doffman's paper. How should you cite Doffman's statistic?"
+                  options={[
+                    { label: "A", text: "(Doffman, 2018)" },
+                    { label: "B", text: "(Hong et al., 2022)" },
+                    { label: "C", text: "(Doffman, 2018, as cited in Hong et al., 2022)" },
+                    { label: "D", text: "(Hong et al., 2022, citing Doffman, 2018)" },
+                  ]}
+                  correctAnswer="C"
+                  explanation="Use 'as cited in' to show you found Doffman's work through Hong et al. The original author comes first, then 'as cited in' the source you actually read."
+                />
 
-                <div className="space-y-3 pt-2">
-                  <QuickCheckMC
-                    questionNumber={6}
-                    question="You're reading Article A by Hong et al. (2022). They cite a statistic from Doffman (2018). You want to use this statistic. What do you write?"
-                    options={[
-                      { label: "A", text: "(Doffman, 2018)" },
-                      { label: "B", text: "(Hong et al., 2022; Doffman, 2018)" },
-                      { label: "C", text: "(Doffman, 2018, as cited in Hong et al., 2022)" },
-                      { label: "D", text: "(as cited in Doffman, 2018, Hong et al., 2022)" },
-                    ]}
-                    correctAnswer="C"
-                    explanation="Use 'as cited in' to show you found Doffman's work THROUGH Hong et al. The original author comes first, then 'as cited in' the source you read."
+                {/* Writing Task */}
+                <div className="space-y-3 pt-4 border-t">
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-amber-500" />
+                    Writing Practice: Secondary Citation
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    Write a sentence using this information with a proper secondary citation:
+                  </p>
+                  <div className="p-3 rounded-lg bg-muted/50 text-sm space-y-2">
+                    <p><strong>Information:</strong> "US schools spend $2.7 billion annually on campus security."</p>
+                    <p><strong>Original source:</strong> Doffman (2018) - you haven't read this</p>
+                    <p><strong>Found in:</strong> Andrejevic & Selwyn (2020) - the article you read</p>
+                  </div>
+                  <WritingPracticeWithHistory
+                    taskKey="w2h1-secondary-citation"
+                    studentId={studentId || "anonymous"}
+                    title="Write with Secondary Citation"
+                    instructions="Write a complete sentence using this statistic with the proper secondary citation format. You can use either author-prominent or info-prominent style."
+                    placeholder="According to Doffman (2018, as cited in ..."
                   />
                 </div>
               </div>
             </CollapsibleSection>
 
-            {/* Part 4: Practice */}
+            {/* Part 4: Integrated Citation Practice */}
             <CollapsibleSection
-              title="Part 4: Citation Practice"
-              description="Apply what you've learned by fixing citation errors"
-              icon={<Sparkles className="h-4 w-4 text-amber-600" />}
+              title="Part 4: Integrated Citation Practice"
+              description="Apply all citation skills to a realistic academic paragraph"
+              icon={<Trophy className="h-4 w-4 text-amber-600" />}
               defaultOpen={false}
               className="border-2 border-amber-500/30 bg-amber-500/5"
             >
               <div className="space-y-4">
+                {/* Scenario */}
                 <div className="p-4 rounded-lg bg-background/80 space-y-3">
                   <h4 className="font-medium flex items-center gap-2">
-                    <AlertCircle className="h-4 w-4 text-red-500" />
-                    Common Citation Errors to Avoid
+                    <Target className="h-4 w-4 text-amber-500" />
+                    Your Task
                   </h4>
-                  <ul className="text-sm space-y-2 text-muted-foreground">
-                    <li>❌ Using "&" outside parentheses</li>
-                    <li>❌ Comma before "et al."</li>
-                    <li>❌ Forgetting the period after "al."</li>
-                    <li>❌ Missing year or wrong punctuation</li>
-                  </ul>
+                  <p className="text-sm text-muted-foreground">
+                    You're writing about FRT in schools for your Pre-course Writing. Use the sources below to write a properly cited paragraph.
+                  </p>
                 </div>
 
-                <div className="space-y-3">
-                  <QuickCheckMC
-                    questionNumber={7}
-                    question="Fix this citation: 'Hong, et al (2022) found that parents support FRT.'"
-                    options={[
-                      { label: "A", text: "Hong et al. (2022) found that parents support FRT." },
-                      { label: "B", text: "Hong, et al. (2022) found that parents support FRT." },
-                      { label: "C", text: "Hong et al (2022) found that parents support FRT." },
-                      { label: "D", text: "(Hong et al., 2022) found that parents support FRT." },
-                    ]}
-                    correctAnswer="A"
-                    explanation="Remove the comma after 'Hong' and add a period after 'al' (it's an abbreviation of 'alia'). Correct: Hong et al. (2022)"
-                  />
-
-                  <QuickCheckMC
-                    questionNumber={8}
-                    question="Which sentence correctly uses Author-Prominent citation with two authors?"
-                    options={[
-                      { label: "A", text: "Andrejevic & Selwyn (2020) argue that FRT is concerning." },
-                      { label: "B", text: "Andrejevic and Selwyn (2020) argue that FRT is concerning." },
-                      { label: "C", text: "(Andrejevic and Selwyn, 2020) argue that FRT is concerning." },
-                      { label: "D", text: "Andrejevic, Selwyn (2020) argue that FRT is concerning." },
-                    ]}
-                    correctAnswer="B"
-                    explanation="Author-Prominent puts the authors IN the sentence, so use 'and' (not &). The year follows in parentheses."
-                  />
+                {/* Available Sources */}
+                <div className="p-4 rounded-lg border bg-muted/30 space-y-3">
+                  <h4 className="font-medium text-sm">Available Sources:</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="p-2 bg-background rounded">
+                      <p className="font-medium text-xs text-blue-600">Source 1 (2 authors, you read this):</p>
+                      <p className="text-muted-foreground">Andrejevic & Selwyn (2020) - FRT is being implemented in schools for security and monitoring</p>
+                    </div>
+                    <div className="p-2 bg-background rounded">
+                      <p className="font-medium text-xs text-green-600">Source 2 (4 authors, you read this):</p>
+                      <p className="text-muted-foreground">Hong, Li, Kuo & An (2022) - Parents in China support FRT in elementary schools</p>
+                    </div>
+                    <div className="p-2 bg-background rounded">
+                      <p className="font-medium text-xs text-purple-600">Source 3 (mentioned in Andrejevic & Selwyn, not read directly):</p>
+                      <p className="text-muted-foreground">Doffman (2018) - US schools spend $2.7 billion on security annually</p>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Writing Practice */}
+                {/* Quick Check */}
+                <QuickCheckMC
+                  questionNumber={6}
+                  question="If you want to emphasize WHAT Hong et al. found (not who said it), which format should you use?"
+                  options={[
+                    { label: "A", text: "Hong et al. (2022) found that parents support FRT." },
+                    { label: "B", text: "Parents support FRT in schools (Hong et al., 2022)." },
+                    { label: "C", text: "According to Hong et al., parents support FRT (2022)." },
+                    { label: "D", text: "Hong, Li, Kuo, and An (2022) report parental support." },
+                  ]}
+                  correctAnswer="B"
+                  explanation="Info-Prominent (parenthetical) citation emphasizes the information, not the author. The author appears in parentheses at the end."
+                />
+
+                {/* Final Writing Task */}
                 <div className="space-y-3 pt-4 border-t">
                   <h4 className="font-medium text-sm flex items-center gap-2">
                     <Sparkles className="h-4 w-4 text-amber-500" />
-                    Writing Practice
+                    Integrated Writing Practice
                   </h4>
                   <p className="text-xs text-muted-foreground">
-                    Rewrite this sentence using the correct APA 7th citation format:
+                    Write a short paragraph (3-4 sentences) discussing FRT in schools. Use ALL THREE sources with correct APA 7th citations. 
+                    Include at least one author-prominent citation and one secondary citation.
                   </p>
-                  <div className="p-3 rounded-lg bg-muted/50 text-sm">
-                    <strong>Original (incorrect):</strong> "According to the research by Hong & Li & Kuo & An from 2022, Chinese parents support FRT in schools."
-                  </div>
                   <WritingPracticeWithHistory
-                    taskKey="w2h1-citation-practice"
+                    taskKey="w2h1-integrated-paragraph"
                     studentId={studentId || "anonymous"}
-                    title="Citation Practice"
-                    instructions="Rewrite this sentence with correct APA 7th citation format. Use 'Hong et al. (2022)' since there are 4 authors."
-                    placeholder="According to Hong et al. (2022), ..."
+                    title="Write Your Paragraph"
+                    instructions="Write a 3-4 sentence paragraph about FRT in schools using all three sources. Include: (1) at least one author-prominent citation, (2) at least one info-prominent citation, (3) the secondary citation for Doffman."
+                    placeholder="Facial recognition technology is increasingly being adopted in educational settings..."
+                    exampleFormat="Tips:&#10;• For 2 authors: Andrejevic and Selwyn (2020) OR (Andrejevic & Selwyn, 2020)&#10;• For 4 authors: Hong et al. (2022)&#10;• Secondary: (Doffman, 2018, as cited in Andrejevic & Selwyn, 2020)"
                   />
                 </div>
               </div>
@@ -2137,12 +2176,12 @@ Provide focused feedback (4-5 sentences):
         {/* Week 2 Hour 2: Paraphrasing Strategies (Core) */}
         {weekNumber === 2 && hourNumber === 2 && (
           <section className="space-y-6">
-            {/* Part 1: Synonym Replacement */}
+            {/* Part 1: Synonym Replacement with Integrated Practice */}
             <CollapsibleSection
               title="Part 1: Synonym Replacement"
-              description="Replace words with similar meanings while maintaining context"
+              description="Replace words with similar meanings and practice with AI feedback"
               icon={<BookOpen className="h-4 w-4 text-blue-600" />}
-              defaultOpen={false}
+              defaultOpen={true}
               className="border-2 border-blue-500/30 bg-blue-500/5"
             >
               <div className="space-y-4">
@@ -2194,6 +2233,7 @@ Provide focused feedback (4-5 sentences):
                   </div>
                 </div>
 
+                {/* MC Questions */}
                 <div className="space-y-3 pt-2">
                   <QuickCheckMC
                     questionNumber={1}
@@ -2205,29 +2245,37 @@ Provide focused feedback (4-5 sentences):
                       { label: "D", text: "checked out" },
                     ]}
                     correctAnswer="B"
-                    explanation="'Investigated' is the most appropriate academic synonym. 'Looked at' and 'checked out' are too informal for academic writing."
+                    explanation="'Investigated' is the most appropriate academic synonym. 'Looked at' and 'checked out' are too informal."
                   />
+                </div>
 
-                  <QuickCheckMC
-                    questionNumber={2}
-                    question="Which is the BEST synonym replacement for 'contends' in: 'This article contends that FRT is problematic.'?"
-                    options={[
-                      { label: "A", text: "fights" },
-                      { label: "B", text: "argues" },
-                      { label: "C", text: "says" },
-                      { label: "D", text: "talks about" },
-                    ]}
-                    correctAnswer="B"
-                    explanation="'Argues' maintains the same strength and academic tone as 'contends'. 'Fights' is too strong/physical, while 'says' is too weak."
+                {/* Writing Task */}
+                <div className="space-y-3 pt-4 border-t">
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-amber-500" />
+                    Writing Practice: Synonym Replacement
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    Rewrite this sentence using ONLY synonym replacement (keep the same structure). Replace at least 3 words with academic synonyms:
+                  </p>
+                  <div className="p-3 rounded-lg bg-muted/50 text-sm">
+                    <strong>Original:</strong> "The study examined how schools use technology for security purposes."
+                  </div>
+                  <WritingPracticeWithHistory
+                    taskKey="w2h2-synonym-practice"
+                    studentId={studentId || "anonymous"}
+                    title="Synonym Replacement Practice"
+                    instructions="Replace at least 3 words with appropriate academic synonyms. Keep the sentence structure the same. Think: examined→?, use→?, purposes→?"
+                    placeholder="The research investigated how schools utilize technology for security..."
                   />
                 </div>
               </div>
             </CollapsibleSection>
 
-            {/* Part 2: Changing Word Forms */}
+            {/* Part 2: Changing Word Forms with Integrated Practice */}
             <CollapsibleSection
               title="Part 2: Changing Word Forms"
-              description="Transform verbs to nouns, adjectives to adverbs, and more"
+              description="Transform verbs to nouns, adjectives to adverbs, and practice"
               icon={<PenLine className="h-4 w-4 text-green-600" />}
               defaultOpen={false}
               className="border-2 border-green-500/30 bg-green-500/5"
@@ -2256,7 +2304,7 @@ Provide focused feedback (4-5 sentences):
                     </p>
                   </div>
                   <div className="p-4 rounded-lg border bg-muted/30 space-y-2">
-                    <p className="text-sm font-medium">Adverb → Noun</p>
+                    <p className="text-sm font-medium">Adverb → Adjective/Noun</p>
                     <p className="text-sm text-muted-foreground">
                       <strong>Original:</strong> "Parents <span className="text-red-500">anxiously</span> viewed the technology."
                     </p>
@@ -2278,34 +2326,50 @@ Provide focused feedback (4-5 sentences):
                       <Badge variant="outline">Adj → Noun</Badge>
                       <span className="text-muted-foreground">significant → significance, important → importance</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline">Adv → Adj</Badge>
-                      <span className="text-muted-foreground">significantly → significant, anxiously → anxious</span>
-                    </div>
                   </div>
                 </div>
 
-                <div className="space-y-3 pt-2">
-                  <QuickCheckMC
-                    questionNumber={3}
-                    question="Which paraphrasing strategy was used here?\n\nOriginal: 'The technology significantly impacts education.'\nParaphrase: 'The significant impact of technology on education...'"
-                    options={[
-                      { label: "A", text: "Synonym replacement" },
-                      { label: "B", text: "Word form change (verb → noun, adverb → adjective)" },
-                      { label: "C", text: "Active to passive voice" },
-                      { label: "D", text: "Combining sentences" },
-                    ]}
-                    correctAnswer="B"
-                    explanation="'impacts' (verb) → 'impact' (noun), 'significantly' (adverb) → 'significant' (adjective). Word form changes naturally alter sentence structure!"
+                {/* MC Question */}
+                <QuickCheckMC
+                  questionNumber={2}
+                  question="Which paraphrasing strategy was used here?\n\nOriginal: 'The technology significantly impacts education.'\nParaphrase: 'The significant impact of technology on education...'"
+                  options={[
+                    { label: "A", text: "Synonym replacement" },
+                    { label: "B", text: "Word form change (verb → noun, adverb → adjective)" },
+                    { label: "C", text: "Active to passive voice" },
+                    { label: "D", text: "Combining sentences" },
+                  ]}
+                  correctAnswer="B"
+                  explanation="'impacts' (verb) → 'impact' (noun), 'significantly' (adverb) → 'significant' (adjective)."
+                />
+
+                {/* Writing Task */}
+                <div className="space-y-3 pt-4 border-t">
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-amber-500" />
+                    Writing Practice: Word Form Changes
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    Rewrite this sentence by changing the word forms. Convert the verb to a noun and restructure accordingly:
+                  </p>
+                  <div className="p-3 rounded-lg bg-muted/50 text-sm">
+                    <strong>Original:</strong> "The researchers <span className="underline">investigated</span> how parents <span className="underline">respond</span> to FRT." (Hong et al., 2022)
+                  </div>
+                  <WritingPracticeWithHistory
+                    taskKey="w2h2-wordform-practice"
+                    studentId={studentId || "anonymous"}
+                    title="Word Form Change Practice"
+                    instructions="Change 'investigated' to 'investigation' and 'respond' to 'response'. You'll need to restructure the sentence. Include the citation."
+                    placeholder="The investigation by Hong et al. (2022) focused on parental response to..."
                   />
                 </div>
               </div>
             </CollapsibleSection>
 
-            {/* Part 3: Active/Passive Voice */}
+            {/* Part 3: Active/Passive Voice with Integrated Practice */}
             <CollapsibleSection
               title="Part 3: Active ↔ Passive Voice"
-              description="Switch between active and passive voice to restructure sentences"
+              description="Switch between active and passive voice with hands-on practice"
               icon={<ScrollText className="h-4 w-4 text-purple-600" />}
               defaultOpen={false}
               className="border-2 border-purple-500/30 bg-purple-500/5"
@@ -2333,71 +2397,79 @@ Provide focused feedback (4-5 sentences):
                 <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
                   <p className="text-sm font-medium text-amber-700 mb-1">💡 Academic Writing Tip:</p>
                   <p className="text-xs text-muted-foreground">
-                    Passive voice is common in academic writing, especially when the focus should be on the action or result rather than who did it.
+                    Passive voice is common in academic writing when the focus should be on the action or result rather than who did it.
                   </p>
                 </div>
 
-                <div className="space-y-3 pt-2">
-                  <QuickCheckMC
-                    questionNumber={4}
-                    question="Which paraphrasing strategy was used here?\n\nOriginal: 'Researchers collected data from participants.'\nParaphrase: 'Data was gathered from participants by the researchers.'"
-                    options={[
-                      { label: "A", text: "Synonym replacement only" },
-                      { label: "B", text: "Word form change" },
-                      { label: "C", text: "Active to passive voice (plus synonym)" },
-                      { label: "D", text: "Sentence structure change only" },
-                    ]}
-                    correctAnswer="C"
-                    explanation="The sentence changed from ACTIVE voice ('Researchers collected') to PASSIVE voice ('Data was collected by researchers'). Also used synonym: collected → gathered."
+                {/* MC Question */}
+                <QuickCheckMC
+                  questionNumber={3}
+                  question="Which paraphrasing strategy was used here?\n\nOriginal: 'Researchers collected data from participants.'\nParaphrase: 'Data was gathered from participants by the researchers.'"
+                  options={[
+                    { label: "A", text: "Synonym replacement only" },
+                    { label: "B", text: "Word form change" },
+                    { label: "C", text: "Active to passive voice (plus synonym)" },
+                    { label: "D", text: "Sentence structure change only" },
+                  ]}
+                  correctAnswer="C"
+                  explanation="Changed from ACTIVE ('Researchers collected') to PASSIVE ('Data was collected'). Also used synonym: collected → gathered."
+                />
+
+                {/* Writing Task */}
+                <div className="space-y-3 pt-4 border-t">
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-amber-500" />
+                    Writing Practice: Voice Change
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    Convert this active voice sentence to passive voice. You may also add synonyms:
+                  </p>
+                  <div className="p-3 rounded-lg bg-muted/50 text-sm">
+                    <strong>Original (Active):</strong> "Schools implement facial recognition systems to monitor students." (Andrejevic & Selwyn, 2020)
+                  </div>
+                  <WritingPracticeWithHistory
+                    taskKey="w2h2-voice-practice"
+                    studentId={studentId || "anonymous"}
+                    title="Voice Change Practice"
+                    instructions="Convert to PASSIVE voice: What is being done? By whom? Feel free to also use synonyms. Include the citation."
+                    placeholder="Facial recognition systems are implemented by schools to..."
                   />
                 </div>
               </div>
             </CollapsibleSection>
 
-            {/* Part 4: The "Too Close" Test */}
+            {/* Part 4: Integrated Paraphrasing Practice with Patchwriting Check */}
             <CollapsibleSection
-              title="Part 4: The 'Too Close' Test (Patchwriting)"
-              description="Learn to identify and avoid plagiarism through patchwriting"
-              icon={<AlertCircle className="h-4 w-4 text-red-600" />}
+              title="Part 4: Integrated Paraphrasing Practice"
+              description="Apply all strategies and learn to avoid patchwriting"
+              icon={<Trophy className="h-4 w-4 text-amber-600" />}
               defaultOpen={false}
-              className="border-2 border-red-500/30 bg-red-500/5"
+              className="border-2 border-amber-500/30 bg-amber-500/5"
             >
               <div className="space-y-4">
-                <div className="p-4 rounded-lg bg-background/80 space-y-3">
+                {/* Patchwriting Warning */}
+                <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/30 space-y-3">
                   <h4 className="font-medium flex items-center gap-2">
                     <AlertCircle className="h-4 w-4 text-red-500" />
                     What is Patchwriting?
                   </h4>
                   <p className="text-sm text-muted-foreground">
-                    <strong>Patchwriting</strong> is when you only replace a few words while keeping the original sentence structure. 
-                    This is considered <span className="text-red-600 font-medium">plagiarism</span> even with a citation!
+                    <strong>Patchwriting</strong> = replacing a few words while keeping the original structure. 
+                    This is <span className="text-red-600 font-medium">plagiarism</span> even with a citation!
                   </p>
-                </div>
-
-                {/* Examples */}
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="p-4 rounded-lg border border-red-500/30 bg-red-500/5 space-y-2">
-                    <p className="text-xs font-medium text-red-700">❌ PATCHWRITING (Too Close)</p>
-                    <p className="text-sm text-muted-foreground">
-                      <strong>Original:</strong> "Facial recognition technology is now being introduced across various aspects of public life."
-                    </p>
-                    <p className="text-sm text-muted-foreground italic mt-2">
-                      "Facial recognition tech is now being introduced in many parts of public life."
-                    </p>
-                    <p className="text-xs text-red-600">Structure identical, only 3 words changed!</p>
-                  </div>
-                  <div className="p-4 rounded-lg border border-green-500/30 bg-green-500/5 space-y-2">
-                    <p className="text-xs font-medium text-green-700">✅ GOOD PARAPHRASE</p>
-                    <p className="text-sm text-muted-foreground">
-                      <strong>Original:</strong> "Facial recognition technology is now being introduced across various aspects of public life."
-                    </p>
-                    <p className="text-sm text-muted-foreground italic mt-2">
-                      "The deployment of facial recognition systems is becoming common in public sectors."
-                    </p>
-                    <p className="text-xs text-green-600">Different structure, multiple techniques used.</p>
+                  <div className="grid md:grid-cols-2 gap-3">
+                    <div className="p-3 rounded bg-red-500/5 border border-red-500/20">
+                      <p className="text-xs font-medium text-red-700">❌ PATCHWRITING</p>
+                      <p className="text-xs text-muted-foreground mt-1">"FRT is now being introduced in many parts of public life."</p>
+                    </div>
+                    <div className="p-3 rounded bg-green-500/5 border border-green-500/20">
+                      <p className="text-xs font-medium text-green-700">✅ GOOD PARAPHRASE</p>
+                      <p className="text-xs text-muted-foreground mt-1">"The deployment of facial recognition systems is becoming common in public sectors."</p>
+                    </div>
                   </div>
                 </div>
 
+                {/* The Rule */}
                 <div className="p-4 rounded-lg border bg-gradient-to-r from-amber-500/5 to-green-500/5">
                   <h4 className="font-medium text-sm mb-2">🎯 The Rule of Thumb</h4>
                   <p className="text-sm text-muted-foreground">
@@ -2406,9 +2478,10 @@ Provide focused feedback (4-5 sentences):
                   </p>
                 </div>
 
-                <div className="space-y-3 pt-2">
+                {/* MC Questions */}
+                <div className="space-y-3">
                   <QuickCheckMC
-                    questionNumber={5}
+                    questionNumber={4}
                     question="Is this a good paraphrase or patchwriting?\n\nOriginal: 'Parents support the use of face recognition systems.'\nParaphrase: 'Parents support using face recognition in schools.'"
                     options={[
                       { label: "A", text: "Good paraphrase - different words used" },
@@ -2417,11 +2490,11 @@ Provide focused feedback (4-5 sentences):
                       { label: "D", text: "Good paraphrase - meaning preserved" },
                     ]}
                     correctAnswer="B"
-                    explanation="This is PATCHWRITING! The structure 'Parents support + [noun phrase]' is identical. Only 2-3 words changed. A good paraphrase would restructure the sentence entirely."
+                    explanation="PATCHWRITING! The structure 'Parents support + [noun phrase]' is identical. Only 2-3 words changed."
                   />
 
                   <QuickCheckMC
-                    questionNumber={6}
+                    questionNumber={5}
                     question="Which is the BEST paraphrase of: 'Parents support the use of face recognition systems in elementary schools.'?"
                     options={[
                       { label: "A", text: "Parents support using face recognition in elementary schools." },
@@ -2430,32 +2503,8 @@ Provide focused feedback (4-5 sentences):
                       { label: "D", text: "Parents like face recognition technology in schools." },
                     ]}
                     correctAnswer="C"
-                    explanation="Option C uses multiple strategies: synonyms (elementary→primary, face recognition→facial identification), word form changes (support→approval), AND restructured the sentence. Options A and B are patchwriting."
+                    explanation="Option C uses multiple strategies: synonyms (elementary→primary), word form changes (support→approval), AND restructured sentence."
                   />
-                </div>
-              </div>
-            </CollapsibleSection>
-
-            {/* Part 5: Integrated Practice */}
-            <CollapsibleSection
-              title="Part 5: Integrated Paraphrase Practice"
-              description="Apply all strategies to paraphrase academic sentences"
-              icon={<Sparkles className="h-4 w-4 text-amber-600" />}
-              defaultOpen={false}
-              className="border-2 border-amber-500/30 bg-amber-500/5"
-            >
-              <div className="space-y-4">
-                <div className="p-4 rounded-lg bg-background/80 space-y-3">
-                  <h4 className="font-medium flex items-center gap-2">
-                    <Target className="h-4 w-4 text-amber-500" />
-                    Paraphrase This Sentence
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    Use at least TWO paraphrasing strategies. Remember to include a citation!
-                  </p>
-                  <div className="p-3 rounded-lg bg-muted/50 text-sm font-medium">
-                    "Researchers collected data from 380 participants using a questionnaire." (Hong et al., 2022)
-                  </div>
                 </div>
 
                 {/* Strategy reminder */}
@@ -2474,26 +2523,61 @@ Provide focused feedback (4-5 sentences):
                   </div>
                 </div>
 
-                <StrategyPracticeTask
-                  taskId="w2h2-strategy-practice"
-                  originalSentence="Researchers collected data from 380 participants using a questionnaire."
-                  citation="Hong et al., 2022"
-                  onComplete={handleTaskComplete}
-                  studentId={studentId}
-                />
+                {/* Integrated Writing Practice */}
+                <div className="space-y-3 pt-4 border-t">
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-amber-500" />
+                    Integrated Paraphrasing Practice
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    Paraphrase this sentence using AT LEAST TWO strategies. The AI will check for meaning preservation and patchwriting:
+                  </p>
+                  <div className="p-3 rounded-lg bg-muted/50 text-sm font-medium">
+                    "Researchers collected data from 380 participants using a questionnaire." (Hong et al., 2022)
+                  </div>
+                  <StrategyPracticeTask
+                    taskId="w2h2-integrated-practice-1"
+                    originalSentence="Researchers collected data from 380 participants using a questionnaire."
+                    citation="Hong et al., 2022"
+                    onComplete={handleTaskComplete}
+                    studentId={studentId}
+                  />
+                </div>
 
-                {/* Second practice */}
-                <div className="pt-4 border-t space-y-3">
-                  <h4 className="font-medium text-sm">Practice 2: Another Sentence</h4>
+                {/* Second Practice */}
+                <div className="space-y-3 pt-4 border-t">
+                  <h4 className="font-medium text-sm">Practice 2: Longer Sentence</h4>
                   <div className="p-3 rounded-lg bg-muted/50 text-sm font-medium">
                     "Facial recognition technology is being used to monitor student engagement in classrooms." (Dewan et al., 2019)
                   </div>
                   <WritingPracticeWithHistory
-                    taskKey="w2h2-paraphrase-practice-2"
+                    taskKey="w2h2-integrated-practice-2"
                     studentId={studentId || "anonymous"}
-                    title="Paraphrase Practice"
-                    instructions="Paraphrase this sentence using at least TWO strategies (synonym replacement, word form change, voice change, or structure change). Include the citation (Dewan et al., 2019)."
-                    placeholder="Start your paraphrase here... (remember to cite!)"
+                    title="Integrated Paraphrase"
+                    instructions="Use at least TWO paraphrasing strategies. Remember: change BOTH words AND structure to avoid patchwriting. Include the citation."
+                    placeholder="Student engagement in classrooms is being monitored through the use of..."
+                  />
+                </div>
+
+                {/* Third Practice - Paragraph */}
+                <div className="space-y-3 pt-4 border-t">
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    <Target className="h-4 w-4 text-amber-500" />
+                    Challenge: Paraphrase a Full Passage
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    This is from the FRT article. Read carefully, then write your paraphrase using multiple strategies:
+                  </p>
+                  <div className="p-3 rounded-lg bg-muted/50 text-sm leading-relaxed">
+                    <strong>Original:</strong> "One prominent educational application of facial recognition technology is campus security. This form of facial recognition is most prevalent in the US, where school shooting incidents have prompted school authorities to annually spend $2.7 billion on campus security products and services." (Andrejevic & Selwyn, 2020)
+                  </div>
+                  <WritingPracticeWithHistory
+                    taskKey="w2h2-paragraph-paraphrase"
+                    studentId={studentId || "anonymous"}
+                    title="Paragraph Paraphrase"
+                    instructions="Paraphrase this entire passage (both sentences). Use multiple strategies across the text. Preserve ALL the key information including the statistic. Include proper citation."
+                    placeholder="Campus security represents a major use of facial recognition in education. In the United States, where..."
+                    exampleFormat="Tips for longer passages:&#10;• Keep all key information (the $2.7 billion statistic)&#10;• You can combine or split sentences&#10;• Use different strategies for different parts&#10;• End with citation (Andrejevic & Selwyn, 2020)"
                   />
                 </div>
               </div>
