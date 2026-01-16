@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
 
@@ -132,20 +133,91 @@ interface LessonAiTutorProps {
   weekTitle: string;
   theme: string;
   aiPromptHint: string;
+  weekNumber?: number;
+  hourNumber?: number;
+  contextKey?: string;
 }
 
-export const LessonAiTutor = ({ weekTitle, theme, aiPromptHint }: LessonAiTutorProps) => {
+export const LessonAiTutor = ({ 
+  weekTitle, 
+  theme, 
+  aiPromptHint,
+  weekNumber,
+  hourNumber,
+  contextKey 
+}: LessonAiTutorProps) => {
   const { toast } = useToast();
   const { accessToken, profile } = useAuth();
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Msg[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [historyLoaded, setHistoryLoaded] = useState(false);
   
   // API source tracking
   const [apiSource, setApiSource] = useState<"user" | "shared" | null>(null);
   const [usageInfo, setUsageInfo] = useState<{ used: number; limit: number } | null>(null);
 
   const studentId = profile?.hkbu_user_id || getBrowserSessionId();
+  const effectiveContextKey = contextKey || (weekNumber && hourNumber ? `w${weekNumber}h${hourNumber}-tutor` : null);
+
+  // Load existing chat history on mount
+  useEffect(() => {
+    const loadChatHistory = async () => {
+      if (!studentId || !effectiveContextKey) {
+        setHistoryLoaded(true);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from("assignment_chat_history")
+          .select("messages")
+          .eq("student_id", studentId)
+          .eq("assignment_key", effectiveContextKey)
+          .single();
+
+        if (data && !error) {
+          const loadedMessages = data.messages as Msg[];
+          if (Array.isArray(loadedMessages) && loadedMessages.length > 0) {
+            setMessages(loadedMessages);
+          }
+        }
+      } catch (err) {
+        console.error("Error loading chat history:", err);
+      } finally {
+        setHistoryLoaded(true);
+      }
+    };
+
+    loadChatHistory();
+  }, [studentId, effectiveContextKey]);
+
+  // Save chat history after each message exchange
+  const saveChatHistory = async (newMessages: Msg[]) => {
+    if (!studentId || !effectiveContextKey || newMessages.length === 0) return;
+
+    try {
+      const { error } = await supabase
+        .from("assignment_chat_history")
+        .upsert({
+          student_id: studentId,
+          assignment_key: effectiveContextKey,
+          context_type: 'lesson',
+          week_number: weekNumber || null,
+          hour_number: hourNumber || null,
+          messages: newMessages,
+          updated_at: new Date().toISOString()
+        }, { 
+          onConflict: 'student_id,assignment_key' 
+        });
+
+      if (error) {
+        console.error("Error saving chat history:", error);
+      }
+    } catch (err) {
+      console.error("Error saving chat history:", err);
+    }
+  };
 
   const handleAsk = async () => {
     if (!input.trim() || isLoading) return;
@@ -154,7 +226,8 @@ export const LessonAiTutor = ({ weekTitle, theme, aiPromptHint }: LessonAiTutorP
       content: input.trim(),
     };
 
-    setMessages((prev) => [...prev, userMsg]);
+    const updatedMessages = [...messages, userMsg];
+    setMessages(updatedMessages);
     setInput("");
     setIsLoading(true);
 
@@ -162,7 +235,7 @@ export const LessonAiTutor = ({ weekTitle, theme, aiPromptHint }: LessonAiTutorP
 
     try {
       await streamChat({
-        messages: [...messages, userMsg],
+        messages: updatedMessages,
         meta: { weekTitle, theme, aiPromptHint },
         accessToken: accessToken || undefined,
         studentId,
@@ -183,6 +256,10 @@ export const LessonAiTutor = ({ weekTitle, theme, aiPromptHint }: LessonAiTutorP
           }
         },
       });
+
+      // Save history after successful response
+      const finalMessages: Msg[] = [...updatedMessages, { role: "assistant", content: assistantSoFar }];
+      await saveChatHistory(finalMessages);
     } catch (e) {
       const message = e instanceof Error ? e.message : "UNKNOWN";
       if (message === "DAILY_LIMIT_REACHED") {
@@ -263,7 +340,9 @@ export const LessonAiTutor = ({ weekTitle, theme, aiPromptHint }: LessonAiTutorP
             </Button>
           </div>
           <div className="mt-2 space-y-2 rounded-xl bg-background/70 p-3 text-xs">
-            {messages.length === 0 ? (
+            {!historyLoaded ? (
+              <p className="text-muted-foreground">Loading conversation...</p>
+            ) : messages.length === 0 ? (
               <p className="text-muted-foreground">
                 Your conversation will appear here. Start by asking a question about this week's content or sharing a short
                 paragraph of your writing.

@@ -41,27 +41,39 @@ export type Database = {
       assignment_chat_history: {
         Row: {
           assignment_key: string
+          context_type: string | null
           created_at: string
+          hour_number: number | null
           id: string
+          lesson_id: string | null
           messages: Json
           student_id: string
           updated_at: string
+          week_number: number | null
         }
         Insert: {
           assignment_key: string
+          context_type?: string | null
           created_at?: string
+          hour_number?: number | null
           id?: string
+          lesson_id?: string | null
           messages?: Json
           student_id: string
           updated_at?: string
+          week_number?: number | null
         }
         Update: {
           assignment_key?: string
+          context_type?: string | null
           created_at?: string
+          hour_number?: number | null
           id?: string
+          lesson_id?: string | null
           messages?: Json
           student_id?: string
           updated_at?: string
+          week_number?: number | null
         }
         Relationships: []
       }
