@@ -103,9 +103,32 @@ export function ParaphraseCoach({ studentId, onComplete }: ParaphraseCoachProps)
       const stepContext = {
         1: `The student is trying to understand this sentence: "${currentSentence.text}". They wrote: "${understanding}". Give a brief Socratic hint (1-2 sentences) to help them identify the main idea. Don't give the answer directly.`,
         2: `The student is choosing paraphrasing strategies for: "${currentSentence.text}". They selected: ${selectedStrategies.join(", ") || "none yet"}. Give a brief hint about which strategies might work well for this sentence.`,
-        3: `Original: "${currentSentence.text}". Student's paraphrase draft: "${draft}". Give brief feedback (2-3 sentences): Is it too close to the original (patchwriting)? Which keywords need changing?`,
+        3: `Original: "${currentSentence.text}". Student's paraphrase draft: "${draft}". 
+
+YOUR PRIMARY CONCERN: Does this paraphrase RETAIN THE ORIGINAL MEANING accurately?
+
+Give brief feedback (3-4 sentences):
+1. First, assess meaning preservation - does the paraphrase say the same thing as the original?
+2. Then check for patchwriting - is it too close to the original in wording?
+3. Identify specific words/phrases that need changing.`,
         4: `The student is adding a citation. Source: ${currentSentence.citation}. Help them understand when to use author-prominent vs info-prominent citations. Keep it to 1-2 sentences.`,
-        5: `Original: "${currentSentence.text}". Final paraphrase: "${finalVersion}". Give comprehensive feedback on the paraphrase quality, check for patchwriting, and confirm the citation is correct. Be constructive.`,
+        5: `Original: "${currentSentence.text}". 
+Student's paraphrase: "${finalVersion}"
+Source: ${currentSentence.citation}
+
+ASSESSMENT PRIORITIES (in order of importance):
+1. **MEANING PRESERVATION (Most Important)**: Does the paraphrase accurately convey the SAME meaning as the original? Are there any meaning distortions, additions, or omissions?
+2. **Patchwriting Check**: Is the wording sufficiently different from the original? Identify any phrases that are too similar.
+3. **Citation Accuracy**: Is the citation correctly formatted?
+
+After your feedback, ALWAYS provide:
+**IMPROVED VERSION:**
+Write an improved paraphrase based on the student's work that:
+- Preserves the exact meaning of the original
+- Uses different vocabulary and structure
+- Maintains proper citation
+
+Be constructive and explain WHY your version is an improvement.`,
       };
 
       const chatUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
@@ -123,7 +146,7 @@ export function ParaphraseCoach({ studentId, onComplete }: ParaphraseCoachProps)
           meta: {
             weekTitle: "Week 1 Hour 2",
             theme: "Paraphrasing Practice",
-            aiPromptHint: "You are a Socratic tutor helping students learn to paraphrase. Use guiding questions. Never write the paraphrase for them. Keep responses brief (2-3 sentences max).",
+            aiPromptHint: "You are an expert academic writing tutor. Your PRIMARY concern is whether the paraphrase retains the original meaning accurately. Secondary concerns are patchwriting and citation. For Step 5, always provide an improved version based on the student's work.",
             mode: "paraphrase-coach"
           }
         }),
