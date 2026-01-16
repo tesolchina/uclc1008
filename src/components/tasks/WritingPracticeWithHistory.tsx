@@ -1,11 +1,13 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Save, CheckCircle2, Loader2, Sparkles, RefreshCw, ChevronDown, History } from "lucide-react";
+import { Save, CheckCircle2, Loader2, Sparkles, RefreshCw, ChevronDown, History, CloudOff, Cloud } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+
+const AUTOSAVE_DELAY_MS = 2000; // Auto-save after 2 seconds of no typing
 
 interface WritingDraft {
   id: string;
@@ -50,7 +52,7 @@ export function WritingPracticeWithHistory({
   const [currentVersion, setCurrentVersion] = useState(1);
   const [isSaving, setIsSaving] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<"idle" | "saved" | "unsaved">("idle");
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saved" | "unsaved" | "saving">("idle");
   const [showHistory, setShowHistory] = useState(false);
   // Track content that was last submitted for feedback to prevent duplicate submissions
   const [lastSubmittedContent, setLastSubmittedContent] = useState<string>("");
@@ -59,12 +61,17 @@ export function WritingPracticeWithHistory({
   const [followUpInput, setFollowUpInput] = useState("");
   const [isFollowUpLoading, setIsFollowUpLoading] = useState(false);
   const [followUpRoundsUsed, setFollowUpRoundsUsed] = useState(0);
+  
+  // Auto-save refs
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const lastSavedContentRef = useRef<string>("");
 
   // Load drafts - reset state first when studentId changes
   useEffect(() => {
     // Reset all state when studentId changes
     setContent("");
     setSavedContent("");
+    lastSavedContentRef.current = "";
     setAiFeedback(null);
     setDrafts([]);
     setCurrentVersion(1);
@@ -96,6 +103,7 @@ export function WritingPracticeWithHistory({
           const latest = data[0] as WritingDraft;
           setContent(latest.content);
           setSavedContent(latest.content);
+          lastSavedContentRef.current = latest.content;
           setAiFeedback(latest.ai_feedback);
           setCurrentVersion(latest.version);
           setSaveStatus("saved");
@@ -112,22 +120,106 @@ export function WritingPracticeWithHistory({
     loadDrafts();
   }, [studentId, taskKey]);
 
-  // Track unsaved changes
-  useEffect(() => {
-    if (content === savedContent && savedContent !== "") {
+  // Auto-save function (silent, no toast)
+  const autoSave = useCallback(async (contentToSave: string) => {
+    if (!studentId || !contentToSave.trim()) return;
+    if (contentToSave.trim() === lastSavedContentRef.current) return;
+    
+    setSaveStatus("saving");
+    try {
+      // Check if there's an existing draft for this version
+      const { data: existingDraft } = await supabase
+        .from("writing_drafts")
+        .select("id")
+        .eq("student_id", studentId)
+        .eq("task_key", taskKey)
+        .eq("version", currentVersion)
+        .maybeSingle();
+
+      if (existingDraft) {
+        await supabase
+          .from("writing_drafts")
+          .update({ content: contentToSave.trim() })
+          .eq("id", existingDraft.id);
+      } else {
+        await supabase.from("writing_drafts").insert({
+          student_id: studentId,
+          task_key: taskKey,
+          content: contentToSave.trim(),
+          version: currentVersion,
+        });
+      }
+
+      lastSavedContentRef.current = contentToSave.trim();
+      setSavedContent(contentToSave.trim());
       setSaveStatus("saved");
-    } else if (content !== savedContent && content !== "") {
+    } catch (err) {
+      console.error("Auto-save error:", err);
       setSaveStatus("unsaved");
     }
-  }, [content, savedContent]);
+  }, [studentId, taskKey, currentVersion]);
+
+  // Debounced auto-save effect
+  useEffect(() => {
+    if (!studentId || !content.trim()) return;
+    if (content.trim() === lastSavedContentRef.current) {
+      setSaveStatus("saved");
+      return;
+    }
+    
+    setSaveStatus("unsaved");
+    
+    // Clear existing timer
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+    
+    // Set new timer for auto-save
+    autoSaveTimerRef.current = setTimeout(() => {
+      autoSave(content);
+    }, AUTOSAVE_DELAY_MS);
+    
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, [content, studentId, autoSave]);
+
+  // Save on page unload
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (content.trim() && content.trim() !== lastSavedContentRef.current && studentId) {
+        // Attempt synchronous save via sendBeacon
+        const url = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/writing_drafts`;
+        const body = JSON.stringify({
+          student_id: studentId,
+          task_key: taskKey,
+          content: content.trim(),
+          version: currentVersion,
+        });
+        navigator.sendBeacon?.(url, new Blob([body], { type: 'application/json' }));
+      }
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [content, studentId, taskKey, currentVersion]);
 
   const handleSaveDraft = useCallback(async () => {
     if (!studentId || !content.trim()) return;
 
     setIsSaving(true);
+    setSaveStatus("saving");
     try {
       // Check if there's an existing draft for this version
-      const existingDraft = drafts.find((d) => d.version === currentVersion && !d.is_submitted);
+      const { data: existingDraft } = await supabase
+        .from("writing_drafts")
+        .select("id")
+        .eq("student_id", studentId)
+        .eq("task_key", taskKey)
+        .eq("version", currentVersion)
+        .maybeSingle();
 
       if (existingDraft) {
         // Update existing draft
@@ -145,6 +237,7 @@ export function WritingPracticeWithHistory({
         });
       }
 
+      lastSavedContentRef.current = content.trim();
       setSavedContent(content.trim());
       setSaveStatus("saved");
       toast({ title: "Draft saved" });
@@ -160,11 +253,12 @@ export function WritingPracticeWithHistory({
       if (data) setDrafts(data as WritingDraft[]);
     } catch (err) {
       console.error("Error saving draft:", err);
+      setSaveStatus("unsaved");
       toast({ variant: "destructive", title: "Failed to save draft" });
     } finally {
       setIsSaving(false);
     }
-  }, [studentId, taskKey, content, currentVersion, drafts, toast]);
+  }, [studentId, taskKey, content, currentVersion, toast]);
 
   const handleSubmitForFeedback = useCallback(async () => {
     if (!studentId || !content.trim()) return;
@@ -338,6 +432,7 @@ Provide constructive, specific feedback on key point coverage and accuracy only.
         .eq("task_key", taskKey)
         .eq("version", currentVersion);
 
+      lastSavedContentRef.current = content.trim();
       setSavedContent(content.trim());
       setSaveStatus("saved");
 
@@ -456,6 +551,7 @@ Provide constructive, specific feedback on key point coverage and accuracy only.
     setCurrentVersion(newVersion);
     setContent("");
     setSavedContent("");
+    lastSavedContentRef.current = "";
     setAiFeedback(null);
     setLastSubmittedContent("");
     setFollowUpMessages([]);
@@ -467,6 +563,7 @@ Provide constructive, specific feedback on key point coverage and accuracy only.
   const handleLoadDraft = useCallback((draft: WritingDraft) => {
     setContent(draft.content);
     setSavedContent(draft.content);
+    lastSavedContentRef.current = draft.content;
     setAiFeedback(draft.ai_feedback);
     setCurrentVersion(draft.version);
     setLastSubmittedContent(draft.is_submitted ? draft.content : "");
@@ -484,9 +581,34 @@ Provide constructive, specific feedback on key point coverage and accuracy only.
           <Sparkles className="h-4 w-4 text-purple-600" />
           {title}
         </h4>
-        <Badge variant="outline" className="text-xs">
-          Version {currentVersion}
-        </Badge>
+        <div className="flex items-center gap-2">
+          {/* Auto-save status indicator */}
+          {studentId && content.trim() && (
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              {saveStatus === "saving" && (
+                <>
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  <span>Saving...</span>
+                </>
+              )}
+              {saveStatus === "saved" && (
+                <>
+                  <Cloud className="h-3 w-3 text-green-500" />
+                  <span className="text-green-600">Saved</span>
+                </>
+              )}
+              {saveStatus === "unsaved" && (
+                <>
+                  <CloudOff className="h-3 w-3 text-amber-500" />
+                  <span className="text-amber-600">Unsaved</span>
+                </>
+              )}
+            </div>
+          )}
+          <Badge variant="outline" className="text-xs">
+            Version {currentVersion}
+          </Badge>
+        </div>
       </div>
 
       {/* Instructions */}
