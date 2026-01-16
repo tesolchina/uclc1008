@@ -22,6 +22,7 @@ import UnitPage from "./pages/UnitPage";
 import HourPage from "./pages/HourPage";
 import StudentDashboard from "./pages/StudentDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
+import LabSpacePage from "./pages/LabSpacePage";
 import {
   Week1Page,
   Week2Page,
@@ -84,6 +85,7 @@ const App = () => (
               <Route path="settings" element={<SettingsPage />} />
               <Route path="join" element={<JoinSessionPage />} />
               <Route path="join/:code" element={<JoinSessionPage />} />
+              <Route path="lab" element={<LabSpacePage />} />
               <Route path="my-progress" element={<StudentDashboard />} />
               <Route path="teacher-dashboard" element={<TeacherDashboard />} />
             </Route>
