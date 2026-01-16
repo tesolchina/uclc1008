@@ -1,19 +1,22 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
-import { QuickCheckMC } from "@/components/tasks/objective/QuickCheckMC";
-import { StrategyPracticeTask } from "@/components/tasks/open-ended/StrategyPracticeTask";
-import { WritingPracticeWithHistory } from "@/components/tasks/WritingPracticeWithHistory";
-import { AiTutorRating } from "./AiTutorRating";
+import LessonAiTutor from "@/components/LessonAiTutor";
 import { 
   BookOpen, 
   Search, 
-  PenLine, 
-  Target, 
-  CheckCircle2,
-  Sparkles 
+  FileText,
+  Target,
+  GraduationCap,
+  MessageSquare
 } from "lucide-react";
 
 interface Hour3PracticeSessionProps {
@@ -22,347 +25,242 @@ interface Hour3PracticeSessionProps {
   onComplete?: () => void;
 }
 
-// Skill summaries for Week 1
-const SKILL_SUMMARIES = {
-  skimming: {
-    title: "What You Learned: Skimming",
+// Themes from Hours 1 & 2 that students can review with AI tutor
+const REVIEW_THEMES = [
+  {
+    id: "skimming",
+    title: "Skimming Techniques",
+    hour: 1,
     icon: BookOpen,
-    points: [
-      "Reading quickly for main ideas and overall structure",
-      "Focusing on headings, first/last sentences, and keywords",
-      "Understanding IMRaD structure (Introduction, Methods, Results, Discussion)"
-    ]
+    description: "Reading quickly for main ideas, structure, and overview",
+    aiPrompt: `You are an expert tutor helping a student review skimming techniques for academic reading.
+
+Key concepts the student learned:
+- Skimming is reading quickly to get the main idea and overall structure
+- Focus on headings, subheadings, first and last sentences of paragraphs
+- Look for topic sentences and keywords
+- Understand the gist without reading every word
+- Used with Article A (Hong et al., 2022) about facial recognition in schools
+
+Help the student understand and apply skimming strategies. Ask them questions to check understanding. Give examples from academic articles. Be encouraging and supportive.`
   },
-  scanning: {
-    title: "What You Learned: Scanning",
+  {
+    id: "scanning",
+    title: "Scanning Techniques", 
+    hour: 1,
     icon: Search,
-    points: [
-      "Searching for specific information quickly",
-      "Looking for keywords, names, dates, or statistics",
-      "Using text features (bold, italics, headings) to locate data"
-    ]
+    description: "Finding specific information quickly in a text",
+    aiPrompt: `You are an expert tutor helping a student review scanning techniques for academic reading.
+
+Key concepts the student learned:
+- Scanning is searching for specific information (names, dates, numbers, statistics)
+- Move eyes quickly over text looking for keywords
+- Use text features like bold, italics, headings, and tables
+- Practice finding: sample size (380 participants), p-values (p<.001), Likert scales
+- Used with Article A (Hong et al., 2022)
+
+Help the student master scanning. Ask them to practice finding specific types of information. Give tips for efficient scanning. Be encouraging.`
   },
-  paraphrasing: {
-    title: "What You Learned: Paraphrasing",
-    icon: PenLine,
-    points: [
-      "4 strategies: synonyms, word forms, voice change, sentence restructuring",
-      "Avoiding patchwriting (copying with minor changes)",
-      "Always include proper APA citations when paraphrasing"
-    ]
+  {
+    id: "imrad",
+    title: "IMRaD Structure",
+    hour: 2,
+    icon: FileText,
+    description: "Understanding the structure of empirical research papers",
+    aiPrompt: `You are an expert tutor helping a student review the IMRaD structure of empirical research papers.
+
+Key concepts the student learned:
+- IMRaD = Introduction, Methods, Results, and Discussion
+- Introduction: background, research gap, purpose/thesis
+- Methods: participants, procedures, instruments, data analysis
+- Results: findings, statistics, tables/figures
+- Discussion: interpretation, implications, limitations, future research
+- Used with Article A (Hong et al., 2022) as an example of IMRaD
+
+Help the student understand each section's purpose. Ask them what information they'd find in each section. Be patient and supportive.`
   },
-  integrated: {
-    title: "Putting It All Together",
+  {
+    id: "article-types",
+    title: "Empirical vs Conceptual Papers",
+    hour: 2,
     icon: Target,
-    points: [
-      "Skim to understand overall structure and main ideas",
-      "Scan to find specific evidence and quotes",
-      "Paraphrase key points with proper citations"
-    ]
-  }
-};
+    description: "Distinguishing between data-driven and argument-driven papers",
+    aiPrompt: `You are an expert tutor helping a student review the difference between empirical and conceptual papers.
 
-// Practice questions for each skill - using correct format for QuickCheckMC
-const SKIMMING_QUESTIONS = [
-  {
-    id: "w1h3-skim1",
-    question: "When skimming an academic article, what should you focus on FIRST?",
-    options: [
-      { label: "A", text: "Reading every word carefully" },
-      { label: "B", text: "Headings, abstract, and topic sentences" },
-      { label: "C", text: "The reference list" },
-      { label: "D", text: "The author's biography" }
-    ],
-    correctAnswer: "B",
-    explanation: "When skimming, start with structural elements like headings, the abstract, and topic sentences to quickly grasp the main ideas."
+Key concepts the student learned:
+- Empirical papers: based on data collection and analysis, follow IMRaD structure
+- Conceptual papers: based on reasoning and argument, no original data collection
+- Empirical papers have Methods and Results sections
+- Conceptual papers develop theoretical frameworks or analyze existing literature
+- Article A (Hong et al., 2022) is empirical (survey data from 380 participants)
+
+Help the student distinguish between these types. Give examples and ask them to identify paper types. Be encouraging.`
   },
   {
-    id: "w1h3-skim2",
-    question: "In IMRaD structure, which section typically presents the main findings?",
-    options: [
-      { label: "A", text: "Introduction" },
-      { label: "B", text: "Methods" },
-      { label: "C", text: "Results" },
-      { label: "D", text: "Discussion" }
-    ],
-    correctAnswer: "C",
-    explanation: "The Results section presents the main findings of the research. The Discussion interprets these findings."
+    id: "abstract-analysis",
+    title: "Abstract & Title Analysis",
+    hour: 1,
+    icon: GraduationCap,
+    description: "Extracting key information from titles and abstracts",
+    aiPrompt: `You are an expert tutor helping a student review how to analyze academic titles and abstracts.
+
+Key concepts the student learned:
+- Titles often reveal: Subject Matter, Context, and Author Stance
+- Abstracts contain: background, purpose, methods, results, conclusions
+- The "gist" (main point) is usually in the first few sentences
+- Purpose statements often use phrases like "This study aims to..." or "The purpose of..."
+- Practice with Article A title and abstract
+
+Help the student extract key information from titles and abstracts. Ask them to identify components. Be supportive.`
   }
 ];
-
-const SCANNING_QUESTIONS = [
-  {
-    id: "w1h3-scan1",
-    question: "What is the PRIMARY purpose of scanning a text?",
-    options: [
-      { label: "A", text: "Understanding the author's argument" },
-      { label: "B", text: "Finding specific information quickly" },
-      { label: "C", text: "Appreciating the writing style" },
-      { label: "D", text: "Memorizing key terms" }
-    ],
-    correctAnswer: "B",
-    explanation: "Scanning is specifically used to locate particular information such as names, dates, or statistics without reading the entire text."
-  },
-  {
-    id: "w1h3-scan2",
-    question: "Which technique is MOST useful when scanning for a specific statistic?",
-    options: [
-      { label: "A", text: "Reading each paragraph carefully" },
-      { label: "B", text: "Looking for numbers, percentages, or charts" },
-      { label: "C", text: "Starting from the conclusion" },
-      { label: "D", text: "Reading the abstract only" }
-    ],
-    correctAnswer: "B",
-    explanation: "When scanning for statistics, look for numerical indicators like numbers, percentages, or data visualizations."
-  }
-];
-
-const PARAPHRASING_QUESTIONS = [
-  {
-    id: "w1h3-para1",
-    question: "Which of the following is an example of patchwriting?",
-    options: [
-      { label: "A", text: "Completely rewriting the idea in your own words" },
-      { label: "B", text: "Copying phrases and changing a few words" },
-      { label: "C", text: "Using a direct quote with quotation marks" },
-      { label: "D", text: "Summarizing multiple paragraphs together" }
-    ],
-    correctAnswer: "B",
-    explanation: "Patchwriting is copying source text and making only minor word substitutions. It's a form of plagiarism."
-  },
-  {
-    id: "w1h3-para2",
-    question: "What MUST be included when paraphrasing someone else's ideas?",
-    options: [
-      { label: "A", text: "Quotation marks" },
-      { label: "B", text: "The exact original wording" },
-      { label: "C", text: "A citation to the source" },
-      { label: "D", text: "The author's email address" }
-    ],
-    correctAnswer: "C",
-    explanation: "Even when you rewrite ideas in your own words, you must cite the source to give proper credit."
-  }
-];
-
-// Practice paragraph for paraphrasing
-const PRACTICE_PARAGRAPH = {
-  id: "w1h3-practice-para",
-  text: "Facial recognition technology is beginning to be implemented at scale in schools. This is perhaps not surprising given the role played by the classroom in the development of monitoring practices and the increasing normalisation of surveillance in the name of protecting young people.",
-  citation: "(Andrejevic & Selwyn, 2020)"
-};
 
 export function Hour3PracticeSession({ weekNumber, studentId, onComplete }: Hour3PracticeSessionProps) {
-  const [completedTasks, setCompletedTasks] = useState<Set<string>>(new Set());
-  const [activeTab, setActiveTab] = useState("skimming");
-  const [showRating, setShowRating] = useState(false);
+  const [selectedTheme, setSelectedTheme] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"tabs" | "dropdown">("tabs");
 
-  // Calculate progress
-  const totalTasks = 8;
-  const progress = (completedTasks.size / totalTasks) * 100;
-
-  useEffect(() => {
-    if (completedTasks.size >= totalTasks - 1) {
-      setShowRating(true);
-    }
-  }, [completedTasks.size]);
-
-  const handleTaskComplete = (taskId: string) => {
-    setCompletedTasks(prev => new Set([...prev, taskId]));
-  };
-
-  const renderSkillSummary = (skillKey: keyof typeof SKILL_SUMMARIES) => {
-    const skill = SKILL_SUMMARIES[skillKey];
-    const Icon = skill.icon;
-    return (
-      <Card className="mb-4 bg-muted/30">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm flex items-center gap-2">
-            <Icon className="h-4 w-4 text-primary" />
-            {skill.title}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <ul className="text-sm space-y-1 text-muted-foreground">
-            {skill.points.map((point, idx) => (
-              <li key={idx} className="flex items-start gap-2">
-                <CheckCircle2 className="h-3.5 w-3.5 text-green-600 shrink-0 mt-0.5" />
-                <span>{point}</span>
-              </li>
-            ))}
-          </ul>
-        </CardContent>
-      </Card>
-    );
-  };
+  const selectedThemeData = REVIEW_THEMES.find(t => t.id === selectedTheme);
 
   return (
     <div className="space-y-6">
-      {/* Progress Header */}
+      {/* Header */}
       <Card>
-        <CardHeader className="pb-2">
+        <CardHeader>
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-primary" />
-                Week {weekNumber} Practice Session
+                <MessageSquare className="h-5 w-5 text-primary" />
+                AI Tutor Review Session
               </CardTitle>
               <CardDescription>
-                Consolidate your skills from Hours 1 & 2 with AI-guided practice
+                Select a topic from Hours 1 & 2 to review with your AI tutor
               </CardDescription>
             </div>
-            <Badge variant="outline" className="text-xs">
-              {completedTasks.size} / {totalTasks} completed
-            </Badge>
+            <Badge variant="secondary">{REVIEW_THEMES.length} topics available</Badge>
           </div>
         </CardHeader>
-        <CardContent>
-          <Progress value={progress} className="h-2" />
-        </CardContent>
       </Card>
 
-      {/* Tabbed Practice Interface */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="skimming" className="text-xs">
-            <BookOpen className="h-3.5 w-3.5 mr-1" />
-            Skimming
-          </TabsTrigger>
-          <TabsTrigger value="scanning" className="text-xs">
-            <Search className="h-3.5 w-3.5 mr-1" />
-            Scanning
-          </TabsTrigger>
-          <TabsTrigger value="paraphrasing" className="text-xs">
-            <PenLine className="h-3.5 w-3.5 mr-1" />
-            Paraphrasing
-          </TabsTrigger>
-          <TabsTrigger value="integrated" className="text-xs">
-            <Target className="h-3.5 w-3.5 mr-1" />
-            All Skills
-          </TabsTrigger>
-        </TabsList>
+      {/* Theme Selection - Tabs for desktop, Dropdown for mobile */}
+      <div className="hidden md:block">
+        <Tabs value={selectedTheme || ""} onValueChange={setSelectedTheme}>
+          <TabsList className="grid w-full grid-cols-5 h-auto">
+            {REVIEW_THEMES.map(theme => {
+              const Icon = theme.icon;
+              return (
+                <TabsTrigger 
+                  key={theme.id} 
+                  value={theme.id}
+                  className="flex flex-col items-center gap-1 py-3 px-2"
+                >
+                  <Icon className="h-4 w-4" />
+                  <span className="text-xs text-center leading-tight">{theme.title}</span>
+                  <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                    Hour {theme.hour}
+                  </Badge>
+                </TabsTrigger>
+              );
+            })}
+          </TabsList>
 
-        {/* Skimming Tab */}
-        <TabsContent value="skimming" className="space-y-4 mt-4">
-          {renderSkillSummary("skimming")}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm">Practice: Skimming Skills</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {SKIMMING_QUESTIONS.map((q, idx) => (
-                <QuickCheckMC
-                  key={q.id}
-                  questionNumber={idx + 1}
-                  questionId={q.id}
-                  question={q.question}
-                  options={q.options}
-                  correctAnswer={q.correctAnswer}
-                  explanation={q.explanation}
-                  weekNumber={weekNumber}
-                  hourNumber={3}
-                  enableAiFeedback={true}
-                />
-              ))}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Scanning Tab */}
-        <TabsContent value="scanning" className="space-y-4 mt-4">
-          {renderSkillSummary("scanning")}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm">Practice: Scanning Skills</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {SCANNING_QUESTIONS.map((q, idx) => (
-                <QuickCheckMC
-                  key={q.id}
-                  questionNumber={idx + 1}
-                  questionId={q.id}
-                  question={q.question}
-                  options={q.options}
-                  correctAnswer={q.correctAnswer}
-                  explanation={q.explanation}
-                  weekNumber={weekNumber}
-                  hourNumber={3}
-                  enableAiFeedback={true}
-                />
-              ))}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Paraphrasing Tab */}
-        <TabsContent value="paraphrasing" className="space-y-4 mt-4">
-          {renderSkillSummary("paraphrasing")}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm">Quick Check: Paraphrasing Concepts</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {PARAPHRASING_QUESTIONS.map((q, idx) => (
-                <QuickCheckMC
-                  key={q.id}
-                  questionNumber={idx + 1}
-                  questionId={q.id}
-                  question={q.question}
-                  options={q.options}
-                  correctAnswer={q.correctAnswer}
-                  explanation={q.explanation}
-                  weekNumber={weekNumber}
-                  hourNumber={3}
-                  enableAiFeedback={true}
-                />
-              ))}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm">Practice: Paraphrase with AI Feedback</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <StrategyPracticeTask
-                taskId={PRACTICE_PARAGRAPH.id}
-                originalSentence={PRACTICE_PARAGRAPH.text}
-                citation={PRACTICE_PARAGRAPH.citation}
-                studentId={studentId}
-                onComplete={() => handleTaskComplete(PRACTICE_PARAGRAPH.id)}
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Integrated Tab */}
-        <TabsContent value="integrated" className="space-y-4 mt-4">
-          {renderSkillSummary("integrated")}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm">Reflection & Goal Setting</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <WritingPracticeWithHistory
-                taskKey={`w${weekNumber}h3-reflection`}
-                title="Reflect on Your Learning"
-                instructions="Reflect on your learning this week: 1) What skill did you find most challenging? 2) What improved from Hour 1 to Hour 3? 3) What will you focus on in Week 2?"
-                placeholder="Write your reflection here..."
+          {REVIEW_THEMES.map(theme => (
+            <TabsContent key={theme.id} value={theme.id} className="mt-4">
+              <ThemeAiTutor 
+                theme={theme} 
+                weekNumber={weekNumber}
                 studentId={studentId}
               />
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            </TabsContent>
+          ))}
+        </Tabs>
+      </div>
 
-      {/* AI Tutor Rating */}
-      {showRating && (
-        <AiTutorRating
-          weekNumber={weekNumber}
-          studentId={studentId}
-          completedTasks={Array.from(completedTasks)}
-          totalTasks={totalTasks}
-        />
+      {/* Mobile: Dropdown selection */}
+      <div className="md:hidden space-y-4">
+        <Select value={selectedTheme || ""} onValueChange={setSelectedTheme}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select a topic to review..." />
+          </SelectTrigger>
+          <SelectContent>
+            {REVIEW_THEMES.map(theme => {
+              const Icon = theme.icon;
+              return (
+                <SelectItem key={theme.id} value={theme.id}>
+                  <div className="flex items-center gap-2">
+                    <Icon className="h-4 w-4" />
+                    <span>{theme.title}</span>
+                    <Badge variant="outline" className="text-xs ml-auto">
+                      Hour {theme.hour}
+                    </Badge>
+                  </div>
+                </SelectItem>
+              );
+            })}
+          </SelectContent>
+        </Select>
+
+        {selectedThemeData && (
+          <ThemeAiTutor 
+            theme={selectedThemeData} 
+            weekNumber={weekNumber}
+            studentId={studentId}
+          />
+        )}
+      </div>
+
+      {/* Empty state when no theme selected (desktop) */}
+      {!selectedTheme && (
+        <Card className="hidden md:block">
+          <CardContent className="py-12 text-center text-muted-foreground">
+            <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-50" />
+            <p className="text-lg font-medium">Select a topic above to start reviewing</p>
+            <p className="text-sm mt-2">
+              Your AI tutor will help you consolidate what you learned in Hours 1 & 2
+            </p>
+          </CardContent>
+        </Card>
       )}
+    </div>
+  );
+}
+
+// Component for individual theme AI tutor
+interface ThemeAiTutorProps {
+  theme: typeof REVIEW_THEMES[0];
+  weekNumber: number;
+  studentId: string;
+}
+
+function ThemeAiTutor({ theme, weekNumber, studentId }: ThemeAiTutorProps) {
+  const Icon = theme.icon;
+  
+  return (
+    <div className="space-y-4">
+      {/* Theme info card */}
+      <Card className="bg-muted/30">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Icon className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <CardTitle className="text-base">{theme.title}</CardTitle>
+              <CardDescription className="text-sm">{theme.description}</CardDescription>
+            </div>
+            <Badge variant="secondary" className="ml-auto">From Hour {theme.hour}</Badge>
+          </div>
+        </CardHeader>
+      </Card>
+
+      {/* AI Tutor Chat */}
+      <LessonAiTutor
+        weekTitle={`Week ${weekNumber} Review: ${theme.title}`}
+        theme={theme.title}
+        aiPromptHint={theme.aiPrompt}
+        weekNumber={weekNumber}
+        hourNumber={3}
+        contextKey={`w${weekNumber}h3-${theme.id}`}
+      />
     </div>
   );
 }
