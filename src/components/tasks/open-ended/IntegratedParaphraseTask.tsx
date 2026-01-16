@@ -88,8 +88,16 @@ export function IntegratedParaphraseTask({ studentId, onComplete }: IntegratedPa
     setIsLoading(true);
     
     try {
-      const response = await supabase.functions.invoke("chat", {
-        body: {
+      const chatUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
+      
+      const response = await fetch(chatUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
           messages: [{
             role: "user",
             content: `You are an expert academic writing assessor. Evaluate this student's paraphrase comprehensively.
@@ -105,69 +113,88 @@ STUDENT'S SELF-ASSESSMENT:
 
 TASK FOCUS: ${currentParagraph.focus}
 
-Provide structured feedback:
+ASSESSMENT PRIORITIES (in order of importance):
 
-1. **Patchwriting Check**: Is this acceptable or too close to the original? (Be specific about which phrases are too similar)
+1. **MEANING PRESERVATION (Most Critical)**: Does the paraphrase accurately convey the SAME meaning as the original?
+   - Are all key ideas present?
+   - Is any information distorted, omitted, or incorrectly added?
+   - This is the PRIMARY criterion for a successful paraphrase.
 
-2. **Strategies Used**: Which of the 4 strategies (synonyms, word forms, voice, structure) were effectively applied?
+2. **Patchwriting Check**: Is the wording sufficiently different from the original? Identify specific phrases that are too similar.
 
-3. **Citation Accuracy**: Is the citation format correct for APA 7th? Is it author-prominent or info-prominent?
+3. **Strategies Applied**: Which paraphrasing strategies (synonyms, word forms, voice, structure) were effectively used?
 
-4. **Meaning Preservation**: Does the paraphrase accurately convey the original meaning?
+4. **Citation Accuracy**: Is the citation format correct for APA 7th?
 
 5. **Overall Assessment**: Strong / Acceptable / Needs Improvement
-   Give 2-3 specific suggestions for improvement.
 
-Keep your response focused and constructive (about 150-200 words).`
+After your assessment, ALWAYS provide:
+
+**IMPROVED VERSION:**
+Based on the student's attempt, write an improved paraphrase that:
+- Preserves the EXACT meaning of the original text
+- Uses clearly different vocabulary and sentence structure
+- Demonstrates effective use of multiple paraphrasing strategies
+- Includes proper APA citation
+
+**WHY THIS IS BETTER:**
+Briefly explain (2-3 sentences) the specific improvements made.
+
+Keep your total response focused and constructive (about 200-250 words).`
           }],
           studentId: studentId || "anonymous",
           meta: {
             weekTitle: "Week 1 Hour 2",
             theme: "Integrated Paraphrase Assessment",
-            aiPromptHint: "Be thorough but constructive. Identify specific issues with line references.",
+            aiPromptHint: "Primary concern is meaning preservation. Always provide an improved version based on the student's work.",
             mode: "assessment"
           }
-        }
+        }),
       });
 
-      if (response.error) throw new Error(response.error.message);
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      if (!response.body) {
+        throw new Error("No response body");
+      }
 
       // Handle streaming response
-      const reader = response.data?.getReader?.();
-      if (reader) {
-        let fullText = "";
-        const decoder = new TextDecoder();
+      const reader = response.body.getReader();
+      let fullText = "";
+      const decoder = new TextDecoder();
+      
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
         
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          
-          const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split("\n");
-          
-          for (const line of lines) {
-            if (line.startsWith("data: ") && line !== "data: [DONE]") {
-              try {
-                const json = JSON.parse(line.slice(6));
-                const content = json.choices?.[0]?.delta?.content;
-                if (content) fullText += content;
-              } catch {}
-            }
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split("\n");
+        
+        for (const line of lines) {
+          if (line.startsWith("data: ") && line !== "data: [DONE]") {
+            try {
+              const json = JSON.parse(line.slice(6));
+              const content = json.choices?.[0]?.delta?.content;
+              if (content) {
+                fullText += content;
+                setAiFeedback(fullText);
+              }
+            } catch {}
           }
         }
-        
-        setAiFeedback(fullText);
-        
-        // Save to database
-        if (studentId) {
-          await supabase.from("student_task_responses").insert({
-            student_id: studentId,
-            question_key: `w1h2-integrated-${currentParagraph.id}`,
-            response: JSON.stringify({ paraphrase, selfAssessment }),
-            ai_feedback: fullText,
-            is_correct: null,
-          });
-        }
+      }
+      
+      // Save to database
+      if (studentId && fullText) {
+        await supabase.from("student_task_responses").insert({
+          student_id: studentId,
+          question_key: `w1h2-integrated-${currentParagraph.id}`,
+          response: JSON.stringify({ paraphrase, selfAssessment }),
+          ai_feedback: fullText,
+          is_correct: null,
+        });
       }
       
       setSubmitted(true);

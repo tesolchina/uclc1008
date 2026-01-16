@@ -108,15 +108,28 @@ STUDENT'S PARAPHRASE:
 STRATEGIES THE STUDENT CLAIMS TO HAVE USED:
 ${strategiesUsed}
 
-TASK: Provide focused feedback (4-6 sentences) addressing:
+ASSESSMENT PRIORITIES (in order of importance):
 
-1. **Strategy Verification**: Did the student actually apply the strategies they selected? Be specific about what changes you observe (or don't observe) for each claimed strategy.
+1. **MEANING PRESERVATION (Most Critical)**: Does the paraphrase accurately convey the SAME meaning as the original sentence? Are there any:
+   - Meaning distortions (saying something different)?
+   - Omissions (leaving out key information)?
+   - Additions (adding information not in the original)?
+   If meaning is NOT preserved, this is the PRIMARY issue to address.
 
-2. **Patchwriting Check**: Is this an acceptable paraphrase or too close to the original? If patchwriting, identify specific phrases that are too similar.
+2. **Strategy Verification**: Did the student actually apply the strategies they selected? Be specific about what changes you observe.
 
-3. **Quick Tip**: Give ONE specific suggestion to improve (if needed).
+3. **Patchwriting Check**: Is the wording sufficiently different? Identify any phrases that are too similar to the original.
 
-Be direct and educational. If they claimed a strategy but didn't use it, point that out clearly.`
+After your feedback, ALWAYS provide:
+
+**IMPROVED VERSION:**
+Based on the student's paraphrase, write an improved version that:
+- Preserves the EXACT meaning of the original
+- Uses clearly different vocabulary and structure
+- Demonstrates the strategies the student intended to use
+- Includes proper citation
+
+Explain briefly (1 sentence) what makes this version better.`
             }
           ],
           studentId: studentId || "anonymous",
