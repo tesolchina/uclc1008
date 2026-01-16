@@ -1646,9 +1646,8 @@ Provide focused feedback (4-5 sentences):
         )}
 
 
-        {/* Key Concepts - hide for Week 1 Hour 1 & 2 (custom content) */}
-        {/* Key Concepts - hide for Week 1 all hours (custom content) */}
-        {!(weekNumber === 1 && (hourNumber === 1 || hourNumber === 2 || hourNumber === 3)) && hourData.keyConcepts && hourData.keyConcepts.length > 0 && (
+        {/* Key Concepts - hide for Weeks 1-3 (content integrated into Parts) */}
+        {!((weekNumber >= 1 && weekNumber <= 3)) && hourData.keyConcepts && hourData.keyConcepts.length > 0 && (
           <CollapsibleSection
             title="Key Concepts"
             description="Essential terms and ideas for this hour"
@@ -1678,8 +1677,8 @@ Provide focused feedback (4-5 sentences):
           </CollapsibleSection>
         )}
 
-        {/* Article Excerpts - hide for Week 1 all hours (custom content) */}
-        {!(weekNumber === 1 && (hourNumber === 1 || hourNumber === 2 || hourNumber === 3)) && hourData.articles && hourData.articles.length > 0 && (
+        {/* Article Excerpts - hide for Weeks 1-3 (content integrated into Parts) */}
+        {!((weekNumber >= 1 && weekNumber <= 3)) && hourData.articles && hourData.articles.length > 0 && (
           <CollapsibleSection
             title="Article Excerpts"
             description="Source materials for this hour"
@@ -1719,8 +1718,8 @@ Provide focused feedback (4-5 sentences):
           </CollapsibleSection>
         )}
 
-        {/* Objective Tasks - hide for Week 1 all hours (custom content) */}
-        {!(weekNumber === 1 && (hourNumber === 1 || hourNumber === 2 || hourNumber === 3)) && objectiveTasks.length > 0 && (
+        {/* Quick Check Tasks - hide for Weeks 1-3 (content integrated into Parts) */}
+        {!((weekNumber >= 1 && weekNumber <= 3)) && objectiveTasks.length > 0 && (
           <CollapsibleSection
             title="Quick Check Tasks"
             description="Multiple choice, true/false, and fill-in-the-blank with instant feedback"
@@ -1748,8 +1747,8 @@ Provide focused feedback (4-5 sentences):
           </CollapsibleSection>
         )}
 
-        {/* Writing Tasks - hide for Week 1 all hours (custom content) */}
-        {!(weekNumber === 1 && (hourNumber === 1 || hourNumber === 2 || hourNumber === 3)) && writingTasks.length > 0 && (
+        {/* Writing Tasks - hide for Weeks 1-3 (content integrated into Parts) */}
+        {!((weekNumber >= 1 && weekNumber <= 3)) && writingTasks.length > 0 && (
           <CollapsibleSection
             title="Writing Tasks"
             description="Practice academic writing with AI feedback"
@@ -1774,8 +1773,8 @@ Provide focused feedback (4-5 sentences):
           </CollapsibleSection>
         )}
 
-        {/* Main Writing Task - hide for Week 1 all hours (custom content) */}
-        {!(weekNumber === 1 && (hourNumber === 1 || hourNumber === 2 || hourNumber === 3)) && hourData.writingTask && (
+        {/* Hour Writing Task - hide for Weeks 1-3 (content integrated into Parts) */}
+        {!((weekNumber >= 1 && weekNumber <= 3)) && hourData.writingTask && (
           <CollapsibleSection
             title="Hour Writing Task"
             description="The main writing practice for this hour"
