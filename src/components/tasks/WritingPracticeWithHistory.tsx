@@ -181,25 +181,27 @@ export function WritingPracticeWithHistory({
 
     setIsSubmitting(true);
     try {
-      // First save the draft
-      const { data: draftData, error: draftError } = await supabase
+      // Check if there's an existing draft for this student, task, and version
+      const { data: existingDraft } = await supabase
         .from("writing_drafts")
-        .upsert(
-          {
-            student_id: studentId,
-            task_key: taskKey,
-            content: content.trim(),
-            version: currentVersion,
-            is_submitted: true,
-          },
-          { onConflict: "id" }
-        )
-        .select()
-        .single();
+        .select("id")
+        .eq("student_id", studentId)
+        .eq("task_key", taskKey)
+        .eq("version", currentVersion)
+        .maybeSingle();
 
-      if (draftError) {
-        // Insert new if upsert failed
-        const { data: newDraft } = await supabase
+      if (existingDraft) {
+        // Update existing draft
+        await supabase
+          .from("writing_drafts")
+          .update({
+            content: content.trim(),
+            is_submitted: true,
+          })
+          .eq("id", existingDraft.id);
+      } else {
+        // Insert new draft
+        await supabase
           .from("writing_drafts")
           .insert({
             student_id: studentId,
@@ -207,9 +209,7 @@ export function WritingPracticeWithHistory({
             content: content.trim(),
             version: currentVersion,
             is_submitted: true,
-          })
-          .select()
-          .single();
+          });
       }
 
       // Get AI feedback (streaming)
