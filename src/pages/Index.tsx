@@ -7,6 +7,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
+import { CollapsibleSection } from "@/components/CollapsibleSection";
 
 // CILOs - Course Intended Learning Outcomes
 const cilos = [
@@ -215,7 +216,8 @@ const assessments = [
 
 const Index = () => {
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
+      {/* Hero Section - Always visible */}
       <section className="hero-shell">
         <div className="hero-glow-orb" aria-hidden="true" />
         <div className="hero-inner">
@@ -263,15 +265,14 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Course Aims */}
-      <Card className="border-primary/20 bg-primary/5">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Target className="h-4 w-4 text-primary" />
-            Course Aims & Descriptions
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="text-sm text-muted-foreground space-y-3">
+      {/* Course Aims - Collapsible */}
+      <CollapsibleSection
+        title="Course Aims & Descriptions"
+        icon={<Target className="h-4 w-4 text-primary" />}
+        defaultOpen={false}
+        className="border-primary/20 bg-primary/5"
+      >
+        <div className="text-sm text-muted-foreground space-y-3">
           <p>
             This course aims to enhance students' English language skills in <strong>critical reading, listening, academic writing, and speaking</strong>.
           </p>
@@ -282,18 +283,17 @@ const Index = () => {
             <li>Develop critical thinking, reading and writing skills for crafting well-structured academic essays</li>
             <li>Use reflection and self-assessment to become more independent readers and writers</li>
           </ol>
-        </CardContent>
-      </Card>
+        </div>
+      </CollapsibleSection>
 
-      {/* Key Facts to Know */}
-      <Card className="border-green-500/30 bg-green-500/5">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4 text-green-600" />
-            Key Facts to Know
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-3 sm:grid-cols-3">
+      {/* Key Facts - Collapsible */}
+      <CollapsibleSection
+        title="Key Facts to Know"
+        icon={<CheckCircle2 className="h-4 w-4 text-green-600" />}
+        defaultOpen={false}
+        className="border-green-500/30 bg-green-500/5"
+      >
+        <div className="grid gap-3 sm:grid-cols-3">
           <div className="flex items-start gap-3 p-3 rounded-lg bg-background/50">
             <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
             <div>
@@ -315,30 +315,28 @@ const Index = () => {
               <p className="text-xs text-muted-foreground">Class Participation (15%), AWQ (15%), ACE Draft (15%), ACE Final (25%), CRAA (20%), Portfolio (10%)</p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </CollapsibleSection>
 
-      {/* Note to Students */}
-      <Alert className="border-primary/50 bg-primary/5">
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Note to All Students</AlertTitle>
-        <AlertDescription className="text-sm">
+      {/* Note to Students - Collapsible */}
+      <CollapsibleSection
+        title="Note to All Students"
+        icon={<AlertCircle className="h-4 w-4 text-primary" />}
+        defaultOpen={false}
+        className="border-primary/50 bg-primary/5"
+      >
+        <div className="text-sm text-muted-foreground">
           University English I aims to strengthen your ability to read, write and speak critically. 
           To make effective use of our limited class time, you should <strong>preview the reading passages</strong> and <strong>complete all the homework tasks</strong>.
-        </AlertDescription>
-      </Alert>
-
-      {/* Weekly Teaching Schedule */}
-      <section className="space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-semibold tracking-tight flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-primary" />
-              Weekly Teaching Schedule
-            </h2>
-          </div>
         </div>
+      </CollapsibleSection>
 
+      {/* Weekly Teaching Schedule - Collapsible */}
+      <CollapsibleSection
+        title="Weekly Teaching Schedule"
+        icon={<Calendar className="h-4 w-4 text-primary" />}
+        defaultOpen={false}
+      >
         <div className="rounded-lg border overflow-hidden">
           <Table>
             <TableHeader>
@@ -395,20 +393,15 @@ const Index = () => {
             </TableBody>
           </Table>
         </div>
-      </section>
+      </CollapsibleSection>
 
-      {/* Assessments Section */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="text-lg font-semibold tracking-tight flex items-center gap-2">
-            <Target className="h-5 w-5 text-primary" />
-            Assessments
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Students' progress will be evaluated through the following assessments/tests
-          </p>
-        </div>
-
+      {/* Assessments Section - Collapsible */}
+      <CollapsibleSection
+        title="Assessments"
+        description="Students' progress will be evaluated through the following assessments/tests"
+        icon={<Target className="h-4 w-4 text-primary" />}
+        defaultOpen={false}
+      >
         <div className="grid gap-4">
           {assessments.map((assessment) => (
             <Card key={assessment.name} className={`${assessment.bgColor} border-0`}>
@@ -468,22 +461,15 @@ const Index = () => {
             </Card>
           ))}
         </div>
-      </section>
+      </CollapsibleSection>
 
-      {/* CILOs Section */}
-      <section className="space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-semibold tracking-tight flex items-center gap-2">
-              <CheckCircle2 className="h-5 w-5 text-primary" />
-              Course Intended Learning Outcomes (CILOs)
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              Upon successful completion of this course, students should be able to:
-            </p>
-          </div>
-        </div>
-
+      {/* CILOs Section - Collapsible */}
+      <CollapsibleSection
+        title="Course Intended Learning Outcomes (CILOs)"
+        description="Upon successful completion of this course, students should be able to:"
+        icon={<CheckCircle2 className="h-4 w-4 text-primary" />}
+        defaultOpen={false}
+      >
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           {cilos.map((cilo) => (
             <Card key={cilo.id} className="card-elevated">
@@ -501,15 +487,14 @@ const Index = () => {
             </Card>
           ))}
         </div>
-      </section>
+      </CollapsibleSection>
 
-      {/* Course Policies */}
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold tracking-tight flex items-center gap-2">
-          <FileText className="h-5 w-5 text-primary" />
-          Course Policies
-        </h2>
-        
+      {/* Course Policies - Collapsible */}
+      <CollapsibleSection
+        title="Course Policies"
+        icon={<FileText className="h-4 w-4 text-primary" />}
+        defaultOpen={false}
+      >
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="attendance">
             <AccordionTrigger className="text-sm">Attendance Policy</AccordionTrigger>
@@ -565,11 +550,16 @@ const Index = () => {
             </AccordionContent>
           </AccordionItem>
         </Accordion>
-      </section>
+      </CollapsibleSection>
 
-      {/* Creator Info */}
-      <Card className="card-elevated border-primary/20 bg-primary/5">
-        <CardContent className="flex items-start gap-4 py-4">
+      {/* Creator Info - Collapsible */}
+      <CollapsibleSection
+        title="Course Information"
+        icon={<User className="h-4 w-4 text-primary" />}
+        defaultOpen={false}
+        className="border-primary/20 bg-primary/5"
+      >
+        <div className="flex items-start gap-4">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
             <User className="h-5 w-5 text-primary" />
           </div>
@@ -582,12 +572,15 @@ const Index = () => {
               Platform developed by Dr Simon Wang. This AI-assisted learning hub leverages artificial intelligence to help students develop critical academic English skills.
             </p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </CollapsibleSection>
 
-      {/* Quick Links */}
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold tracking-tight">Quick Links</h2>
+      {/* Quick Links - Collapsible */}
+      <CollapsibleSection
+        title="Quick Links"
+        icon={<ExternalLink className="h-4 w-4 text-primary" />}
+        defaultOpen={false}
+      >
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Card className="card-elevated hover:border-primary/50 transition-colors">
             <Link to="/week/1/hour/1" className="block p-4">
@@ -640,7 +633,7 @@ const Index = () => {
             </a>
           </Card>
         </div>
-      </section>
+      </CollapsibleSection>
 
       <Separator />
 
