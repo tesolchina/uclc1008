@@ -108,8 +108,16 @@ export function ParaphraseCoach({ studentId, onComplete }: ParaphraseCoachProps)
         5: `Original: "${currentSentence.text}". Final paraphrase: "${finalVersion}". Give comprehensive feedback on the paraphrase quality, check for patchwriting, and confirm the citation is correct. Be constructive.`,
       };
 
-      const response = await supabase.functions.invoke("chat", {
-        body: {
+      const chatUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
+      
+      const response = await fetch(chatUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
           messages: [{ role: "user", content: stepContext[currentStep as keyof typeof stepContext] }],
           studentId: studentId || "anonymous",
           meta: {
@@ -118,43 +126,47 @@ export function ParaphraseCoach({ studentId, onComplete }: ParaphraseCoachProps)
             aiPromptHint: "You are a Socratic tutor helping students learn to paraphrase. Use guiding questions. Never write the paraphrase for them. Keep responses brief (2-3 sentences max).",
             mode: "paraphrase-coach"
           }
-        }
+        }),
       });
 
-      if (response.error) throw new Error(response.error.message);
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      if (!response.body) {
+        throw new Error("No response body");
+      }
 
       // Handle streaming response
-      const reader = response.data?.getReader?.();
-      if (reader) {
-        let fullText = "";
-        const decoder = new TextDecoder();
+      const reader = response.body.getReader();
+      let fullText = "";
+      const decoder = new TextDecoder();
+      
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
         
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          
-          const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split("\n");
-          
-          for (const line of lines) {
-            if (line.startsWith("data: ") && line !== "data: [DONE]") {
-              try {
-                const json = JSON.parse(line.slice(6));
-                const content = json.choices?.[0]?.delta?.content;
-                if (content) fullText += content;
-              } catch {}
-            }
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split("\n");
+        
+        for (const line of lines) {
+          if (line.startsWith("data: ") && line !== "data: [DONE]") {
+            try {
+              const json = JSON.parse(line.slice(6));
+              const content = json.choices?.[0]?.delta?.content;
+              if (content) fullText += content;
+            } catch {}
           }
         }
-        
-        if (currentStep === 5) {
-          setAiFeedback(fullText);
-          // Calculate simple similarity
-          const simScore = calculateSimilarity(currentSentence.text, finalVersion);
-          setSimilarity(simScore);
-        } else {
-          setAiHint(fullText);
-        }
+      }
+      
+      if (currentStep === 5) {
+        setAiFeedback(fullText.trim() || "Feedback not available.");
+        // Calculate simple similarity
+        const simScore = calculateSimilarity(currentSentence.text, finalVersion);
+        setSimilarity(simScore);
+      } else {
+        setAiHint(fullText.trim() || "No hint available.");
       }
     } catch (err) {
       console.error("AI hint error:", err);
