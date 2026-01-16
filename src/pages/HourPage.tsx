@@ -558,7 +558,7 @@ Remember to also save any written responses separately.
               title="Part 1: Why Paraphrase?"
               description="Understand the importance of paraphrasing for academic writing and the AWQ"
               icon={<BookOpen className="h-4 w-4 text-blue-600" />}
-              defaultOpen={true}
+              defaultOpen={false}
               className="border-2 border-blue-500/30 bg-blue-500/5"
             >
               <div className="space-y-4">
@@ -675,7 +675,7 @@ Provide brief feedback (3-4 sentences):
               title="Part 2: The 4 Paraphrasing Strategies"
               description="Learn and apply four key techniques for effective paraphrasing"
               icon={<PenLine className="h-4 w-4 text-green-600" />}
-              defaultOpen={true}
+              defaultOpen={false}
               className="border-2 border-green-500/30 bg-green-500/5"
             >
               <div className="space-y-4">
@@ -807,7 +807,7 @@ Provide brief feedback (3-4 sentences):
               title="Part 3: Patchwriting Detection"
               description="Learn to identify and avoid patchwriting (a form of plagiarism)"
               icon={<AlertCircle className="h-4 w-4 text-red-600" />}
-              defaultOpen={true}
+              defaultOpen={false}
               className="border-2 border-red-500/30 bg-red-500/5"
             >
               <div className="space-y-4">
@@ -924,7 +924,7 @@ Provide feedback (4-6 sentences):
               title="Part 4: Citation Integration"
               description="Learn to correctly cite your paraphrased content"
               icon={<FileText className="h-4 w-4 text-purple-600" />}
-              defaultOpen={true}
+              defaultOpen={false}
               className="border-2 border-purple-500/30 bg-purple-500/5"
             >
               <div className="space-y-4">
@@ -1032,7 +1032,7 @@ Provide focused feedback (4-5 sentences):
               title="Part 5: Integrated Skills Assessment"
               description="Test ALL your paraphrasing skills with comprehensive paragraph-level tasks"
               icon={<Target className="h-4 w-4 text-accent" />}
-              defaultOpen={true}
+              defaultOpen={false}
               className="border-2 border-accent/30 bg-gradient-to-r from-accent/10 to-transparent"
             >
               <div className="space-y-4">
@@ -1124,7 +1124,7 @@ Provide focused feedback (4-5 sentences):
               title="Part 2: Skimming & Scanning"
               description="Learn essential reading techniques for academic texts, then practice with a real article"
               icon={<BookOpen className="h-4 w-4 text-green-600" />}
-              defaultOpen={true}
+              defaultOpen={false}
               className="border-2 border-green-500/30 bg-green-500/5"
             >
               <div className="space-y-4">
@@ -1335,7 +1335,7 @@ Provide focused feedback (4-5 sentences):
               title="Part 3a: Outlining – Macro Level"
               description="Learn to identify the overall structure of academic papers"
               icon={<FileText className="h-4 w-4 text-purple-600" />}
-              defaultOpen={true}
+              defaultOpen={false}
               className="border-2 border-purple-500/30 bg-purple-500/5"
             >
               <div className="space-y-4">
@@ -1540,7 +1540,7 @@ Provide focused feedback (4-5 sentences):
               title="Part 3b: Outlining – Micro Level"
               description="Learn to identify key points within paragraphs"
               icon={<FileText className="h-4 w-4 text-indigo-600" />}
-              defaultOpen={true}
+              defaultOpen={false}
               className="border-2 border-indigo-500/30 bg-indigo-500/5"
             >
               <div className="space-y-4">
@@ -1642,7 +1642,7 @@ Provide focused feedback (4-5 sentences):
             title="Key Concepts"
             description="Essential terms and ideas for this hour"
             icon={<Lightbulb className="h-4 w-4 text-amber-500" />}
-            defaultOpen={true}
+            defaultOpen={false}
           >
             <div className="space-y-4">
               {hourData.keyConcepts.map((concept, idx) => (
@@ -1714,7 +1714,7 @@ Provide focused feedback (4-5 sentences):
             title="Quick Check Tasks"
             description="Multiple choice, true/false, and fill-in-the-blank with instant feedback"
             icon={<BookOpen className="h-4 w-4 text-primary" />}
-            defaultOpen={true}
+            defaultOpen={false}
           >
             <div className="space-y-4">
               {objectiveTasks.map((task) => (
@@ -1743,7 +1743,7 @@ Provide focused feedback (4-5 sentences):
             title="Writing Tasks"
             description="Practice academic writing with AI feedback"
             icon={<PenLine className="h-4 w-4 text-primary" />}
-            defaultOpen={true}
+            defaultOpen={false}
           >
             <div className="space-y-4">
               {writingTasks.map((task) => (
@@ -1769,7 +1769,7 @@ Provide focused feedback (4-5 sentences):
             title="Hour Writing Task"
             description="The main writing practice for this hour"
             icon={<PenLine className="h-4 w-4 text-amber-500" />}
-            defaultOpen={true}
+            defaultOpen={false}
             className="border-amber-500/30 bg-gradient-to-r from-amber-500/5 to-transparent"
           >
             <WritingTask
