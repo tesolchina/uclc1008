@@ -1,4 +1,4 @@
-import { BookOpen, CalendarRange, MessageCircle, PanelLeftClose, Sparkles, Target, Settings, CheckCircle2, XCircle, Loader2, Shield, Key } from "lucide-react";
+import { BookOpen, CalendarRange, MessageCircle, PanelLeftClose, Sparkles, Target, Settings, CheckCircle2, XCircle, Loader2, Shield, Radio } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { getWeekMetaById, getAssignmentById } from "@/data";
 import { useLocation } from "react-router-dom";
@@ -83,6 +83,7 @@ export function AppSidebar() {
   // Build navigation items based on role
   const overviewItems = [
     { title: "Course overview", url: "/", icon: BookOpen },
+    { title: "Lab Space", url: "/lab", icon: Radio },
     { title: "Settings", url: "/settings", icon: Settings, showStatus: true },
   ];
 
