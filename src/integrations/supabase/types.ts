@@ -14,6 +14,71 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_tutor_reports: {
+        Row: {
+          commented_at: string | null
+          created_at: string
+          hour_number: number
+          id: string
+          performance_data: Json | null
+          qualitative_report: string
+          star_rating: number
+          student_id: string
+          student_notes: string | null
+          tasks_completed: number | null
+          tasks_total: number | null
+          teacher_comment: string | null
+          teacher_id: string | null
+          topic_id: string
+          updated_at: string
+          week_number: number
+        }
+        Insert: {
+          commented_at?: string | null
+          created_at?: string
+          hour_number: number
+          id?: string
+          performance_data?: Json | null
+          qualitative_report: string
+          star_rating: number
+          student_id: string
+          student_notes?: string | null
+          tasks_completed?: number | null
+          tasks_total?: number | null
+          teacher_comment?: string | null
+          teacher_id?: string | null
+          topic_id: string
+          updated_at?: string
+          week_number: number
+        }
+        Update: {
+          commented_at?: string | null
+          created_at?: string
+          hour_number?: number
+          id?: string
+          performance_data?: Json | null
+          qualitative_report?: string
+          star_rating?: number
+          student_id?: string
+          student_notes?: string | null
+          tasks_completed?: number | null
+          tasks_total?: number | null
+          teacher_comment?: string | null
+          teacher_id?: string | null
+          topic_id?: string
+          updated_at?: string
+          week_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_tutor_reports_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       api_keys: {
         Row: {
           api_key: string
