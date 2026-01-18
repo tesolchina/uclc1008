@@ -9,7 +9,7 @@ interface RoleGuardProps {
   fallbackPath?: string;
 }
 
-export function RoleGuard({ children, allowedRoles, fallbackPath = '/' }: RoleGuardProps) {
+export function RoleGuard({ children, allowedRoles, fallbackPath = '/course_info' }: RoleGuardProps) {
   const { isLoading, isAuthenticated, isAdmin, isTeacher } = useAuth();
 
   if (isLoading) {

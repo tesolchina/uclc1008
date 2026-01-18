@@ -176,7 +176,7 @@ const AssessmentPage = () => {
           <Link to="/week/1">Start with Week 1</Link>
         </Button>
         <Button asChild variant="outline">
-          <Link to="/">Back to Course Overview</Link>
+          <Link to="/course_info">Back to Course Overview</Link>
         </Button>
       </section>
     </div>

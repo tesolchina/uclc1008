@@ -15,7 +15,7 @@ export const WeekAssignmentPage = () => {
   const assignment = assignmentId ? getAssignmentById(assignmentId) : undefined;
 
   if (!week) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/course_info" replace />;
   }
 
   if (!assignment) {

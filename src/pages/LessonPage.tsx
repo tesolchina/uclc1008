@@ -248,7 +248,7 @@ const LessonPage = () => {
   }, [locationState]);
 
   if (!week) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/course_info" replace />;
   }
 
   if (lessonLoading) {

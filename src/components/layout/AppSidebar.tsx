@@ -82,7 +82,7 @@ export function AppSidebar() {
 
   // Build navigation items based on role
   const overviewItems = [
-    { title: "Course overview", url: "/", icon: BookOpen },
+    { title: "Course overview", url: "/course_info", icon: BookOpen },
     { title: "Lab Space", url: "/lab", icon: Radio },
     { title: "Settings", url: "/settings", icon: Settings, showStatus: true },
   ];

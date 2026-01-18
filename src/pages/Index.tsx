@@ -267,6 +267,7 @@ const Index = () => {
 
       {/* Course Aims - Collapsible */}
       <CollapsibleSection
+        id="course_aims"
         title="Course Aims & Descriptions"
         icon={<Target className="h-4 w-4 text-primary" />}
         defaultOpen={false}
@@ -288,6 +289,7 @@ const Index = () => {
 
       {/* Key Facts - Collapsible */}
       <CollapsibleSection
+        id="key_facts"
         title="Key Facts to Know"
         icon={<CheckCircle2 className="h-4 w-4 text-green-600" />}
         defaultOpen={false}
@@ -320,6 +322,7 @@ const Index = () => {
 
       {/* Note to Students - Collapsible */}
       <CollapsibleSection
+        id="student_note"
         title="Note to All Students"
         icon={<AlertCircle className="h-4 w-4 text-primary" />}
         defaultOpen={false}
@@ -333,6 +336,7 @@ const Index = () => {
 
       {/* Weekly Teaching Schedule - Collapsible */}
       <CollapsibleSection
+        id="weekly_schedule"
         title="Weekly Teaching Schedule"
         icon={<Calendar className="h-4 w-4 text-primary" />}
         defaultOpen={false}
@@ -397,6 +401,7 @@ const Index = () => {
 
       {/* Assessments Section - Collapsible */}
       <CollapsibleSection
+        id="assessments"
         title="Assessments"
         description="Students' progress will be evaluated through the following assessments/tests"
         icon={<Target className="h-4 w-4 text-primary" />}
@@ -465,6 +470,7 @@ const Index = () => {
 
       {/* CILOs Section - Collapsible */}
       <CollapsibleSection
+        id="cilos"
         title="Course Intended Learning Outcomes (CILOs)"
         description="Upon successful completion of this course, students should be able to:"
         icon={<CheckCircle2 className="h-4 w-4 text-primary" />}
@@ -491,6 +497,7 @@ const Index = () => {
 
       {/* Course Policies - Collapsible */}
       <CollapsibleSection
+        id="course_policies"
         title="Course Policies"
         icon={<FileText className="h-4 w-4 text-primary" />}
         defaultOpen={false}
@@ -554,6 +561,7 @@ const Index = () => {
 
       {/* Creator Info - Collapsible */}
       <CollapsibleSection
+        id="course_info"
         title="Course Information"
         icon={<User className="h-4 w-4 text-primary" />}
         defaultOpen={false}
@@ -577,6 +585,7 @@ const Index = () => {
 
       {/* Quick Links - Collapsible */}
       <CollapsibleSection
+        id="quick_links"
         title="Quick Links"
         icon={<ExternalLink className="h-4 w-4 text-primary" />}
         defaultOpen={false}

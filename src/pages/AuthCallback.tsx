@@ -13,10 +13,10 @@ export default function AuthCallback() {
     if (token) {
       // Store the session token for legacy HKBU OAuth
       localStorage.setItem('hkbu_session', token);
-      navigate('/');
+      navigate('/course_info');
     } else {
       // Normal Supabase auth callback - just redirect
-      navigate('/');
+      navigate('/course_info');
     }
   }, [searchParams, navigate]);
 
