@@ -8,7 +8,7 @@ interface AdminAuthGuardProps {
 
 export function AdminAuthGuard({ children }: AdminAuthGuardProps) {
   return (
-    <RoleGuard allowedRoles={['admin']} fallbackPath="/">
+    <RoleGuard allowedRoles={['admin']} fallbackPath="/course_info">
       {children}
     </RoleGuard>
   );

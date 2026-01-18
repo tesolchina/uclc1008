@@ -1117,7 +1117,7 @@ Provide focused feedback (4-5 sentences):
               </CardHeader>
               <CardContent>
                 <Button variant="default" className="w-full justify-start h-auto py-3" asChild>
-                  <Link to="/" className="flex items-center gap-2">
+                  <Link to="/course_info" className="flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
                     <div className="text-left flex-1">
                       <div className="font-medium">View Course Overview</div>

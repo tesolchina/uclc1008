@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
   Collapsible,
@@ -16,6 +17,7 @@ interface CollapsibleSectionProps {
   defaultOpen?: boolean;
   className?: string;
   headerClassName?: string;
+  id?: string;
 }
 
 export const CollapsibleSection = ({
@@ -26,12 +28,28 @@ export const CollapsibleSection = ({
   defaultOpen = true,
   className,
   headerClassName,
+  id,
 }: CollapsibleSectionProps) => {
+  const location = useLocation();
   const [isOpen, setIsOpen] = useState(defaultOpen);
+
+  // Auto-open and scroll when hash matches this section's id
+  useEffect(() => {
+    if (id && location.hash === `#${id}`) {
+      setIsOpen(true);
+      // Small delay to allow content to render before scrolling
+      setTimeout(() => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 100);
+    }
+  }, [id, location.hash]);
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <Card className={cn("card-elevated", className)}>
+      <Card id={id} className={cn("card-elevated scroll-mt-20", className)}>
         <CollapsibleTrigger asChild>
           <CardHeader className={cn("pb-3 cursor-pointer select-none hover:bg-muted/30 transition-colors rounded-t-xl", headerClassName)}>
             <div className="flex items-center justify-between">
