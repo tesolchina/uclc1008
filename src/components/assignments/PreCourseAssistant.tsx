@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -41,12 +42,15 @@ const SUGGESTED_QUESTIONS = [
 
 export function PreCourseAssistant() {
   const { user, studentId: authStudentId, isTeacher, isAdmin } = useAuth();
+  const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [isHighlighted, setIsHighlighted] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   // Get effective student ID
   const teacherStudentId = user?.id ? generateTeacherStudentId(user.id) : null;
@@ -59,6 +63,20 @@ export function PreCourseAssistant() {
   const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
   const isPastDue = timeDiff <= 0;
   const isUrgent = daysRemaining <= 3 && !isPastDue;
+
+  // Auto-open and highlight when navigating to #AI
+  useEffect(() => {
+    if (location.hash === "#AI") {
+      setIsOpen(true);
+      setIsHighlighted(true);
+      // Scroll into view with offset
+      setTimeout(() => {
+        cardRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
+      // Remove highlight after animation
+      setTimeout(() => setIsHighlighted(false), 2000);
+    }
+  }, [location.hash]);
 
   // Load chat history when opened
   useEffect(() => {
@@ -257,7 +275,12 @@ export function PreCourseAssistant() {
   };
 
   return (
-    <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-transparent">
+    <Card 
+      ref={cardRef}
+      className={`border-primary/30 bg-gradient-to-br from-primary/5 to-transparent transition-all duration-500 ${
+        isHighlighted ? "ring-2 ring-primary ring-offset-2 ring-offset-background shadow-lg shadow-primary/20" : ""
+      }`}
+    >
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
           <CardHeader className="cursor-pointer hover:bg-muted/30 transition-colors rounded-t-lg">
