@@ -36,6 +36,18 @@ interface AiChatHistory {
   updated_at: string;
 }
 
+interface AiTutorReport {
+  id: string;
+  week_number: number;
+  hour_number: number;
+  topic_id: string;
+  star_rating: number;
+  qualitative_report: string;
+  student_notes: string | null;
+  teacher_comment: string | null;
+  created_at: string;
+}
+
 interface StudentQuestion {
   id: string;
   week_number: number;
@@ -79,6 +91,7 @@ export default function StudentDashboard() {
   const [writingDrafts, setWritingDrafts] = useState<WritingDraft[]>([]);
   const [paragraphNotes, setParagraphNotes] = useState<ParagraphNote[]>([]);
   const [aiChats, setAiChats] = useState<AiChatHistory[]>([]);
+  const [aiTutorReports, setAiTutorReports] = useState<AiTutorReport[]>([]);
   const [expandedChats, setExpandedChats] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
 
@@ -89,6 +102,7 @@ export default function StudentDashboard() {
     setWritingDrafts([]);
     setParagraphNotes([]);
     setAiChats([]);
+    setAiTutorReports([]);
     setLoading(true);
 
     const fetchData = async () => {
@@ -99,7 +113,7 @@ export default function StudentDashboard() {
 
       try {
         // Fetch all data in parallel
-        const [questionsRes, responsesRes, draftsRes, notesRes, chatsRes] = await Promise.all([
+        const [questionsRes, responsesRes, draftsRes, notesRes, chatsRes, tutorReportsRes] = await Promise.all([
           supabase
             .from("student_questions")
             .select("*")
@@ -123,7 +137,12 @@ export default function StudentDashboard() {
             .from("assignment_chat_history")
             .select("*")
             .eq("student_id", studentId)
-            .order("updated_at", { ascending: false })
+            .order("updated_at", { ascending: false }),
+          supabase
+            .from("ai_tutor_reports")
+            .select("*")
+            .eq("student_id", studentId)
+            .order("created_at", { ascending: false })
         ]);
 
         if (questionsRes.data) setQuestions(questionsRes.data);
@@ -131,6 +150,7 @@ export default function StudentDashboard() {
         if (draftsRes.data) setWritingDrafts(draftsRes.data as WritingDraft[]);
         if (notesRes.data) setParagraphNotes(notesRes.data as ParagraphNote[]);
         if (chatsRes.data) setAiChats(chatsRes.data as AiChatHistory[]);
+        if (tutorReportsRes.data) setAiTutorReports(tutorReportsRes.data as AiTutorReport[]);
       } catch (err) {
         console.error("Error fetching data:", err);
       } finally {
@@ -213,7 +233,7 @@ export default function StudentDashboard() {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid gap-4 md:grid-cols-5">
+      <div className="grid gap-4 md:grid-cols-6">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">MC Tasks</CardTitle>
@@ -233,6 +253,17 @@ export default function StudentDashboard() {
             <div className="text-2xl font-bold">{writingDrafts.length}</div>
             <p className="text-xs text-muted-foreground">
               {writingDrafts.filter(d => d.ai_feedback).length} with feedback
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">AI Tutor Sessions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{aiTutorReports.length}</div>
+            <p className="text-xs text-muted-foreground">
+              {aiTutorReports.length > 0 ? `Avg ★${(aiTutorReports.reduce((sum, r) => sum + r.star_rating, 0) / aiTutorReports.length).toFixed(1)}` : 'No sessions'}
             </p>
           </CardContent>
         </Card>
@@ -294,8 +325,12 @@ export default function StudentDashboard() {
             <BookOpen className="h-4 w-4" />
             MC Responses
           </TabsTrigger>
-          <TabsTrigger value="ai-chats" className="gap-1">
+          <TabsTrigger value="ai-tutor" className="gap-1">
             <Sparkles className="h-4 w-4" />
+            AI Tutor ({aiTutorReports.length})
+          </TabsTrigger>
+          <TabsTrigger value="ai-chats" className="gap-1">
+            <MessageCircle className="h-4 w-4" />
             AI Chats
           </TabsTrigger>
         </TabsList>
@@ -560,6 +595,76 @@ export default function StudentDashboard() {
                     </div>
                     );
                   })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* AI Tutor Reports Tab */}
+        <TabsContent value="ai-tutor" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-primary" />
+                My AI Tutor Practice Sessions
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {aiTutorReports.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Sparkles className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p>No AI tutor sessions yet.</p>
+                  <p className="text-xs mt-1">Complete Week 1 Hour 3 AI practice sessions to see reports here.</p>
+                  <Button size="sm" asChild className="mt-3">
+                    <Link to="/week/1/hour/3">Go to Week 1 Hour 3</Link>
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {aiTutorReports.map(report => (
+                    <div key={report.id} className="p-4 rounded-lg border space-y-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="space-y-1">
+                          <p className="font-medium text-sm capitalize">
+                            {report.topic_id.replace(/-/g, ' ')}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Week {report.week_number} Hour {report.hour_number} • {new Date(report.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-yellow-100">
+                          {'★'.repeat(report.star_rating)}{'☆'.repeat(5 - report.star_rating)}
+                        </div>
+                      </div>
+                      
+                      <div className="p-3 bg-muted/50 rounded text-sm">
+                        <p className="text-xs font-medium text-muted-foreground mb-1">AI Assessment:</p>
+                        <p>{report.qualitative_report}</p>
+                      </div>
+
+                      {report.student_notes && (
+                        <div className="p-3 bg-blue-500/10 rounded text-sm">
+                          <p className="text-xs font-medium text-blue-700 mb-1">Your Notes:</p>
+                          <p>{report.student_notes}</p>
+                        </div>
+                      )}
+
+                      {report.teacher_comment && (
+                        <div className="p-3 bg-green-500/10 rounded text-sm">
+                          <p className="text-xs font-medium text-green-700 mb-1">Teacher Feedback:</p>
+                          <p>{report.teacher_comment}</p>
+                        </div>
+                      )}
+
+                      <Button size="sm" variant="outline" asChild>
+                        <Link to={`/week/${report.week_number}/hour/${report.hour_number}`}>
+                          Retry Practice
+                          <ArrowRight className="h-3.5 w-3.5 ml-1" />
+                        </Link>
+                      </Button>
+                    </div>
+                  ))}
                 </div>
               )}
             </CardContent>
