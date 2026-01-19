@@ -1096,7 +1096,7 @@ Provide focused feedback (4-5 sentences):
         {weekNumber === 1 && hourNumber === 3 && (
           <Hour3PracticeSession
             weekNumber={weekNumber}
-            studentId={studentId || "anonymous"}
+            studentId={studentId} // Pass null if not logged in - component will show login prompt
             onComplete={() => handleTaskComplete("w1h3-practice-complete")}
           />
         )}

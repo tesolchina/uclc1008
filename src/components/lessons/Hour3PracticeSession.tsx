@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { 
   BookOpen, 
   Search, 
@@ -11,7 +12,8 @@ import {
   AlertTriangle,
   MessageSquare,
   Star,
-  ChevronRight
+  ChevronRight,
+  LogIn
 } from "lucide-react";
 import { SmartAiTutor } from "./SmartAiTutor";
 import { TutorReportView } from "./TutorReportView";
@@ -19,7 +21,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface Hour3PracticeSessionProps {
   weekNumber: number;
-  studentId: string;
+  studentId: string | null; // Now nullable - null means not logged in
   onComplete?: () => void;
 }
 
@@ -77,12 +79,19 @@ export function Hour3PracticeSession({ weekNumber, studentId, onComplete }: Hour
   const [reports, setReports] = useState<Record<string, TopicReport>>({});
   const [currentReport, setCurrentReport] = useState<TopicReport | null>(null);
 
-  // Load existing reports for this student
+  // Check if student is logged in
+  const isLoggedIn = studentId && studentId !== "anonymous";
+
+  // Load existing reports for this student (only if logged in)
   useEffect(() => {
-    loadReports();
-  }, [studentId, weekNumber]);
+    if (isLoggedIn) {
+      loadReports();
+    }
+  }, [studentId, weekNumber, isLoggedIn]);
 
   const loadReports = async () => {
+    if (!studentId || studentId === "anonymous") return;
+    
     const { data, error } = await supabase
       .from("ai_tutor_reports")
       .select("*")
@@ -98,6 +107,42 @@ export function Hour3PracticeSession({ weekNumber, studentId, onComplete }: Hour
       setReports(reportMap);
     }
   };
+
+  // If not logged in, show login prompt
+  if (!isLoggedIn) {
+    return (
+      <Card className="border-amber-200 bg-amber-50/30">
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <LogIn className="h-5 w-5 text-amber-600" />
+            Login Required for AI Tutor
+          </CardTitle>
+          <CardDescription>
+            Please sign in with your student ID to access the AI tutor and save your progress.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Alert className="border-amber-300 bg-amber-100/50">
+            <AlertDescription className="text-sm">
+              <strong>Why login is required:</strong>
+              <ul className="list-disc ml-4 mt-2 space-y-1">
+                <li>Your chat history will be saved for review</li>
+                <li>Teachers can view your progress and provide feedback</li>
+                <li>Your performance reports are tracked over time</li>
+                <li>You can access your history from the Student Dashboard</li>
+              </ul>
+            </AlertDescription>
+          </Alert>
+          <Button asChild className="w-full">
+            <Link to="/settings">
+              <LogIn className="h-4 w-4 mr-2" />
+              Go to Settings to Sign In
+            </Link>
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const handleStartTutor = (topicId: string) => {
     setSelectedTopic(topicId);
