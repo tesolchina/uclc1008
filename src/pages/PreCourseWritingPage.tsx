@@ -84,11 +84,15 @@ const PreCourseWritingPage = () => {
                   className="flex items-center gap-2"
                 >
                   <Upload className="h-4 w-4" />
-                  Submit on Moodle
+                  Submit on Moodle (Section 53)
                   <ExternalLink className="h-3 w-3" />
                 </a>
               </Button>
             </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              <Info className="h-3 w-3 inline mr-1" />
+              The button above is for <strong>Section 53</strong> only. Students from other sections should submit through their own section on Moodle.
+            </p>
           </div>
         </div>
       </section>
@@ -116,7 +120,9 @@ const PreCourseWritingPage = () => {
       </div>
 
       {/* AI Assistant */}
-      <PreCourseAssistant />
+      <div id="AI">
+        <PreCourseAssistant />
+      </div>
 
       {/* Instructions Section - Collapsible */}
       <Collapsible open={instructionsOpen} onOpenChange={setInstructionsOpen}>
