@@ -110,6 +110,19 @@ interface AiChatHistory {
   updated_at: string;
 }
 
+interface AiTutorReport {
+  id: string;
+  student_id: string;
+  week_number: number;
+  hour_number: number;
+  topic_id: string;
+  star_rating: number;
+  qualitative_report: string;
+  student_notes: string | null;
+  teacher_comment: string | null;
+  created_at: string;
+}
+
 interface WeekProgressData {
   week: number;
   completed: number;
@@ -126,6 +139,8 @@ interface StudentSummary {
   submittedDrafts: number;
   notes: number;
   questions: number;
+  aiTutorSessions: number;
+  avgTutorRating: number;
   lastActive: string;
   weekProgress: WeekProgressData[];
 }
@@ -144,6 +159,7 @@ export default function TeacherDashboard() {
   const [teacherNotes, setTeacherNotes] = useState<TeacherStudentNote[]>([]);
   const [taskFeedback, setTaskFeedback] = useState<TaskFeedback[]>([]);
   const [aiChats, setAiChats] = useState<AiChatHistory[]>([]);
+  const [aiTutorReports, setAiTutorReports] = useState<AiTutorReport[]>([]);
   const [loading, setLoading] = useState(true);
   const [responding, setResponding] = useState<string | null>(null);
   const [responseText, setResponseText] = useState<Record<string, string>>({});
@@ -186,7 +202,7 @@ export default function TeacherDashboard() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [questionsRes, responsesRes, draftsRes, notesRes, teacherNotesRes, feedbackRes, studentsRes, chatsRes] = await Promise.all([
+      const [questionsRes, responsesRes, draftsRes, notesRes, teacherNotesRes, feedbackRes, studentsRes, chatsRes, tutorReportsRes] = await Promise.all([
         supabase
           .from("student_questions")
           .select("*")
@@ -221,6 +237,11 @@ export default function TeacherDashboard() {
           .from("assignment_chat_history")
           .select("*")
           .order("updated_at", { ascending: false })
+          .limit(500),
+        supabase
+          .from("ai_tutor_reports")
+          .select("*")
+          .order("created_at", { ascending: false })
           .limit(500)
       ]);
 
@@ -233,6 +254,7 @@ export default function TeacherDashboard() {
       setTaskFeedback(feedbackRes.data || []);
       setStudentRecords(studentsRes.data || []);
       setAiChats((chatsRes.data || []) as AiChatHistory[]);
+      setAiTutorReports((tutorReportsRes.data || []) as AiTutorReport[]);
     } catch (err) {
       console.error("Error fetching data:", err);
       toast.error("Failed to load data");
@@ -278,7 +300,8 @@ export default function TeacherDashboard() {
       ...studentResponses.map(r => r.student_id),
       ...writingDrafts.map(d => d.student_id),
       ...paragraphNotes.map(n => n.student_id),
-      ...questions.map(q => q.student_id)
+      ...questions.map(q => q.student_id),
+      ...aiTutorReports.map(r => r.student_id)
     ]);
 
     return Array.from(allStudentIds).map(studentId => {
@@ -286,13 +309,15 @@ export default function TeacherDashboard() {
       const studentDrafts = writingDrafts.filter(d => d.student_id === studentId);
       const studentNotes = paragraphNotes.filter(n => n.student_id === studentId);
       const studentQuestions = questions.filter(q => q.student_id === studentId);
+      const studentTutorReports = aiTutorReports.filter(r => r.student_id === studentId);
       const sectionNumber = getStudentSection(studentId);
 
       const allDates = [
         ...studentMc.map(r => new Date(r.submitted_at)),
         ...studentDrafts.map(d => new Date(d.created_at)),
         ...studentNotes.map(n => new Date(n.updated_at)),
-        ...studentQuestions.map(q => new Date(q.created_at))
+        ...studentQuestions.map(q => new Date(q.created_at)),
+        ...studentTutorReports.map(r => new Date(r.created_at))
       ];
       const lastActive = allDates.length > 0 
         ? new Date(Math.max(...allDates.map(d => d.getTime()))).toISOString()
@@ -303,10 +328,11 @@ export default function TeacherDashboard() {
         const weekMc = studentMc.filter(r => parseWeekFromKey(r.question_key) === weekNum).length;
         const weekDrafts = studentDrafts.filter(d => parseWeekFromKey(d.task_key) === weekNum && d.is_submitted).length;
         const weekNotes = studentNotes.filter(n => parseWeekFromKey(n.paragraph_key) === weekNum && n.notes.trim()).length;
+        const weekTutor = studentTutorReports.filter(r => r.week_number === weekNum).length;
         
-        // Estimated totals per week (adjust as needed)
-        const estimatedTotal = 36; // 15 MC + 3 writing + 18 notes
-        const completed = Math.min(weekMc, 15) + Math.min(weekDrafts, 3) + Math.min(weekNotes, 18);
+        // Estimated totals per week - include AI tutor sessions for Week 1
+        const estimatedTotal = weekNum === 1 ? 41 : 36; // 15 MC + 3 writing + 18 notes + (5 AI tutor for W1)
+        const completed = Math.min(weekMc, 15) + Math.min(weekDrafts, 3) + Math.min(weekNotes, 18) + (weekNum === 1 ? Math.min(weekTutor, 5) : 0);
         
         return {
           week: weekNum,
@@ -315,6 +341,11 @@ export default function TeacherDashboard() {
           percentage: estimatedTotal > 0 ? (completed / estimatedTotal) * 100 : 0,
         };
       });
+
+      // Calculate average tutor rating
+      const avgTutorRating = studentTutorReports.length > 0 
+        ? studentTutorReports.reduce((sum, r) => sum + r.star_rating, 0) / studentTutorReports.length 
+        : 0;
 
       return {
         student_id: studentId,
@@ -325,6 +356,8 @@ export default function TeacherDashboard() {
         submittedDrafts: studentDrafts.filter(d => d.is_submitted).length,
         notes: studentNotes.length,
         questions: studentQuestions.length,
+        aiTutorSessions: studentTutorReports.length,
+        avgTutorRating,
         lastActive,
         weekProgress,
       };
@@ -505,6 +538,7 @@ export default function TeacherDashboard() {
     const studentDrafts = writingDrafts.filter(d => d.student_id === selectedStudent);
     const studentNotes = paragraphNotes.filter(n => n.student_id === selectedStudent);
     const studentQuestions = questions.filter(q => q.student_id === selectedStudent);
+    const studentTutorReports = aiTutorReports.filter(r => r.student_id === selectedStudent);
     const teacherNote = getTeacherNote(selectedStudent);
     const studentFeedback = taskFeedback.filter(f => f.student_id === selectedStudent);
 
@@ -565,7 +599,7 @@ export default function TeacherDashboard() {
           </CardContent>
         </Card>
 
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-5">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">MC Responses</CardTitle>
@@ -582,6 +616,19 @@ export default function TeacherDashboard() {
             <CardContent>
               <div className="text-2xl font-bold">{studentDrafts.length}</div>
               <p className="text-xs text-muted-foreground">{studentDrafts.filter(d => d.is_submitted).length} submitted</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">AI Tutor</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{studentTutorReports.length}</div>
+              <p className="text-xs text-muted-foreground">
+                {studentTutorReports.length > 0 
+                  ? `Avg ★${(studentTutorReports.reduce((s, r) => s + r.star_rating, 0) / studentTutorReports.length).toFixed(1)}`
+                  : 'No sessions'}
+              </p>
             </CardContent>
           </Card>
           <Card>
@@ -609,6 +656,7 @@ export default function TeacherDashboard() {
             <TabsTrigger value="all-tasks">All Tasks by Week</TabsTrigger>
             <TabsTrigger value="mc">MC Responses ({studentMc.length})</TabsTrigger>
             <TabsTrigger value="writing">Writing ({studentDrafts.length})</TabsTrigger>
+            <TabsTrigger value="ai-tutor">AI Tutor ({studentTutorReports.length})</TabsTrigger>
             <TabsTrigger value="notes">Notes ({studentNotes.length})</TabsTrigger>
             <TabsTrigger value="questions">Questions ({studentQuestions.length})</TabsTrigger>
           </TabsList>
@@ -621,6 +669,47 @@ export default function TeacherDashboard() {
               taskFeedback={studentFeedback}
               onAddFeedback={openFeedbackDialog}
             />
+          </TabsContent>
+
+          <TabsContent value="ai-tutor" className="space-y-3 mt-4">
+            {studentTutorReports.length === 0 ? (
+              <Card><CardContent className="py-6 text-center text-muted-foreground">No AI Tutor sessions completed</CardContent></Card>
+            ) : studentTutorReports.map(report => (
+              <Card key={report.id}>
+                <CardContent className="pt-4 space-y-3">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="font-medium text-sm capitalize">{report.topic_id.replace(/-/g, ' ')}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Week {report.week_number} Hour {report.hour_number} • {new Date(report.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-yellow-100 text-sm">
+                      {'★'.repeat(report.star_rating)}{'☆'.repeat(5 - report.star_rating)}
+                    </div>
+                  </div>
+                  
+                  <div className="p-3 bg-muted/50 rounded text-sm">
+                    <p className="text-xs font-medium text-muted-foreground mb-1">AI Assessment:</p>
+                    <p className="text-sm">{report.qualitative_report}</p>
+                  </div>
+
+                  {report.student_notes && (
+                    <div className="p-3 bg-blue-500/10 rounded text-sm">
+                      <p className="text-xs font-medium text-blue-700 mb-1">Student Notes:</p>
+                      <p>{report.student_notes}</p>
+                    </div>
+                  )}
+
+                  {report.teacher_comment && (
+                    <div className="p-3 bg-green-500/10 rounded text-sm">
+                      <p className="text-xs font-medium text-green-700 mb-1">Your Comment:</p>
+                      <p>{report.teacher_comment}</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
           </TabsContent>
 
           <TabsContent value="mc" className="space-y-3 mt-4">
