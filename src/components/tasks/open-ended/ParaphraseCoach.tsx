@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { AiFeedbackHint } from "@/components/api/AiFeedbackHint";
 import { 
   ArrowRight, 
   ArrowLeft, 
@@ -614,6 +615,9 @@ Be constructive and explain WHY your version is an improvement.`,
             <p className="text-sm text-muted-foreground">{aiHint}</p>
           </div>
         )}
+        
+        {/* API Key Status & Formatting Tips */}
+        <AiFeedbackHint />
         
         {/* Actions */}
         <div className="flex items-center justify-between pt-4 border-t">

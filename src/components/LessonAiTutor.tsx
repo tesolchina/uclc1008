@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { AiFeedbackHint } from "@/components/api/AiFeedbackHint";
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
 
@@ -330,6 +331,9 @@ export const LessonAiTutor = ({
             placeholder="E.g. Can you help me improve this summary? Or: What are good phrases for this week's topic?"
             className="min-h-[96px] resize-none text-sm"
           />
+          {/* API Key Status & Formatting Tips */}
+          <AiFeedbackHint showMarkdownTip={false} />
+          
           <div className="flex items-center justify-between gap-2">
             <p className="hidden text-[11px] text-muted-foreground sm:block">
               Tip: Paste your writing and ask for language-focused feedback, not just a new version.

@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { AiFeedbackHint } from "@/components/api/AiFeedbackHint";
 import { 
   CheckCircle2, 
   Sparkles, 
@@ -335,8 +336,11 @@ Keep your total response focused and constructive (about 200-250 words).`
           </div>
         )}
 
+        {/* API Key Status & Formatting Tips */}
+        <AiFeedbackHint className="pt-2 border-t" />
+
         {/* Action Buttons */}
-        <div className="flex items-center justify-between pt-2 border-t">
+        <div className="flex items-center justify-between pt-2">
           {!submitted ? (
             <Button
               onClick={handleSubmit}
