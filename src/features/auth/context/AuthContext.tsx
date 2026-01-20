@@ -159,6 +159,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setProfile(null);
     setUserRoles([]);
     
+    // Reset active role to student
+    setActiveRoleState('student');
+    localStorage.removeItem('ue1_active_role');
+    
     // Clear student ID session
     clearStoredStudentId();
     setStudentId(null);
@@ -195,8 +199,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     accessToken: session?.access_token ?? null,
     isLoading,
     isAuthenticated: !!user || !!studentId,
-    isTeacher: activeRole === 'teacher' || activeRole === 'admin' || userRoles.includes('teacher') || userRoles.includes('admin'),
-    isAdmin: activeRole === 'admin' || userRoles.includes('admin'),
+    // Only set isTeacher/isAdmin when user is actually authenticated with OAuth
+    isTeacher: !!user && (activeRole === 'teacher' || activeRole === 'admin' || userRoles.includes('teacher') || userRoles.includes('admin')),
+    isAdmin: !!user && (activeRole === 'admin' || userRoles.includes('admin')),
     isStudent: !!studentId && !user,
     studentId,
     userRoles,
