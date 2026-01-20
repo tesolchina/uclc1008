@@ -53,6 +53,8 @@ const App = () => (
               <Route index element={<Navigate to="/course_info" replace />} />
               <Route path="course_info" element={<Index />} />
               <Route path="auth" element={<AuthPage />} />
+              <Route path="auth/student/login" element={<AuthPage initialMode="student-login" />} />
+              <Route path="auth/student/register" element={<AuthPage initialMode="student-register" />} />
               <Route path="auth/callback" element={<AuthCallback />} />
               <Route path="assessment" element={<AssessmentPage />} />
               

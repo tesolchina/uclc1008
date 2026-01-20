@@ -331,7 +331,7 @@ export default function SettingsPage() {
               ) : (
                 <p className="text-xs text-muted-foreground">
                   Don't have an ID yet?{' '}
-                  <a href="/auth" className="text-primary hover:underline font-medium">
+                  <a href="/auth/student/register" className="text-primary hover:underline font-medium">
                     Sign up here
                   </a>{' '}
                   to get started.
@@ -525,7 +525,8 @@ export default function SettingsPage() {
       )}
 
       {/* Prompt for non-fully-authenticated users to sign in to use API key */}
-      {!isFullyAuthenticated && !hasHkbuKey && (
+      {/* Only show once - not for student-only sessions who already see the ID section */}
+      {!isFullyAuthenticated && !hasHkbuKey && !isAuthenticated && (
         <Card className="border-dashed border-yellow-500/50">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
@@ -548,18 +549,26 @@ export default function SettingsPage() {
         </Card>
       )}
 
-      {/* Sign in prompt for sync features */}
-      {!isFullyAuthenticated && (
-        <Card className="border-dashed">
-          <CardContent className="pt-6">
-            <div className="text-center space-y-3">
-              <p className="text-sm text-muted-foreground">
-                Sign in with your HKBU account to sync settings across devices and enable API key management.
-              </p>
-              <Button variant="outline" onClick={loginWithHkbu}>
-                Sign in with HKBU
-              </Button>
-            </div>
+      {/* For student-only sessions - show upgrade prompt */}
+      {!isFullyAuthenticated && isAuthenticated && !hasHkbuKey && (
+        <Card className="border-dashed border-primary/30">
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Key className="h-4 w-4" />
+              Want Unlimited AI Access?
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Alert className="border-primary/30 bg-primary/5">
+              <Sparkles className="h-4 w-4 text-primary" />
+              <AlertDescription className="text-foreground">
+                You're currently using the shared API with daily limits. 
+                Link your HKBU account to add your own API key for unlimited access.
+              </AlertDescription>
+            </Alert>
+            <Button variant="outline" onClick={loginWithHkbu} className="w-full">
+              Link HKBU Account
+            </Button>
           </CardContent>
         </Card>
       )}
