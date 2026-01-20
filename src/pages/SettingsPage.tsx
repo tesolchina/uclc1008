@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -37,18 +38,24 @@ function setStoredStudentId(id: string): void {
 
 export default function SettingsPage() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const { isAuthenticated, user, profile, accessToken, loginWithHkbu } = useAuth();
   
   // Check if user is fully authenticated (OAuth login), not just student-only mode
   const isFullyAuthenticated = !!user && !!profile;
   
+  // Redirect unauthenticated users to login
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/auth/student/login', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
+  
   const [isLoading, setIsLoading] = useState(true);
   const [isSavingKey, setIsSavingKey] = useState(false);
-  const [isSavingId, setIsSavingId] = useState(false);
   const [isRevoking, setIsRevoking] = useState(false);
   
-  // Student ID
-  const [studentId, setStudentId] = useState('');
+  // Student ID (for display only now)
   const [savedStudentId, setSavedStudentId] = useState('');
   
   // API status
@@ -75,16 +82,24 @@ export default function SettingsPage() {
     todayRequests: number;
     totalRequests: number;
   }>({ todayTokens: 0, totalTokens: 0, todayRequests: 0, totalRequests: 0 });
+  
+  // If not authenticated, show loading while redirecting
+  if (!isAuthenticated) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   const loadStatus = async () => {
     setIsLoading(true);
     try {
       // Load stored student ID (sync, no await needed)
       const storedId = getStoredStudentId();
-      setStudentId(storedId);
       setSavedStudentId(storedId);
       
-      // For authenticated users, prioritize profile ID; for anonymous, use stored ID or browser session
+      // For authenticated users, prioritize profile ID; for student-only, use stored ID or browser session
       const effectiveStudentId = profile?.hkbu_user_id || storedId || getBrowserSessionId();
       const today = new Date().toISOString().split('T')[0];
 
@@ -145,20 +160,6 @@ export default function SettingsPage() {
     loadStatus();
   }, [profile]);
 
-  const handleSaveStudentId = () => {
-    setIsSavingId(true);
-    try {
-      setStoredStudentId(studentId);
-      setSavedStudentId(studentId);
-      toast({ title: 'Student ID saved' });
-      // Reload status to check if student has saved API key
-      loadStatus();
-    } catch (error) {
-      toast({ variant: 'destructive', title: 'Failed to save Student ID' });
-    } finally {
-      setIsSavingId(false);
-    }
-  };
 
   const handleTestConnection = async () => {
     if (!apiKey.trim()) {
@@ -335,8 +336,6 @@ export default function SettingsPage() {
     );
   }
 
-  const studentIdChanged = studentId !== savedStudentId;
-
   return (
     <div className="space-y-6">
       <header className="space-y-2">
@@ -352,54 +351,19 @@ export default function SettingsPage() {
         </p>
       </header>
 
-      {/* Unique ID Section - Only show for anonymous users */}
-      {!isAuthenticated && (
+      {/* Show current student ID */}
+      {savedStudentId && (
         <Card>
-          <CardHeader>
+          <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
               <User className="h-4 w-4" />
               Your Unique ID
             </CardTitle>
-            <CardDescription>
-              This is <strong>not</strong> your student ID. Enter the unique anonymized ID assigned to you by your instructor, or create your own memorable code.
-            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="studentId">Unique ID</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="studentId"
-                  placeholder="e.g. bluefox42 or your assigned code"
-                  value={studentId}
-                  onChange={(e) => setStudentId(e.target.value)}
-                  className="max-w-xs"
-                />
-                <Button 
-                  onClick={handleSaveStudentId} 
-                  disabled={isSavingId || !studentIdChanged}
-                  variant={studentIdChanged ? "default" : "outline"}
-                >
-                  {isSavingId ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Save'}
-                </Button>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Your progress and AI usage will be tracked under this ID. Keep it private and memorable.
-              </p>
-              {savedStudentId ? (
-                <p className="text-xs text-muted-foreground">
-                  Current ID: <span className="font-mono font-medium">{savedStudentId}</span>
-                </p>
-              ) : (
-                <p className="text-xs text-muted-foreground">
-                  Don't have an ID yet?{' '}
-                  <a href="/auth/student/register" className="text-primary hover:underline font-medium">
-                    Sign up here
-                  </a>{' '}
-                  to get started.
-                </p>
-              )}
-            </div>
+          <CardContent>
+            <p className="text-sm">
+              Logged in as: <span className="font-mono font-medium">{savedStudentId}</span>
+            </p>
           </CardContent>
         </Card>
       )}
