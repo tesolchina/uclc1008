@@ -68,7 +68,6 @@ export default function SettingsPage() {
   const [validationStatus, setValidationStatus] = useState<'idle' | 'validating' | 'success' | 'error'>('idle');
   const [validationError, setValidationError] = useState<string | null>(null);
   const [showWalkthrough, setShowWalkthrough] = useState(false);
-  const [isTesting, setIsTesting] = useState(false);
   
   // Shared API status
   const [sharedApiEnabled, setSharedApiEnabled] = useState(true);
@@ -160,64 +159,7 @@ export default function SettingsPage() {
     loadStatus();
   }, [profile]);
 
-
-  const handleTestConnection = async () => {
-    if (!apiKey.trim()) {
-      toast({
-        variant: 'destructive',
-        title: 'Please enter your HKBU API key',
-      });
-      return;
-    }
-
-    setIsTesting(true);
-    setValidationStatus('validating');
-    setValidationError(null);
-
-    try {
-      // Test the key by calling save-api-key with test mode
-      const { data, error } = await supabase.functions.invoke('save-api-key', {
-        body: {
-          provider: 'hkbu',
-          apiKey: apiKey.trim(),
-          testOnly: true,
-        },
-      });
-
-      if (error) {
-        throw new Error(error.message || 'Connection test failed');
-      }
-
-      if (data?.validated) {
-        setValidationStatus('success');
-        toast({ 
-          title: '✓ Connection successful!',
-          description: 'Your API key is valid. Click "Save API Key" to save it to your profile.',
-        });
-      } else if (data?.error) {
-        setValidationStatus('error');
-        setValidationError(data.error);
-        toast({
-          variant: 'destructive',
-          title: 'Invalid API Key',
-          description: data.error,
-        });
-      }
-    } catch (error: any) {
-      console.error('Error testing key:', error);
-      setValidationStatus('error');
-      setValidationError(error.message || 'Connection test failed');
-      toast({
-        variant: 'destructive',
-        title: 'Connection test failed',
-        description: error.message,
-      });
-    } finally {
-      setIsTesting(false);
-    }
-  };
-
-  const handleSaveKey = async () => {
+  const handleConnectAndSave = async () => {
     if (!apiKey.trim()) {
       toast({
         variant: 'destructive',
@@ -233,7 +175,7 @@ export default function SettingsPage() {
       toast({
         variant: 'destructive',
         title: 'Student ID required',
-        description: 'Please set your Unique ID first to save your API key.',
+        description: 'Please sign in first to save your API key.',
       });
       return;
     }
@@ -243,6 +185,7 @@ export default function SettingsPage() {
     setValidationError(null);
 
     try {
+      // This will test and save in one call
       const { data, error } = await supabase.functions.invoke('save-api-key', {
         body: {
           provider: 'hkbu',
@@ -252,14 +195,14 @@ export default function SettingsPage() {
       });
 
       if (error) {
-        throw new Error(error.message || 'Failed to save API key');
+        throw new Error(error.message || 'Failed to connect');
       }
 
       if (data?.success && data?.validated) {
         setValidationStatus('success');
         toast({ 
-          title: '✓ API key validated and saved!',
-          description: 'Your key has been saved. You won\'t need to enter it again.',
+          title: '✓ Connected!',
+          description: 'Your API key is valid and saved.',
         });
         setApiKey('');
         loadStatus();
@@ -275,10 +218,10 @@ export default function SettingsPage() {
     } catch (error: any) {
       console.error('Error saving key:', error);
       setValidationStatus('error');
-      setValidationError(error.message || 'Failed to save API key');
+      setValidationError(error.message || 'Failed to connect');
       toast({
         variant: 'destructive',
-        title: 'Failed to save API key',
+        title: 'Connection failed',
         description: error.message,
       });
     } finally {
@@ -544,47 +487,23 @@ export default function SettingsPage() {
               </Alert>
             )}
 
-            {validationStatus === 'success' && (
-              <Alert className="border-green-500 bg-green-500/10">
-                <CheckCircle2 className="h-4 w-4 text-green-500" />
-                <AlertDescription className="text-green-700">
-                  API key is valid! Click "Save API Key" to save it.
-                </AlertDescription>
-              </Alert>
-            )}
-
-            <div className="flex gap-2">
-              <Button 
-                variant="outline"
-                onClick={handleTestConnection} 
-                disabled={isTesting || isSavingKey || !apiKey.trim()}
-              >
-                {isTesting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Testing...
-                  </>
-                ) : (
-                  <>
-                    <Zap className="mr-2 h-4 w-4" />
-                    Test Connection
-                  </>
-                )}
-              </Button>
-              <Button 
-                onClick={handleSaveKey} 
-                disabled={isSavingKey || isTesting || !apiKey.trim()}
-              >
-                {isSavingKey ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  'Save API Key'
-                )}
-              </Button>
-            </div>
+            <Button 
+              onClick={handleConnectAndSave} 
+              disabled={isSavingKey || !apiKey.trim()}
+              className="w-full"
+            >
+              {isSavingKey ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Connecting...
+                </>
+              ) : (
+                <>
+                  <Zap className="mr-2 h-4 w-4" />
+                  Connect & Save
+                </>
+              )}
+            </Button>
           </CardContent>
         </Card>
       )}
