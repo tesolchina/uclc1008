@@ -2053,411 +2053,387 @@ Provide focused feedback (4-5 sentences):
           </section>
         )}
 
-        {/* Week 2 Hour 2: Paraphrasing Strategies (Core) */}
+        {/* Week 2 Hour 2: End-of-Text Citations / Reference List */}
         {weekNumber === 2 && hourNumber === 2 && (
           <section className="space-y-6">
-            {/* Part 1: Synonym Replacement with Integrated Practice */}
+            {/* Part 1: What are End-of-Text Citations? */}
             <CollapsibleSection
-              title="Part 1: Synonym Replacement"
-              description="Replace words with similar meanings and practice with AI feedback"
+              title="Part 1: End-of-Text Citations / References"
+              description="Understanding reference list formatting in APA 7th edition"
               icon={<BookOpen className="h-4 w-4 text-blue-600" />}
               defaultOpen={true}
               className="border-2 border-blue-500/30 bg-blue-500/5"
             >
               <div className="space-y-4">
+                {/* Introduction */}
                 <div className="p-4 rounded-lg bg-background/80 space-y-3">
                   <h4 className="font-medium flex items-center gap-2">
                     <Lightbulb className="h-4 w-4 text-amber-500" />
-                    What is Synonym Replacement?
+                    Why End-of-Text Citations Matter
                   </h4>
                   <p className="text-sm text-muted-foreground">
-                    Replacing words with similar meanings WITHOUT changing the context. Be careful of "thesaurus abuse" — 
-                    only use synonyms you know fit the academic context.
+                    While <strong>in-text citations</strong> show WHO and WHEN (author + year), 
+                    <strong> end-of-text citations</strong> (the Reference List) provide the complete information: 
+                    WHO, WHEN, WHAT, and WHERE — allowing readers to locate the original source.
                   </p>
                 </div>
 
-                {/* Examples */}
+                {/* In-text vs End-of-text Comparison */}
                 <div className="grid md:grid-cols-2 gap-4">
-                  <div className="p-4 rounded-lg border border-red-500/30 bg-red-500/5 space-y-2">
-                    <p className="text-xs font-medium text-red-700">❌ Bad Synonym (Unnatural)</p>
+                  <div className="p-4 rounded-lg border border-blue-500/30 bg-blue-500/5 space-y-2">
+                    <p className="text-xs font-medium text-blue-700">📝 In-Text Citation</p>
                     <p className="text-sm text-muted-foreground italic">
-                      "FRT is being <span className="line-through">introduced</span> <strong>acquainted</strong> across public life."
+                      "According to Andrejevic and Selwyn (2020), FRT raises privacy concerns."
                     </p>
-                    <p className="text-xs text-red-600">"Acquainted" doesn't fit this context!</p>
+                    <p className="text-xs text-blue-600">Shows: Author + Year (WHO + WHEN)</p>
                   </div>
                   <div className="p-4 rounded-lg border border-green-500/30 bg-green-500/5 space-y-2">
-                    <p className="text-xs font-medium text-green-700">✅ Good Synonym (Natural)</p>
+                    <p className="text-xs font-medium text-green-700">📚 End-of-Text Reference</p>
                     <p className="text-sm text-muted-foreground italic">
-                      "FRT is being <span className="line-through">introduced</span> <strong>implemented</strong> across public spaces."
+                      Andrejevic, M., & Selwyn, N. (2020). Facial recognition technology in schools: Critical questions and concerns. <em>Learning, Media and Technology</em>, 45(2), 115-128.
                     </p>
-                    <p className="text-xs text-green-600">"Implemented" fits the academic context.</p>
+                    <p className="text-xs text-green-600">Shows: Authors, Year, Title, Journal, Volume, Pages</p>
                   </div>
                 </div>
 
-                {/* Common Academic Synonyms */}
-                <div className="p-4 rounded-lg border bg-muted/30">
-                  <h4 className="font-medium text-sm mb-3">Common Academic Synonym Swaps</h4>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-                    <div className="p-2 bg-background rounded text-center">
-                      <span className="text-red-500 line-through">examined</span> → <span className="text-green-600">investigated</span>
-                    </div>
-                    <div className="p-2 bg-background rounded text-center">
-                      <span className="text-red-500 line-through">shows</span> → <span className="text-green-600">demonstrates</span>
-                    </div>
-                    <div className="p-2 bg-background rounded text-center">
-                      <span className="text-red-500 line-through">important</span> → <span className="text-green-600">significant</span>
-                    </div>
-                    <div className="p-2 bg-background rounded text-center">
-                      <span className="text-red-500 line-through">use</span> → <span className="text-green-600">utilize</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* MC Questions */}
-                <div className="space-y-3 pt-2">
-                  <QuickCheckMC
-                    questionNumber={1}
-                    question="Select the BEST academic synonym for 'examined' in: 'The study examined the effects of FRT.'"
-                    options={[
-                      { label: "A", text: "looked at" },
-                      { label: "B", text: "investigated" },
-                      { label: "C", text: "stared at" },
-                      { label: "D", text: "checked out" },
-                    ]}
-                    correctAnswer="B"
-                    explanation="'Investigated' is the most appropriate academic synonym. 'Looked at' and 'checked out' are too informal."
-                  />
-                </div>
-
-                {/* Writing Task */}
-                <div className="space-y-3 pt-4 border-t">
-                  <h4 className="font-medium text-sm flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-amber-500" />
-                    Writing Practice: Synonym Replacement
-                  </h4>
+                {/* Key Rule */}
+                <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
+                  <p className="text-sm font-medium text-amber-700 mb-1">🔑 Key Rule:</p>
                   <p className="text-xs text-muted-foreground">
-                    Rewrite this sentence using ONLY synonym replacement (keep the same structure). Replace at least 3 words with academic synonyms:
+                    Every in-text citation must have a corresponding entry in the Reference List (and vice versa). 
+                    This allows readers to find the full source details.
                   </p>
-                  <div className="p-3 rounded-lg bg-muted/50 text-sm">
-                    <strong>Original:</strong> "The study examined how schools use technology for security purposes."
-                  </div>
-                  <WritingPracticeWithHistory
-                    taskKey="w2h2-synonym-practice"
-                    studentId={studentId || "anonymous"}
-                    title="Synonym Replacement Practice"
-                    instructions="Replace at least 3 words with appropriate academic synonyms. Keep the sentence structure the same. Think: examined→?, use→?, purposes→?"
-                    placeholder="The research investigated how schools utilize technology for security..."
-                  />
                 </div>
+
+                {/* MC Question */}
+                <QuickCheckMC
+                  questionNumber={1}
+                  question="What information does an END-OF-TEXT citation include that an IN-TEXT citation does NOT?"
+                  options={[
+                    { label: "A", text: "Author name" },
+                    { label: "B", text: "Publication year" },
+                    { label: "C", text: "Article title, journal name, volume, and page numbers" },
+                    { label: "D", text: "The main argument of the source" },
+                  ]}
+                  correctAnswer="C"
+                  explanation="End-of-text citations include the full publication details: article title, journal name, volume/issue numbers, and page numbers — everything needed to locate the source."
+                />
               </div>
             </CollapsibleSection>
 
-            {/* Part 2: Changing Word Forms with Integrated Practice */}
+            {/* Part 2: Journal Article Format */}
             <CollapsibleSection
-              title="Part 2: Changing Word Forms"
-              description="Transform verbs to nouns, adjectives to adverbs, and practice"
+              title="Part 2: Formatting Journal Article References"
+              description="Master the APA 7th edition format for journal articles"
               icon={<PenLine className="h-4 w-4 text-green-600" />}
               defaultOpen={false}
               className="border-2 border-green-500/30 bg-green-500/5"
             >
               <div className="space-y-4">
+                {/* Format Template */}
                 <div className="p-4 rounded-lg bg-background/80 space-y-3">
                   <h4 className="font-medium flex items-center gap-2">
                     <Lightbulb className="h-4 w-4 text-green-500" />
-                    Word Form Changes Force Structure Changes
+                    The APA 7th Edition Format for Journal Articles
                   </h4>
-                  <p className="text-sm text-muted-foreground">
-                    Changing a verb to a noun (or vice versa) naturally changes the sentence structure. 
-                    This is one of the most effective paraphrasing techniques!
-                  </p>
+                  <div className="p-3 rounded-lg bg-muted/50 font-mono text-sm">
+                    <span className="text-blue-600">Author last name, Initials.</span> (<span className="text-purple-600">Year</span>). <span className="text-green-600">Title of article</span>. <em className="text-amber-600">Title of Journal</em>, <span className="text-red-600">volume</span>(issue), pages. https://doi.org/xxxxx
+                  </div>
                 </div>
 
-                {/* Examples */}
+                {/* Examples by Number of Authors */}
                 <div className="space-y-3">
+                  <h4 className="font-medium text-sm">Examples by Number of Authors</h4>
+                  
+                  {/* One Author */}
                   <div className="p-4 rounded-lg border bg-muted/30 space-y-2">
-                    <p className="text-sm font-medium">Verb → Noun</p>
-                    <p className="text-sm text-muted-foreground">
-                      <strong>Original:</strong> "The author <span className="text-red-500">supports</span> the use of FR systems."
+                    <p className="text-sm font-medium flex items-center gap-2">
+                      <Badge variant="outline">1 Author</Badge>
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      <strong>Paraphrase:</strong> "The author expresses <span className="text-green-600">support</span> for the implementation of FR systems."
+                      Arpaci, I. (2016). Understanding and predicting students' intention to use mobile cloud storage services. <em>Computers in Human Behaviour</em>, 58(5), 150–157. https://doi.org/10.1016/j.chb.2015.12.067
                     </p>
                   </div>
+
+                  {/* Two Authors */}
                   <div className="p-4 rounded-lg border bg-muted/30 space-y-2">
-                    <p className="text-sm font-medium">Adverb → Adjective/Noun</p>
-                    <p className="text-sm text-muted-foreground">
-                      <strong>Original:</strong> "Parents <span className="text-red-500">anxiously</span> viewed the technology."
+                    <p className="text-sm font-medium flex items-center gap-2">
+                      <Badge variant="outline">2 Authors</Badge>
+                      <span className="text-xs text-muted-foreground">Use "&" between authors</span>
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      <strong>Paraphrase:</strong> "Parents expressed <span className="text-green-600">anxiety</span> regarding the technology."
+                      Aurigemma, S., <span className="text-green-600 font-medium">&</span> Mattson, T. (2017). Exploring the effect of uncertainty avoidance on taking voluntary protective security actions. <em>Computers & Security</em>, 73(5), 219–234.
+                    </p>
+                  </div>
+
+                  {/* Three+ Authors */}
+                  <div className="p-4 rounded-lg border bg-muted/30 space-y-2">
+                    <p className="text-sm font-medium flex items-center gap-2">
+                      <Badge variant="outline">3+ Authors</Badge>
+                      <span className="text-xs text-muted-foreground">List ALL authors with "&" before the last</span>
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Plouffe, C. R., Hulland, J. S., <span className="text-green-600 font-medium">&</span> Vandenbosch, M. (2001). Research report: Richness versus parsimony in modelling technology adoption decisions. <em>Information Systems Research</em>, 12(2), 208–222.
                     </p>
                   </div>
                 </div>
 
-                {/* Word Form Reference */}
-                <div className="p-4 rounded-lg border bg-gradient-to-r from-green-500/5 to-blue-500/5">
-                  <h4 className="font-medium text-sm mb-3">Common Word Form Transformations</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline">Verb → Noun</Badge>
-                      <span className="text-muted-foreground">impacts → impact, supports → support, develops → development</span>
+                {/* Common Errors */}
+                <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/30 space-y-3">
+                  <h4 className="font-medium flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4 text-red-500" />
+                    Common Formatting Errors
+                  </h4>
+                  <div className="grid gap-2 text-sm">
+                    <div className="flex items-start gap-2">
+                      <span className="text-red-500">✗</span>
+                      <span className="text-muted-foreground">Using "and" instead of "&" between authors</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline">Adj → Noun</Badge>
-                      <span className="text-muted-foreground">significant → significance, important → importance</span>
+                    <div className="flex items-start gap-2">
+                      <span className="text-red-500">✗</span>
+                      <span className="text-muted-foreground">Capitalizing every word in the article title (only capitalize the first word and proper nouns)</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-red-500">✗</span>
+                      <span className="text-muted-foreground">Not italicizing the journal name</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-red-500">✗</span>
+                      <span className="text-muted-foreground">Missing the DOI when available</span>
                     </div>
                   </div>
                 </div>
 
-                {/* MC Question */}
-                <QuickCheckMC
-                  questionNumber={2}
-                  question="Which paraphrasing strategy was used here?\n\nOriginal: 'The technology significantly impacts education.'\nParaphrase: 'The significant impact of technology on education...'"
-                  options={[
-                    { label: "A", text: "Synonym replacement" },
-                    { label: "B", text: "Word form change (verb → noun, adverb → adjective)" },
-                    { label: "C", text: "Active to passive voice" },
-                    { label: "D", text: "Combining sentences" },
-                  ]}
-                  correctAnswer="B"
-                  explanation="'impacts' (verb) → 'impact' (noun), 'significantly' (adverb) → 'significant' (adjective)."
-                />
+                {/* Spot the Errors MC */}
+                <div className="space-y-3 pt-2">
+                  <h4 className="font-medium text-sm">🔍 Spot the Errors</h4>
+                  <div className="p-3 rounded-lg bg-muted/50 text-sm">
+                    <strong>Reference with errors:</strong><br/>
+                    Andrejevic, M. and Selwyn, N. (2020). Facial Recognition Technology In Schools: Critical Questions And Concerns. Learning, Media and Technology, 45:2, 115-128.
+                  </div>
+                  
+                  <QuickCheckMC
+                    questionNumber={2}
+                    question="How many APA 7th formatting ERRORS are in the reference above?"
+                    options={[
+                      { label: "A", text: "1 error" },
+                      { label: "B", text: "2 errors" },
+                      { label: "C", text: "3 errors" },
+                      { label: "D", text: "4 errors" },
+                    ]}
+                    correctAnswer="D"
+                    explanation="4 errors: (1) 'and' should be '&', (2) title shouldn't have Title Case (only first word capitalized), (3) journal name not italicized, (4) volume format should be 45(2) not 45:2."
+                  />
 
-                {/* Writing Task */}
+                  <QuickCheckMC
+                    questionNumber={3}
+                    question="Which reference is correctly formatted in APA 7th edition?"
+                    options={[
+                      { label: "A", text: "Andrejevic, M. and Selwyn, N. (2020). Facial recognition technology in schools. Learning, Media and Technology, 45(2), 115-128." },
+                      { label: "B", text: "Andrejevic, M., & Selwyn, N. (2020). Facial recognition technology in schools: Critical questions and concerns. Learning, Media and Technology, 45(2), 115-128." },
+                      { label: "C", text: "Andrejevic, M., & Selwyn, N. (2020). Facial recognition technology in schools: Critical questions and concerns. *Learning, Media and Technology*, 45(2), 115-128." },
+                      { label: "D", text: "Andrejevic and Selwyn (2020). Facial Recognition Technology in Schools. Learning, Media and Technology." },
+                    ]}
+                    correctAnswer="C"
+                    explanation="Option C is correct: uses '&' between authors, sentence case for article title, italicized journal name (shown with asterisks), and proper volume(issue) format."
+                  />
+                </div>
+
+                {/* Writing Practice */}
                 <div className="space-y-3 pt-4 border-t">
                   <h4 className="font-medium text-sm flex items-center gap-2">
                     <Sparkles className="h-4 w-4 text-amber-500" />
-                    Writing Practice: Word Form Changes
+                    Practice: Fix the Reference
                   </h4>
                   <p className="text-xs text-muted-foreground">
-                    Rewrite this sentence by changing the word forms. Convert the verb to a noun and restructure accordingly:
+                    The reference below has multiple errors. Rewrite it correctly in APA 7th format:
                   </p>
-                  <div className="p-3 rounded-lg bg-muted/50 text-sm">
-                    <strong>Original:</strong> "The researchers <span className="underline">investigated</span> how parents <span className="underline">respond</span> to FRT." (Hong et al., 2022)
+                  <div className="p-3 rounded-lg bg-red-500/5 border border-red-500/20 text-sm">
+                    <strong>Incorrect:</strong> Hong, J.C. and Li, Y. and Kuo, S.Y. (2022). Supporting Schools To Use Face Recognition Systems: A Continuance Intention Perspective Of Elementary School Parents In China. Education and Information Technologies. 27, 12645–12665
                   </div>
                   <WritingPracticeWithHistory
-                    taskKey="w2h2-wordform-practice"
+                    taskKey="w2h2-fix-reference"
                     studentId={studentId || "anonymous"}
-                    title="Word Form Change Practice"
-                    instructions="Change 'investigated' to 'investigation' and 'respond' to 'response'. You'll need to restructure the sentence. Include the citation."
-                    placeholder="The investigation by Hong et al. (2022) focused on parental response to..."
+                    title="Reference Correction Practice"
+                    instructions="Rewrite this reference correctly. Remember: (1) Use '&' before the last author, (2) Sentence case for the title, (3) Italicize the journal name, (4) Include volume in proper format."
+                    placeholder="Hong, J. C., Li, Y., & Kuo, S. Y. (2022). Supporting schools to use face recognition systems: A continuance intention perspective..."
                   />
                 </div>
               </div>
             </CollapsibleSection>
 
-            {/* Part 3: Active/Passive Voice with Integrated Practice */}
+            {/* Part 3: Books and Book Chapters */}
             <CollapsibleSection
-              title="Part 3: Active ↔ Passive Voice"
-              description="Switch between active and passive voice with hands-on practice"
+              title="Part 3: Books and Book Chapters"
+              description="Learn to format references for books and edited book chapters"
               icon={<ScrollText className="h-4 w-4 text-purple-600" />}
               defaultOpen={false}
               className="border-2 border-purple-500/30 bg-purple-500/5"
             >
               <div className="space-y-4">
+                {/* Book Format */}
                 <div className="p-4 rounded-lg bg-background/80 space-y-3">
                   <h4 className="font-medium flex items-center gap-2">
-                    <Lightbulb className="h-4 w-4 text-purple-500" />
-                    Active vs Passive Voice
+                    <BookOpen className="h-4 w-4 text-purple-500" />
+                    Format: A Book
                   </h4>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="p-3 rounded-lg border bg-blue-500/5">
-                      <p className="text-xs font-medium text-blue-700 mb-1">Active Voice</p>
-                      <p className="text-sm text-muted-foreground italic">"Schools use these technologies for security."</p>
-                      <p className="text-xs text-blue-600 mt-1">Subject (Schools) does the action</p>
-                    </div>
-                    <div className="p-3 rounded-lg border bg-purple-500/5">
-                      <p className="text-xs font-medium text-purple-700 mb-1">Passive Voice</p>
-                      <p className="text-sm text-muted-foreground italic">"These technologies are used by schools for security."</p>
-                      <p className="text-xs text-purple-600 mt-1">Subject receives the action</p>
-                    </div>
+                  <div className="p-3 rounded-lg bg-muted/50 font-mono text-sm">
+                    <span className="text-blue-600">Author last name, Initials.</span> (<span className="text-purple-600">Year</span>). <em className="text-green-600">Title of book</em>. <span className="text-amber-600">Publisher</span>.
+                  </div>
+                  <div className="p-3 rounded-lg border bg-muted/30">
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Example:</p>
+                    <p className="text-sm">Altemeyer, B. (1988). <em>Enemies of freedom: Understanding right-wing authoritarianism</em>. Jossey-Bass.</p>
                   </div>
                 </div>
 
+                {/* Book Chapter Format */}
+                <div className="p-4 rounded-lg bg-background/80 space-y-3">
+                  <h4 className="font-medium flex items-center gap-2">
+                    <ScrollText className="h-4 w-4 text-purple-500" />
+                    Format: A Book Chapter in an Edited Book
+                  </h4>
+                  <div className="p-3 rounded-lg bg-muted/50 font-mono text-sm">
+                    <span className="text-blue-600">Author.</span> (<span className="text-purple-600">Year</span>). <span className="text-green-600">Title of chapter</span>. In <span className="text-red-600">Editor(s) (Eds.)</span>, <em className="text-amber-600">Title of book</em> (pp. pages). Publisher.
+                  </div>
+                  <div className="p-3 rounded-lg border bg-muted/30">
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Example:</p>
+                    <p className="text-sm">D'Mello, S. (2017). Emotional learning analytics. In C. Lang, G. Siemens, A. Wise, & D. Gašević (Eds.), <em>Handbook of learning analytics</em> (pp. 115–127). SoLAR.</p>
+                  </div>
+                </div>
+
+                {/* Key Differences */}
                 <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
-                  <p className="text-sm font-medium text-amber-700 mb-1">💡 Academic Writing Tip:</p>
-                  <p className="text-xs text-muted-foreground">
-                    Passive voice is common in academic writing when the focus should be on the action or result rather than who did it.
-                  </p>
+                  <p className="text-sm font-medium text-amber-700 mb-2">💡 Key Differences:</p>
+                  <ul className="text-xs text-muted-foreground space-y-1">
+                    <li>• <strong>Book:</strong> Italicize the book title</li>
+                    <li>• <strong>Book Chapter:</strong> Italicize the BOOK title, not the chapter title</li>
+                    <li>• <strong>Book Chapter:</strong> Include "In" + Editor names + "(Eds.)" + page numbers</li>
+                  </ul>
                 </div>
 
                 {/* MC Question */}
                 <QuickCheckMC
-                  questionNumber={3}
-                  question="Which paraphrasing strategy was used here?\n\nOriginal: 'Researchers collected data from participants.'\nParaphrase: 'Data was gathered from participants by the researchers.'"
+                  questionNumber={4}
+                  question="In a book CHAPTER reference, which title should be italicized?"
                   options={[
-                    { label: "A", text: "Synonym replacement only" },
-                    { label: "B", text: "Word form change" },
-                    { label: "C", text: "Active to passive voice (plus synonym)" },
-                    { label: "D", text: "Sentence structure change only" },
+                    { label: "A", text: "The chapter title" },
+                    { label: "B", text: "The book title" },
+                    { label: "C", text: "Both titles" },
+                    { label: "D", text: "Neither title" },
                   ]}
-                  correctAnswer="C"
-                  explanation="Changed from ACTIVE ('Researchers collected') to PASSIVE ('Data was collected'). Also used synonym: collected → gathered."
+                  correctAnswer="B"
+                  explanation="In a book chapter reference, only the BOOK title is italicized, not the chapter title. The chapter title uses regular sentence case."
                 />
-
-                {/* Writing Task */}
-                <div className="space-y-3 pt-4 border-t">
-                  <h4 className="font-medium text-sm flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-amber-500" />
-                    Writing Practice: Voice Change
-                  </h4>
-                  <p className="text-xs text-muted-foreground">
-                    Convert this active voice sentence to passive voice. You may also add synonyms:
-                  </p>
-                  <div className="p-3 rounded-lg bg-muted/50 text-sm">
-                    <strong>Original (Active):</strong> "Schools implement facial recognition systems to monitor students." (Andrejevic & Selwyn, 2020)
-                  </div>
-                  <WritingPracticeWithHistory
-                    taskKey="w2h2-voice-practice"
-                    studentId={studentId || "anonymous"}
-                    title="Voice Change Practice"
-                    instructions="Convert to PASSIVE voice: What is being done? By whom? Feel free to also use synonyms. Include the citation."
-                    placeholder="Facial recognition systems are implemented by schools to..."
-                  />
-                </div>
               </div>
             </CollapsibleSection>
 
-            {/* Part 4: Integrated Paraphrasing Practice with Patchwriting Check */}
+            {/* Part 4: Reference List & Integrated Practice */}
             <CollapsibleSection
-              title="Part 4: Integrated Paraphrasing Practice"
-              description="Apply all strategies and learn to avoid patchwriting"
+              title="Part 4: Building a Reference List & Practice"
+              description="Compile references and practice paraphrasing with proper citations"
               icon={<Trophy className="h-4 w-4 text-amber-600" />}
               defaultOpen={false}
               className="border-2 border-amber-500/30 bg-amber-500/5"
             >
               <div className="space-y-4">
-                {/* Patchwriting Warning */}
-                <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/30 space-y-3">
+                {/* Reference List Rules */}
+                <div className="p-4 rounded-lg bg-background/80 space-y-3">
                   <h4 className="font-medium flex items-center gap-2">
-                    <AlertCircle className="h-4 w-4 text-red-500" />
-                    What is Patchwriting?
+                    <Lightbulb className="h-4 w-4 text-amber-500" />
+                    Building Your Reference List
                   </h4>
-                  <p className="text-sm text-muted-foreground">
-                    <strong>Patchwriting</strong> = replacing a few words while keeping the original structure. 
-                    This is <span className="text-red-600 font-medium">plagiarism</span> even with a citation!
-                  </p>
-                  <div className="grid md:grid-cols-2 gap-3">
-                    <div className="p-3 rounded bg-red-500/5 border border-red-500/20">
-                      <p className="text-xs font-medium text-red-700">❌ PATCHWRITING</p>
-                      <p className="text-xs text-muted-foreground mt-1">"FRT is now being introduced in many parts of public life."</p>
-                    </div>
-                    <div className="p-3 rounded bg-green-500/5 border border-green-500/20">
-                      <p className="text-xs font-medium text-green-700">✅ GOOD PARAPHRASE</p>
-                      <p className="text-xs text-muted-foreground mt-1">"The deployment of facial recognition systems is becoming common in public sectors."</p>
-                    </div>
+                  <ul className="text-sm text-muted-foreground space-y-2">
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-500">✓</span>
+                      <span>Arrange all works in <strong>alphabetical order</strong> by the first author's last name</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-500">✓</span>
+                      <span>Use a <strong>hanging indentation</strong> (first line flush left, subsequent lines indented)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-500">✓</span>
+                      <span>Every in-text citation must have a matching reference entry</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-amber-500">⚠</span>
+                      <span>For <strong>secondary citations</strong>: only include the source you actually read</span>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Example Reference List */}
+                <div className="p-4 rounded-lg border bg-muted/30 space-y-2">
+                  <h4 className="font-medium text-sm mb-2">Example Reference List (Alphabetical Order)</h4>
+                  <div className="text-sm space-y-3 font-mono text-xs">
+                    <p className="pl-4 -indent-4">Altemeyer, B. (1988). <em>Enemies of freedom: Understanding right-wing authoritarianism</em>. Jossey-Bass.</p>
+                    <p className="pl-4 -indent-4">Andrejevic, M., & Selwyn, N. (2020). Facial recognition technology in schools: Critical questions and concerns. <em>Learning, Media and Technology</em>, 45(2), 115-128.</p>
+                    <p className="pl-4 -indent-4">Hong, J. C., Li, Y., & Kuo, S. Y. (2022). Supporting schools to use face recognition systems: A continuance intention perspective. <em>Education and Information Technologies</em>, 27, 12645–12665.</p>
                   </div>
                 </div>
 
-                {/* The Rule */}
-                <div className="p-4 rounded-lg border bg-gradient-to-r from-amber-500/5 to-green-500/5">
-                  <h4 className="font-medium text-sm mb-2">🎯 The Rule of Thumb</h4>
-                  <p className="text-sm text-muted-foreground">
-                    A good paraphrase changes BOTH the <strong>words</strong> AND the <strong>structure</strong>, 
-                    but keeps the <strong>meaning</strong> exactly the same.
-                  </p>
-                </div>
+                {/* MC Question */}
+                <QuickCheckMC
+                  questionNumber={5}
+                  question="In what order should references appear in your Reference List?"
+                  options={[
+                    { label: "A", text: "In the order they appear in your paper" },
+                    { label: "B", text: "Alphabetically by the first author's last name" },
+                    { label: "C", text: "Chronologically by publication year" },
+                    { label: "D", text: "By importance of the source" },
+                  ]}
+                  correctAnswer="B"
+                  explanation="In APA style, references must be arranged alphabetically by the first author's last name, regardless of the order they appear in your paper."
+                />
 
-                {/* MC Questions */}
-                <div className="space-y-3">
-                  <QuickCheckMC
-                    questionNumber={4}
-                    question="Is this a good paraphrase or patchwriting?\n\nOriginal: 'Parents support the use of face recognition systems.'\nParaphrase: 'Parents support using face recognition in schools.'"
-                    options={[
-                      { label: "A", text: "Good paraphrase - different words used" },
-                      { label: "B", text: "Patchwriting - structure too similar" },
-                      { label: "C", text: "Acceptable - enough words changed" },
-                      { label: "D", text: "Good paraphrase - meaning preserved" },
-                    ]}
-                    correctAnswer="B"
-                    explanation="PATCHWRITING! The structure 'Parents support + [noun phrase]' is identical. Only 2-3 words changed."
-                  />
-
-                  <QuickCheckMC
-                    questionNumber={5}
-                    question="Which is the BEST paraphrase of: 'Parents support the use of face recognition systems in elementary schools.'?"
-                    options={[
-                      { label: "A", text: "Parents support using face recognition in elementary schools." },
-                      { label: "B", text: "Face recognition systems are supported by parents in elementary schools." },
-                      { label: "C", text: "In primary education settings, facial identification technology receives parental approval." },
-                      { label: "D", text: "Parents like face recognition technology in schools." },
-                    ]}
-                    correctAnswer="C"
-                    explanation="Option C uses multiple strategies: synonyms (elementary→primary), word form changes (support→approval), AND restructured sentence."
-                  />
-                </div>
-
-                {/* Strategy reminder */}
-                <div className="grid grid-cols-4 gap-2">
-                  <div className="p-2 rounded bg-blue-500/10 text-center">
-                    <p className="text-xs font-medium text-blue-600">Synonyms</p>
-                  </div>
-                  <div className="p-2 rounded bg-green-500/10 text-center">
-                    <p className="text-xs font-medium text-green-600">Word Forms</p>
-                  </div>
-                  <div className="p-2 rounded bg-purple-500/10 text-center">
-                    <p className="text-xs font-medium text-purple-600">Voice</p>
-                  </div>
-                  <div className="p-2 rounded bg-amber-500/10 text-center">
-                    <p className="text-xs font-medium text-amber-600">Structure</p>
-                  </div>
-                </div>
-
-                {/* Integrated Writing Practice */}
-                <div className="space-y-3 pt-4 border-t">
-                  <h4 className="font-medium text-sm flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-amber-500" />
-                    Integrated Paraphrasing Practice
-                  </h4>
-                  <p className="text-xs text-muted-foreground">
-                    Paraphrase this sentence using AT LEAST TWO strategies. The AI will check for meaning preservation and patchwriting:
-                  </p>
-                  <div className="p-3 rounded-lg bg-muted/50 text-sm font-medium">
-                    "Researchers collected data from 380 participants using a questionnaire." (Hong et al., 2022)
-                  </div>
-                  <StrategyPracticeTask
-                    taskId="w2h2-integrated-practice-1"
-                    originalSentence="Researchers collected data from 380 participants using a questionnaire."
-                    citation="Hong et al., 2022"
-                    onComplete={handleTaskComplete}
-                    studentId={studentId}
-                  />
-                </div>
-
-                {/* Second Practice */}
-                <div className="space-y-3 pt-4 border-t">
-                  <h4 className="font-medium text-sm">Practice 2: Longer Sentence</h4>
-                  <div className="p-3 rounded-lg bg-muted/50 text-sm font-medium">
-                    "Facial recognition technology is being used to monitor student engagement in classrooms." (Dewan et al., 2019)
-                  </div>
-                  <WritingPracticeWithHistory
-                    taskKey="w2h2-integrated-practice-2"
-                    studentId={studentId || "anonymous"}
-                    title="Integrated Paraphrase"
-                    instructions="Use at least TWO paraphrasing strategies. Remember: change BOTH words AND structure to avoid patchwriting. Include the citation."
-                    placeholder="Student engagement in classrooms is being monitored through the use of..."
-                  />
-                </div>
-
-                {/* Third Practice - Paragraph */}
+                {/* Integrated Practice: Paraphrasing + Citations */}
                 <div className="space-y-3 pt-4 border-t">
                   <h4 className="font-medium text-sm flex items-center gap-2">
                     <Target className="h-4 w-4 text-amber-500" />
-                    Challenge: Paraphrase a Full Passage
+                    Integrated Practice: Paraphrase with Proper Citation
                   </h4>
                   <p className="text-xs text-muted-foreground">
-                    This is from the FRT article. Read carefully, then write your paraphrase using multiple strategies:
+                    Now practice paraphrasing while maintaining proper citation format. Remember what you learned in Hour 1!
                   </p>
-                  <div className="p-3 rounded-lg bg-muted/50 text-sm leading-relaxed">
-                    <strong>Original:</strong> "One prominent educational application of facial recognition technology is campus security. This form of facial recognition is most prevalent in the US, where school shooting incidents have prompted school authorities to annually spend $2.7 billion on campus security products and services." (Andrejevic & Selwyn, 2020)
+                  
+                  <div className="p-3 rounded-lg bg-muted/50 text-sm">
+                    <strong>Original:</strong> "One prominent educational application of facial recognition technology is campus security. This form of facial recognition is most prevalent in the US, where school shooting incidents have prompted school authorities to annually spend $2.7 billion on campus security products and services." (Andrejevic & Selwyn, 2020, p. 117)
                   </div>
+                  
                   <WritingPracticeWithHistory
-                    taskKey="w2h2-paragraph-paraphrase"
+                    taskKey="w2h2-paraphrase-citation"
                     studentId={studentId || "anonymous"}
-                    title="Paragraph Paraphrase"
-                    instructions="Paraphrase this entire passage (both sentences). Use multiple strategies across the text. Preserve ALL the key information including the statistic. Include proper citation."
-                    placeholder="Campus security represents a major use of facial recognition in education. In the United States, where..."
-                    exampleFormat="Tips for longer passages:&#10;• Keep all key information (the $2.7 billion statistic)&#10;• You can combine or split sentences&#10;• Use different strategies for different parts&#10;• End with citation (Andrejevic & Selwyn, 2020)"
+                    title="Paraphrase with Citation"
+                    instructions="Paraphrase this passage using paraphrasing strategies from Hour 1. Include the proper in-text citation. Keep all key facts (including the $2.7 billion figure)."
+                    placeholder="According to Andrejevic and Selwyn (2020), the primary educational use of facial recognition technology is..."
+                  />
+                </div>
+
+                {/* Final Challenge: Write Reference Entry */}
+                <div className="space-y-3 pt-4 border-t">
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-amber-500" />
+                    Challenge: Write the Reference Entry
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    Based on this information, write the complete end-of-text reference entry in APA 7th format:
+                  </p>
+                  <div className="p-3 rounded-lg bg-muted/50 text-sm space-y-1">
+                    <p><strong>Authors:</strong> Marina Heiden, Linda Widar, Birgitta Wiitavaara, Erik Boman</p>
+                    <p><strong>Year:</strong> 2020</p>
+                    <p><strong>Article Title:</strong> Telework in academia: Associations with health and well-being among staff</p>
+                    <p><strong>Journal:</strong> Higher Education</p>
+                    <p><strong>Volume:</strong> 81</p>
+                    <p><strong>Pages:</strong> 707-722</p>
+                    <p><strong>DOI:</strong> https://doi.org/10.1007/s10734-020-00569-4</p>
+                  </div>
+                  
+                  <WritingPracticeWithHistory
+                    taskKey="w2h2-write-reference"
+                    studentId={studentId || "anonymous"}
+                    title="Write Reference Entry"
+                    instructions="Format this as a complete APA 7th reference entry. Check: (1) Author format with &, (2) Year in parentheses, (3) Sentence case for title, (4) Italicized journal name, (5) Volume and pages, (6) DOI."
+                    placeholder="Heiden, M., Widar, L., Wiitavaara, B., & Boman, E. (2020). Telework in academia..."
                   />
                 </div>
               </div>
