@@ -2062,44 +2062,41 @@ Provide focused feedback (4-5 sentences):
                   </div>
                 </div>
 
-                {/* Reading Passage with Errors */}
-                <div className="p-4 rounded-lg border bg-red-500/5 border-red-500/30 space-y-3">
+                {/* Spot the Errors - MC Task */}
+                <div className="p-4 rounded-lg border bg-red-500/5 border-red-500/30 space-y-4">
                   <h4 className="font-medium text-sm flex items-center gap-2">
                     <AlertCircle className="h-4 w-4 text-red-500" />
                     Spot the Errors
                   </h4>
-                  <p className="text-xs text-muted-foreground">Read this passage and identify the citation formatting errors:</p>
-                  <div className="p-3 bg-background rounded-lg text-sm leading-relaxed">
+                  <p className="text-xs text-muted-foreground">Read this passage carefully:</p>
+                  <div className="p-3 bg-background rounded-lg text-sm leading-relaxed border">
                     "According to Andrejevic & Selwyn (2020), FRT raises concerns. Their research shows that schools are adopting this technology rapidly (Andrejevic and Selwyn, 2020). Hong, Li, Kuo, and An (2022) also found similar patterns."
                   </div>
-                </div>
-
-                {/* MC Questions */}
-                <div className="space-y-3 pt-2">
+                  
                   <QuickCheckMC
                     questionNumber={3}
-                    question="Which is the CORRECT APA 7th citation for Hong, Li, Kuo, and An (2022) INSIDE parentheses?"
+                    question="How many APA 7th citation ERRORS are in the passage above?"
                     options={[
-                      { label: "A", text: "(Hong, Li, Kuo and An, 2022)" },
-                      { label: "B", text: "(Hong et al., 2022)" },
-                      { label: "C", text: "(Hong & colleagues, 2022)" },
-                      { label: "D", text: "(Hong, 2022)" },
+                      { label: "A", text: "1 error" },
+                      { label: "B", text: "2 errors" },
+                      { label: "C", text: "3 errors" },
+                      { label: "D", text: "4 errors" },
                     ]}
-                    correctAnswer="B"
-                    explanation="With 3+ authors, always use 'et al.' from the first citation. Full names are never listed in-text."
+                    correctAnswer="C"
+                    explanation="There are 3 errors: (1) 'Andrejevic & Selwyn' in the sentence should use 'and' not '&', (2) '(Andrejevic and Selwyn, 2020)' in parentheses should use '&' not 'and', and (3) 'Hong, Li, Kuo, and An (2022)' should be 'Hong et al. (2022)' since there are 3+ authors."
                   />
 
                   <QuickCheckMC
                     questionNumber={4}
-                    question="What's WRONG in this sentence? 'According to Andrejevic & Selwyn (2020), schools are adopting FRT.'"
+                    question="Which shows ALL three errors CORRECTLY fixed?"
                     options={[
-                      { label: "A", text: "Nothing - this is correct" },
-                      { label: "B", text: "Should use 'and' instead of '&' since it's in the sentence" },
-                      { label: "C", text: "Missing comma after 'Selwyn'" },
-                      { label: "D", text: "Year should come before names" },
+                      { label: "A", text: "According to Andrejevic and Selwyn (2020)... (Andrejevic & Selwyn, 2020)... Hong et al. (2022)" },
+                      { label: "B", text: "According to Andrejevic & Selwyn (2020)... (Andrejevic & Selwyn, 2020)... Hong et al. (2022)" },
+                      { label: "C", text: "According to Andrejevic and Selwyn (2020)... (Andrejevic and Selwyn, 2020)... Hong et al. (2022)" },
+                      { label: "D", text: "According to Andrejevic and Selwyn (2020)... (Andrejevic & Selwyn, 2020)... Hong, Li, Kuo, & An (2022)" },
                     ]}
-                    correctAnswer="B"
-                    explanation="In the sentence, use 'and'. The ampersand (&) is ONLY used inside parentheses."
+                    correctAnswer="A"
+                    explanation="Option A correctly applies all three rules: 'and' in sentences, '&' in parentheses, and 'et al.' for 3+ authors."
                   />
                 </div>
 
