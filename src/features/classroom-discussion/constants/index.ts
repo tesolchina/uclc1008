@@ -1,0 +1,10 @@
+export {
+  HOUR3_TASKS,
+  WEEK1_HOUR3_TASKS,
+  WEEK2_HOUR3_TASKS,
+  WEEK3_HOUR3_TASKS,
+  WEEK4_HOUR3_TASKS,
+  WEEK5_HOUR3_TASKS,
+  getHour3Tasks,
+  getTaskById,
+} from './taskBank';
