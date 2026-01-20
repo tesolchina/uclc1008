@@ -6,7 +6,7 @@ import { UserMenu } from "@/components/auth/UserMenu";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-
+import { ApiKeyStatusIndicator } from "@/components/api/ApiKeyStatusIndicator";
 const Header = () => {
   const { toggleSidebar, open } = useSidebar();
   const isMobile = useIsMobile();
@@ -34,7 +34,8 @@ const Header = () => {
           </p>
           <h1 className="truncate text-sm font-semibold">AI-Assisted Learning Hub</h1>
         </div>
-        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+        <div className="flex items-center gap-2 sm:gap-3 text-xs text-muted-foreground">
+          <ApiKeyStatusIndicator />
           <div className="hidden items-center gap-3 md:flex">
             <span className="rounded-full bg-secondary/70 px-2 py-1 text-[11px] font-medium">
               AI-empowered lessons

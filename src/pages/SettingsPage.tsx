@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useApiKeyStatus } from '@/contexts/ApiKeyContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -40,6 +41,7 @@ export default function SettingsPage() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { isAuthenticated, user, profile, accessToken, loginWithHkbu } = useAuth();
+  const { refreshStatus: refreshGlobalApiStatus } = useApiKeyStatus();
   
   // Check if user is fully authenticated (OAuth login), not just student-only mode
   const isFullyAuthenticated = !!user && !!profile;
@@ -206,6 +208,8 @@ export default function SettingsPage() {
         });
         setApiKey('');
         loadStatus();
+        // Refresh global API key status
+        refreshGlobalApiStatus();
       } else if (data?.error) {
         setValidationStatus('error');
         setValidationError(data.error);
@@ -259,6 +263,8 @@ export default function SettingsPage() {
       }
       
       loadStatus();
+      // Refresh global API key status
+      refreshGlobalApiStatus();
     } catch (error) {
       console.error('Error revoking key:', error);
       toast({
