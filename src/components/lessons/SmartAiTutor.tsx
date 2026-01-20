@@ -8,6 +8,7 @@ import { ArrowLeft, Send, Loader2, CheckCircle2, LucideIcon } from "lucide-react
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
+import { AiFeedbackHint } from "@/components/api/AiFeedbackHint";
 
 interface SmartAiTutorProps {
   topicId: string;
@@ -328,7 +329,10 @@ export function SmartAiTutor({
         </ScrollArea>
 
         {/* Input Area */}
-        <div className="p-4 border-t">
+        <div className="p-4 border-t space-y-2">
+          {/* API Key Status & Formatting Tips */}
+          <AiFeedbackHint />
+          
           {sessionComplete ? (
             <Button 
               className="w-full" 

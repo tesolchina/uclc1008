@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Loader2, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { AiFeedbackHint } from "@/components/api/AiFeedbackHint";
 
 // ============================================================================
 // Types
@@ -155,6 +156,9 @@ Give critical but constructive feedback. Be specific and actionable.`
         className="min-h-[100px] resize-y"
         disabled={isLoading}
       />
+
+      {/* API Key Status & Formatting Tips */}
+      <AiFeedbackHint />
       
       {/* Submit button */}
       <div className="flex justify-end">

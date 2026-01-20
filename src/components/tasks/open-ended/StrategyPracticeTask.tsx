@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Sparkles, CheckCircle2, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { AiFeedbackHint } from "@/components/api/AiFeedbackHint";
 
 const PARAPHRASING_STRATEGIES = [
   {
@@ -273,6 +274,9 @@ Explain briefly (1 sentence) what makes this version better.`
           className="min-h-[120px]"
         />
       </div>
+
+      {/* API Key Status & Formatting Tips */}
+      <AiFeedbackHint />
 
       {/* Submit Button */}
       <div className="flex items-center justify-between">

@@ -6,6 +6,7 @@ import { Save, CheckCircle2, Loader2, Sparkles, RefreshCw, ChevronDown, History,
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { AiFeedbackHint } from "@/components/api/AiFeedbackHint";
 
 const AUTOSAVE_DELAY_MS = 2000; // Auto-save after 2 seconds of no typing
 
@@ -706,6 +707,9 @@ IMPROVED VERSION:
           </p>
         </div>
       )}
+
+      {/* API Key Status & Formatting Tips */}
+      <AiFeedbackHint className="pb-2" />
 
       {/* Action buttons */}
       <div className="flex flex-wrap items-center gap-2">
