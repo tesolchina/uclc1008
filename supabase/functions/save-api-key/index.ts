@@ -81,14 +81,14 @@ serve(async (req) => {
   const operation = "save-api-key";
 
   try {
-    const { provider, apiKey, studentId, sessionId } = await req.json();
+    const { provider, apiKey, studentId, sessionId, testOnly } = await req.json();
 
     await logProcess({
       operation,
       step: "start",
       status: "info",
-      message: `Saving API key for ${provider}`,
-      details: { provider, hasStudentId: !!studentId },
+      message: testOnly ? `Testing API key for ${provider}` : `Saving API key for ${provider}`,
+      details: { provider, hasStudentId: !!studentId, testOnly: !!testOnly },
       sessionId,
     });
 
@@ -106,7 +106,8 @@ serve(async (req) => {
       );
     }
 
-    if (!studentId) {
+    // Only require studentId if not in testOnly mode
+    if (!testOnly && !studentId) {
       await logProcess({
         operation,
         step: "validation-error",
@@ -172,6 +173,25 @@ serve(async (req) => {
         message: "API key validated successfully",
         sessionId,
       });
+    }
+
+    // If testOnly mode, return success without saving
+    if (testOnly) {
+      await logProcess({
+        operation,
+        step: "test-complete",
+        status: "success",
+        message: "API key test successful (not saved)",
+        sessionId,
+      });
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          validated: true,
+          message: "API key is valid!" 
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     // Save to student database

@@ -8,8 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import { SharedApiUsageIndicator } from '@/components/api/SharedApiUsageIndicator';
-import { Loader2, Settings, CheckCircle2, XCircle, ExternalLink, User, Key, AlertCircle, Sparkles } from 'lucide-react';
+import { Loader2, Settings, CheckCircle2, XCircle, ExternalLink, User, Key, AlertCircle, Sparkles, ChevronDown, ChevronUp, Zap } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 // Get or create browser session ID for anonymous tracking
 function getBrowserSessionId(): string {
@@ -59,6 +60,8 @@ export default function SettingsPage() {
   const [apiKey, setApiKey] = useState('');
   const [validationStatus, setValidationStatus] = useState<'idle' | 'validating' | 'success' | 'error'>('idle');
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [showWalkthrough, setShowWalkthrough] = useState(false);
+  const [isTesting, setIsTesting] = useState(false);
   
   // Shared API status
   const [sharedApiEnabled, setSharedApiEnabled] = useState(true);
@@ -157,6 +160,62 @@ export default function SettingsPage() {
     }
   };
 
+  const handleTestConnection = async () => {
+    if (!apiKey.trim()) {
+      toast({
+        variant: 'destructive',
+        title: 'Please enter your HKBU API key',
+      });
+      return;
+    }
+
+    setIsTesting(true);
+    setValidationStatus('validating');
+    setValidationError(null);
+
+    try {
+      // Test the key by calling save-api-key with test mode
+      const { data, error } = await supabase.functions.invoke('save-api-key', {
+        body: {
+          provider: 'hkbu',
+          apiKey: apiKey.trim(),
+          testOnly: true,
+        },
+      });
+
+      if (error) {
+        throw new Error(error.message || 'Connection test failed');
+      }
+
+      if (data?.validated) {
+        setValidationStatus('success');
+        toast({ 
+          title: '✓ Connection successful!',
+          description: 'Your API key is valid. Click "Save API Key" to save it to your profile.',
+        });
+      } else if (data?.error) {
+        setValidationStatus('error');
+        setValidationError(data.error);
+        toast({
+          variant: 'destructive',
+          title: 'Invalid API Key',
+          description: data.error,
+        });
+      }
+    } catch (error: any) {
+      console.error('Error testing key:', error);
+      setValidationStatus('error');
+      setValidationError(error.message || 'Connection test failed');
+      toast({
+        variant: 'destructive',
+        title: 'Connection test failed',
+        description: error.message,
+      });
+    } finally {
+      setIsTesting(false);
+    }
+  };
+
   const handleSaveKey = async () => {
     if (!apiKey.trim()) {
       toast({
@@ -166,13 +225,14 @@ export default function SettingsPage() {
       return;
     }
 
-    const effectiveStudentId = profile?.hkbu_user_id;
+    // Allow both fully authenticated and student-only sessions
+    const effectiveStudentId = profile?.hkbu_user_id || savedStudentId || getStoredStudentId();
 
     if (!effectiveStudentId) {
       toast({
         variant: 'destructive',
-        title: 'Sign in required',
-        description: 'Please sign in with your HKBU account to save your API key.',
+        title: 'Student ID required',
+        description: 'Please set your Unique ID first to save your API key.',
       });
       return;
     }
@@ -198,7 +258,7 @@ export default function SettingsPage() {
         setValidationStatus('success');
         toast({ 
           title: '✓ API key validated and saved!',
-          description: 'Your key has been saved to your profile. You won\'t need to enter it again.',
+          description: 'Your key has been saved. You won\'t need to enter it again.',
         });
         setApiKey('');
         loadStatus();
@@ -437,41 +497,61 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      {/* Add HKBU Key - Only for fully authenticated users (OAuth login) */}
-      {isFullyAuthenticated && !hasHkbuKey && (
+      {/* Add HKBU Key - For any authenticated user (OAuth or student-only) */}
+      {(isAuthenticated || savedStudentId) && !hasHkbuKey && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Add Your HKBU API Key</CardTitle>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Key className="h-4 w-4" />
+              Add Your HKBU API Key
+            </CardTitle>
             <CardDescription>
-              Get unlimited AI tutor access by adding your personal HKBU GenAI API key. 
-              Your key will be validated and saved to your profile.
+              Get unlimited AI tutor access by adding your personal HKBU GenAI API key.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Instructions on how to get the API key */}
-            <Alert className="border-primary/30 bg-primary/5">
-              <Key className="h-4 w-4 text-primary" />
-              <AlertDescription className="space-y-3">
-                <p className="font-medium text-foreground">How to get your HKBU GenAI API key:</p>
-                <a 
-                  href="https://scribehow.com/viewer/Generate_an_API_Key_for_AI_Tutor__GPd3vfdkR6mghvEFGAHeog" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                  View Step-by-Step Guide
-                </a>
-                <p className="text-xs text-muted-foreground">
-                  Or visit <a 
-                    href="https://genai.hkbu.edu.hk/settings/api-docs" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline"
-                  >genai.hkbu.edu.hk/settings/api-docs</a> directly
-                </p>
-              </AlertDescription>
-            </Alert>
+            {/* Collapsible walkthrough */}
+            <Collapsible open={showWalkthrough} onOpenChange={setShowWalkthrough}>
+              <CollapsibleTrigger asChild>
+                <Button variant="outline" className="w-full justify-between">
+                  <span className="flex items-center gap-2">
+                    <ExternalLink className="h-4 w-4" />
+                    How to get your API key
+                  </span>
+                  {showWalkthrough ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mt-3">
+                <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
+                  <p className="text-sm font-medium">Step-by-step guide:</p>
+                  <div className="aspect-video w-full rounded-md overflow-hidden border">
+                    <iframe 
+                      src="https://scribehow.com/embed/Generate_an_API_Key_for_AI_Tutor__GPd3vfdkR6mghvEFGAHeog"
+                      width="100%" 
+                      height="100%" 
+                      allowFullScreen
+                      className="border-0"
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Or visit{' '}
+                    <a 
+                      href="https://genai.hkbu.edu.hk/settings/api-docs" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline"
+                    >
+                      genai.hkbu.edu.hk/settings/api-docs
+                    </a>{' '}
+                    directly
+                  </p>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
 
             <div className="space-y-2">
               <Label htmlFor="apiKey">HKBU API Key</Label>
@@ -502,31 +582,49 @@ export default function SettingsPage() {
               <Alert className="border-green-500 bg-green-500/10">
                 <CheckCircle2 className="h-4 w-4 text-green-500" />
                 <AlertDescription className="text-green-700">
-                  API key validated and saved successfully!
+                  API key is valid! Click "Save API Key" to save it.
                 </AlertDescription>
               </Alert>
             )}
 
-            <Button 
-              onClick={handleSaveKey} 
-              disabled={isSavingKey || !apiKey.trim()}
-            >
-              {isSavingKey ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {validationStatus === 'validating' ? 'Validating...' : 'Saving...'}
-                </>
-              ) : (
-                'Validate & Save API Key'
-              )}
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline"
+                onClick={handleTestConnection} 
+                disabled={isTesting || isSavingKey || !apiKey.trim()}
+              >
+                {isTesting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Testing...
+                  </>
+                ) : (
+                  <>
+                    <Zap className="mr-2 h-4 w-4" />
+                    Test Connection
+                  </>
+                )}
+              </Button>
+              <Button 
+                onClick={handleSaveKey} 
+                disabled={isSavingKey || isTesting || !apiKey.trim()}
+              >
+                {isSavingKey ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  'Save API Key'
+                )}
+              </Button>
+            </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Prompt for non-fully-authenticated users to sign in to use API key */}
-      {/* Only show once - not for student-only sessions who already see the ID section */}
-      {!isFullyAuthenticated && !hasHkbuKey && !isAuthenticated && (
+      {/* Prompt for completely anonymous users to set up ID first */}
+      {!isAuthenticated && !savedStudentId && !hasHkbuKey && (
         <Card className="border-dashed border-yellow-500/50">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
@@ -538,37 +636,10 @@ export default function SettingsPage() {
             <Alert className="border-yellow-500/50 bg-yellow-500/10">
               <AlertCircle className="h-4 w-4 text-yellow-600" />
               <AlertDescription className="text-yellow-700 dark:text-yellow-300">
-                <strong>Sign in required:</strong> To add your own HKBU API key for unlimited AI tutor access, 
-                please sign in with your HKBU account first.
+                <strong>Set up required:</strong> Please enter your Unique ID above first, 
+                then you can add your HKBU API key for unlimited AI tutor access.
               </AlertDescription>
             </Alert>
-            <Button variant="outline" onClick={loginWithHkbu} className="w-full">
-              Sign in with HKBU
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* For student-only sessions - show upgrade prompt */}
-      {!isFullyAuthenticated && isAuthenticated && !hasHkbuKey && (
-        <Card className="border-dashed border-primary/30">
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <Key className="h-4 w-4" />
-              Want Unlimited AI Access?
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Alert className="border-primary/30 bg-primary/5">
-              <Sparkles className="h-4 w-4 text-primary" />
-              <AlertDescription className="text-foreground">
-                You're currently using the shared API with daily limits. 
-                Link your HKBU account to add your own API key for unlimited access.
-              </AlertDescription>
-            </Alert>
-            <Button variant="outline" onClick={loginWithHkbu} className="w-full">
-              Link HKBU Account
-            </Button>
           </CardContent>
         </Card>
       )}
