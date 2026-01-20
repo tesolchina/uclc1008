@@ -162,13 +162,13 @@ export default function SettingsPage() {
       return;
     }
 
-    const effectiveStudentId = savedStudentId || profile?.hkbu_user_id;
+    const effectiveStudentId = profile?.hkbu_user_id;
 
     if (!effectiveStudentId) {
       toast({
         variant: 'destructive',
-        title: 'Please set your Unique ID first',
-        description: 'Your API key will be saved to your profile so you don\'t need to enter it again.',
+        title: 'Sign in required',
+        description: 'Please sign in with your HKBU account to save your API key.',
       });
       return;
     }
@@ -429,8 +429,8 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      {/* Add HKBU Key */}
-      {!hasHkbuKey && (
+      {/* Add HKBU Key - Only for authenticated users */}
+      {isAuthenticated && !hasHkbuKey && (
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Add Your HKBU API Key</CardTitle>
@@ -440,14 +440,25 @@ export default function SettingsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {!savedStudentId && (
-              <Alert>
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>
-                  Please set your Student ID above first. Your API key will be saved to your profile so you don't need to enter it again.
-                </AlertDescription>
-              </Alert>
-            )}
+            {/* Instructions on how to get the API key */}
+            <Alert className="border-primary/30 bg-primary/5">
+              <Key className="h-4 w-4 text-primary" />
+              <AlertDescription className="space-y-2">
+                <p className="font-medium text-foreground">How to get your HKBU GenAI API key:</p>
+                <ol className="list-decimal list-inside text-sm space-y-1 text-muted-foreground">
+                  <li>Visit <a 
+                    href="https://genai.hkbu.edu.hk/settings/api-docs" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline font-medium"
+                  >genai.hkbu.edu.hk/settings/api-docs</a></li>
+                  <li>Sign in with your HKBU account</li>
+                  <li>Navigate to "API Keys" section</li>
+                  <li>Click "Create New Key" and copy your key</li>
+                  <li>Paste the key below and save</li>
+                </ol>
+              </AlertDescription>
+            </Alert>
 
             <div className="space-y-2">
               <Label htmlFor="apiKey">HKBU API Key</Label>
@@ -461,19 +472,9 @@ export default function SettingsPage() {
                   setValidationStatus('idle');
                   setValidationError(null);
                 }}
-                disabled={!savedStudentId}
               />
               <p className="text-xs text-muted-foreground">
-                Get your API key from the{' '}
-                <a 
-                  href="https://genai.hkbu.edu.hk/settings/api-docs" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline inline-flex items-center gap-1"
-                >
-                  HKBU GenAI Platform
-                  <ExternalLink className="h-3 w-3" />
-                </a>
+                Your key will be securely stored and used only for AI tutor requests.
               </p>
             </div>
 
@@ -495,7 +496,7 @@ export default function SettingsPage() {
 
             <Button 
               onClick={handleSaveKey} 
-              disabled={isSavingKey || !apiKey.trim() || !savedStudentId}
+              disabled={isSavingKey || !apiKey.trim()}
             >
               {isSavingKey ? (
                 <>
@@ -506,6 +507,27 @@ export default function SettingsPage() {
                 'Validate & Save API Key'
               )}
             </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Prompt for non-authenticated users to sign in to use API key */}
+      {!isAuthenticated && !hasHkbuKey && (
+        <Card className="border-dashed border-yellow-500/50">
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Key className="h-4 w-4" />
+              HKBU API Key
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Alert className="border-yellow-500/50 bg-yellow-500/10">
+              <AlertCircle className="h-4 w-4 text-yellow-600" />
+              <AlertDescription className="text-yellow-700 dark:text-yellow-300">
+                <strong>Sign in required:</strong> To add your own HKBU API key for unlimited AI tutor access, 
+                please sign in with your HKBU account first.
+              </AlertDescription>
+            </Alert>
           </CardContent>
         </Card>
       )}
