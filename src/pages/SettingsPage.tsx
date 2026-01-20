@@ -451,20 +451,25 @@ export default function SettingsPage() {
             {/* Instructions on how to get the API key */}
             <Alert className="border-primary/30 bg-primary/5">
               <Key className="h-4 w-4 text-primary" />
-              <AlertDescription className="space-y-2">
+              <AlertDescription className="space-y-3">
                 <p className="font-medium text-foreground">How to get your HKBU GenAI API key:</p>
-                <ol className="list-decimal list-inside text-sm space-y-1 text-muted-foreground">
-                  <li>Visit <a 
+                <a 
+                  href="https://scribehow.com/viewer/Generate_an_API_Key_for_AI_Tutor__GPd3vfdkR6mghvEFGAHeog" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  View Step-by-Step Guide
+                </a>
+                <p className="text-xs text-muted-foreground">
+                  Or visit <a 
                     href="https://genai.hkbu.edu.hk/settings/api-docs" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-primary hover:underline font-medium"
-                  >genai.hkbu.edu.hk/settings/api-docs</a></li>
-                  <li>Sign in with your HKBU account</li>
-                  <li>Navigate to "API Keys" section</li>
-                  <li>Click "Create New Key" and copy your key</li>
-                  <li>Paste the key below and save</li>
-                </ol>
+                    className="text-primary hover:underline"
+                  >genai.hkbu.edu.hk/settings/api-docs</a> directly
+                </p>
               </AlertDescription>
             </Alert>
 
