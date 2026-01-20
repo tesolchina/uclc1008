@@ -89,24 +89,35 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Remove from api_keys table
-    const { error } = await supabase
-      .from("api_keys")
-      .delete()
-      .eq("provider", provider);
+    // IMPORTANT:
+    // - If this call is for a specific student (studentId provided), only remove from that student's record.
+    // - Do NOT delete from the shared api_keys table (that would affect everyone).
 
-    if (error) {
-      console.error("Error deleting API key from local database:", error);
-    } else {
-      console.log(`API key deleted from local database for ${provider}`);
+    // Remove from api_keys table ONLY when no studentId is provided (admin/system operation)
+    let sharedDeleteError: any = null;
+    if (!studentId) {
+      const { error } = await supabase
+        .from("api_keys")
+        .delete()
+        .eq("provider", provider);
+      sharedDeleteError = error;
+
+      if (error) {
+        console.error("Error deleting API key from shared local database:", error);
+      } else {
+        console.log(`Shared API key deleted from local database for ${provider}`);
+      }
     }
 
     // Also remove from student record if studentId provided
+    let studentUpdateError: any = null;
     if (studentId && provider === "hkbu") {
       const { error: studentError } = await supabase
         .from("students")
         .update({ hkbu_api_key: null, updated_at: new Date().toISOString() })
         .eq("student_id", studentId);
+
+      studentUpdateError = studentError;
 
       if (studentError) {
         console.error("Error removing API key from student record:", studentError);
@@ -115,13 +126,17 @@ serve(async (req) => {
       }
     }
 
+    const revokedFromLocal = studentId
+      ? (provider === "hkbu" ? !studentUpdateError : true)
+      : !sharedDeleteError;
+
     // If HKBU revoke failed but we have an access token, warn the user
     if (accessToken && !revokedFromHkbu && hkbuError) {
       return new Response(
         JSON.stringify({ 
           success: true, 
           revokedFromHkbu: false,
-          revokedFromLocal: !error,
+          revokedFromLocal,
           warning: "Could not remove key from HKBU platform. The key may still be synced from your HKBU account.",
           hkbuError,
           message: `Local API key revoked for ${provider}, but remote key may still exist` 
@@ -134,7 +149,7 @@ serve(async (req) => {
       JSON.stringify({ 
         success: true, 
         revokedFromHkbu,
-        revokedFromLocal: !error,
+        revokedFromLocal,
         message: `API key revoked for ${provider}` 
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }

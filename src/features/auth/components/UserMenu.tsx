@@ -74,7 +74,7 @@ export function UserMenu() {
 
   // Check if user has multiple roles
   const hasMultipleRoles = userRoles.length > 1;
-  const isTeacherOrAdmin = activeRole === 'teacher' || activeRole === 'admin';
+  const isTeacherOrAdmin = !!user && (activeRole === 'teacher' || activeRole === 'admin');
 
   const getRoleIcon = (role: string) => {
     switch (role) {
@@ -180,8 +180,8 @@ export function UserMenu() {
           
           <DropdownMenuSeparator />
           
-          {/* Role Switcher for users with multiple roles OR teachers/admins who can use student mode */}
-          {(hasMultipleRoles || isTeacherOrAdmin) && (
+          {/* Role Switcher only for signed-in HKBU users */}
+          {user && (hasMultipleRoles || isTeacherOrAdmin) && (
             <>
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
