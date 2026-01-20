@@ -1,3 +1,16 @@
+/**
+ * @fileoverview HourPage - Main page component for hour-based curriculum content.
+ * 
+ * This page renders the curriculum content for a specific week/hour combination.
+ * It includes:
+ * - Learning objectives and goals
+ * - Interactive tasks (MC questions, writing exercises)
+ * - AI-powered feedback
+ * - Progress tracking
+ * 
+ * @see /docs/architecture/README.md for system overview
+ */
+
 import { useParams, Link } from "react-router-dom";
 import { getHourData } from "@/data/hourContent";
 import { useAuth } from "@/features/auth";
@@ -6,14 +19,50 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { CollapsibleSection } from "@/components/CollapsibleSection";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ObjectiveTask, QuickCheckMC, WritingTask, ParaphraseCoach, AskQuestionButton, ParagraphWithNotes, WritingPracticeWithHistory, IntegratedParaphraseTask, StrategyPracticeTask, ConceptSelectTask } from "@/components/tasks";
+
+// Task components
+import { 
+  ObjectiveTask, 
+  QuickCheckMC, 
+  WritingTask, 
+  ParaphraseCoach, 
+  AskQuestionButton, 
+  ParagraphWithNotes, 
+  WritingPracticeWithHistory, 
+  IntegratedParaphraseTask, 
+  StrategyPracticeTask, 
+  ConceptSelectTask 
+} from "@/components/tasks";
 import type { ConceptOption } from "@/components/tasks";
+
+// Hour-specific components (extracted for modularity)
+import { WritingTaskWithFeedback, MicroLevelPractice } from "@/components/hours";
+
+// Data imports (extracted to separate module)
+import {
+  PRACTICE_PARAGRAPHS,
+  PARAPHRASING_STRATEGIES,
+  AWQ_SKILLS,
+  CITATION_CONCEPTS,
+  OUTLINING_CONCEPTS,
+  SKIMMING_SCANNING_CONCEPTS,
+  getProgressKey,
+} from "@/data/hours";
+
+// Feature modules
 import { StudentLoginReminder } from "@/components/StudentLoginReminder";
 import { LectureOutline, useSectionProgress, generateSectionId } from "@/features/lecture-mode";
 import type { AgendaSectionEnhanced } from "@/features/lecture-mode";
 import { TeacherQuestionDashboard } from "@/components/teacher/TeacherQuestionDashboard";
 import { Hour3PracticeSession } from "@/components/lessons/Hour3PracticeSession";
-import { ArrowLeft, ArrowRight, Clock, Target, BookOpen, PenLine, CheckCircle2, Lightbulb, FileText, Sparkles, ExternalLink, AlertCircle, Calendar, GraduationCap, ScrollText, ChevronDown, Download, LogIn, Loader2, Trophy, Users } from "lucide-react";
+
+// UI components and icons
+import { 
+  ArrowLeft, ArrowRight, Clock, Target, BookOpen, PenLine, 
+  CheckCircle2, Lightbulb, FileText, Sparkles, ExternalLink, 
+  AlertCircle, Calendar, GraduationCap, ScrollText, ChevronDown, 
+  Download, LogIn, Loader2, Trophy, Users 
+} from "lucide-react";
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,307 +75,25 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-// Paragraph options for micro-level practice
-// NOTE: These paragraphs MUST match the Source Text in Part 3b for consistency
-const PRACTICE_PARAGRAPHS = [
-  {
-    id: "para1",
-    label: "Paragraph 1: FRT in Education Context",
-    text: "Against this contentious background, then, we need to consider how these technologies are being applied to the specific context of education. While rarely foregrounded in debates about facial recognition in society, the school sector is one of the public settings where this technology is beginning to be taken up and implemented at scale. This is perhaps not surprising given, on the one hand, the role played by the classroom in the development of monitoring and disciplinary practices and, on the other, the increasing normalisation of surveillance in the name of protecting and securing young people."
-  },
-  {
-    id: "para2",
-    label: "Paragraph 2: Campus Security",
-    text: "One prominent educational application of facial recognition technology is campus security. This form of facial recognition is most prevalent in the US, where school shooting incidents have prompted school authorities to annually spend $2.7 billion on-campus security products and services (Doffman, 2018). Facial recognition systems have now been sold to thousands of US schools, with vendors 'pitching the technology as an all-seeing shield against school shootings' (Harwell, 2018, n.p). As well as purporting to identify unauthorised intruders, systems have been developed to make use of video object classification trained to detect gun-shaped objects, alongside more subtle forms of 'anomaly detection' such as students arriving at school in different-than-usual clothes, bags and other apparel (Harwell, 2018)."
-  },
-  {
-    id: "para3",
-    label: "Paragraph 3: Attendance Monitoring",
-    text: "Another application of facial recognition in schools is attendance monitoring – promising to put an end to the inevitable gaps and omissions that arise when human teachers are tasked with repeatedly conducting roll-calls of large student groups (Puthea et al., 2017). This application of facial recognition is proving popular in countries such as the UK and Australia where school shootings and unauthorised campus incursions are rare. For example, the Australian 'Loop-Learn' facial recognition roll-call system has been marketed amidst estimates of saving up to 2.5 hours of teacher time per week."
-  },
-  {
-    id: "para4",
-    label: "Paragraph 4: Virtual Learning",
-    text: "Beyond campus-based security and tracking physical bodies, facial recognition is also being used in a number of 'virtual learning' contexts. For example, facial recognition systems are now being developed as a means of ensuring the integrity of various aspects of online courses. This includes controlling access to online educational content (Montgomery & Marais, 2014), as well as using webcam-based facial recognition to authenticate online learners (Valera et al., 2015). Similarly, there is a growing interest in using facial recognition technology for so-called e-assessment security."
-  },
-  {
-    id: "para5",
-    label: "Paragraph 5: Engagement Detection",
-    text: "Finally, there is a growing interest in facial detection techniques as an indicator of student 'engagement' and learning. For example, research and development in this area have reported that detecting brief 'facial actions' can prove an accurate indicator of students' (non)engagement with online learning environments – highlighting episodes of boredom, confusion, delight, flow, frustration, and surprise (Dewan et al., 2019). Particularly insightful facial actions with regards to learning are reckoned to include brow-raising, eyelid tightening, and mouth dimpling."
-  },
-  {
-    id: "para6",
-    label: "Paragraph 6: Future of Facial Learning Detection",
-    text: "These largely experimental developments have led some educationalists to enthusiastically anticipate facial learning detection being deployed on a mass scale. As Timms (2016, p. 712) reasons, it might soon be possible to gain a 'real-time' sense of which groups of students are in a 'productive state' and other instances 'where the overall activity is not productive'. The promise of customisation that characterises the development of automated learning systems encourages their incorporation into student learning interfaces."
-  }
-];
+// ============================================================================
+// Constants
+// ============================================================================
 
-// Concept options for different task types
-const PARAPHRASING_STRATEGIES: ConceptOption[] = [
-  { id: "synonyms", label: "Synonym Replacement", description: "Replace words with similar-meaning words", example: "introduced → implemented" },
-  { id: "wordforms", label: "Word Form Changes", description: "Change word forms (verb → noun, adjective → adverb)", example: "impacts → impact" },
-  { id: "voice", label: "Active ↔ Passive Voice", description: "Switch between active and passive voice", example: "Researchers collected → Data was collected" },
-  { id: "structure", label: "Sentence Structure", description: "Reorder, combine, or split sentences", example: "Because X, Y → Y resulted from X" }
-];
-
-const AWQ_SKILLS: ConceptOption[] = [
-  { id: "paraphrasing", label: "Paraphrasing Skills", description: "Restating ideas in your own words while keeping meaning" },
-  { id: "summarizing", label: "Summarizing Skills", description: "Condensing main ideas in shorter form" },
-  { id: "critical-thinking", label: "Critical Thinking", description: "Analyzing and evaluating ideas, not just repeating" },
-  { id: "comprehension", label: "Reading Comprehension", description: "Understanding complex academic texts accurately" }
-];
-
-const CITATION_CONCEPTS: ConceptOption[] = [
-  { id: "author-prominent", label: "Author-Prominent Citation", description: "Author name is part of the sentence", example: "Hong et al. (2022) argue that..." },
-  { id: "info-prominent", label: "Info-Prominent Citation", description: "Focus on information, author in parentheses", example: "...according to research (Hong et al., 2022)" },
-  { id: "secondary-source", label: "Secondary Source Citation", description: "Citing through another source", example: "(Smith, 2018, as cited in Jones, 2020)" }
-];
-
-const OUTLINING_CONCEPTS: ConceptOption[] = [
-  { id: "topic-sentence", label: "Topic Sentence", description: "Identify the main idea of each paragraph" },
-  { id: "logical-flow", label: "Logical Flow", description: "How ideas progress from one section to another" },
-  { id: "structural-patterns", label: "Structural Patterns", description: "Recognize patterns like problem-solution, cause-effect" },
-  { id: "transitions", label: "Transitions", description: "Words/phrases connecting ideas between paragraphs" }
-];
-
-const SKIMMING_SCANNING_CONCEPTS: ConceptOption[] = [
-  { id: "skimming", label: "Skimming", description: "Reading quickly for overall meaning and structure" },
-  { id: "scanning", label: "Scanning", description: "Searching for specific information quickly" },
-  { id: "headings", label: "Using Headings", description: "Leveraging titles and headers to understand structure" },
-  { id: "first-last", label: "First/Last Sentences", description: "Reading opening and closing sentences of paragraphs" }
-];
-
-// Week 1 Hour 1 has 10 MC questions + 2 writing tasks = 12 total tasks
+/** Week 1 Hour 1 has 10 MC questions + 2 writing tasks = 12 total tasks */
 const WEEK1_HOUR1_TOTAL_TASKS = 12;
 
-// Local storage key for progress
-const getProgressKey = (weekNumber: number, hourNumber: number) => 
-  `ue1_progress_w${weekNumber}h${hourNumber}`;
+// ============================================================================
+// Utility Functions
+// ============================================================================
 
-// Writing task with AI feedback component
-function WritingTaskWithFeedback({ 
-  taskId, 
-  placeholder, 
-  onComplete,
-  studentId
-}: { 
-  taskId: string; 
-  placeholder: string; 
-  onComplete: (taskId: string) => void;
-  studentId?: string;
-}) {
-  const [text, setText] = useState("");
-  const [feedback, setFeedback] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
-
-  const handleSubmit = async () => {
-    if (!text.trim()) return;
-    
-    setIsLoading(true);
-    setFeedback(null);
-    
-    try {
-      const chatUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
-      
-      const resp = await fetch(chatUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        },
-        body: JSON.stringify({
-          messages: [
-            {
-              role: "user",
-              content: `You are a concise, critical academic writing tutor. Provide brief feedback (2-3 sentences max) on this student's response. Be direct about what's good and what could be improved.
-
-Student's response:
-${text}
-
-Give critical but constructive feedback. Be specific and actionable.`
-            }
-          ],
-          studentId: studentId || "anonymous",
-          meta: {
-            taskId,
-            type: "reflection-feedback"
-          }
-        }),
-      });
-
-      if (!resp.ok) {
-        throw new Error(`AI request failed (${resp.status})`);
-      }
-
-      if (!resp.body) {
-        throw new Error("AI stream unavailable");
-      }
-
-      // Stream the response
-      const reader = resp.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = "";
-      let fullText = "";
-      let streamDone = false;
-
-      while (!streamDone) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-
-        let newlineIndex: number;
-        while ((newlineIndex = buffer.indexOf("\n")) !== -1) {
-          let line = buffer.slice(0, newlineIndex);
-          buffer = buffer.slice(newlineIndex + 1);
-
-          if (line.endsWith("\r")) line = line.slice(0, -1);
-          if (line.startsWith(":") || line.trim() === "") continue;
-          if (!line.startsWith("data: ")) continue;
-
-          const jsonStr = line.slice(6).trim();
-          if (jsonStr === "[DONE]") {
-            streamDone = true;
-            break;
-          }
-
-          try {
-            const parsed = JSON.parse(jsonStr);
-            const content = parsed?.choices?.[0]?.delta?.content;
-            if (content) {
-              fullText += content;
-              setFeedback(fullText); // Update feedback progressively
-            }
-          } catch {
-            // Incomplete JSON, put back in buffer
-            buffer = line + "\n" + buffer;
-            break;
-          }
-        }
-      }
-
-      // Save to database
-      if (studentId && fullText) {
-        await supabase.from("student_task_responses").insert({
-          student_id: studentId,
-          question_key: taskId,
-          response: text,
-          ai_feedback: fullText,
-          is_correct: null,
-        });
-      }
-
-      onComplete(taskId);
-    } catch (err) {
-      console.error("AI feedback error:", err);
-      toast({
-        title: "Feedback unavailable",
-        description: "Could not get AI feedback. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <div className="space-y-3">
-      <textarea 
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        className="w-full min-h-[150px] p-3 rounded-lg border bg-background text-sm resize-y placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
-        placeholder={placeholder}
-      />
-      
-      <div className="flex items-center justify-between">
-        <p className="text-xs text-muted-foreground italic">
-          💡 Remember to save your work externally.
-        </p>
-        <Button 
-          size="sm" 
-          onClick={handleSubmit} 
-          disabled={!text.trim() || isLoading}
-        >
-          {isLoading ? (
-            <>
-              <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-              Getting Feedback...
-            </>
-          ) : (
-            "Submit for Feedback"
-          )}
-        </Button>
-      </div>
-
-      {feedback && (
-        <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/30 space-y-2">
-          <p className="text-xs font-medium text-blue-700 flex items-center gap-1">
-            <Sparkles className="h-3 w-3" />
-            AI Feedback
-          </p>
-          <p className="text-sm text-muted-foreground">{feedback}</p>
-          <p className="text-xs text-amber-600 italic">
-            ⚠️ AI feedback may contain errors. Always consult your teacher for authoritative guidance.
-          </p>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// Micro-level practice component with paragraph selector and AI feedback
-function MicroLevelPractice({ onComplete, studentId }: { onComplete: (taskId: string) => void; studentId?: string }) {
-  const [selectedParagraph, setSelectedParagraph] = useState(PRACTICE_PARAGRAPHS[0].id);
-  const currentParagraph = PRACTICE_PARAGRAPHS.find(p => p.id === selectedParagraph) || PRACTICE_PARAGRAPHS[0];
-
-  return (
-    <div className="p-4 rounded-lg bg-indigo-500/10 border border-indigo-500/30 space-y-4">
-      <h4 className="font-medium text-sm flex items-center gap-2">
-        <PenLine className="h-4 w-4 text-indigo-600" />
-        Your Turn: Analyze a Paragraph
-      </h4>
-      
-      {/* Paragraph Selector */}
-      <div className="space-y-2">
-        <label className="text-xs font-medium text-indigo-700">Choose a paragraph to analyze:</label>
-        <Select value={selectedParagraph} onValueChange={setSelectedParagraph}>
-          <SelectTrigger className="w-full bg-background">
-            <SelectValue placeholder="Select a paragraph" />
-          </SelectTrigger>
-          <SelectContent className="bg-background z-50">
-            {PRACTICE_PARAGRAPHS.map((para) => (
-              <SelectItem key={para.id} value={para.id}>
-                {para.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      
-      {/* Selected paragraph */}
-      <div className="p-3 rounded bg-background border text-sm">
-        <p className="font-medium text-xs text-indigo-600 mb-2">{currentParagraph.label}:</p>
-        <p className="text-muted-foreground leading-relaxed">
-          "{currentParagraph.text}"
-        </p>
-      </div>
-      
-      {/* Writing area with AI feedback and autosave */}
-      <WritingPracticeWithHistory
-        taskKey={`w1h1-micro-outline-${selectedParagraph}`}
-        title="Create a Micro-Level Outline"
-        instructions="Identify the topic sentence, supporting details, and concluding thought for the paragraph above."
-        exampleFormat="Topic Sentence: [main idea]&#10;Supporting Details:&#10;• [detail 1]&#10;• [detail 2]&#10;Concluding Thought: [wrap-up]"
-        placeholder={"Topic Sentence:\n...\n\nSupporting Details:\n• ...\n• ...\n\nConcluding Thought:\n..."}
-        studentId={studentId}
-        className="bg-transparent border-0 p-0"
-      />
-    </div>
-  );
-}
-
-// Helper to get student ID from localStorage
+/**
+ * Gets the student ID from localStorage for anonymous session tracking.
+ * @returns Student ID string or undefined if not set
+ */
+/**
+ * Gets the student ID from localStorage for anonymous session tracking.
+ * @returns Student ID string or undefined if not set
+ */
 function getStoredStudentId(): string | undefined {
   try {
     return localStorage.getItem("ue1_student_id") || undefined;
@@ -334,6 +101,10 @@ function getStoredStudentId(): string | undefined {
     return undefined;
   }
 }
+
+// ============================================================================
+// Main Component
+// ============================================================================
 
 export default function HourPage() {
   const { weekId, hourId } = useParams();
