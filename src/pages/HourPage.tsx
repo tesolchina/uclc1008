@@ -55,6 +55,7 @@ import { LectureOutline, useSectionProgress, generateSectionId } from "@/feature
 import type { AgendaSectionEnhanced } from "@/features/lecture-mode";
 import { TeacherQuestionDashboard } from "@/components/teacher/TeacherQuestionDashboard";
 import { Hour3PracticeSession } from "@/components/lessons/Hour3PracticeSession";
+import { ClassroomDiscussionPage } from "@/features/classroom-discussion";
 
 // UI components and icons
 import { 
@@ -2441,9 +2442,9 @@ Provide focused feedback (4-5 sentences):
           </section>
         )}
 
-        {/* Week 2 Hour 3: AI-Tutored Practice Session */}
+        {/* Week 2 Hour 3: Classroom Discussion Module */}
         {weekNumber === 2 && hourNumber === 3 && (
-          <Hour3PracticeSession
+          <ClassroomDiscussionPage
             weekNumber={weekNumber}
             studentId={studentId || "anonymous"}
             onComplete={() => handleTaskComplete("w2h3-practice-complete")}
