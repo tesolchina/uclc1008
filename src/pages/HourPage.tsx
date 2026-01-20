@@ -12,7 +12,7 @@ import { LectureOutline, useSectionProgress, generateSectionId } from "@/feature
 import type { AgendaSectionEnhanced } from "@/features/lecture-mode";
 import { TeacherQuestionDashboard } from "@/components/teacher/TeacherQuestionDashboard";
 import { Hour3PracticeSession } from "@/components/lessons/Hour3PracticeSession";
-import { ArrowLeft, ArrowRight, Clock, Target, BookOpen, PenLine, CheckCircle2, Lightbulb, FileText, Sparkles, ExternalLink, AlertCircle, Calendar, GraduationCap, ScrollText, ChevronDown, Download, LogIn, Loader2, Trophy } from "lucide-react";
+import { ArrowLeft, ArrowRight, Clock, Target, BookOpen, PenLine, CheckCircle2, Lightbulb, FileText, Sparkles, ExternalLink, AlertCircle, Calendar, GraduationCap, ScrollText, ChevronDown, Download, LogIn, Loader2, Trophy, Users } from "lucide-react";
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
@@ -1806,14 +1806,82 @@ Provide focused feedback (4-5 sentences):
               className="border-2 border-blue-500/30 bg-blue-500/5"
             >
               <div className="space-y-4">
-                {/* Concept Introduction */}
-                <div className="p-4 rounded-lg bg-background/80 space-y-3">
+                {/* What Are Citations & Why They Matter */}
+                <div className="p-4 rounded-lg bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20 space-y-4">
+                  <h4 className="font-medium flex items-center gap-2 text-primary">
+                    <Sparkles className="h-4 w-4" />
+                    What Are Citations?
+                  </h4>
+                  <div className="space-y-3">
+                    <p className="text-sm">
+                      A <strong>citation</strong> is a reference to a source of information—a way of acknowledging where your ideas, evidence, or words come from. In academic writing, citations typically include the author's name and publication year.
+                    </p>
+                    <div className="p-3 rounded-lg bg-background/80 border">
+                      <p className="text-xs font-medium text-muted-foreground mb-1">Example:</p>
+                      <p className="text-sm italic">"Facial recognition technology raises privacy concerns (Andrejevic & Selwyn, 2020)."</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Why Citations Matter - Academic Socialization */}
+                <div className="p-4 rounded-lg bg-amber-500/5 border border-amber-500/20 space-y-4">
+                  <h4 className="font-medium flex items-center gap-2 text-amber-700">
+                    <Users className="h-4 w-4" />
+                    Why Do We Cite? Joining the Scholarly Conversation
+                  </h4>
+                  <div className="space-y-3 text-sm">
+                    <p>
+                      Citations are more than just a formatting requirement—they're a <strong>defining feature of academic writing</strong> and a key part of your <strong>academic socialisation</strong>.
+                    </p>
+                    <div className="p-3 rounded-lg bg-background/80 border-l-4 border-amber-500">
+                      <p className="text-sm italic text-muted-foreground">
+                        "If I have seen further, it is by standing on the shoulders of giants."
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">— Isaac Newton (1675)</p>
+                    </div>
+                    <p>
+                      Academic research is fundamentally <strong>social</strong>. Every scholar builds upon the work of those who came before. When you cite:
+                    </p>
+                    <ul className="space-y-2 ml-4">
+                      <li className="flex items-start gap-2">
+                        <span className="text-amber-600 mt-0.5">•</span>
+                        <span>You <strong>acknowledge</strong> the scholars whose ideas shaped your thinking</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-amber-600 mt-0.5">•</span>
+                        <span>You <strong>join</strong> an ongoing conversation in your field</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-amber-600 mt-0.5">•</span>
+                        <span>You allow <strong>future scholars</strong> to trace and build upon your work</span>
+                      </li>
+                    </ul>
+                    <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
+                      <p className="text-sm font-medium text-primary">
+                        💡 Learning to cite is how you become "one of us"—a member of the academic community.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Practical Reminder */}
+                <div className="p-3 rounded-lg bg-blue-500/5 border border-blue-500/20">
+                  <p className="text-sm flex items-start gap-2">
+                    <Target className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
+                    <span>
+                      <strong>Practical note:</strong> Mastering citations is essential for your <strong>AWQ</strong> and all future assignments. But beyond grades, it's a skill that marks you as a serious academic thinker.
+                    </span>
+                  </p>
+                </div>
+
+                {/* Concept Introduction - Two Ways to Cite */}
+                <div className="p-4 rounded-lg bg-background/80 space-y-3 border-t-2 border-blue-500/30 pt-6 mt-2">
                   <h4 className="font-medium flex items-center gap-2">
                     <Lightbulb className="h-4 w-4 text-amber-500" />
                     Two Ways to Cite
                   </h4>
                   <p className="text-sm text-muted-foreground">
-                    In academic writing, you can cite sources in two main ways depending on what you want to emphasize.
+                    Now that you understand <em>why</em> we cite, let's learn <em>how</em>. In academic writing, you can cite sources in two main ways depending on what you want to emphasize.
                   </p>
                 </div>
 
