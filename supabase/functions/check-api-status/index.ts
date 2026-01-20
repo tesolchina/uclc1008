@@ -47,147 +47,55 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const operation = "check-api-status";
-
   try {
-    const { accessToken, studentId, sessionId } = await req.json().catch(() => ({}));
-
-    await logProcess({
-      operation,
-      step: "start",
-      status: "info",
-      message: `Checking API status (authenticated: ${!!accessToken}, hasStudentId: ${!!studentId})`,
-      sessionId,
-    });
+    const { accessToken, studentId } = await req.json().catch(() => ({}));
 
     const statuses = [];
-
     let hkbuPlatformKeys: Record<string, string> = {};
 
-    // Fetch keys from HKBU platform (only if authenticated)
-    if (accessToken) {
-      try {
-        await logProcess({
-          operation,
-          step: "fetch-remote",
-          status: "info",
-          message: "Fetching API keys from HKBU platform...",
-          sessionId,
-        });
-
-        const response = await fetch(`${HKBU_PLATFORM_URL}/api/user/api-keys`, {
-          headers: {
-            "Authorization": `Bearer ${accessToken}`,
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          const rawKeys = data.api_keys || {};
-          // Normalize key names (blt -> bolatu)
-          hkbuPlatformKeys = {};
-          for (const [key, value] of Object.entries(rawKeys)) {
-            const normalizedKey = key === "blt" ? "bolatu" : key;
-            hkbuPlatformKeys[normalizedKey] = value as string;
-          }
-          const foundKeys = Object.keys(hkbuPlatformKeys);
-
-          await logProcess({
-            operation,
-            step: "remote-success",
-            status: "success",
-            message: `HKBU platform returned ${foundKeys.length} keys`,
-            details: { keys: foundKeys },
-            sessionId,
-          });
-        } else {
-          await logProcess({
-            operation,
-            step: "remote-error",
-            status: "error",
-            message: `HKBU platform error: ${response.status}`,
-            details: { status: response.status },
-            sessionId,
-          });
-        }
-      } catch (err) {
-        await logProcess({
-          operation,
-          step: "remote-exception",
-          status: "error",
-          message: `Error fetching from HKBU platform: ${err}`,
-          sessionId,
-        });
-      }
-    } else {
-      await logProcess({
-        operation,
-        step: "remote-skip",
-        status: "warning",
-        message: "No access token provided - skipping HKBU platform check",
-        sessionId,
-      });
-    }
-
-    // Local database (system settings / shared keys) + per-student key
+    // Supabase client for local queries
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Read per-student HKBU key (if studentId provided)
-    let studentHkbuKey: string | null = null;
-    if (studentId) {
-      const { data: studentRow, error: studentErr } = await supabase
-        .from("students")
-        .select("hkbu_api_key")
-        .eq("student_id", studentId)
-        .maybeSingle();
+    // Run all async operations in parallel for speed
+    const [hkbuPlatformResult, studentResult, localKeysResult] = await Promise.all([
+      // Fetch keys from HKBU platform (only if authenticated)
+      accessToken
+        ? fetch(`${HKBU_PLATFORM_URL}/api/user/api-keys`, {
+            headers: { "Authorization": `Bearer ${accessToken}` },
+          })
+            .then(async (res) => {
+              if (res.ok) {
+                const data = await res.json();
+                const rawKeys = data.api_keys || {};
+                const normalized: Record<string, string> = {};
+                for (const [key, value] of Object.entries(rawKeys)) {
+                  normalized[key === "blt" ? "bolatu" : key] = value as string;
+                }
+                return normalized;
+              }
+              return {};
+            })
+            .catch(() => ({}))
+        : Promise.resolve({}),
+      
+      // Read per-student HKBU key
+      studentId
+        ? supabase
+            .from("students")
+            .select("hkbu_api_key")
+            .eq("student_id", studentId)
+            .maybeSingle()
+        : Promise.resolve({ data: null, error: null }),
+      
+      // Read local/system keys
+      supabase.from("api_keys").select("provider, api_key"),
+    ]);
 
-      if (studentErr) {
-        await logProcess({
-          operation,
-          step: "student-key-error",
-          status: "warning",
-          message: `Could not read student key: ${studentErr.message}`,
-          sessionId,
-        });
-      } else {
-        studentHkbuKey = (studentRow?.hkbu_api_key as string | null) ?? null;
-      }
-    }
-
-    await logProcess({
-      operation,
-      step: "fetch-local",
-      status: "info",
-      message: "Checking local database for API keys...",
-      sessionId,
-    });
-
-    const { data: storedKeys, error } = await supabase
-      .from("api_keys")
-      .select("provider, api_key");
-
-    if (error) {
-      await logProcess({
-        operation,
-        step: "local-error",
-        status: "error",
-        message: `Local database error: ${error.message}`,
-        sessionId,
-      });
-    } else {
-      await logProcess({
-        operation,
-        step: "local-success",
-        status: "info",
-        message: `Local database returned ${storedKeys?.length || 0} keys`,
-        details: { providers: storedKeys?.map(k => k.provider) || [] },
-        sessionId,
-      });
-    }
-
-    const localKeyMap = new Map(storedKeys?.map(k => [k.provider, k.api_key]) || []);
+    hkbuPlatformKeys = hkbuPlatformResult;
+    const studentHkbuKey = studentResult.data?.hkbu_api_key ?? null;
+    const localKeyMap = new Map(localKeysResult.data?.map(k => [k.provider, k.api_key]) || []);
 
     // Check HKBU GenAI - prioritize: student key > HKBU platform > local
     const hkbuKey = studentHkbuKey || hkbuPlatformKeys.hkbu || localKeyMap.get("hkbu");
@@ -238,27 +146,11 @@ serve(async (req) => {
       maskedKey: maskApiKey(kimiKey),
     });
 
-    const availableCount = statuses.filter(s => s.available).length;
-    await logProcess({
-      operation,
-      step: "complete",
-      status: "success",
-      message: `Status check complete: ${availableCount}/${statuses.length} providers available`,
-      details: { statuses: statuses.map(s => ({ provider: s.provider, available: s.available, source: s.source })) },
-      sessionId,
-    });
-
     return new Response(JSON.stringify({ statuses, authenticated: !!accessToken }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
-    await logProcess({
-      operation,
-      step: "exception",
-      status: "error",
-      message: `Unhandled error: ${error}`,
-    });
-
+    console.error("check-api-status error:", error);
     return new Response(
       JSON.stringify({ error: "Failed to check API status" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
