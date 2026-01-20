@@ -78,7 +78,8 @@ export default function SettingsPage() {
       setStudentId(storedId);
       setSavedStudentId(storedId);
       
-      const effectiveStudentId = storedId || profile?.hkbu_user_id || getBrowserSessionId();
+      // For authenticated users, prioritize profile ID; for anonymous, use stored ID or browser session
+      const effectiveStudentId = profile?.hkbu_user_id || storedId || getBrowserSessionId();
       const today = new Date().toISOString().split('T')[0];
 
       // Run all async operations in parallel
@@ -368,15 +369,19 @@ export default function SettingsPage() {
                   {keySource === 'student' && (
                     <Badge variant="secondary" className="mt-1 text-xs">Saved to your profile</Badge>
                   )}
+                  {keySource === 'hkbu_platform' && (
+                    <Badge variant="outline" className="mt-1 text-xs">Synced from HKBU Platform</Badge>
+                  )}
                 </div>
-                {keySource === 'student' && (
+                {/* Show revoke button for authenticated users with student-saved keys */}
+                {isAuthenticated && keySource === 'student' && (
                   <Button 
                     variant="destructive" 
                     size="sm" 
                     onClick={handleRevokeKey}
                     disabled={isRevoking}
                   >
-                    {isRevoking ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Revoke Key'}
+                    {isRevoking ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Remove Key'}
                   </Button>
                 )}
               </>
