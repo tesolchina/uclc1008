@@ -29,16 +29,30 @@ export function AiFeedbackHint({ showMarkdownTip = true, className = '' }: AiFee
   const remaining = sharedUsage ? Math.max(0, sharedUsage.limit - sharedUsage.used) : null;
   const isEmpty = remaining === 0;
 
+  // If user has personal key configured, just show confirmation (no setup link needed)
+  if (hasPersonalKey) {
+    return (
+      <div className={`flex flex-wrap items-center gap-x-4 gap-y-1 text-xs ${className}`}>
+        <span className="inline-flex items-center gap-1 text-emerald-600">
+          <Key className="h-3 w-3" />
+          HKBU API key connected
+        </span>
+        {showMarkdownTip && (
+          <span className="inline-flex items-center gap-1 text-muted-foreground">
+            <Info className="h-3 w-3" />
+            Use *asterisks* for <em>italics</em>
+          </span>
+        )}
+      </div>
+    );
+  }
+
+  // No personal key - show appropriate message with setup link
   return (
     <div className={`flex flex-wrap items-center gap-x-4 gap-y-1 text-xs ${className}`}>
-      {/* API Key Status */}
-      {studentId && (
-        hasPersonalKey ? (
-          <span className="inline-flex items-center gap-1 text-emerald-600">
-            <Key className="h-3 w-3" />
-            HKBU API active
-          </span>
-        ) : isEmpty ? (
+      {/* API Key Status - only show setup prompts when NOT configured */}
+      {studentId ? (
+        isEmpty ? (
           <span className="inline-flex items-center gap-1 text-destructive">
             <AlertCircle className="h-3 w-3" />
             Daily limit reached.{' '}
@@ -55,9 +69,7 @@ export function AiFeedbackHint({ showMarkdownTip = true, className = '' }: AiFee
             </Link>
           </span>
         )
-      )}
-
-      {!studentId && (
+      ) : (
         <span className="inline-flex items-center gap-1 text-muted-foreground">
           <AlertCircle className="h-3 w-3" />
           <Link to="/settings" className="underline hover:text-foreground">
