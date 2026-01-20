@@ -61,7 +61,7 @@ export function AiFeedbackHint({ showMarkdownTip = true, className = '' }: AiFee
         <span className="inline-flex items-center gap-1 text-muted-foreground">
           <AlertCircle className="h-3 w-3" />
           <Link to="/settings" className="underline hover:text-foreground">
-            Log in for AI feedback
+            Set up API key for AI feedback
           </Link>
         </span>
       )}
