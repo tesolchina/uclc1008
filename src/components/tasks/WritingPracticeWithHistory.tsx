@@ -320,11 +320,11 @@ export function WritingPracticeWithHistory({
           messages: [
             {
               role: "user",
-              content: `You are a concise academic writing tutor. Provide brief feedback (3-4 sentences max) on this student's outline.
+              content: `You are a concise academic writing tutor. Provide brief feedback (3-4 sentences max) on this student's work.
 
-FOCUS ONLY ON: Does the student accurately cover all the key points from the source text? Are the main ideas identified correctly?
+FOCUS ONLY ON: Does the student accurately cover all the key points? Are any errors present?
 
-Do NOT evaluate: writing style, grammar, sentence structure, or how ideas are organized/progressed.
+Do NOT evaluate: writing style, grammar, or sentence structure.
 
 Task: ${title}
 Instructions: ${instructions}
@@ -332,7 +332,13 @@ Instructions: ${instructions}
 Student's response:
 ${content}
 
-Provide constructive, specific feedback on key point coverage and accuracy only.`,
+IMPORTANT: After your feedback, ALWAYS provide an "IMPROVED VERSION:" section showing the corrected/improved version based on the student's draft. This helps students see exactly what changes are needed.
+
+Format your response as:
+[Your feedback here - 3-4 sentences]
+
+IMPROVED VERSION:
+[The corrected version of the student's work]`,
             },
           ],
           studentId,
