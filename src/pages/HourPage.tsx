@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { CollapsibleSection } from "@/components/CollapsibleSection";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ObjectiveTask, QuickCheckMC, WritingTask, ParaphraseCoach, AskQuestionButton, ParagraphWithNotes, WritingPracticeWithHistory, IntegratedParaphraseTask, StrategyPracticeTask, ConceptSelectTask } from "@/components/tasks";
 import type { ConceptOption } from "@/components/tasks";
 import { StudentLoginReminder } from "@/components/StudentLoginReminder";
@@ -530,6 +531,50 @@ Remember to also save any written responses separately.
           </div>
         </section>
 
+        {/* Week 2: Adhoc Notes - Embedded Google Doc */}
+        {weekNumber === 2 && (
+          <Collapsible>
+            <Card className="border-amber-500/30 bg-amber-500/5">
+              <CollapsibleTrigger asChild>
+                <CardHeader className="cursor-pointer hover:bg-amber-500/10 transition-colors pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <ScrollText className="h-4 w-4 text-amber-600" />
+                      <CardTitle className="text-base">Adhoc Notes</CardTitle>
+                    </div>
+                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <CardDescription>Additional notes and materials for this week</CardDescription>
+                </CardHeader>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <CardContent className="pt-0 space-y-3">
+                  <div className="aspect-[16/9] w-full rounded-lg overflow-hidden border">
+                    <iframe
+                      src="https://docs.google.com/document/d/182xbd3rh66VcnqXugXg3UKxF-ZdXQWtgWOR11LDmL8Y/preview"
+                      width="100%"
+                      height="100%"
+                      className="border-0"
+                      title="Week 2 Adhoc Notes"
+                    />
+                  </div>
+                  <Button variant="outline" size="sm" asChild>
+                    <a
+                      href="https://docs.google.com/document/d/182xbd3rh66VcnqXugXg3UKxF-ZdXQWtgWOR11LDmL8Y/edit?tab=t.0"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="gap-2"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      Open in Google Docs
+                    </a>
+                  </Button>
+                </CardContent>
+              </CollapsibleContent>
+            </Card>
+          </Collapsible>
+        )}
+
         {/* Learning Goals - moved to top */}
         <Card className="border-primary/20 bg-primary/5">
           <CardHeader className="pb-2">
@@ -745,7 +790,7 @@ Provide brief feedback (3-4 sentences):
 
                   <QuickCheckMC
                     questionNumber={3}
-                    question="Which paraphrasing strategy was used here?\n\nOriginal: 'Researchers collected data from participants.'\nParaphrase: 'Data was gathered from participants by the researchers.'"
+                    question="Which paraphrasing strategy was used here? Original: 'Researchers collected data from participants.' Paraphrase: 'Data was gathered from participants by the researchers.'"
                     options={[
                       { label: "A", text: "Synonym replacement only" },
                       { label: "B", text: "Word form change" },
@@ -758,7 +803,7 @@ Provide brief feedback (3-4 sentences):
 
                   <QuickCheckMC
                     questionNumber={4}
-                    question="Which paraphrasing strategy was used here?\n\nOriginal: 'The technology significantly impacts education.'\nParaphrase: 'The significant impact of technology on education...'"
+                    question="Which paraphrasing strategy was used here? Original: 'The technology significantly impacts education.' Paraphrase: 'The significant impact of technology on education...'"
                     options={[
                       { label: "A", text: "Synonym replacement" },
                       { label: "B", text: "Word form change (verb → noun)" },
@@ -862,7 +907,7 @@ Provide brief feedback (3-4 sentences):
 
                   <QuickCheckMC
                     questionNumber={7}
-                    question="Is this an acceptable paraphrase or patchwriting?\n\nOriginal: 'Facial recognition technology is now being introduced across various aspects of public life.'\nAttempt: 'Facial recognition is currently being introduced across many aspects of public life.'"
+                    question="Is this an acceptable paraphrase or patchwriting? Original: 'Facial recognition technology is now being introduced across various aspects of public life.' Attempt: 'Facial recognition is currently being introduced across many aspects of public life.'"
                     options={[
                       { label: "A", text: "Acceptable paraphrase — words were changed" },
                       { label: "B", text: "Patchwriting — too close to the original" },
@@ -1924,7 +1969,7 @@ Provide focused feedback (4-5 sentences):
                   
                   <QuickCheckMC
                     questionNumber={1}
-                    question="Which citation style is this?\n\n'Parental support for FRT was found to be high (Hong et al., 2022).'"
+                    question="Which citation style is this? 'Parental support for FRT was found to be high (Hong et al., 2022).'"
                     options={[
                       { label: "A", text: "Author-Prominent (Narrative)" },
                       { label: "B", text: "Information-Prominent (Parenthetical)" },
@@ -1937,7 +1982,7 @@ Provide focused feedback (4-5 sentences):
 
                   <QuickCheckMC
                     questionNumber={2}
-                    question="Which citation style is this?\n\n'Andrejevic and Selwyn (2020) argue that FRT raises ethical concerns.'"
+                    question="Which citation style is this? 'Andrejevic and Selwyn (2020) argue that FRT raises ethical concerns.'"
                     options={[
                       { label: "A", text: "Author-Prominent (Narrative)" },
                       { label: "B", text: "Information-Prominent (Parenthetical)" },
@@ -1964,7 +2009,7 @@ Provide focused feedback (4-5 sentences):
                   <WritingPracticeWithHistory
                     taskKey="w2h1-citation-convert-1"
                     studentId={studentId || "anonymous"}
-                    title="Convert to Author-Prominent"
+                    title="Writing Practice 1: Convert to Author-Prominent"
                     instructions="Rewrite this sentence using Author-Prominent citation. The author's name should be part of the sentence, with the year in parentheses."
                     placeholder="Doffman (2018) ..."
                   />
@@ -2046,7 +2091,7 @@ Provide focused feedback (4-5 sentences):
 
                   <QuickCheckMC
                     questionNumber={4}
-                    question="What's WRONG in this sentence?\n\n'According to Andrejevic & Selwyn (2020), schools are adopting FRT.'"
+                    question="What's WRONG in this sentence? 'According to Andrejevic & Selwyn (2020), schools are adopting FRT.'"
                     options={[
                       { label: "A", text: "Nothing - this is correct" },
                       { label: "B", text: "Should use 'and' instead of '&' since it's in the sentence" },
@@ -2073,7 +2118,7 @@ Provide focused feedback (4-5 sentences):
                   <WritingPracticeWithHistory
                     taskKey="w2h1-fix-citations"
                     studentId={studentId || "anonymous"}
-                    title="Fix the Citations"
+                    title="Writing Practice 2: Fix the Citations"
                     instructions="Rewrite this paragraph with correct APA 7th formatting. Remember: 'and' in sentences, '&' in parentheses, and 'et al.' for 3+ authors."
                     placeholder="According to Andrejevic and Selwyn (2020), ..."
                   />
@@ -2155,7 +2200,7 @@ Provide focused feedback (4-5 sentences):
                   <WritingPracticeWithHistory
                     taskKey="w2h1-secondary-citation"
                     studentId={studentId || "anonymous"}
-                    title="Write with Secondary Citation"
+                    title="Writing Practice 3: Write with Secondary Citation"
                     instructions="Write a complete sentence using this statistic with the proper secondary citation format. You can use either author-prominent or info-prominent style."
                     placeholder="According to Doffman (2018, as cited in ..."
                   />
@@ -2229,7 +2274,7 @@ Provide focused feedback (4-5 sentences):
                   <WritingPracticeWithHistory
                     taskKey="w2h1-integrated-paragraph"
                     studentId={studentId || "anonymous"}
-                    title="Write Your Paragraph"
+                    title="Writing Practice 4: Write Your Paragraph"
                     instructions="Write a 3-4 sentence paragraph about FRT in schools using all three sources. Include: (1) at least one author-prominent citation, (2) at least one info-prominent citation, (3) the secondary citation for Doffman."
                     placeholder="Facial recognition technology is increasingly being adopted in educational settings..."
                     exampleFormat="Tips:&#10;• For 2 authors: Andrejevic and Selwyn (2020) OR (Andrejevic & Selwyn, 2020)&#10;• For 4 authors: Hong et al. (2022)&#10;• Secondary: (Doffman, 2018, as cited in Andrejevic & Selwyn, 2020)"
