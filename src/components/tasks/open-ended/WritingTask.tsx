@@ -4,6 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Sparkles, Send, RotateCcw, Lightbulb, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { AiFeedbackHint } from "@/components/api/AiFeedbackHint";
 
 interface WritingTaskProps {
   id: string;
@@ -185,6 +186,9 @@ Please provide feedback on this response.`
           )}
         </div>
       )}
+
+      {/* API Key Status & Formatting Tips */}
+      <AiFeedbackHint />
 
       {/* Actions */}
       <div className="flex gap-2">
