@@ -289,7 +289,9 @@ export default function SettingsPage() {
     const confirmed = window.confirm('Remove your HKBU API key? You will fall back to the shared API.');
     if (!confirmed) return;
 
-    const effectiveStudentId = savedStudentId || profile?.hkbu_user_id || getBrowserSessionId();
+    // IMPORTANT: when signed in with HKBU, always prefer the HKBU user id.
+    // savedStudentId is for student-only sessions and may not match the HKBU-linked record.
+    const effectiveStudentId = profile?.hkbu_user_id || savedStudentId || getStoredStudentId() || getBrowserSessionId();
 
     setIsRevoking(true);
     try {
@@ -436,8 +438,8 @@ export default function SettingsPage() {
                     <Badge variant="outline" className="mt-1 text-xs">Synced from HKBU Platform</Badge>
                   )}
                 </div>
-                {/* Show revoke button for fully authenticated users with student-saved keys */}
-                {isFullyAuthenticated && keySource === 'student' && (
+                {/* Allow removing a student-saved key (OAuth or student-only) */}
+                {keySource === 'student' && (profile?.hkbu_user_id || savedStudentId || getStoredStudentId()) && (
                   <Button 
                     variant="destructive" 
                     size="sm" 

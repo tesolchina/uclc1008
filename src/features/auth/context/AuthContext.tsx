@@ -92,6 +92,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } else {
           setProfile(null);
           setUserRoles([]);
+          // Ensure student-only sessions never inherit teacher/admin role UI.
+          setActiveRoleState('student');
+          localStorage.removeItem('ue1_active_role');
           setIsLoading(false);
         }
       }
@@ -109,7 +112,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUserRoles(roles);
           const primaryRole = roles.includes('admin') ? 'admin' : roles.includes('teacher') ? 'teacher' : 'student';
           setProfile({ ...profileData, role: primaryRole });
-          
+
           // Restore saved active role or use primary
           const savedRole = localStorage.getItem('ue1_active_role') as 'admin' | 'teacher' | 'student' | null;
           if (savedRole && roles.includes(savedRole)) {
@@ -117,8 +120,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           } else {
             setActiveRoleState(primaryRole as 'admin' | 'teacher' | 'student');
           }
+        } else {
+          setProfile(null);
+          setUserRoles([]);
+          setActiveRoleState('student');
+          localStorage.removeItem('ue1_active_role');
         }
+      } else {
+        setProfile(null);
+        setUserRoles([]);
+        setActiveRoleState('student');
+        localStorage.removeItem('ue1_active_role');
       }
+
       setIsLoading(false);
     });
 
