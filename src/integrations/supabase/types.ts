@@ -142,6 +142,96 @@ export type Database = {
         }
         Relationships: []
       }
+      discussion_sessions: {
+        Row: {
+          created_at: string
+          current_task_id: string | null
+          id: string
+          session_id: string
+          task_context: string | null
+          week_number: number
+        }
+        Insert: {
+          created_at?: string
+          current_task_id?: string | null
+          id?: string
+          session_id: string
+          task_context?: string | null
+          week_number: number
+        }
+        Update: {
+          created_at?: string
+          current_task_id?: string | null
+          id?: string
+          session_id?: string
+          task_context?: string | null
+          week_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discussion_sessions_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "live_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      discussion_threads: {
+        Row: {
+          author_type: string
+          content: string
+          created_at: string
+          id: string
+          is_spotlight: boolean
+          parent_id: string | null
+          response_id: string | null
+          session_id: string
+        }
+        Insert: {
+          author_type: string
+          content: string
+          created_at?: string
+          id?: string
+          is_spotlight?: boolean
+          parent_id?: string | null
+          response_id?: string | null
+          session_id: string
+        }
+        Update: {
+          author_type?: string
+          content?: string
+          created_at?: string
+          id?: string
+          is_spotlight?: boolean
+          parent_id?: string | null
+          response_id?: string | null
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discussion_threads_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "discussion_threads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discussion_threads_response_id_fkey"
+            columns: ["response_id"]
+            isOneToOne: false
+            referencedRelation: "session_responses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discussion_threads_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "live_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hour_tasks: {
         Row: {
           context: string | null
