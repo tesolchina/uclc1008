@@ -36,7 +36,10 @@ function setStoredStudentId(id: string): void {
 
 export default function SettingsPage() {
   const { toast } = useToast();
-  const { isAuthenticated, profile, accessToken, loginWithHkbu } = useAuth();
+  const { isAuthenticated, user, profile, accessToken, loginWithHkbu } = useAuth();
+  
+  // Check if user is fully authenticated (OAuth login), not just student-only mode
+  const isFullyAuthenticated = !!user && !!profile;
   
   const [isLoading, setIsLoading] = useState(true);
   const [isSavingKey, setIsSavingKey] = useState(false);
@@ -373,8 +376,8 @@ export default function SettingsPage() {
                     <Badge variant="outline" className="mt-1 text-xs">Synced from HKBU Platform</Badge>
                   )}
                 </div>
-                {/* Show revoke button for authenticated users with student-saved keys */}
-                {isAuthenticated && keySource === 'student' && (
+                {/* Show revoke button for fully authenticated users with student-saved keys */}
+                {isFullyAuthenticated && keySource === 'student' && (
                   <Button 
                     variant="destructive" 
                     size="sm" 
@@ -434,8 +437,8 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      {/* Add HKBU Key - Only for authenticated users */}
-      {isAuthenticated && !hasHkbuKey && (
+      {/* Add HKBU Key - Only for fully authenticated users (OAuth login) */}
+      {isFullyAuthenticated && !hasHkbuKey && (
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Add Your HKBU API Key</CardTitle>
@@ -516,8 +519,8 @@ export default function SettingsPage() {
         </Card>
       )}
 
-      {/* Prompt for non-authenticated users to sign in to use API key */}
-      {!isAuthenticated && !hasHkbuKey && (
+      {/* Prompt for non-fully-authenticated users to sign in to use API key */}
+      {!isFullyAuthenticated && !hasHkbuKey && (
         <Card className="border-dashed border-yellow-500/50">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
@@ -525,7 +528,7 @@ export default function SettingsPage() {
               HKBU API Key
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <Alert className="border-yellow-500/50 bg-yellow-500/10">
               <AlertCircle className="h-4 w-4 text-yellow-600" />
               <AlertDescription className="text-yellow-700 dark:text-yellow-300">
@@ -533,17 +536,20 @@ export default function SettingsPage() {
                 please sign in with your HKBU account first.
               </AlertDescription>
             </Alert>
+            <Button variant="outline" onClick={loginWithHkbu} className="w-full">
+              Sign in with HKBU
+            </Button>
           </CardContent>
         </Card>
       )}
 
-      {/* Sign in prompt */}
-      {!isAuthenticated && (
+      {/* Sign in prompt for sync features */}
+      {!isFullyAuthenticated && (
         <Card className="border-dashed">
           <CardContent className="pt-6">
             <div className="text-center space-y-3">
               <p className="text-sm text-muted-foreground">
-                Sign in with your HKBU account to sync settings across devices.
+                Sign in with your HKBU account to sync settings across devices and enable API key management.
               </p>
               <Button variant="outline" onClick={loginWithHkbu}>
                 Sign in with HKBU
