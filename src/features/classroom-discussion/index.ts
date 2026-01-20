@@ -17,3 +17,5 @@ export * from './hooks';
 
 // Components
 export * from './components';
+export * from './pages';
+export { ClassroomDiscussionPage } from './pages/ClassroomDiscussionPage';
