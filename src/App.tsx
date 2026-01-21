@@ -38,6 +38,7 @@ import {
   Week11Page,
   Week12Page,
   Week13Page,
+  PreCourseWritingFeedbackPage,
 } from "./pages/weeks";
 
 const queryClient = new QueryClient();
@@ -79,6 +80,7 @@ const App = () => (
                 <Route path="week/:weekId/hour/:hourId" element={<HourPage />} />
                 <Route path="week/1/assignment/pre-course-writing" element={<PreCourseWritingPage />} />
                 <Route path="week/2/assignment/pre-course-writing" element={<PreCourseWritingPage />} />
+                <Route path="week/2/feedback" element={<PreCourseWritingFeedbackPage />} />
                 <Route path="week/:weekId/assignment/:assignmentId" element={<WeekAssignmentPage />} />
                 <Route path="week/1/lesson/1" element={<Lesson1Page />} />
                 <Route path="week/:weekId/lesson/:lessonId" element={<LessonPage />} />

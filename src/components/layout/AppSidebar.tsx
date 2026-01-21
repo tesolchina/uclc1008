@@ -25,6 +25,7 @@ type WeekNavItem = {
   url: string;
   assignments: { id: string; title: string; weight: string }[];
   hours?: { number: number; title: string }[];
+  specialPages?: { id: string; title: string; icon: string }[];
 };
 
 const weeks: WeekNavItem[] = Array.from({ length: 13 }, (_, index) => {
@@ -48,11 +49,17 @@ const weeks: WeekNavItem[] = Array.from({ length: 13 }, (_, index) => {
     { number: 3, title: "Hour 3" },
   ] : undefined;
 
+  // Special pages for specific weeks
+  const specialPages = id === 2 ? [
+    { id: "feedback", title: "Pre-course Writing Feedback", icon: "feedback" }
+  ] : undefined;
+
   return {
     title: `Week ${id}`,
     url: `/week/${id}`,
     assignments,
     hours,
+    specialPages,
   };
 });
 
@@ -216,6 +223,28 @@ export function AppSidebar() {
                                 A
                               </span>
                               <span className="truncate">{assignment.title} ({assignment.weight})</span>
+                            </NavLink>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      );
+                    })}
+                    {!collapsed && week.specialPages?.map((page) => {
+                      const pagePath = `${week.url}/${page.id}`;
+                      const pageActive = isActive(pagePath);
+
+                      return (
+                        <SidebarMenuItem key={page.id}>
+                          <SidebarMenuButton asChild data-active={pageActive}>
+                            <NavLink
+                              to={pagePath}
+                              end
+                              className="flex items-center gap-2 rounded-md px-6 py-1.5 text-[11px] text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
+                              activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
+                            >
+                              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-amber-500/20 text-[9px] font-semibold text-amber-600">
+                                F
+                              </span>
+                              <span className="truncate">{page.title}</span>
                             </NavLink>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
