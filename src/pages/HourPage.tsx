@@ -2057,72 +2057,141 @@ Provide focused feedback (4-5 sentences):
         {/* Week 2 Hour 2: End-of-Text Citations / Reference List */}
         {weekNumber === 2 && hourNumber === 2 && (
           <section className="space-y-6">
-            {/* Part 1: What are End-of-Text Citations? */}
+            {/* Part 1: The Link Between In-Text and End-of-Text Citations */}
             <CollapsibleSection
-              title="Part 1: End-of-Text Citations / References"
-              description="Understanding reference list formatting in APA 7th edition"
+              title="Part 1: From In-Text to Reference List"
+              description="Understanding the connection between in-text citations and end-of-text references"
               icon={<BookOpen className="h-4 w-4 text-blue-600" />}
               defaultOpen={true}
               className="border-2 border-blue-500/30 bg-blue-500/5"
             >
               <div className="space-y-4">
-                {/* Introduction */}
+                {/* Recap from Hour 1 */}
                 <div className="p-4 rounded-lg bg-background/80 space-y-3">
                   <h4 className="font-medium flex items-center gap-2">
                     <Lightbulb className="h-4 w-4 text-amber-500" />
-                    Why End-of-Text Citations Matter
+                    Quick Recap: In-Text Citations (Hour 1)
                   </h4>
                   <p className="text-sm text-muted-foreground">
-                    While <strong>in-text citations</strong> show WHO and WHEN (author + year), 
-                    <strong> end-of-text citations</strong> (the Reference List) provide the complete information: 
-                    WHO, WHEN, WHAT, and WHERE — allowing readers to locate the original source.
+                    Last time, we learned about <strong>in-text citations</strong> — the brief references within 
+                    your writing that show WHO said something and WHEN (author + year). But where can readers 
+                    find the complete source details?
                   </p>
                 </div>
 
-                {/* In-text vs End-of-text Comparison */}
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="p-4 rounded-lg border border-blue-500/30 bg-blue-500/5 space-y-2">
-                    <p className="text-xs font-medium text-blue-700">📝 In-Text Citation</p>
-                    <p className="text-sm text-muted-foreground italic">
-                      "According to Andrejevic and Selwyn (2020), FRT raises privacy concerns."
-                    </p>
-                    <p className="text-xs text-blue-600">Shows: Author + Year (WHO + WHEN)</p>
-                  </div>
-                  <div className="p-4 rounded-lg border border-green-500/30 bg-green-500/5 space-y-2">
-                    <p className="text-xs font-medium text-green-700">📚 End-of-Text Reference</p>
-                    <p className="text-sm text-muted-foreground italic">
-                      Andrejevic, M., & Selwyn, N. (2020). Facial recognition technology in schools: Critical questions and concerns. <em>Learning, Media and Technology</em>, 45(2), 115-128.
-                    </p>
-                    <p className="text-xs text-green-600">Shows: Authors, Year, Title, Journal, Volume, Pages</p>
-                  </div>
+                {/* Introduction to End-of-Text */}
+                <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/30 space-y-3">
+                  <h4 className="font-medium flex items-center gap-2">
+                    <BookOpen className="h-4 w-4 text-green-600" />
+                    Introducing: The Reference List
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    At the <strong>end of every academic article</strong>, you'll find a <strong>Reference List</strong> (also called "References" or "Works Cited"). 
+                    This list contains <strong>complete information</strong> for every source cited in the text — enough for any reader to locate the original article.
+                  </p>
+                  <p className="text-sm font-medium text-green-700">
+                    🔑 The Rule: Every in-text citation must have a matching entry in the Reference List — and vice versa!
+                  </p>
                 </div>
 
-                {/* Key Rule */}
-                <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
-                  <p className="text-sm font-medium text-amber-700 mb-1">🔑 Key Rule:</p>
+                {/* Visual: How to Match */}
+                <div className="p-4 rounded-lg bg-muted/50 space-y-3">
+                  <h4 className="font-medium text-sm">🔍 How to Find the Match: Author's Last Name + Year</h4>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="p-3 rounded-lg border border-blue-500/30 bg-blue-500/5 space-y-2">
+                      <p className="text-xs font-medium text-blue-700">📝 In the Body Text:</p>
+                      <p className="text-sm text-muted-foreground italic">
+                        "...school shooting incidents have prompted school authorities to annually spend $2.7 billion on campus security products and services (<strong>Doffman, 2018</strong>)."
+                      </p>
+                    </div>
+                    <div className="p-3 rounded-lg border border-green-500/30 bg-green-500/5 space-y-2">
+                      <p className="text-xs font-medium text-green-700">📚 In the Reference List:</p>
+                      <p className="text-sm text-muted-foreground">
+                        <strong>Doffman</strong>, Z. (<strong>2018</strong>, November 18). Hundreds of U.S. schools now have AI-enabled camera systems scanning for guns. <em>Forbes</em>. https://forbes.com/...
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground text-center mt-2">
+                    ↑ Match by: <strong>Author's last name</strong> + <strong>Publication year</strong>
+                  </p>
+                </div>
+
+                {/* Why This Matters */}
+                <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/30 space-y-2">
+                  <p className="text-sm font-medium text-amber-700 mb-1">💡 Why Do We Need End-of-Text Citations?</p>
+                  <ul className="text-xs text-muted-foreground space-y-1">
+                    <li>• <strong>Traceability:</strong> Readers can find and verify your sources</li>
+                    <li>• <strong>Credibility:</strong> Shows your work is based on real research</li>
+                    <li>• <strong>Academic Integrity:</strong> Gives proper credit to original authors</li>
+                    <li>• <strong>DOI/URL:</strong> Often includes a direct link to access the article</li>
+                  </ul>
+                </div>
+
+                {/* Interactive: Citation Hunt Game */}
+                <div className="space-y-3 pt-4 border-t">
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    🎯 Mini-Game: Citation Hunt
+                  </h4>
                   <p className="text-xs text-muted-foreground">
-                    Every in-text citation must have a corresponding entry in the Reference List (and vice versa). 
-                    This allows readers to find the full source details.
+                    Look at the article excerpt below. The text contains several in-text citations. For each citation, 
+                    you should be able to find the matching reference in the Reference List at the end.
                   </p>
+                  
+                  {/* Article Excerpt */}
+                  <div className="p-4 rounded-lg border bg-background space-y-3">
+                    <p className="text-xs font-medium text-muted-foreground">📄 From: Andrejevic & Selwyn (2020)</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      "...school shooting incidents have prompted school authorities to annually spend $2.7 billion 
+                      on campus security products and services (<strong className="text-blue-600">Doffman, 2018</strong>). 
+                      Facial recognition systems have now been sold to thousands of US schools, with vendors 
+                      'pitching the technology as an all-seeing shield against school shootings' 
+                      (<strong className="text-blue-600">Harwell, 2018</strong>, n.p)."
+                    </p>
+                    <p className="text-xs text-blue-600">↑ Find these two citations in the Reference List below!</p>
+                  </div>
+
+                  {/* Sample Reference List */}
+                  <div className="p-4 rounded-lg border bg-muted/30 space-y-2">
+                    <p className="text-xs font-medium text-muted-foreground mb-2">📚 Reference List (partial):</p>
+                    <div className="text-sm space-y-3 font-mono text-xs">
+                      <p className="pl-4 -indent-4 text-muted-foreground">Apampa, K. M., Wills, G. B., & Sherrill-Mix, D. (2010). Approaches to security in e-assessment. <em>International Journal of Information Security</em>, 9(4), 263–277.</p>
+                      <p className="pl-4 -indent-4 bg-green-500/10 p-1 rounded">Doffman, Z. (2018, November 18). Hundreds of U.S. schools now have AI-enabled camera systems scanning for guns. <em>Forbes</em>. https://forbes.com/sites/...</p>
+                      <p className="pl-4 -indent-4 bg-green-500/10 p-1 rounded">Harwell, D. (2018, October 17). Unproven facial recognition companies target schools, promising an end to shootings. <em>The Washington Post</em>. https://washingtonpost.com/...</p>
+                      <p className="pl-4 -indent-4 text-muted-foreground">Puthea, S., Anshul, V., & Sujaybhai, N. (2017). Face recognition based automatic attendance system. <em>IJARIIE</em>, 3(1), 212–218.</p>
+                    </div>
+                  </div>
                 </div>
 
-                {/* MC Question */}
+                {/* MC Questions */}
                 <QuickCheckMC
                   questionNumber={1}
-                  question="What information does an END-OF-TEXT citation include that an IN-TEXT citation does NOT?"
+                  question="In the passage above, 'Doffman, 2018' is cited. What type of source is this (based on the reference entry)?"
                   options={[
-                    { label: "A", text: "Author name" },
-                    { label: "B", text: "Publication year" },
-                    { label: "C", text: "Article title, journal name, volume, and page numbers" },
-                    { label: "D", text: "The main argument of the source" },
+                    { label: "A", text: "A peer-reviewed journal article" },
+                    { label: "B", text: "A book chapter" },
+                    { label: "C", text: "A newspaper/online news article" },
+                    { label: "D", text: "A government report" },
                   ]}
                   correctAnswer="C"
-                  explanation="End-of-text citations include the full publication details: article title, journal name, volume/issue numbers, and page numbers — everything needed to locate the source."
+                  explanation="The reference shows it's from Forbes, a news website. Notice there's no volume/issue numbers — instead, there's a specific date (November 18) and a URL, which are typical for news articles."
+                />
+
+                <QuickCheckMC
+                  questionNumber={2}
+                  question="Why is 'n.p.' included after (Harwell, 2018) in the in-text citation?"
+                  options={[
+                    { label: "A", text: "It means 'no publication'" },
+                    { label: "B", text: "It means 'no page number' — the online source has no page numbers" },
+                    { label: "C", text: "It's the author's initials" },
+                    { label: "D", text: "It's a formatting error" },
+                  ]}
+                  correctAnswer="B"
+                  explanation="'n.p.' stands for 'no page' — used when citing online sources that don't have page numbers. For direct quotes, we normally include page numbers, but for online news articles, we use n.p. or paragraph numbers."
                 />
               </div>
             </CollapsibleSection>
 
-            {/* Part 2: Journal Article Format */}
+            {/* Part 2: Formatting Journal Article References */}
             <CollapsibleSection
               title="Part 2: Formatting Journal Article References"
               description="Master the APA 7th edition format for journal articles"
@@ -2131,14 +2200,82 @@ Provide focused feedback (4-5 sentences):
               className="border-2 border-green-500/30 bg-green-500/5"
             >
               <div className="space-y-4">
-                {/* Format Template */}
+                {/* The Formula */}
                 <div className="p-4 rounded-lg bg-background/80 space-y-3">
                   <h4 className="font-medium flex items-center gap-2">
                     <Lightbulb className="h-4 w-4 text-green-500" />
-                    The APA 7th Edition Format for Journal Articles
+                    The APA 7th Edition Formula for Journal Articles
                   </h4>
                   <div className="p-3 rounded-lg bg-muted/50 font-mono text-sm">
-                    <span className="text-blue-600">Author last name, Initials.</span> (<span className="text-purple-600">Year</span>). <span className="text-green-600">Title of article</span>. <em className="text-amber-600">Title of Journal</em>, <span className="text-red-600">volume</span>(issue), pages. https://doi.org/xxxxx
+                    <span className="text-blue-600">Author(s)</span> (<span className="text-purple-600">Year</span>). <span className="text-green-600">Article title</span>. <em className="text-amber-600">Journal Name</em>, <span className="text-red-600">Volume</span>(Issue), Pages. DOI
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+                    <div className="p-2 rounded bg-blue-500/10 text-center">
+                      <span className="font-medium text-blue-700">Author(s)</span>
+                      <p className="text-muted-foreground">Last name, Initials.</p>
+                    </div>
+                    <div className="p-2 rounded bg-purple-500/10 text-center">
+                      <span className="font-medium text-purple-700">Year</span>
+                      <p className="text-muted-foreground">In parentheses</p>
+                    </div>
+                    <div className="p-2 rounded bg-green-500/10 text-center">
+                      <span className="font-medium text-green-700">Title</span>
+                      <p className="text-muted-foreground">Sentence case</p>
+                    </div>
+                    <div className="p-2 rounded bg-amber-500/10 text-center">
+                      <span className="font-medium text-amber-700">Journal</span>
+                      <p className="text-muted-foreground">Italicized</p>
+                    </div>
+                    <div className="p-2 rounded bg-red-500/10 text-center">
+                      <span className="font-medium text-red-700">Volume(Issue)</span>
+                      <p className="text-muted-foreground">Vol italicized</p>
+                    </div>
+                    <div className="p-2 rounded bg-gray-500/10 text-center">
+                      <span className="font-medium text-gray-700">DOI</span>
+                      <p className="text-muted-foreground">https://doi.org/...</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Demo: Breaking Down a Reference */}
+                <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/30 space-y-3">
+                  <h4 className="font-medium flex items-center gap-2">
+                    ✅ Demo: Let's Build the Reference for Our Course Article
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    Using the Andrejevic & Selwyn (2020) article from the Pre-course Writing assignment:
+                  </p>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-start gap-2">
+                      <Badge variant="outline" className="shrink-0">Authors</Badge>
+                      <span className="text-muted-foreground">Mark Andrejevic & Neil Selwyn → <strong>Andrejevic, M., & Selwyn, N.</strong></span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Badge variant="outline" className="shrink-0">Year</Badge>
+                      <span className="text-muted-foreground">2020 → <strong>(2020).</strong></span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Badge variant="outline" className="shrink-0">Title</Badge>
+                      <span className="text-muted-foreground">Facial Recognition Technology in Schools: Critical Questions and Concerns → <strong>Facial recognition technology in schools: Critical questions and concerns.</strong> (sentence case)</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Badge variant="outline" className="shrink-0">Journal</Badge>
+                      <span className="text-muted-foreground">Learning, Media and Technology → <strong><em>Learning, Media and Technology</em>,</strong> (italicized)</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Badge variant="outline" className="shrink-0">Vol/Pages</Badge>
+                      <span className="text-muted-foreground">Volume 45, Issue 2, Pages 115-128 → <strong><em>45</em>(2), 115-128.</strong></span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Badge variant="outline" className="shrink-0">DOI</Badge>
+                      <span className="text-muted-foreground break-all"><strong>https://doi.org/10.1080/17439884.2020.1686014</strong></span>
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-lg bg-background border mt-2">
+                    <p className="text-xs font-medium text-green-700 mb-1">✓ Complete Reference:</p>
+                    <p className="text-sm">
+                      Andrejevic, M., & Selwyn, N. (2020). Facial recognition technology in schools: Critical questions and concerns. <em>Learning, Media and Technology</em>, <em>45</em>(2), 115-128. https://doi.org/10.1080/17439884.2020.1686014
+                    </p>
                   </div>
                 </div>
 
@@ -2152,7 +2289,7 @@ Provide focused feedback (4-5 sentences):
                       <Badge variant="outline">1 Author</Badge>
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      Arpaci, I. (2016). Understanding and predicting students' intention to use mobile cloud storage services. <em>Computers in Human Behaviour</em>, 58(5), 150–157. https://doi.org/10.1016/j.chb.2015.12.067
+                      Arpaci, I. (2016). Understanding and predicting students' intention to use mobile cloud storage services. <em>Computers in Human Behaviour</em>, <em>58</em>(5), 150–157. https://doi.org/10.1016/j.chb.2015.12.067
                     </p>
                   </div>
 
@@ -2163,7 +2300,7 @@ Provide focused feedback (4-5 sentences):
                       <span className="text-xs text-muted-foreground">Use "&" between authors</span>
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      Aurigemma, S., <span className="text-green-600 font-medium">&</span> Mattson, T. (2017). Exploring the effect of uncertainty avoidance on taking voluntary protective security actions. <em>Computers & Security</em>, 73(5), 219–234.
+                      Aurigemma, S., <span className="text-green-600 font-medium">&</span> Mattson, T. (2017). Exploring the effect of uncertainty avoidance on taking voluntary protective security actions. <em>Computers & Security</em>, <em>73</em>(5), 219–234.
                     </p>
                   </div>
 
@@ -2174,47 +2311,21 @@ Provide focused feedback (4-5 sentences):
                       <span className="text-xs text-muted-foreground">List ALL authors with "&" before the last</span>
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      Plouffe, C. R., Hulland, J. S., <span className="text-green-600 font-medium">&</span> Vandenbosch, M. (2001). Research report: Richness versus parsimony in modelling technology adoption decisions. <em>Information Systems Research</em>, 12(2), 208–222.
+                      Hong, J. C., Li, Y., <span className="text-green-600 font-medium">&</span> Kuo, S. Y. (2022). Supporting schools to use face recognition systems: A continuance intention perspective of elementary school parents in China. <em>Education and Information Technologies</em>, <em>27</em>, 12645–12665.
                     </p>
                   </div>
                 </div>
 
-                {/* Common Errors */}
-                <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/30 space-y-3">
-                  <h4 className="font-medium flex items-center gap-2">
-                    <AlertCircle className="h-4 w-4 text-red-500" />
-                    Common Formatting Errors
-                  </h4>
-                  <div className="grid gap-2 text-sm">
-                    <div className="flex items-start gap-2">
-                      <span className="text-red-500">✗</span>
-                      <span className="text-muted-foreground">Using "and" instead of "&" between authors</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="text-red-500">✗</span>
-                      <span className="text-muted-foreground">Capitalizing every word in the article title (only capitalize the first word and proper nouns)</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="text-red-500">✗</span>
-                      <span className="text-muted-foreground">Not italicizing the journal name</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="text-red-500">✗</span>
-                      <span className="text-muted-foreground">Missing the DOI when available</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Spot the Errors MC */}
+                {/* Spot the Errors */}
                 <div className="space-y-3 pt-2">
                   <h4 className="font-medium text-sm">🔍 Spot the Errors</h4>
-                  <div className="p-3 rounded-lg bg-muted/50 text-sm">
+                  <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-sm">
                     <strong>Reference with errors:</strong><br/>
                     Andrejevic, M. and Selwyn, N. (2020). Facial Recognition Technology In Schools: Critical Questions And Concerns. Learning, Media and Technology, 45:2, 115-128.
                   </div>
                   
                   <QuickCheckMC
-                    questionNumber={2}
+                    questionNumber={3}
                     question="How many APA 7th formatting ERRORS are in the reference above?"
                     options={[
                       { label: "A", text: "1 error" },
@@ -2223,98 +2334,180 @@ Provide focused feedback (4-5 sentences):
                       { label: "D", text: "4 errors" },
                     ]}
                     correctAnswer="D"
-                    explanation="4 errors: (1) 'and' should be '&', (2) title shouldn't have Title Case (only first word capitalized), (3) journal name not italicized, (4) volume format should be 45(2) not 45:2."
+                    explanation="4 errors: (1) 'and' should be '&', (2) title shouldn't have Title Case (only first word capitalized), (3) journal name not italicized, (4) volume format should be 45(2) not 45:2, and missing DOI."
                   />
 
                   <QuickCheckMC
-                    questionNumber={3}
+                    questionNumber={4}
                     question="Which reference is correctly formatted in APA 7th edition?"
                     options={[
                       { label: "A", text: "Andrejevic, M. and Selwyn, N. (2020). Facial recognition technology in schools. Learning, Media and Technology, 45(2), 115-128." },
                       { label: "B", text: "Andrejevic, M., & Selwyn, N. (2020). Facial recognition technology in schools: Critical questions and concerns. Learning, Media and Technology, 45(2), 115-128." },
-                      { label: "C", text: "Andrejevic, M., & Selwyn, N. (2020). Facial recognition technology in schools: Critical questions and concerns. *Learning, Media and Technology*, 45(2), 115-128." },
+                      { label: "C", text: "Andrejevic, M., & Selwyn, N. (2020). Facial recognition technology in schools: Critical questions and concerns. *Learning, Media and Technology*, *45*(2), 115-128." },
                       { label: "D", text: "Andrejevic and Selwyn (2020). Facial Recognition Technology in Schools. Learning, Media and Technology." },
                     ]}
                     correctAnswer="C"
-                    explanation="Option C is correct: uses '&' between authors, sentence case for article title, italicized journal name (shown with asterisks), and proper volume(issue) format."
+                    explanation="Option C is correct: uses '&' between authors, sentence case for article title, italicized journal name and volume (shown with asterisks), and proper volume(issue) format."
                   />
                 </div>
 
-                {/* Writing Practice */}
+                {/* Writing Practice with Demo First */}
                 <div className="space-y-3 pt-4 border-t">
                   <h4 className="font-medium text-sm flex items-center gap-2">
                     <Sparkles className="h-4 w-4 text-amber-500" />
                     Practice: Fix the Reference
                   </h4>
+                  
+                  {/* Demo: How to fix */}
+                  <div className="p-3 rounded-lg bg-green-500/5 border border-green-500/20 text-sm space-y-2">
+                    <p className="font-medium text-green-700">✅ Demo: Fixing a Reference</p>
+                    <p className="text-muted-foreground"><strong>Incorrect:</strong> Smith, J and Jones, M (2019). The Effects Of Technology On Learning. Journal of Education. 15, 23-45</p>
+                    <p className="text-muted-foreground"><strong>Fixed:</strong> Smith, J., <span className="text-green-600">&</span> Jones, M. (2019). The effects of technology on learning. <em>Journal of Education</em>, <em>15</em>, 23-45.</p>
+                    <p className="text-xs text-green-600">Changes: Added period after initials, & instead of "and", sentence case title, italicized journal + volume, added period at end</p>
+                  </div>
+
                   <p className="text-xs text-muted-foreground">
-                    The reference below has multiple errors. Rewrite it correctly in APA 7th format:
+                    Now you try! The reference below has multiple errors. Rewrite it correctly in APA 7th format:
                   </p>
                   <div className="p-3 rounded-lg bg-red-500/5 border border-red-500/20 text-sm">
-                    <strong>Incorrect:</strong> Hong, J.C. and Li, Y. and Kuo, S.Y. (2022). Supporting Schools To Use Face Recognition Systems: A Continuance Intention Perspective Of Elementary School Parents In China. Education and Information Technologies. 27, 12645–12665
+                    <strong>Incorrect:</strong> Puthea, S. and Anshul, V. and Sujaybhai, N. (2017). Face Recognition Based Automatic Attendance System. IJARIIE. 3(1), 212-218
                   </div>
                   <WritingPracticeWithHistory
                     taskKey="w2h2-fix-reference"
                     studentId={studentId || "anonymous"}
                     title="Reference Correction Practice"
-                    instructions="Rewrite this reference correctly. Remember: (1) Use '&' before the last author, (2) Sentence case for the title, (3) Italicize the journal name, (4) Include volume in proper format."
-                    placeholder="Hong, J. C., Li, Y., & Kuo, S. Y. (2022). Supporting schools to use face recognition systems: A continuance intention perspective..."
+                    instructions="Rewrite this reference correctly. Check: (1) Use '&' before the last author, (2) Add periods after initials, (3) Sentence case for the title, (4) Italicize the journal name and volume, (5) Add final period."
+                    placeholder="Puthea, S., Anshul, V., & Sujaybhai, N. (2017). Face recognition based automatic attendance system..."
                   />
+                </div>
+
+                {/* Tool Link */}
+                <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/30 space-y-2">
+                  <h4 className="font-medium flex items-center gap-2 text-sm">
+                    🛠️ Helpful Tool: ZBib Bibliography Generator
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    In practice, you can use online tools to help generate APA references. <strong>ZBib</strong> is a free, 
+                    easy-to-use bibliography generator that can format references automatically.
+                  </p>
+                  <a 
+                    href="https://zbib.org/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-sm text-blue-600 hover:underline"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    Open ZBib (zbib.org)
+                  </a>
+                  <p className="text-xs text-amber-600">
+                    ⚠️ Always double-check AI/tool-generated references — they can have errors!
+                  </p>
                 </div>
               </div>
             </CollapsibleSection>
 
-            {/* Part 3: Books and Book Chapters */}
+            {/* Part 3: Books, Book Chapters & Other Sources */}
             <CollapsibleSection
-              title="Part 3: Books and Book Chapters"
-              description="Learn to format references for books and edited book chapters"
+              title="Part 3: Books, Book Chapters & Other Sources"
+              description="Learn to format references for books, chapters, and other academic sources"
               icon={<ScrollText className="h-4 w-4 text-purple-600" />}
               defaultOpen={false}
               className="border-2 border-purple-500/30 bg-purple-500/5"
             >
               <div className="space-y-4">
+                {/* Introduction */}
+                <div className="p-4 rounded-lg bg-background/80 space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    Journal articles are just ONE type of academic source. Academic writing also uses <strong>books</strong>, 
+                    <strong> book chapters</strong>, and sometimes <strong>news articles</strong>. Each has a slightly different format.
+                  </p>
+                </div>
+
                 {/* Book Format */}
-                <div className="p-4 rounded-lg bg-background/80 space-y-3">
+                <div className="p-4 rounded-lg bg-purple-500/10 border border-purple-500/30 space-y-3">
                   <h4 className="font-medium flex items-center gap-2">
                     <BookOpen className="h-4 w-4 text-purple-500" />
                     Format: A Book
                   </h4>
-                  <div className="p-3 rounded-lg bg-muted/50 font-mono text-sm">
-                    <span className="text-blue-600">Author last name, Initials.</span> (<span className="text-purple-600">Year</span>). <em className="text-green-600">Title of book</em>. <span className="text-amber-600">Publisher</span>.
+                  <div className="p-3 rounded-lg bg-background font-mono text-sm">
+                    <span className="text-blue-600">Author.</span> (<span className="text-purple-600">Year</span>). <em className="text-green-600">Title of book</em>. <span className="text-amber-600">Publisher</span>.
                   </div>
-                  <div className="p-3 rounded-lg border bg-muted/30">
+                  <div className="p-3 rounded-lg border bg-background">
                     <p className="text-xs font-medium text-muted-foreground mb-1">Example:</p>
                     <p className="text-sm">Altemeyer, B. (1988). <em>Enemies of freedom: Understanding right-wing authoritarianism</em>. Jossey-Bass.</p>
                   </div>
+                  <p className="text-xs text-purple-600">📌 Notice: The <strong>book title</strong> is italicized (not the author or publisher)</p>
                 </div>
 
                 {/* Book Chapter Format */}
-                <div className="p-4 rounded-lg bg-background/80 space-y-3">
+                <div className="p-4 rounded-lg bg-purple-500/10 border border-purple-500/30 space-y-3">
                   <h4 className="font-medium flex items-center gap-2">
                     <ScrollText className="h-4 w-4 text-purple-500" />
-                    Format: A Book Chapter in an Edited Book
+                    Format: A Chapter in an Edited Book
                   </h4>
-                  <div className="p-3 rounded-lg bg-muted/50 font-mono text-sm">
-                    <span className="text-blue-600">Author.</span> (<span className="text-purple-600">Year</span>). <span className="text-green-600">Title of chapter</span>. In <span className="text-red-600">Editor(s) (Eds.)</span>, <em className="text-amber-600">Title of book</em> (pp. pages). Publisher.
+                  <div className="p-3 rounded-lg bg-background font-mono text-sm">
+                    <span className="text-blue-600">Chapter Author.</span> (<span className="text-purple-600">Year</span>). <span className="text-green-600">Chapter title</span>. In <span className="text-red-600">Editor(s) (Eds.)</span>, <em className="text-amber-600">Book title</em> (pp. pages). Publisher.
                   </div>
-                  <div className="p-3 rounded-lg border bg-muted/30">
+                  <div className="p-3 rounded-lg border bg-background">
                     <p className="text-xs font-medium text-muted-foreground mb-1">Example:</p>
                     <p className="text-sm">D'Mello, S. (2017). Emotional learning analytics. In C. Lang, G. Siemens, A. Wise, & D. Gašević (Eds.), <em>Handbook of learning analytics</em> (pp. 115–127). SoLAR.</p>
                   </div>
+                  <p className="text-xs text-purple-600">📌 Notice: The <strong>book title</strong> is italicized, NOT the chapter title. Include "In" + Editors + "(Eds.)" + page range.</p>
                 </div>
 
-                {/* Key Differences */}
-                <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
-                  <p className="text-sm font-medium text-amber-700 mb-2">💡 Key Differences:</p>
-                  <ul className="text-xs text-muted-foreground space-y-1">
-                    <li>• <strong>Book:</strong> Italicize the book title</li>
-                    <li>• <strong>Book Chapter:</strong> Italicize the BOOK title, not the chapter title</li>
-                    <li>• <strong>Book Chapter:</strong> Include "In" + Editor names + "(Eds.)" + page numbers</li>
-                  </ul>
+                {/* Newspaper / Online News Article */}
+                <div className="p-4 rounded-lg bg-purple-500/10 border border-purple-500/30 space-y-3">
+                  <h4 className="font-medium flex items-center gap-2">
+                    📰 Format: Newspaper / Online News Article
+                  </h4>
+                  <div className="p-3 rounded-lg bg-background font-mono text-sm">
+                    <span className="text-blue-600">Author.</span> (<span className="text-purple-600">Year, Month Day</span>). <span className="text-green-600">Article title</span>. <em className="text-amber-600">Newspaper Name</em>. URL
+                  </div>
+                  <div className="p-3 rounded-lg border bg-background">
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Example (from the Andrejevic & Selwyn article's references):</p>
+                    <p className="text-sm">Harwell, D. (2018, October 17). Unproven facial recognition companies target schools, promising an end to shootings. <em>The Washington Post</em>. https://washingtonpost.com/technology/...</p>
+                  </div>
+                  <p className="text-xs text-purple-600">📌 Notice: Include the <strong>full date</strong> (Year, Month Day), and the <strong>URL</strong> at the end. No page numbers for online articles.</p>
                 </div>
 
-                {/* MC Question */}
+                {/* Summary Comparison Table */}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-muted/50">
+                        <th className="border p-2 text-left">Source Type</th>
+                        <th className="border p-2 text-left">What to Italicize</th>
+                        <th className="border p-2 text-left">Special Elements</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className="border p-2">Journal Article</td>
+                        <td className="border p-2">Journal name + Volume</td>
+                        <td className="border p-2">Volume(Issue), Pages, DOI</td>
+                      </tr>
+                      <tr>
+                        <td className="border p-2">Book</td>
+                        <td className="border p-2">Book title</td>
+                        <td className="border p-2">Publisher name</td>
+                      </tr>
+                      <tr>
+                        <td className="border p-2">Book Chapter</td>
+                        <td className="border p-2">Book title (NOT chapter)</td>
+                        <td className="border p-2">"In" + Editors (Eds.), + (pp. X–X)</td>
+                      </tr>
+                      <tr>
+                        <td className="border p-2">News Article</td>
+                        <td className="border p-2">Newspaper name</td>
+                        <td className="border p-2">Full date (Year, Month Day), URL</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* MC Questions */}
                 <QuickCheckMC
-                  questionNumber={4}
+                  questionNumber={5}
                   question="In a book CHAPTER reference, which title should be italicized?"
                   options={[
                     { label: "A", text: "The chapter title" },
@@ -2324,6 +2517,19 @@ Provide focused feedback (4-5 sentences):
                   ]}
                   correctAnswer="B"
                   explanation="In a book chapter reference, only the BOOK title is italicized, not the chapter title. The chapter title uses regular sentence case."
+                />
+
+                <QuickCheckMC
+                  questionNumber={6}
+                  question="What is the main difference between a journal article reference and a news article reference?"
+                  options={[
+                    { label: "A", text: "News articles don't need author names" },
+                    { label: "B", text: "News articles include the full date (Month Day) and URL instead of volume/issue/DOI" },
+                    { label: "C", text: "News articles never use italics" },
+                    { label: "D", text: "They are formatted exactly the same way" },
+                  ]}
+                  correctAnswer="B"
+                  explanation="News articles include the complete date (Year, Month Day) and URL, whereas journal articles use volume(issue), page numbers, and DOI. Both italicize the publication name."
                 />
               </div>
             </CollapsibleSection>
@@ -2375,7 +2581,7 @@ Provide focused feedback (4-5 sentences):
 
                 {/* MC Question */}
                 <QuickCheckMC
-                  questionNumber={5}
+                  questionNumber={7}
                   question="In what order should references appear in your Reference List?"
                   options={[
                     { label: "A", text: "In the order they appear in your paper" },
@@ -2397,15 +2603,27 @@ Provide focused feedback (4-5 sentences):
                     Now practice paraphrasing while maintaining proper citation format. Remember what you learned in Hour 1!
                   </p>
                   
+                  {/* Demo first */}
+                  <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/30 space-y-3">
+                    <p className="font-medium text-green-700 text-sm">✅ Demo: Paraphrasing with Citation</p>
+                    <div className="text-sm space-y-2">
+                      <p className="text-muted-foreground"><strong>Original:</strong> "Facial recognition systems have now been sold to thousands of US schools" (Andrejevic & Selwyn, 2020, p. 116).</p>
+                      <p className="text-muted-foreground"><strong>Paraphrased (Author-Prominent):</strong> According to Andrejevic and Selwyn (2020), facial recognition technology has been purchased by thousands of American educational institutions.</p>
+                      <p className="text-muted-foreground"><strong>Paraphrased (Information-Prominent):</strong> Thousands of schools across the United States have acquired facial recognition systems (Andrejevic & Selwyn, 2020).</p>
+                    </div>
+                    <p className="text-xs text-green-600">📌 Notice: The facts are preserved, but the words and structure are changed. The citation is included in the correct format.</p>
+                  </div>
+
+                  {/* Now student tries */}
                   <div className="p-3 rounded-lg bg-muted/50 text-sm">
-                    <strong>Original:</strong> "One prominent educational application of facial recognition technology is campus security. This form of facial recognition is most prevalent in the US, where school shooting incidents have prompted school authorities to annually spend $2.7 billion on campus security products and services." (Andrejevic & Selwyn, 2020, p. 117)
+                    <strong>Your Turn - Original:</strong> "One prominent educational application of facial recognition technology is campus security. This form of facial recognition is most prevalent in the US, where school shooting incidents have prompted school authorities to annually spend $2.7 billion on campus security products and services." (Andrejevic & Selwyn, 2020, p. 117)
                   </div>
                   
                   <WritingPracticeWithHistory
                     taskKey="w2h2-paraphrase-citation"
                     studentId={studentId || "anonymous"}
                     title="Paraphrase with Citation"
-                    instructions="Paraphrase this passage using paraphrasing strategies from Hour 1. Include the proper in-text citation. Keep all key facts (including the $2.7 billion figure)."
+                    instructions="Paraphrase this passage using strategies from Hour 1 (synonym substitution, sentence restructuring). Include the proper in-text citation. Keep the key facts (especially the $2.7 billion figure)."
                     placeholder="According to Andrejevic and Selwyn (2020), the primary educational use of facial recognition technology is..."
                   />
                 </div>
@@ -2414,10 +2632,29 @@ Provide focused feedback (4-5 sentences):
                 <div className="space-y-3 pt-4 border-t">
                   <h4 className="font-medium text-sm flex items-center gap-2">
                     <Sparkles className="h-4 w-4 text-amber-500" />
-                    Challenge: Write the Reference Entry
+                    Challenge: Build a Reference from Scratch
                   </h4>
+                  
+                  {/* Demo first */}
+                  <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/30 space-y-3">
+                    <p className="font-medium text-green-700 text-sm">✅ Demo: Building a Reference Entry</p>
+                    <div className="text-sm space-y-2">
+                      <p className="text-muted-foreground"><strong>Given information:</strong></p>
+                      <ul className="text-xs text-muted-foreground ml-4 space-y-1">
+                        <li>• Authors: John Smith, Mary Johnson</li>
+                        <li>• Year: 2021</li>
+                        <li>• Title: The Impact of Technology on Student Learning</li>
+                        <li>• Journal: Educational Research Quarterly</li>
+                        <li>• Volume: 44, Issue: 3, Pages: 123-145</li>
+                      </ul>
+                      <p className="text-muted-foreground"><strong>Formatted Reference:</strong></p>
+                      <p className="text-sm pl-4 -indent-4">Smith, J., & Johnson, M. (2021). The impact of technology on student learning. <em>Educational Research Quarterly</em>, <em>44</em>(3), 123-145.</p>
+                    </div>
+                    <p className="text-xs text-green-600">📌 Steps: (1) Last name, Initial. for each author, (2) Year in parentheses, (3) Title in sentence case, (4) Journal italicized, (5) Volume(Issue) with volume italicized, (6) Pages</p>
+                  </div>
+
                   <p className="text-xs text-muted-foreground">
-                    Based on this information, write the complete end-of-text reference entry in APA 7th format:
+                    Now you try! Based on this information, write the complete end-of-text reference entry in APA 7th format:
                   </p>
                   <div className="p-3 rounded-lg bg-muted/50 text-sm space-y-1">
                     <p><strong>Authors:</strong> Marina Heiden, Linda Widar, Birgitta Wiitavaara, Erik Boman</p>
@@ -2433,7 +2670,7 @@ Provide focused feedback (4-5 sentences):
                     taskKey="w2h2-write-reference"
                     studentId={studentId || "anonymous"}
                     title="Write Reference Entry"
-                    instructions="Format this as a complete APA 7th reference entry. Check: (1) Author format with &, (2) Year in parentheses, (3) Sentence case for title, (4) Italicized journal name, (5) Volume and pages, (6) DOI."
+                    instructions="Format this as a complete APA 7th reference entry. Checklist: (1) Author format: Last, I., (2) Use & before the last author, (3) Year in parentheses, (4) Sentence case for title, (5) Italicize journal name + volume, (6) Include DOI."
                     placeholder="Heiden, M., Widar, L., Wiitavaara, B., & Boman, E. (2020). Telework in academia..."
                   />
                 </div>
