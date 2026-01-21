@@ -12,3 +12,4 @@ export { default as Week11Page } from './Week11Page';
 export { default as Week12Page } from './Week12Page';
 export { default as Week13Page } from './Week13Page';
 export { WeekOverviewTemplate } from './WeekOverviewTemplate';
+export { default as PreCourseWritingFeedbackPage } from './PreCourseWritingFeedbackPage';
