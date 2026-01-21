@@ -315,9 +315,9 @@ export default function PreCourseWritingFeedbackPage() {
           <span>/</span>
           <span>Feedback</span>
         </div>
-        <h1 className="text-2xl font-bold">Pre-course Writing Feedback</h1>
+        <h1 className="text-2xl font-bold">Pre-course Writing Feedback (Summary)</h1>
         <p className="text-muted-foreground">
-          Common patterns, areas for improvement, and examples of good practice from your submissions.
+          Common patterns, areas for improvement, and examples of good practice from your summary submissions.
         </p>
       </div>
 
@@ -329,8 +329,45 @@ export default function PreCourseWritingFeedbackPage() {
             Overview
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <CardContent className="space-y-6">
+          {/* Charts Section */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium text-muted-foreground">Analysis Dashboard</h3>
+              <img 
+                src="/images/feedback-charts/analysis_dashboard.png" 
+                alt="Comprehensive analysis dashboard showing word count and citation statistics"
+                className="w-full rounded-lg border shadow-sm"
+              />
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium text-muted-foreground">Quality Categories</h3>
+              <img 
+                src="/images/feedback-charts/quality_categories_stacked.png" 
+                alt="Stacked bar chart showing quality categories across submissions"
+                className="w-full rounded-lg border shadow-sm"
+              />
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium text-muted-foreground">Word Count Distribution</h3>
+              <img 
+                src="/images/feedback-charts/word_count_pie_chart.png" 
+                alt="Pie chart showing distribution of word counts across submissions"
+                className="w-full rounded-lg border shadow-sm"
+              />
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium text-muted-foreground">Citation Usage</h3>
+              <img 
+                src="/images/feedback-charts/citation_pie_chart.png" 
+                alt="Pie chart showing citation usage across submissions"
+                className="w-full rounded-lg border shadow-sm"
+              />
+            </div>
+          </div>
+
+          {/* Category Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t">
             {rubricCategories.map((cat) => (
               <div 
                 key={cat.id}
@@ -351,7 +388,7 @@ export default function PreCourseWritingFeedbackPage() {
               </div>
             ))}
           </div>
-          <p className="text-xs text-muted-foreground text-center mt-4">
+          <p className="text-xs text-muted-foreground text-center">
             Click each section below to view detailed feedback with examples
           </p>
         </CardContent>
@@ -367,13 +404,14 @@ export default function PreCourseWritingFeedbackPage() {
       {/* Next Steps */}
       <Card className="border-primary/30 bg-primary/5">
         <CardHeader>
-          <CardTitle className="text-lg">📚 Next Steps</CardTitle>
+          <CardTitle className="text-lg">📚 Next Steps for Summary Writing</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 text-sm text-muted-foreground">
-          <p>• Review the feedback above and identify 1-2 areas to focus on improving.</p>
-          <p>• Practice paraphrasing using the strategies from Week 1 Hour 1.</p>
-          <p>• Review in-text citation rules from Week 2 Hour 1.</p>
-          <p>• The AWQ (15%) in Week 5 will assess similar skills — use this feedback to prepare!</p>
+          <p>• Review the feedback above and identify 1-2 areas to focus on improving in your summary writing.</p>
+          <p>• Practice paraphrasing using the strategies from Week 1 Hour 1 to avoid patchwriting in summaries.</p>
+          <p>• Review in-text citation rules from Week 2 Hour 1 — summaries require proper citation of source material.</p>
+          <p>• Focus on summary accuracy: ensure all main ideas are included without adding personal opinions.</p>
+          <p>• The AWQ (15%) in Week 5 will assess similar summary skills — use this feedback to prepare!</p>
         </CardContent>
       </Card>
     </div>
