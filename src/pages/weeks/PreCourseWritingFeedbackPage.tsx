@@ -1,4 +1,4 @@
-import { RubricSection, OverviewSection, NextStepsCard, rubricCategories } from "./feedback";
+import { RubricSection, OverviewSection, rubricCategories } from "./feedback";
 
 export default function PreCourseWritingFeedbackPage() {
   return (
@@ -25,9 +25,6 @@ export default function PreCourseWritingFeedbackPage() {
           <RubricSection key={category.id} category={category} />
         ))}
       </div>
-
-      {/* Next Steps */}
-      <NextStepsCard />
     </div>
   );
 }

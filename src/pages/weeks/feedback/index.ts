@@ -1,6 +1,5 @@
 export { RubricSection } from "./RubricSection";
 export { OverviewSection } from "./OverviewSection";
-export { NextStepsCard } from "./NextStepsCard";
 export { ImageLightbox } from "./ImageLightbox";
 export { RubricTable } from "./RubricTable";
 export { MCTask } from "./MCTask";
