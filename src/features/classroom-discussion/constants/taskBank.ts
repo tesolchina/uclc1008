@@ -55,74 +55,148 @@ Which sections of a typical academic article would you prioritize reading first,
   }
 ];
 
-// Week 2: Citation & Paraphrasing Integration
+// Week 2: Pre-course Writing Feedback Practice
+// Tasks aligned with common issues found in student summaries
 export const WEEK2_HOUR3_TASKS: Hour3Task[] = [
+  // Summary Accuracy tasks
   {
-    id: "w2-citation-paraphrase-1",
-    title: "Paraphrase with APA Citation",
-    prompt: `Paraphrase the following sentence and add a proper APA 7th in-text citation:
+    id: "w2-summary-coverage",
+    title: "Complete Coverage Check",
+    prompt: `The FRT article describes FOUR main applications. A student's summary says:
 
-"Research has shown that students who receive immediate feedback perform 23% better on subsequent tests" (Smith, 2023, p. 45).`,
-    skillFocus: ["paraphrasing", "in-text-citation"],
+"Facial recognition technology is used in schools for security, monitoring attendance, and verifying student identity in online courses."
+
+What is MISSING from this summary? Write 2-3 sentences describing the missing application and why it matters.`,
+    skillFocus: ["summary-accuracy", "completeness"],
+    wordLimit: 60,
+    rubricPoints: [
+      "Identifies the missing application (engagement detection/emotion monitoring)",
+      "Explains what this application involves",
+      "Understands why comprehensive coverage matters"
+    ]
+  },
+  {
+    id: "w2-personal-opinion",
+    title: "Remove Personal Opinion",
+    prompt: `This summary sentence contains personal opinion. Identify the problem and rewrite it as a neutral summary:
+
+"FRT is clearly beneficial for schools as it can reduce school shooting incidents and help teachers save valuable time on administrative tasks."
+
+Rewrite WITHOUT personal evaluation while keeping the factual content.`,
+    skillFocus: ["summary-accuracy", "objectivity"],
     wordLimit: 50,
     rubricPoints: [
-      "Effective paraphrase that changes structure",
-      "Correct APA 7th in-text citation format",
-      "Page number included appropriately"
+      "Identifies 'clearly beneficial' as personal evaluation",
+      "Rewrites in neutral, descriptive language",
+      "Preserves the factual claims from the source"
+    ]
+  },
+  // Paraphrasing tasks
+  {
+    id: "w2-patchwriting",
+    title: "Fix Patchwriting",
+    prompt: `This is patchwriting (not acceptable paraphrasing):
+
+Original: "school shooting incidents have prompted school authorities to invest heavily in security systems"
+Student: "school shooting events have caused school authorities to invest significantly in security systems"
+
+The student only changed 3 words. Rewrite with COMPLETE paraphrasing (different structure AND vocabulary).`,
+    skillFocus: ["paraphrasing", "restructuring"],
+    wordLimit: 40,
+    rubricPoints: [
+      "Changes sentence structure completely",
+      "Uses different vocabulary throughout",
+      "Preserves the original meaning accurately"
     ]
   },
   {
-    id: "w2-reference-entry-1",
-    title: "Build a Reference Entry",
-    prompt: `Write the complete APA 7th reference entry for:
+    id: "w2-preserve-nuance",
+    title: "Preserve Nuance",
+    prompt: `The source says vendors are "pitching the technology as an all-seeing shield."
 
-Author: Maria Chen
-Year: 2024
-Title: Digital literacy in higher education
-Journal: Educational Technology Review
-Volume: 15, Issue 3
-Pages: 45-62
-DOI: 10.1234/etr.2024.0045`,
-    skillFocus: ["end-of-text-citation", "APA-format"],
-    wordLimit: 100,
+A student paraphrased this as: "FRT can prevent all school shootings."
+
+What is WRONG with this paraphrase? Write 2-3 sentences explaining the problem, then write a better paraphrase that preserves the nuance.`,
+    skillFocus: ["paraphrasing", "meaning-preservation"],
+    wordLimit: 80,
     rubricPoints: [
-      "Correct author format (Chen, M.)",
-      "Correct title capitalization (sentence case)",
-      "Proper italicization and punctuation",
-      "DOI formatted correctly"
+      "Identifies that original describes marketing claims, not proven effectiveness",
+      "Explains the difference between 'pitched as' and 'can prevent'",
+      "Writes a paraphrase that preserves the marketing/claim language"
+    ]
+  },
+  // Academic Tone tasks
+  {
+    id: "w2-formal-language",
+    title: "Fix Informal Language",
+    prompt: `Rewrite these informal sentences in academic style:
+
+1. "FRT is a really big deal in schools nowadays."
+2. "What's more, it can also be used for taking attendance."
+3. "A lot of schools are using this tech."
+
+Write all three sentences in formal academic English.`,
+    skillFocus: ["academic-tone", "formal-register"],
+    wordLimit: 60,
+    rubricPoints: [
+      "Replaces 'really big deal' with formal expression",
+      "Replaces 'What's more' with academic transition",
+      "Replaces 'a lot of' and 'tech' with precise language"
     ]
   },
   {
-    id: "w2-citation-error-1",
-    title: "Citation Error Detection",
-    prompt: `Find and correct all errors in this reference entry:
+    id: "w2-thesis-statement",
+    title: "Write a Clear Thesis",
+    prompt: `This is a weak thesis statement for a summary of the FRT article:
 
-Chen, Maria. (2024). Digital Literacy In Higher Education. Educational technology review, Vol. 15(3), pp. 45-62. doi:10.1234/etr.2024.0045
+"The article talks about some questions and concerns about facial recognition technology being used in schools."
 
-Rewrite the correct version.`,
-    skillFocus: ["end-of-text-citation", "error-detection"],
-    wordLimit: 100,
+Write a BETTER thesis statement that:
+- Names the source authors (Andrejevic & Selwyn, 2020)
+- Clearly identifies the four main applications covered`,
+    skillFocus: ["academic-tone", "thesis-writing"],
+    wordLimit: 50,
     rubricPoints: [
-      "Identifies author name format error",
-      "Identifies capitalization errors",
-      "Identifies volume/page format errors",
-      "Identifies DOI format error"
+      "Includes author citation",
+      "Mentions all four applications or states the number",
+      "Uses clear, specific language"
+    ]
+  },
+  // Citation tasks
+  {
+    id: "w2-add-citations",
+    title: "Add Missing Citations",
+    prompt: `This paragraph has NO citations. Add appropriate APA 7th citations:
+
+"Facial recognition systems have been sold to thousands of US schools. These systems are marketed as protection against threats like school shootings. The US school security industry is valued at $2.7 billion."
+
+All information comes from: Andrejevic & Selwyn (2020)
+
+Rewrite with proper in-text citations.`,
+    skillFocus: ["in-text-citation", "APA-format"],
+    wordLimit: 80,
+    rubricPoints: [
+      "Adds citation appropriately (not after every sentence)",
+      "Uses correct APA format (& in parentheses, 'and' in text)",
+      "Places citation in correct position"
     ]
   },
   {
-    id: "w2-integrated-citation",
-    title: "Full Citation Integration",
-    prompt: `You are writing about online learning. Paraphrase and cite the following, then write the reference entry:
+    id: "w2-fix-citation-errors",
+    title: "Fix Citation Errors",
+    prompt: `Find and fix ALL errors in these citations:
 
-"Online courses provide flexibility that allows students to balance work and study commitments more effectively" (Wong, 2023, p. 112).
+1. "(Andrejevic & Selwyn, 2020) FRT is used in schools."
+2. "According to Andrejevic & Selwyn (2020), schools use FRT."
+3. "Mark Andrejevic and Selwyn(2020) describe FRT applications."
 
-Source: Wong, A. (2023). Flexible learning in the digital age. Journal of Higher Education, 28(2), 105-120. https://doi.org/10.5678/jhe.2023.028`,
-    skillFocus: ["paraphrasing", "in-text-citation", "end-of-text-citation"],
-    wordLimit: 150,
+Rewrite each citation correctly and explain what was wrong.`,
+    skillFocus: ["in-text-citation", "error-detection"],
+    wordLimit: 120,
     rubricPoints: [
-      "Effective paraphrase",
-      "Correct in-text citation",
-      "Correct reference entry format"
+      "Fixes citation placement (should come after information)",
+      "Fixes & vs 'and' usage (use 'and' in signal phrases)",
+      "Fixes author name format (no first names, add space before parentheses)"
     ]
   }
 ];
