@@ -61,7 +61,7 @@ export function OverviewSection() {
               </div>
             </div>
 
-            {/* Category Cards */}
+            {/* Category Cards with Weighting */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t">
               {rubricCategories.map((cat) => (
                 <div 
@@ -72,19 +72,14 @@ export function OverviewSection() {
                     {cat.icon}
                   </div>
                   <p className="font-medium text-sm">{cat.title}</p>
-                  <div className="flex justify-center gap-2 mt-2">
-                    <Badge variant="outline" className="text-xs bg-destructive/10 text-destructive border-destructive/30">
-                      {cat.commonProblems.length} issues
-                    </Badge>
-                    <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/30">
-                      {cat.strengths.length} strengths
-                    </Badge>
-                  </div>
+                  <Badge className="mt-2 bg-primary/20 text-primary border-primary/30 hover:bg-primary/30">
+                    20%
+                  </Badge>
                 </div>
               ))}
             </div>
             <p className="text-xs text-muted-foreground text-center">
-              Click each section below to view detailed feedback with examples
+              Click each section below to practice with MC tasks based on common issues and strengths
             </p>
           </CardContent>
         </CollapsibleContent>
