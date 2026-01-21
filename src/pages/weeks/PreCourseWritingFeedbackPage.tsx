@@ -1,4 +1,4 @@
-import { RubricSection, OverviewSection, NextStepsCard, rubricCategories } from "./feedback";
+import { RubricSection, OverviewSection, NextStepsCard, InsightsMCSection, rubricCategories } from "./feedback";
 
 export default function PreCourseWritingFeedbackPage() {
   return (
@@ -16,15 +16,18 @@ export default function PreCourseWritingFeedbackPage() {
         </p>
       </div>
 
-      {/* Overview Visualization */}
+      {/* Overview Visualization (Toggleable) */}
       <OverviewSection />
 
-      {/* Rubric Sections */}
+      {/* Rubric Sections with Tables */}
       <div className="space-y-4">
         {rubricCategories.map((category) => (
           <RubricSection key={category.id} category={category} />
         ))}
       </div>
+
+      {/* MC Tasks for Actionable Insights */}
+      <InsightsMCSection />
 
       {/* Next Steps */}
       <NextStepsCard />

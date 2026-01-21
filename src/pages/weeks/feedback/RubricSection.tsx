@@ -1,8 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { ChevronDown, AlertTriangle, CheckCircle2, BookOpen } from "lucide-react";
 import { useState } from "react";
 import type { RubricCategory } from "./types";
+import { RubricTable } from "./RubricTable";
+import { rubricTableMap } from "./rubricTables";
 
 interface RubricSectionProps {
   category: RubricCategory;
@@ -10,6 +12,7 @@ interface RubricSectionProps {
 
 export function RubricSection({ category }: RubricSectionProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const tableData = rubricTableMap[category.id];
   
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
@@ -27,14 +30,13 @@ export function RubricSection({ category }: RubricSectionProps) {
         </CollapsibleTrigger>
         <CollapsibleContent>
           <CardContent className="space-y-6">
-            {/* Rubric Description */}
-            <div className="p-4 rounded-lg bg-muted/30 border">
-              <h4 className="font-medium text-sm mb-2 flex items-center gap-2">
-                📋 Rubric Criteria
+            {/* Rubric Table */}
+            <div className="space-y-3">
+              <h4 className="font-medium flex items-center gap-2">
+                <BookOpen className="h-4 w-4 text-primary" />
+                Grading Rubric (20%)
               </h4>
-              <p className="text-sm text-muted-foreground">
-                {category.rubricDescription}
-              </p>
+              {tableData && <RubricTable data={tableData} />}
             </div>
 
             {/* Common Problems */}
