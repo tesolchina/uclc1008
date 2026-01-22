@@ -32,6 +32,8 @@ interface WritingPracticeWithHistoryProps {
   placeholder?: string;
   studentId?: string;
   className?: string;
+  /** Optional correct answer for the AI to evaluate against */
+  correctAnswer?: string;
 }
 
 const MAX_FOLLOWUP_ROUNDS = 3;
@@ -44,6 +46,7 @@ export function WritingPracticeWithHistory({
   placeholder = "Write your response here...",
   studentId,
   className,
+  correctAnswer,
 }: WritingPracticeWithHistoryProps) {
   const { toast } = useToast();
   const [content, setContent] = useState("");
@@ -329,11 +332,11 @@ Do NOT evaluate: writing style, grammar, or sentence structure.
 
 Task: ${title}
 Instructions: ${instructions}
-
+${correctAnswer ? `\nCORRECT ANSWER (use this as the reference for evaluation):\n${correctAnswer}\n` : ''}
 Student's response:
 ${content}
 
-IMPORTANT: After your feedback, ALWAYS provide an "IMPROVED VERSION:" section showing the corrected/improved version based on the student's draft. This helps students see exactly what changes are needed.
+IMPORTANT: After your feedback, ALWAYS provide an "IMPROVED VERSION:" section showing the corrected/improved version based on the student's draft.${correctAnswer ? ' Use the CORRECT ANSWER above as the model answer.' : ''} This helps students see exactly what changes are needed.
 
 Format your response as:
 [Your feedback here - 3-4 sentences]

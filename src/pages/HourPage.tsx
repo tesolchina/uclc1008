@@ -2378,6 +2378,7 @@ Provide focused feedback (4-5 sentences):
                     title="Reference Correction Practice"
                     instructions="Rewrite this reference correctly. Check: (1) Use '&' before the last author and commas between others, (2) Sentence case for the title, (3) Italicize the journal name (*Higher Education*) and volume (*81*), (4) Use en-dash (–) for page range, (5) Add DOI link."
                     placeholder="Heiden, M., Widar, L., Wiitavaara, B., & Boman, E. (2020). Telework in academia..."
+                    correctAnswer="Heiden, M., Widar, L., Wiitavaara, B., & Boman, E. (2020). Telework in academia: Associations with health and well-being among staff. *Higher Education*, *81*, 707–722. https://doi.org/10.1007/s10734-020-00569-4"
                   />
                 </div>
 
