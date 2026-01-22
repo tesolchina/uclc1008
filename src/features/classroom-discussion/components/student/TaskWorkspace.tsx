@@ -24,16 +24,25 @@ interface TaskWorkspaceProps {
 // Component for toggling excerpt preview/full
 function ExcerptToggle({ excerpt }: { excerpt: { label: string; preview: string; full: string } }) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const isFullArticle = excerpt.label.includes('Full Article');
 
   return (
     <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
-      <div className="border rounded-lg overflow-hidden bg-background">
+      <div className={cn(
+        "border rounded-lg overflow-hidden",
+        isFullArticle ? "bg-primary/5 border-primary/20" : "bg-background"
+      )}>
         <CollapsibleTrigger asChild>
           <button className="w-full p-3 text-left hover:bg-muted/50 transition-colors">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-primary">{excerpt.label}</span>
+              <span className={cn(
+                "text-sm font-medium",
+                isFullArticle ? "text-primary" : "text-foreground"
+              )}>
+                {excerpt.label}
+              </span>
               <ChevronDown className={cn(
-                "h-4 w-4 text-muted-foreground transition-transform",
+                "h-4 w-4 text-muted-foreground transition-transform flex-shrink-0",
                 isExpanded && "rotate-180"
               )} />
             </div>
@@ -45,11 +54,15 @@ function ExcerptToggle({ excerpt }: { excerpt: { label: string; preview: string;
           </button>
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <div className="p-3 pt-0 border-t bg-muted/30">
-            <ScrollArea className="max-h-[300px]">
-              <pre className="whitespace-pre-wrap text-sm font-sans">
-                {excerpt.full}
-              </pre>
+          <div className="p-4 border-t bg-muted/30">
+            <ScrollArea className={isFullArticle ? "h-[400px]" : "max-h-[300px]"}>
+              <div className="prose prose-sm max-w-none dark:prose-invert pr-4">
+                {excerpt.full.split('\n\n').map((paragraph, i) => (
+                  <p key={i} className="text-sm leading-relaxed mb-3 last:mb-0">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
             </ScrollArea>
           </div>
         </CollapsibleContent>
