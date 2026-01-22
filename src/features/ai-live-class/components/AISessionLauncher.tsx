@@ -35,20 +35,61 @@
  */
 
 import { useState, useCallback } from 'react';
-import { Play, Users, Sparkles, MessageSquare, ChevronDown, ChevronUp } from 'lucide-react';
+import { Play, Users, Sparkles, MessageSquare, ChevronDown, ChevronUp, Settings2, FileText } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { useTeacherAISession } from '../hooks/useTeacherAISession';
+import { DEFAULT_PROMPTS } from '../constants';
 import type { AILiveSession, CreateSessionOptions } from '../types';
+
+// =============================================================================
+// PROMPT TEMPLATES
+// =============================================================================
+
+/**
+ * Pre-configured prompt templates for common use cases.
+ */
+const PROMPT_TEMPLATES = {
+  general: {
+    label: 'General Academic',
+    description: 'Broad academic discussion on any topic',
+    prompt: DEFAULT_PROMPTS.ACADEMIC_GENERAL,
+  },
+  writing: {
+    label: 'Academic Writing',
+    description: 'Focus on writing skills, citations, structure',
+    prompt: DEFAULT_PROMPTS.ACADEMIC_WRITING,
+  },
+  analysis: {
+    label: 'Critical Analysis',
+    description: 'Analyze arguments, evaluate sources',
+    prompt: DEFAULT_PROMPTS.CRITICAL_ANALYSIS,
+  },
+  custom: {
+    label: 'Custom',
+    description: 'Write your own system prompt',
+    prompt: '',
+  },
+} as const;
+
+type PromptTemplateKey = keyof typeof PROMPT_TEMPLATES;
 
 // =============================================================================
 // COMPONENT PROPS INTERFACE
@@ -201,6 +242,21 @@ export function AISessionLauncher({
   const [description, setDescription] = useState('');
 
   /**
+   * Selected prompt template.
+   */
+  const [promptTemplate, setPromptTemplate] = useState<PromptTemplateKey>('general');
+
+  /**
+   * Custom system prompt (used when template is 'custom' or edited).
+   */
+  const [customPrompt, setCustomPrompt] = useState('');
+
+  /**
+   * Additional context to inject into the prompt.
+   */
+  const [additionalContext, setAdditionalContext] = useState('');
+
+  /**
    * Whether the advanced options are expanded.
    */
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -254,24 +310,32 @@ export function AISessionLauncher({
       return;
     }
 
+    // Build the system prompt based on template or custom
+    let finalSystemPrompt = promptTemplate === 'custom' 
+      ? customPrompt 
+      : PROMPT_TEMPLATES[promptTemplate].prompt;
+    
+    // Append additional context if provided
+    if (additionalContext.trim()) {
+      finalSystemPrompt += `\n\n## Additional Context\n${additionalContext.trim()}`;
+    }
+
     const options: CreateSessionOptions = {
       topic: topic.trim(),
       description: description.trim() || undefined,
       weekNumber,
+      systemPrompt: finalSystemPrompt || undefined,
     };
 
     const success = await createSession(options);
 
     if (success && onSessionCreated) {
       // Wait for session state to update
-      // The hook will set the session after creation
       setTimeout(() => {
         // Re-check session from hook
-        // This is a workaround since createSession returns boolean, not session
-        // In production, you might want to modify the hook to return the session
       }, 100);
     }
-  }, [topic, description, weekNumber, createSession, onSessionCreated]);
+  }, [topic, description, weekNumber, promptTemplate, customPrompt, additionalContext, createSession, onSessionCreated]);
 
   // ---------------------------------------------------------------------------
   // COMPACT VARIANT
@@ -304,6 +368,12 @@ export function AISessionLauncher({
             setTopic={setTopic}
             description={description}
             setDescription={setDescription}
+            promptTemplate={promptTemplate}
+            setPromptTemplate={setPromptTemplate}
+            customPrompt={customPrompt}
+            setCustomPrompt={setCustomPrompt}
+            additionalContext={additionalContext}
+            setAdditionalContext={setAdditionalContext}
             topics={topics}
             onTopicSelect={handleTopicSelect}
             onCreateSession={handleCreateSession}
@@ -330,6 +400,12 @@ export function AISessionLauncher({
           setTopic={setTopic}
           description={description}
           setDescription={setDescription}
+          promptTemplate={promptTemplate}
+          setPromptTemplate={setPromptTemplate}
+          customPrompt={customPrompt}
+          setCustomPrompt={setCustomPrompt}
+          additionalContext={additionalContext}
+          setAdditionalContext={setAdditionalContext}
           topics={topics}
           onTopicSelect={handleTopicSelect}
           onCreateSession={handleCreateSession}
@@ -369,6 +445,12 @@ export function AISessionLauncher({
           setTopic={setTopic}
           description={description}
           setDescription={setDescription}
+          promptTemplate={promptTemplate}
+          setPromptTemplate={setPromptTemplate}
+          customPrompt={customPrompt}
+          setCustomPrompt={setCustomPrompt}
+          additionalContext={additionalContext}
+          setAdditionalContext={setAdditionalContext}
           topics={topics}
           onTopicSelect={handleTopicSelect}
           onCreateSession={handleCreateSession}
@@ -400,6 +482,12 @@ interface AISessionLauncherFormProps {
   setTopic: (topic: string) => void;
   description: string;
   setDescription: (description: string) => void;
+  promptTemplate: PromptTemplateKey;
+  setPromptTemplate: (template: PromptTemplateKey) => void;
+  customPrompt: string;
+  setCustomPrompt: (prompt: string) => void;
+  additionalContext: string;
+  setAdditionalContext: (context: string) => void;
   topics: string[];
   onTopicSelect: (topic: string) => void;
   onCreateSession: () => Promise<void>;
@@ -419,6 +507,12 @@ function AISessionLauncherForm({
   setTopic,
   description,
   setDescription,
+  promptTemplate,
+  setPromptTemplate,
+  customPrompt,
+  setCustomPrompt,
+  additionalContext,
+  setAdditionalContext,
   topics,
   onTopicSelect,
   onCreateSession,
@@ -460,7 +554,8 @@ function AISessionLauncherForm({
       <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
         <CollapsibleTrigger asChild>
           <Button variant="ghost" size="sm" className="w-full text-muted-foreground">
-            {showAdvanced ? 'Hide' : 'Show'} Advanced Options
+            <Settings2 className="h-4 w-4 mr-2" />
+            {showAdvanced ? 'Hide' : 'Show'} AI Configuration
             {showAdvanced ? (
               <ChevronUp className="h-4 w-4 ml-2" />
             ) : (
@@ -468,15 +563,115 @@ function AISessionLauncherForm({
             )}
           </Button>
         </CollapsibleTrigger>
-        <CollapsibleContent className="pt-2 space-y-4">
-          {/* Description */}
+        <CollapsibleContent className="pt-4 space-y-4">
+          {/* Tabs for Basic vs Custom */}
+          <Tabs defaultValue="templates" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="templates">Templates</TabsTrigger>
+              <TabsTrigger value="custom">Custom Prompt</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="templates" className="space-y-4 mt-4">
+              {/* Prompt Template Selection */}
+              <div className="space-y-2">
+                <Label>AI Behavior Template</Label>
+                <Select 
+                  value={promptTemplate} 
+                  onValueChange={(v) => setPromptTemplate(v as PromptTemplateKey)}
+                  disabled={disabled}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a template" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(PROMPT_TEMPLATES).filter(([key]) => key !== 'custom').map(([key, template]) => (
+                      <SelectItem key={key} value={key}>
+                        <div className="flex flex-col items-start">
+                          <span>{template.label}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {promptTemplate !== 'custom' && (
+                  <p className="text-xs text-muted-foreground">
+                    {PROMPT_TEMPLATES[promptTemplate].description}
+                  </p>
+                )}
+              </div>
+              
+              {/* Additional Context */}
+              <div className="space-y-2">
+                <Label htmlFor="additional-context">
+                  <FileText className="h-4 w-4 inline mr-1" />
+                  Additional Context (optional)
+                </Label>
+                <Textarea
+                  id="additional-context"
+                  value={additionalContext}
+                  onChange={(e) => setAdditionalContext(e.target.value)}
+                  placeholder="Paste lecture notes, article excerpts, or specific instructions for this session..."
+                  rows={4}
+                  disabled={disabled}
+                  className="font-mono text-sm"
+                />
+                <p className="text-xs text-muted-foreground">
+                  This context will be included in the AI's system prompt.
+                </p>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="custom" className="space-y-4 mt-4">
+              {/* Custom System Prompt */}
+              <div className="space-y-2">
+                <Label htmlFor="custom-prompt">Custom System Prompt</Label>
+                <Textarea
+                  id="custom-prompt"
+                  value={customPrompt}
+                  onChange={(e) => {
+                    setCustomPrompt(e.target.value);
+                    setPromptTemplate('custom');
+                  }}
+                  placeholder="You are an AI tutor specializing in academic English. Your role is to..."
+                  rows={6}
+                  disabled={disabled}
+                  className="font-mono text-sm"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Define exactly how the AI should behave during this session.
+                </p>
+              </div>
+              
+              {/* Quick Insert Buttons */}
+              <div className="space-y-2">
+                <Label className="text-xs">Quick insert from template:</Label>
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(PROMPT_TEMPLATES).filter(([key]) => key !== 'custom').map(([key, template]) => (
+                    <Badge
+                      key={key}
+                      variant="outline"
+                      className="cursor-pointer hover:bg-muted transition-colors text-xs"
+                      onClick={() => {
+                        setCustomPrompt(template.prompt);
+                        setPromptTemplate('custom');
+                      }}
+                    >
+                      {template.label}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+          
+          {/* Description for students */}
           <div className="space-y-2">
-            <Label htmlFor="session-description">Description (optional)</Label>
+            <Label htmlFor="session-description">Session Description (optional)</Label>
             <Textarea
               id="session-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Provide additional context for students..."
+              placeholder="Brief description students will see when joining..."
               rows={2}
               disabled={disabled}
             />
