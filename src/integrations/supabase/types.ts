@@ -14,6 +14,180 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_conversation_messages: {
+        Row: {
+          author: string
+          content: string
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          queued_message_id: string | null
+          session_id: string | null
+          student_name: string | null
+        }
+        Insert: {
+          author: string
+          content: string
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          queued_message_id?: string | null
+          session_id?: string | null
+          student_name?: string | null
+        }
+        Update: {
+          author?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          queued_message_id?: string | null
+          session_id?: string | null
+          student_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_conversation_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "ai_live_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_live_sessions: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          ended_at: string | null
+          id: string
+          material_id: string | null
+          session_code: string
+          started_at: string | null
+          status: string
+          teacher_id: string
+          topic: string | null
+          week_number: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          ended_at?: string | null
+          id?: string
+          material_id?: string | null
+          session_code: string
+          started_at?: string | null
+          status?: string
+          teacher_id: string
+          topic?: string | null
+          week_number?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          ended_at?: string | null
+          id?: string
+          material_id?: string | null
+          session_code?: string
+          started_at?: string | null
+          status?: string
+          teacher_id?: string
+          topic?: string | null
+          week_number?: number | null
+        }
+        Relationships: []
+      }
+      ai_message_queue: {
+        Row: {
+          content: string
+          id: string
+          is_highlighted: boolean | null
+          promoted_message_id: string | null
+          reviewed_at: string | null
+          session_id: string | null
+          status: string | null
+          student_id: string
+          student_name: string
+          submitted_at: string | null
+        }
+        Insert: {
+          content: string
+          id?: string
+          is_highlighted?: boolean | null
+          promoted_message_id?: string | null
+          reviewed_at?: string | null
+          session_id?: string | null
+          status?: string | null
+          student_id: string
+          student_name: string
+          submitted_at?: string | null
+        }
+        Update: {
+          content?: string
+          id?: string
+          is_highlighted?: boolean | null
+          promoted_message_id?: string | null
+          reviewed_at?: string | null
+          session_id?: string | null
+          status?: string | null
+          student_id?: string
+          student_name?: string
+          submitted_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_message_queue_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "ai_live_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_session_participants: {
+        Row: {
+          display_name: string
+          id: string
+          is_online: boolean | null
+          joined_at: string | null
+          last_seen_at: string | null
+          messages_promoted: number | null
+          messages_submitted: number | null
+          session_id: string | null
+          student_id: string
+        }
+        Insert: {
+          display_name: string
+          id?: string
+          is_online?: boolean | null
+          joined_at?: string | null
+          last_seen_at?: string | null
+          messages_promoted?: number | null
+          messages_submitted?: number | null
+          session_id?: string | null
+          student_id: string
+        }
+        Update: {
+          display_name?: string
+          id?: string
+          is_online?: boolean | null
+          joined_at?: string | null
+          last_seen_at?: string | null
+          messages_promoted?: number | null
+          messages_submitted?: number | null
+          session_id?: string | null
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_session_participants_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "ai_live_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_tutor_reports: {
         Row: {
           commented_at: string | null
