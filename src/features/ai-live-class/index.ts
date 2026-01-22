@@ -167,6 +167,10 @@
 export { 
   AISessionLauncher,
   type AISessionLauncherProps,
+  TeacherAIClassView,
+  type TeacherAIClassViewProps,
+  StudentAIClassView,
+  type StudentAIClassViewProps,
 } from './components';
 
 // -----------------------------------------------------------------------------
