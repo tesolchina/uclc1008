@@ -4,42 +4,47 @@
  */
 
 import type { Hour3Task, TaskExcerpt } from '../types';
+import { preCourseWritingArticle } from '@/data/assignments/preCourseWriting';
 
-// Full FRT Article for Week 2 tasks
-const FRT_FULL_ARTICLE = `Facial recognition technology (FRT) is increasingly being adopted by schools in a variety of ways. In the US, school shooting incidents have prompted school authorities to invest heavily in security systems. The US school security industry is estimated to be currently valued at $2.7 billion, with thousands of schools having purchased some form of facial recognition system. Vendors are pitching the technology as an all-seeing shield protecting schools and students from mass-shootings and other violent incidents.
-
-Beyond these security applications, FRT is being used in schools to automate time-consuming administrative tasks. For example, some schools use the technology to monitor attendance — with students' faces being scanned upon entry to their schools, as well as when entering individual classrooms. Similarly, FRT is being used by schools offering online courses to verify student identities while they are completing assessments.
-
-A fourth emerging application is the use of FRT in schools to monitor student engagement and wellbeing. The technology is being promoted to schools as a means of gaining insight into student emotional states and engagement in learning. Some software claims to be able to infer students' moods from their facial expressions — labelling them as happy, sad, angry, surprised, scared or neutral.
-
-Against this contentious background, then, we need to consider how these technologies are being applied to the specific context of education. In particular, it is important to consider what is driving the increased use of FRT in schools. Schools are adopting facial recognition for a range of reasons — from security, to efficiency, to monitoring and control.
-
-While there are clear potential benefits to these technologies, the use of FRT raises significant concerns relating to student privacy. Many parents remain unaware that their children's biometric data is being collected and stored. Moreover, there are questions about how this data is being used, shared and secured. Critics argue that the normalisation of surveillance in educational settings could have lasting implications for how young people understand privacy and consent.`;
-
+// Full FRT Article from the pre-course writing assignment
 const FRT_FULL_READING: TaskExcerpt = {
   label: "📖 Full Article: Andrejevic & Selwyn (2020)",
-  preview: "Facial recognition technology (FRT) is increasingly being adopted by schools in a variety of ways...",
-  full: FRT_FULL_ARTICLE
+  preview: "Against this contentious background, then, we need to consider how these technologies are being applied to the specific context of education...",
+  full: `${preCourseWritingArticle.fullCitation}\n\n${preCourseWritingArticle.content}`
 };
 
-const FRT_EXCERPT_PREVIEW = "Facial recognition technology (FRT) is increasingly being adopted by schools in a variety of ways. In the US, school shooting incidents have prompted school authorities to invest heavily in security systems...";
-
+// Key excerpts for specific tasks
 const FRT_APPLICATIONS_EXCERPT: TaskExcerpt = {
-  label: "Key Excerpt: FRT Applications in Schools",
-  preview: FRT_EXCERPT_PREVIEW,
-  full: `Facial recognition technology (FRT) is increasingly being adopted by schools in a variety of ways. In the US, school shooting incidents have prompted school authorities to invest heavily in security systems. The US school security industry is estimated to be currently valued at $2.7 billion, with thousands of schools having purchased some form of facial recognition system. Vendors are pitching the technology as an all-seeing shield protecting schools and students from mass-shootings and other violent incidents.
+  label: "Key Excerpt: Four FRT Applications",
+  preview: "One prominent educational application of facial recognition technology is campus security...",
+  full: `The article describes FOUR main applications of FRT in schools:
 
-Beyond these security applications, FRT is being used in schools to automate time-consuming administrative tasks. For example, some schools use the technology to monitor attendance — with students' faces being scanned upon entry to their schools, as well as when entering individual classrooms. Similarly, FRT is being used by schools offering online courses to verify student identities while they are completing assessments.
+1. CAMPUS SECURITY
+"One prominent educational application of facial recognition technology is campus security. This form of facial recognition is most prevalent in the US, where school shooting incidents have prompted school authorities to annually spend $2.7 billion on-campus security products and services... Facial recognition systems have now been sold to thousands of US schools, with vendors 'pitching the technology as an all-seeing shield against school shootings.'"
 
-A fourth emerging application is the use of FRT in schools to monitor student engagement and wellbeing. The technology is being promoted to schools as a means of gaining insight into student emotional states and engagement in learning. Some software claims to be able to infer students' moods from their facial expressions — labelling them as happy, sad, angry, surprised, scared or neutral.`
+2. ATTENDANCE MONITORING
+"Another application of facial recognition in schools is attendance monitoring – promising to put an end to the inevitable gaps and omissions that arise when human teachers are tasked with repeatedly conducting roll-calls of large student groups."
+
+3. ONLINE IDENTITY VERIFICATION
+"Beyond campus-based security and tracking physical bodies, facial recognition is also being used in a number of 'virtual learning' contexts... using webcam-based facial recognition to authenticate online learners (i.e., confirming that the people engaging in online learning activities are actually who they claim to be)."
+
+4. STUDENT ENGAGEMENT/EMOTION MONITORING
+"Finally, there is a growing interest in facial detection techniques as an indicator of student 'engagement' and learning... detecting brief 'facial actions' can prove an accurate indicator of students' (non)engagement with online learning environments."`
 };
 
 const FRT_SECURITY_EXCERPT: TaskExcerpt = {
   label: "Key Excerpt: Security Marketing Claims",
-  preview: "Vendors are pitching the technology as an all-seeing shield protecting schools and students from mass-shootings...",
-  full: `In the US, school shooting incidents have prompted school authorities to invest heavily in security systems. The US school security industry is estimated to be currently valued at $2.7 billion, with thousands of schools having purchased some form of facial recognition system. Vendors are pitching the technology as an all-seeing shield protecting schools and students from mass-shootings and other violent incidents.
+  preview: "Vendors 'pitching the technology as an all-seeing shield against school shootings'...",
+  full: `From the article:
 
-Note: The phrase "pitching the technology as" indicates this is a marketing claim by vendors, not a proven capability. The authors are reporting what vendors say, not endorsing these claims.`
+"Facial recognition systems have now been sold to thousands of US schools, with vendors 'pitching the technology as an all-seeing shield against school shootings' (Harwell, 2018, n.p)."
+
+IMPORTANT: Notice the phrase "pitching the technology as" — this indicates:
+• The authors are REPORTING what vendors SAY, not what FRT actually does
+• This is a MARKETING CLAIM, not a proven capability
+• The original meaning includes skepticism about vendor promises
+
+A good paraphrase must preserve this nuance!`
 };
 
 // Week 1: Basic Paraphrasing & Reading Strategies
