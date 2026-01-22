@@ -76,14 +76,28 @@ export function useStudentDiscussion({ weekNumber, studentId }: UseStudentDiscus
         }
       }));
 
-      // Get AI feedback
+      // Get AI feedback using streaming response
       const task = tasks.find(t => t.id === taskId);
-      const { data: feedbackData, error: feedbackError } = await supabase.functions.invoke('chat', {
-        body: {
-          messages: [
-            {
-              role: 'system',
-              content: `You are an academic writing tutor providing feedback on student responses. Focus on:
+      
+      // Use fetch directly to handle streaming response
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      
+      let aiFeedback: string | null = null;
+      
+      try {
+        const chatResponse = await fetch(`${supabaseUrl}/functions/v1/chat`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${supabaseKey}`,
+            'apikey': supabaseKey,
+          },
+          body: JSON.stringify({
+            messages: [
+              {
+                role: 'system',
+                content: `You are an academic writing tutor providing feedback on student responses. Focus on:
 1. Whether the student met the task requirements
 2. Specific strengths in their response
 3. One or two areas for improvement
@@ -94,17 +108,52 @@ Prompt: ${task?.prompt}
 Rubric points to evaluate: ${task?.rubricPoints?.join(', ') || 'Clear, accurate, well-structured'}
 
 Keep feedback concise (100-150 words), constructive, and encouraging.`
-            },
-            {
-              role: 'user',
-              content: `Student's response:\n\n${response}`
-            }
-          ],
-          studentId,
-        }
-      });
+              },
+              {
+                role: 'user',
+                content: `Student's response:\n\n${response}`
+              }
+            ],
+            studentId,
+          }),
+        });
 
-      const aiFeedback = feedbackError ? null : (feedbackData?.content || feedbackData?.message || null);
+        if (chatResponse.ok && chatResponse.body) {
+          // Read the streaming response
+          const reader = chatResponse.body.getReader();
+          const decoder = new TextDecoder();
+          let fullContent = '';
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const chunk = decoder.decode(value, { stream: true });
+            const lines = chunk.split('\n');
+
+            for (const line of lines) {
+              if (line.startsWith('data: ') && !line.includes('[DONE]')) {
+                try {
+                  const jsonStr = line.slice(6).trim();
+                  if (jsonStr) {
+                    const parsed = JSON.parse(jsonStr);
+                    const content = parsed.choices?.[0]?.delta?.content;
+                    if (content) {
+                      fullContent += content;
+                    }
+                  }
+                } catch {
+                  // Ignore parse errors for partial JSON
+                }
+              }
+            }
+          }
+
+          aiFeedback = fullContent || null;
+        }
+      } catch (chatErr) {
+        console.error('Error getting AI feedback:', chatErr);
+      }
 
       // Save to database - check if exists first, then insert or update
       const { data: existingRecord } = await supabase
