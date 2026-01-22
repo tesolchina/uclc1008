@@ -5,23 +5,37 @@
 
 import type { Hour3Task, TaskExcerpt } from '../types';
 
-// FRT Article excerpts for Week 2 tasks
-const FRT_EXCERPT_FULL = `Facial recognition technology (FRT) is increasingly being adopted by schools in a variety of ways. In the US, school shooting incidents have prompted school authorities to invest heavily in security systems. The US school security industry is estimated to be currently valued at $2.7 billion, with thousands of schools having purchased some form of facial recognition system. Vendors are pitching the technology as an all-seeing shield protecting schools and students from mass-shootings and other violent incidents.
+// Full FRT Article for Week 2 tasks
+const FRT_FULL_ARTICLE = `Facial recognition technology (FRT) is increasingly being adopted by schools in a variety of ways. In the US, school shooting incidents have prompted school authorities to invest heavily in security systems. The US school security industry is estimated to be currently valued at $2.7 billion, with thousands of schools having purchased some form of facial recognition system. Vendors are pitching the technology as an all-seeing shield protecting schools and students from mass-shootings and other violent incidents.
 
 Beyond these security applications, FRT is being used in schools to automate time-consuming administrative tasks. For example, some schools use the technology to monitor attendance — with students' faces being scanned upon entry to their schools, as well as when entering individual classrooms. Similarly, FRT is being used by schools offering online courses to verify student identities while they are completing assessments.
 
-A fourth emerging application is the use of FRT in schools to monitor student engagement and wellbeing. The technology is being promoted to schools as a means of gaining insight into student emotional states and engagement in learning. Some software claims to be able to infer students' moods from their facial expressions — labelling them as happy, sad, angry, surprised, scared or neutral.`;
+A fourth emerging application is the use of FRT in schools to monitor student engagement and wellbeing. The technology is being promoted to schools as a means of gaining insight into student emotional states and engagement in learning. Some software claims to be able to infer students' moods from their facial expressions — labelling them as happy, sad, angry, surprised, scared or neutral.
+
+Against this contentious background, then, we need to consider how these technologies are being applied to the specific context of education. In particular, it is important to consider what is driving the increased use of FRT in schools. Schools are adopting facial recognition for a range of reasons — from security, to efficiency, to monitoring and control.
+
+While there are clear potential benefits to these technologies, the use of FRT raises significant concerns relating to student privacy. Many parents remain unaware that their children's biometric data is being collected and stored. Moreover, there are questions about how this data is being used, shared and secured. Critics argue that the normalisation of surveillance in educational settings could have lasting implications for how young people understand privacy and consent.`;
+
+const FRT_FULL_READING: TaskExcerpt = {
+  label: "📖 Full Article: Andrejevic & Selwyn (2020)",
+  preview: "Facial recognition technology (FRT) is increasingly being adopted by schools in a variety of ways...",
+  full: FRT_FULL_ARTICLE
+};
 
 const FRT_EXCERPT_PREVIEW = "Facial recognition technology (FRT) is increasingly being adopted by schools in a variety of ways. In the US, school shooting incidents have prompted school authorities to invest heavily in security systems...";
 
 const FRT_APPLICATIONS_EXCERPT: TaskExcerpt = {
-  label: "Andrejevic & Selwyn (2020) – FRT Applications in Schools",
+  label: "Key Excerpt: FRT Applications in Schools",
   preview: FRT_EXCERPT_PREVIEW,
-  full: FRT_EXCERPT_FULL
+  full: `Facial recognition technology (FRT) is increasingly being adopted by schools in a variety of ways. In the US, school shooting incidents have prompted school authorities to invest heavily in security systems. The US school security industry is estimated to be currently valued at $2.7 billion, with thousands of schools having purchased some form of facial recognition system. Vendors are pitching the technology as an all-seeing shield protecting schools and students from mass-shootings and other violent incidents.
+
+Beyond these security applications, FRT is being used in schools to automate time-consuming administrative tasks. For example, some schools use the technology to monitor attendance — with students' faces being scanned upon entry to their schools, as well as when entering individual classrooms. Similarly, FRT is being used by schools offering online courses to verify student identities while they are completing assessments.
+
+A fourth emerging application is the use of FRT in schools to monitor student engagement and wellbeing. The technology is being promoted to schools as a means of gaining insight into student emotional states and engagement in learning. Some software claims to be able to infer students' moods from their facial expressions — labelling them as happy, sad, angry, surprised, scared or neutral.`
 };
 
 const FRT_SECURITY_EXCERPT: TaskExcerpt = {
-  label: "Andrejevic & Selwyn (2020) – Security Marketing",
+  label: "Key Excerpt: Security Marketing Claims",
   preview: "Vendors are pitching the technology as an all-seeing shield protecting schools and students from mass-shootings...",
   full: `In the US, school shooting incidents have prompted school authorities to invest heavily in security systems. The US school security industry is estimated to be currently valued at $2.7 billion, with thousands of schools having purchased some form of facial recognition system. Vendors are pitching the technology as an all-seeing shield protecting schools and students from mass-shootings and other violent incidents.
 
@@ -97,7 +111,7 @@ What is MISSING from this summary? Write 2-3 sentences describing the missing ap
       "Explains what this application involves",
       "Understands why comprehensive coverage matters"
     ],
-    excerpts: [FRT_APPLICATIONS_EXCERPT]
+    excerpts: [FRT_APPLICATIONS_EXCERPT, FRT_FULL_READING]
   },
   {
     id: "w2-personal-opinion",
@@ -114,7 +128,7 @@ Rewrite WITHOUT personal evaluation while keeping the factual content.`,
       "Rewrites in neutral, descriptive language",
       "Preserves the factual claims from the source"
     ],
-    excerpts: [FRT_APPLICATIONS_EXCERPT]
+    excerpts: [FRT_APPLICATIONS_EXCERPT, FRT_FULL_READING]
   },
   // Paraphrasing tasks
   {
@@ -134,7 +148,7 @@ The student only changed 3 words. Rewrite with COMPLETE paraphrasing (different 
       "Preserves the original meaning accurately"
     ],
     excerpts: [{
-      label: "Andrejevic & Selwyn (2020) – Original Sentence",
+      label: "Key Excerpt: Original Sentence",
       preview: "school shooting incidents have prompted school authorities to invest heavily in security systems",
       full: `Original sentence in context:
 
@@ -144,7 +158,7 @@ Key meaning to preserve:
 • Cause: school shootings in the US
 • Effect: schools spending lots of money on security
 • This is describing a factual trend, not making a judgment`
-    }]
+    }, FRT_FULL_READING]
   },
   {
     id: "w2-preserve-nuance",
@@ -161,7 +175,7 @@ What is WRONG with this paraphrase? Write 2-3 sentences explaining the problem, 
       "Explains the difference between 'pitched as' and 'can prevent'",
       "Writes a paraphrase that preserves the marketing/claim language"
     ],
-    excerpts: [FRT_SECURITY_EXCERPT]
+    excerpts: [FRT_SECURITY_EXCERPT, FRT_FULL_READING]
   },
   // Academic Tone tasks
   {
@@ -182,7 +196,7 @@ Write all three sentences in formal academic English.`,
       "Replaces 'a lot of' and 'tech' with precise language"
     ],
     excerpts: [{
-      label: "Academic vs Informal Language Guide",
+      label: "Reference: Academic vs Informal Language",
       preview: "Academic writing avoids casual expressions, contractions, and vague quantifiers...",
       full: `Academic Writing Conventions:
 
@@ -197,7 +211,7 @@ Academic writing should be:
 • Precise (avoid vague words like "stuff", "things", "a lot")
 • Formal (avoid contractions and casual expressions)
 • Objective (avoid emotional language)`
-    }]
+    }, FRT_FULL_READING]
   },
   {
     id: "w2-thesis-statement",
@@ -217,7 +231,7 @@ Write a BETTER thesis statement that:
       "Uses clear, specific language"
     ],
     excerpts: [FRT_APPLICATIONS_EXCERPT, {
-      label: "Strong Thesis Statement Examples",
+      label: "Reference: Strong Thesis Statements",
       preview: "A thesis statement should clearly identify the source, main topic, and scope...",
       full: `Strong Thesis Statement Formula for Summaries:
 
@@ -232,7 +246,7 @@ Weak patterns to AVOID:
 • "The article talks about..." (too vague)
 • "This paper is about..." (doesn't name authors)
 • "Some questions and concerns..." (imprecise)`
-    }]
+    }, FRT_FULL_READING]
   },
   // Citation tasks
   {
@@ -253,7 +267,7 @@ Rewrite with proper in-text citations.`,
       "Places citation in correct position"
     ],
     excerpts: [{
-      label: "APA 7th In-Text Citation Rules",
+      label: "Reference: APA 7th In-Text Citations",
       preview: "Use '&' in parenthetical citations, 'and' in narrative citations...",
       full: `APA 7th Edition In-Text Citation Guide:
 
@@ -272,7 +286,7 @@ PLACEMENT:
 
 EXAMPLE:
 "Schools have invested heavily in security technology. The US school security industry is valued at $2.7 billion (Andrejevic & Selwyn, 2020)."`
-    }]
+    }, FRT_FULL_READING]
   },
   {
     id: "w2-fix-citation-errors",
@@ -292,7 +306,7 @@ Rewrite each citation correctly and explain what was wrong.`,
       "Fixes author name format (no first names, add space before parentheses)"
     ],
     excerpts: [{
-      label: "Common APA Citation Errors",
+      label: "Reference: Common APA Citation Errors",
       preview: "Frequent mistakes include wrong placement, mixing & and 'and', using first names...",
       full: `Common APA In-Text Citation Errors:
 
@@ -318,7 +332,7 @@ ERROR 4: Missing space before year
 ERROR 5: Wrong punctuation
 ❌ "(Smith; 2020)"
 ✓ "(Smith, 2020)"`
-    }]
+    }, FRT_FULL_READING]
   }
 ];
 
