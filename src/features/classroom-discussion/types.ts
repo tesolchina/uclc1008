@@ -2,6 +2,12 @@
  * Types for the classroom discussion module
  */
 
+export type TaskExcerpt = {
+  label: string;
+  preview: string;
+  full: string;
+};
+
 export type Hour3Task = {
   id: string;
   title: string;
@@ -11,6 +17,7 @@ export type Hour3Task = {
   wordLimit?: number;
   sampleAnswer?: string;
   rubricPoints?: string[];
+  excerpts?: TaskExcerpt[];
 };
 
 export type DiscussionSession = {
