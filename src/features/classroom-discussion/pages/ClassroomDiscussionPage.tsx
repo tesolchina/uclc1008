@@ -17,7 +17,7 @@ import { Sparkles, Users, BookOpen } from "lucide-react";
 // Student components
 import { 
   LiveSessionBanner, 
-  SelfStudyTaskGrid, 
+  TaskSelectDropdown, 
   TaskWorkspace 
 } from "../components/student";
 
@@ -197,7 +197,7 @@ export function ClassroomDiscussionPage({
           onBack={() => setSelectedTaskId(null)}
         />
       ) : (
-        <SelfStudyTaskGrid
+        <TaskSelectDropdown
           tasks={tasks}
           getProgress={getTaskProgress}
           onSelectTask={setSelectedTaskId}
