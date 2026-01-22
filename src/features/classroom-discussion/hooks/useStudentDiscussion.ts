@@ -106,18 +106,39 @@ Keep feedback concise (100-150 words), constructive, and encouraging.`
 
       const aiFeedback = feedbackError ? null : (feedbackData?.content || feedbackData?.message || null);
 
-      // Save to database
-      const { error: saveError } = await supabase
+      // Save to database - check if exists first, then insert or update
+      const { data: existingRecord } = await supabase
         .from('student_task_responses')
-        .upsert({
-          student_id: studentId,
-          question_key: questionKey,
-          response,
-          ai_feedback: aiFeedback,
-          submitted_at: new Date().toISOString(),
-        }, {
-          onConflict: 'student_id,question_key',
-        });
+        .select('id')
+        .eq('student_id', studentId)
+        .eq('question_key', questionKey)
+        .maybeSingle();
+
+      let saveError;
+      if (existingRecord) {
+        // Update existing record
+        const { error } = await supabase
+          .from('student_task_responses')
+          .update({
+            response,
+            ai_feedback: aiFeedback,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', existingRecord.id);
+        saveError = error;
+      } else {
+        // Insert new record
+        const { error } = await supabase
+          .from('student_task_responses')
+          .insert({
+            student_id: studentId,
+            question_key: questionKey,
+            response,
+            ai_feedback: aiFeedback,
+            submitted_at: new Date().toISOString(),
+          });
+        saveError = error;
+      }
 
       if (saveError) throw saveError;
 
