@@ -3,12 +3,14 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { ArrowLeft, Send, Loader2, Bot, Sparkles } from 'lucide-react';
+import { ArrowLeft, Send, Loader2, Bot, Sparkles, ChevronDown, FileText } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { cn } from '@/lib/utils';
 import type { Hour3Task, StudentTaskProgress } from '@/features/classroom-discussion/types';
 
 interface TaskWorkspaceProps {
@@ -17,6 +19,43 @@ interface TaskWorkspaceProps {
   onSubmit: (taskId: string, response: string) => Promise<string | null>;
   onSaveDraft: (taskId: string, response: string) => void;
   onBack: () => void;
+}
+
+// Component for toggling excerpt preview/full
+function ExcerptToggle({ excerpt }: { excerpt: { label: string; preview: string; full: string } }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
+      <div className="border rounded-lg overflow-hidden bg-background">
+        <CollapsibleTrigger asChild>
+          <button className="w-full p-3 text-left hover:bg-muted/50 transition-colors">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-primary">{excerpt.label}</span>
+              <ChevronDown className={cn(
+                "h-4 w-4 text-muted-foreground transition-transform",
+                isExpanded && "rotate-180"
+              )} />
+            </div>
+            {!isExpanded && (
+              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                {excerpt.preview}
+              </p>
+            )}
+          </button>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <div className="p-3 pt-0 border-t bg-muted/30">
+            <ScrollArea className="max-h-[300px]">
+              <pre className="whitespace-pre-wrap text-sm font-sans">
+                {excerpt.full}
+              </pre>
+            </ScrollArea>
+          </div>
+        </CollapsibleContent>
+      </div>
+    </Collapsible>
+  );
 }
 
 export function TaskWorkspace({ 
@@ -86,15 +125,28 @@ export function TaskWorkspace({
               ))}
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <div className="bg-muted/50 rounded-lg p-4">
               <pre className="whitespace-pre-wrap text-sm font-sans">
                 {task.prompt}
               </pre>
             </div>
 
+            {/* Source Excerpts */}
+            {task.excerpts && task.excerpts.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-sm font-medium flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-primary" />
+                  Source Material
+                </p>
+                {task.excerpts.map((excerpt, i) => (
+                  <ExcerptToggle key={i} excerpt={excerpt} />
+                ))}
+              </div>
+            )}
+
             {task.rubricPoints && task.rubricPoints.length > 0 && (
-              <div className="mt-4">
+              <div>
                 <p className="text-sm font-medium mb-2">What we're looking for:</p>
                 <ul className="text-sm text-muted-foreground space-y-1">
                   {task.rubricPoints.map((point, i) => (

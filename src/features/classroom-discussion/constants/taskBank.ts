@@ -3,7 +3,30 @@
  * Each week has its own set of tasks aligned with the curriculum.
  */
 
-import type { Hour3Task } from '../types';
+import type { Hour3Task, TaskExcerpt } from '../types';
+
+// FRT Article excerpts for Week 2 tasks
+const FRT_EXCERPT_FULL = `Facial recognition technology (FRT) is increasingly being adopted by schools in a variety of ways. In the US, school shooting incidents have prompted school authorities to invest heavily in security systems. The US school security industry is estimated to be currently valued at $2.7 billion, with thousands of schools having purchased some form of facial recognition system. Vendors are pitching the technology as an all-seeing shield protecting schools and students from mass-shootings and other violent incidents.
+
+Beyond these security applications, FRT is being used in schools to automate time-consuming administrative tasks. For example, some schools use the technology to monitor attendance — with students' faces being scanned upon entry to their schools, as well as when entering individual classrooms. Similarly, FRT is being used by schools offering online courses to verify student identities while they are completing assessments.
+
+A fourth emerging application is the use of FRT in schools to monitor student engagement and wellbeing. The technology is being promoted to schools as a means of gaining insight into student emotional states and engagement in learning. Some software claims to be able to infer students' moods from their facial expressions — labelling them as happy, sad, angry, surprised, scared or neutral.`;
+
+const FRT_EXCERPT_PREVIEW = "Facial recognition technology (FRT) is increasingly being adopted by schools in a variety of ways. In the US, school shooting incidents have prompted school authorities to invest heavily in security systems...";
+
+const FRT_APPLICATIONS_EXCERPT: TaskExcerpt = {
+  label: "Andrejevic & Selwyn (2020) – FRT Applications in Schools",
+  preview: FRT_EXCERPT_PREVIEW,
+  full: FRT_EXCERPT_FULL
+};
+
+const FRT_SECURITY_EXCERPT: TaskExcerpt = {
+  label: "Andrejevic & Selwyn (2020) – Security Marketing",
+  preview: "Vendors are pitching the technology as an all-seeing shield protecting schools and students from mass-shootings...",
+  full: `In the US, school shooting incidents have prompted school authorities to invest heavily in security systems. The US school security industry is estimated to be currently valued at $2.7 billion, with thousands of schools having purchased some form of facial recognition system. Vendors are pitching the technology as an all-seeing shield protecting schools and students from mass-shootings and other violent incidents.
+
+Note: The phrase "pitching the technology as" indicates this is a marketing claim by vendors, not a proven capability. The authors are reporting what vendors say, not endorsing these claims.`
+};
 
 // Week 1: Basic Paraphrasing & Reading Strategies
 export const WEEK1_HOUR3_TASKS: Hour3Task[] = [
@@ -73,7 +96,8 @@ What is MISSING from this summary? Write 2-3 sentences describing the missing ap
       "Identifies the missing application (engagement detection/emotion monitoring)",
       "Explains what this application involves",
       "Understands why comprehensive coverage matters"
-    ]
+    ],
+    excerpts: [FRT_APPLICATIONS_EXCERPT]
   },
   {
     id: "w2-personal-opinion",
@@ -89,7 +113,8 @@ Rewrite WITHOUT personal evaluation while keeping the factual content.`,
       "Identifies 'clearly beneficial' as personal evaluation",
       "Rewrites in neutral, descriptive language",
       "Preserves the factual claims from the source"
-    ]
+    ],
+    excerpts: [FRT_APPLICATIONS_EXCERPT]
   },
   // Paraphrasing tasks
   {
@@ -107,7 +132,19 @@ The student only changed 3 words. Rewrite with COMPLETE paraphrasing (different 
       "Changes sentence structure completely",
       "Uses different vocabulary throughout",
       "Preserves the original meaning accurately"
-    ]
+    ],
+    excerpts: [{
+      label: "Andrejevic & Selwyn (2020) – Original Sentence",
+      preview: "school shooting incidents have prompted school authorities to invest heavily in security systems",
+      full: `Original sentence in context:
+
+"In the US, school shooting incidents have prompted school authorities to invest heavily in security systems. The US school security industry is estimated to be currently valued at $2.7 billion, with thousands of schools having purchased some form of facial recognition system."
+
+Key meaning to preserve:
+• Cause: school shootings in the US
+• Effect: schools spending lots of money on security
+• This is describing a factual trend, not making a judgment`
+    }]
   },
   {
     id: "w2-preserve-nuance",
@@ -123,7 +160,8 @@ What is WRONG with this paraphrase? Write 2-3 sentences explaining the problem, 
       "Identifies that original describes marketing claims, not proven effectiveness",
       "Explains the difference between 'pitched as' and 'can prevent'",
       "Writes a paraphrase that preserves the marketing/claim language"
-    ]
+    ],
+    excerpts: [FRT_SECURITY_EXCERPT]
   },
   // Academic Tone tasks
   {
@@ -142,7 +180,24 @@ Write all three sentences in formal academic English.`,
       "Replaces 'really big deal' with formal expression",
       "Replaces 'What's more' with academic transition",
       "Replaces 'a lot of' and 'tech' with precise language"
-    ]
+    ],
+    excerpts: [{
+      label: "Academic vs Informal Language Guide",
+      preview: "Academic writing avoids casual expressions, contractions, and vague quantifiers...",
+      full: `Academic Writing Conventions:
+
+AVOID → USE INSTEAD
+• "really big deal" → "significant development" / "increasingly prevalent"
+• "What's more" → "Furthermore" / "Additionally" / "Moreover"
+• "a lot of" → "many" / "numerous" / "a significant number of"
+• "tech" → "technology"
+• "nowadays" → "currently" / "in recent years"
+
+Academic writing should be:
+• Precise (avoid vague words like "stuff", "things", "a lot")
+• Formal (avoid contractions and casual expressions)
+• Objective (avoid emotional language)`
+    }]
   },
   {
     id: "w2-thesis-statement",
@@ -160,7 +215,24 @@ Write a BETTER thesis statement that:
       "Includes author citation",
       "Mentions all four applications or states the number",
       "Uses clear, specific language"
-    ]
+    ],
+    excerpts: [FRT_APPLICATIONS_EXCERPT, {
+      label: "Strong Thesis Statement Examples",
+      preview: "A thesis statement should clearly identify the source, main topic, and scope...",
+      full: `Strong Thesis Statement Formula for Summaries:
+
+[Author(s)] ([Year]) [verb: examine/discuss/analyze/explore] [main topic], focusing on [specific aspects].
+
+Example patterns:
+• "Andrejevic and Selwyn (2020) examine four applications of facial recognition technology in schools: security, attendance monitoring, identity verification, and engagement tracking."
+
+• "According to Andrejevic and Selwyn (2020), FRT is being implemented in educational settings for four distinct purposes..."
+
+Weak patterns to AVOID:
+• "The article talks about..." (too vague)
+• "This paper is about..." (doesn't name authors)
+• "Some questions and concerns..." (imprecise)`
+    }]
   },
   // Citation tasks
   {
@@ -179,7 +251,28 @@ Rewrite with proper in-text citations.`,
       "Adds citation appropriately (not after every sentence)",
       "Uses correct APA format (& in parentheses, 'and' in text)",
       "Places citation in correct position"
-    ]
+    ],
+    excerpts: [{
+      label: "APA 7th In-Text Citation Rules",
+      preview: "Use '&' in parenthetical citations, 'and' in narrative citations...",
+      full: `APA 7th Edition In-Text Citation Guide:
+
+PARENTHETICAL (citation at end):
+• (Andrejevic & Selwyn, 2020)
+• Use ampersand (&) between authors
+
+NARRATIVE (authors in sentence):
+• Andrejevic and Selwyn (2020) argue that...
+• Use "and" (not &) between authors
+
+PLACEMENT:
+• Don't cite after every sentence if information comes from same source
+• Place citation at the end of the relevant passage
+• For direct quotes: include page number (p. 45) or (para. 3)
+
+EXAMPLE:
+"Schools have invested heavily in security technology. The US school security industry is valued at $2.7 billion (Andrejevic & Selwyn, 2020)."`
+    }]
   },
   {
     id: "w2-fix-citation-errors",
@@ -197,7 +290,35 @@ Rewrite each citation correctly and explain what was wrong.`,
       "Fixes citation placement (should come after information)",
       "Fixes & vs 'and' usage (use 'and' in signal phrases)",
       "Fixes author name format (no first names, add space before parentheses)"
-    ]
+    ],
+    excerpts: [{
+      label: "Common APA Citation Errors",
+      preview: "Frequent mistakes include wrong placement, mixing & and 'and', using first names...",
+      full: `Common APA In-Text Citation Errors:
+
+ERROR 1: Citation before the information
+❌ "(Smith, 2020) The study found..."
+✓ "The study found... (Smith, 2020)."
+✓ "Smith (2020) found that..."
+
+ERROR 2: Using & in narrative citations
+❌ "According to Smith & Jones (2020)..."
+✓ "According to Smith and Jones (2020)..."
+(Use & only inside parentheses)
+
+ERROR 3: Including first names
+❌ "John Smith (2020) argues..."
+✓ "Smith (2020) argues..."
+(Use last names only)
+
+ERROR 4: Missing space before year
+❌ "Smith(2020)"
+✓ "Smith (2020)"
+
+ERROR 5: Wrong punctuation
+❌ "(Smith; 2020)"
+✓ "(Smith, 2020)"`
+    }]
   }
 ];
 
