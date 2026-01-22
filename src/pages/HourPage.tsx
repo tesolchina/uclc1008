@@ -2157,7 +2157,7 @@ Provide focused feedback (4-5 sentences):
                       <p className="pl-4 -indent-4 text-muted-foreground">Apampa, K. M., Wills, G. B., & Sherrill-Mix, D. (2010). Approaches to security in e-assessment. <em>International Journal of Information Security</em>, 9(4), 263–277.</p>
                       <p className="pl-4 -indent-4 bg-green-500/10 p-1 rounded">Doffman, Z. (2018, November 18). Hundreds of U.S. schools now have AI-enabled camera systems scanning for guns. <em>Forbes</em>. https://forbes.com/sites/...</p>
                       <p className="pl-4 -indent-4 bg-green-500/10 p-1 rounded">Harwell, D. (2018, October 17). Unproven facial recognition companies target schools, promising an end to shootings. <em>The Washington Post</em>. https://washingtonpost.com/...</p>
-                      <p className="pl-4 -indent-4 text-muted-foreground">Puthea, S., Anshul, V., & Sujaybhai, N. (2017). Face recognition based automatic attendance system. <em>IJARIIE</em>, 3(1), 212–218.</p>
+                      <p className="pl-4 -indent-4 text-muted-foreground">Heiden, M., Widar, L., Wiitavaara, B., & Boman, E. (2020). Telework in academia: Associations with health and well-being among staff. <em>Higher Education</em>, <em>81</em>, 707–722. https://doi.org/10.1007/s10734-020-00569-4</p>
                     </div>
                   </div>
                 </div>
@@ -2370,14 +2370,14 @@ Provide focused feedback (4-5 sentences):
                     Now you try! The reference below has multiple errors. Rewrite it correctly in APA 7th format:
                   </p>
                   <div className="p-3 rounded-lg bg-red-500/5 border border-red-500/20 text-sm">
-                    <strong>Incorrect:</strong> Puthea, S. and Anshul, V. and Sujaybhai, N. (2017). Face Recognition Based Automatic Attendance System. IJARIIE. 3(1), 212-218
+                    <strong>Incorrect:</strong> Heiden, M. and Widar, L. and Wiitavaara, B. and Boman, E. (2020). Telework in Academia: Associations With Health and Well-Being Among Staff. Higher Education. 81, 707-722
                   </div>
                   <WritingPracticeWithHistory
-                    taskKey="w2h2-fix-reference"
+                    taskKey="w2h2-fix-reference-heiden"
                     studentId={studentId || "anonymous"}
                     title="Reference Correction Practice"
-                    instructions="Rewrite this reference correctly. Check: (1) Use '&' before the last author, (2) Add periods after initials, (3) Sentence case for the title, (4) Italicize the journal name and volume, (5) Add final period."
-                    placeholder="Puthea, S., Anshul, V., & Sujaybhai, N. (2017). Face recognition based automatic attendance system..."
+                    instructions="Rewrite this reference correctly. Check: (1) Use '&' before the last author and commas between others, (2) Sentence case for the title, (3) Italicize the journal name (*Higher Education*) and volume (*81*), (4) Use en-dash (–) for page range, (5) Add DOI link."
+                    placeholder="Heiden, M., Widar, L., Wiitavaara, B., & Boman, E. (2020). Telework in academia..."
                   />
                 </div>
 
