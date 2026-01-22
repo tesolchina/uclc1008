@@ -27,3 +27,8 @@ export type { TeacherAIClassViewProps } from './TeacherAIClassView';
 // Student View - Audience view with question submission
 export { StudentAIClassView } from './StudentAIClassView';
 export type { StudentAIClassViewProps } from './StudentAIClassView';
+
+// Task Components
+export { ChatTaskDisplay } from './ChatTaskDisplay';
+export { TaskGenerationPanel } from './TaskGenerationPanel';
+export { TaskLibrarySelector } from './TaskLibrarySelector';

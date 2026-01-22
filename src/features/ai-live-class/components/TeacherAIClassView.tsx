@@ -16,7 +16,7 @@
  * =============================================================================
  */
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { 
   Send, 
   Users, 
@@ -31,7 +31,6 @@ import {
   X,
   Star,
   Copy,
-  ExternalLink
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -45,8 +44,12 @@ import { useTeacherAISession } from '../hooks/useTeacherAISession';
 import { useAIConversation } from '../hooks/useAIConversation';
 import { useMessageQueue } from '../hooks/useMessageQueue';
 import { formatSessionCodeForDisplay } from '../utils/sessionCode';
+import { parseTasksFromMessage, TASK_GENERATION_INSTRUCTION } from '../utils/taskParser';
 import { STATUS_DISPLAY, DEFAULT_PROMPTS } from '../constants';
+import { TaskGenerationPanel } from './TaskGenerationPanel';
+import { ChatTaskDisplay } from './ChatTaskDisplay';
 import type { AILiveSession, ConversationMessage, QueuedMessage } from '../types';
+import type { TaskLibraryItem, GeneratedTask } from '../types/tasks';
 
 // =============================================================================
 // COMPONENT PROPS
@@ -104,6 +107,11 @@ export function TeacherAIClassView({
     endSession,
   } = useTeacherAISession({ teacherId });
   
+  // Enhance system prompt with task generation instruction
+  const enhancedSystemPrompt = useMemo(() => {
+    return `${DEFAULT_PROMPTS.ACADEMIC_GENERAL}\n\n${TASK_GENERATION_INSTRUCTION}`;
+  }, []);
+  
   const {
     messages,
     isGenerating,
@@ -111,7 +119,7 @@ export function TeacherAIClassView({
     promoteMessage,
   } = useAIConversation({
     sessionId: session.id,
-    systemPrompt: DEFAULT_PROMPTS.ACADEMIC_GENERAL,
+    systemPrompt: enhancedSystemPrompt,
   });
   
   const {
@@ -174,6 +182,19 @@ export function TeacherAIClassView({
     onSessionEnd?.();
   };
   
+  // Handle task generation request from panel
+  const handleRequestTask = async (prompt: string) => {
+    await sendMessage(prompt, 'teacher');
+  };
+  
+  // Handle library task selection - inject into conversation
+  const handleSelectLibraryTask = async (task: TaskLibraryItem) => {
+    const prompt = `Please create a task for the students based on this:\n\nTitle: ${task.title}\n\nPrompt: ${task.prompt}${task.context ? `\n\nContext: ${task.context}` : ''}${task.wordLimit ? `\n\nWord limit: ${task.wordLimit} words` : ''}`;
+    
+    await sendMessage(prompt, 'teacher');
+    toast.success(`Selected: ${task.title}`);
+  };
+  
   // ---------------------------------------------------------------------------
   // COMPUTED
   // ---------------------------------------------------------------------------
@@ -181,6 +202,17 @@ export function TeacherAIClassView({
   const onlineCount = participants.filter(p => p.is_online).length;
   const statusConfig = STATUS_DISPLAY[session.status as keyof typeof STATUS_DISPLAY];
   const pendingMessages = queue.filter(m => m.status === 'pending');
+  
+  // Parse messages for embedded tasks
+  const parsedMessages = useMemo(() => {
+    return messages.map(msg => {
+      if (msg.author === 'ai') {
+        const parseResult = parseTasksFromMessage(msg.content);
+        return { message: msg, ...parseResult };
+      }
+      return { message: msg, cleanContent: msg.content, tasks: [], hasTasks: false };
+    });
+  }, [messages]);
   
   // ---------------------------------------------------------------------------
   // RENDER
@@ -249,20 +281,30 @@ export function TeacherAIClassView({
       <div className="flex-1 flex flex-col min-h-0 p-4">
         <Card className="flex-1 flex flex-col min-h-0">
           <CardHeader className="flex-shrink-0 pb-2">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Sparkles className="h-5 w-5 text-primary" />
-              AI Conversation
-              <Badge variant="secondary" className="ml-auto">
-                {messages.length} messages
-              </Badge>
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Sparkles className="h-5 w-5 text-primary" />
+                AI Conversation
+                <Badge variant="secondary">
+                  {messages.length} messages
+                </Badge>
+              </CardTitle>
+              
+              {/* Task Generation Button */}
+              <TaskGenerationPanel
+                onRequestTask={handleRequestTask}
+                onSelectLibraryTask={handleSelectLibraryTask}
+                isGenerating={isGenerating}
+                currentTopic={session.topic || undefined}
+              />
+            </div>
           </CardHeader>
           
           <CardContent className="flex-1 flex flex-col min-h-0 p-0">
             {/* Message List */}
             <ScrollArea className="flex-1 px-4">
               <div className="space-y-4 py-4">
-                {messages.length === 0 ? (
+                {parsedMessages.length === 0 ? (
                   <div className="text-center text-muted-foreground py-12">
                     <MessageCircle className="h-12 w-12 mx-auto mb-4 opacity-30" />
                     <p>Start the conversation by sending a message.</p>
@@ -271,8 +313,20 @@ export function TeacherAIClassView({
                     </p>
                   </div>
                 ) : (
-                  messages.map((msg) => (
-                    <MessageBubble key={msg.id} message={msg} />
+                  parsedMessages.map(({ message: msg, cleanContent, tasks, hasTasks }) => (
+                    <div key={msg.id} className="space-y-3">
+                      <MessageBubble message={msg} cleanContent={cleanContent} />
+                      
+                      {/* Render embedded tasks */}
+                      {hasTasks && tasks.map(({ task }) => (
+                        <ChatTaskDisplay
+                          key={task.id}
+                          task={task}
+                          sessionId={session.id}
+                          isTeacher={true}
+                        />
+                      ))}
+                    </div>
                   ))
                 )}
                 
@@ -380,9 +434,11 @@ export function TeacherAIClassView({
 
 interface MessageBubbleProps {
   message: ConversationMessage;
+  cleanContent?: string;
 }
 
-function MessageBubble({ message }: MessageBubbleProps) {
+function MessageBubble({ message, cleanContent }: MessageBubbleProps) {
+  const displayContent = cleanContent ?? message.content;
   const isTeacher = message.author === 'teacher';
   const isAI = message.author === 'ai';
   const isPromoted = message.author === 'student';
@@ -416,7 +472,7 @@ function MessageBubble({ message }: MessageBubbleProps) {
             Promoted Question
           </p>
         )}
-        <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+        <p className="text-sm whitespace-pre-wrap">{displayContent}</p>
       </div>
     </div>
   );
