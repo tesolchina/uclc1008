@@ -16,7 +16,7 @@
  * =============================================================================
  */
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { 
   Send, 
   Users, 
@@ -31,7 +31,19 @@ import {
   X,
   Star,
   Copy,
+  FileText,
+  Plus,
 } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -93,7 +105,10 @@ export function TeacherAIClassView({
   
   const [messageInput, setMessageInput] = useState('');
   const [isQueueExpanded, setIsQueueExpanded] = useState(false);
+  const [showMaterialDialog, setShowMaterialDialog] = useState(false);
+  const [materialContent, setMaterialContent] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const hasGreeted = useRef(false);
   
   // ---------------------------------------------------------------------------
   // HOOKS
@@ -141,6 +156,18 @@ export function TeacherAIClassView({
   // ---------------------------------------------------------------------------
   // EFFECTS
   // ---------------------------------------------------------------------------
+  
+  // Auto-greet AI when session becomes active and no messages yet
+  useEffect(() => {
+    if (session.status === 'active' && messages.length === 0 && !isGenerating && !hasGreeted.current) {
+      hasGreeted.current = true;
+      // Send initial greeting to AI Tutor
+      const greetingMessage = session.topic 
+        ? `Hi! Let's start our session on "${session.topic}". I'm ready to begin.`
+        : `Hi! Let's start our live session. I'm ready to begin.`;
+      sendMessage(greetingMessage, 'teacher');
+    }
+  }, [session.status, messages.length, isGenerating, session.topic, sendMessage]);
   
   // Auto-scroll to latest message
   useEffect(() => {
@@ -194,6 +221,18 @@ export function TeacherAIClassView({
     await sendMessage(prompt, 'teacher');
     toast.success(`Selected: ${task.title}`);
   };
+  
+  // Handle material import - inject into conversation for AI context
+  const handleImportMaterial = useCallback(async () => {
+    if (!materialContent.trim()) return;
+    
+    const prompt = `I'm sharing some material for our session. Please acknowledge this and let me know you're ready to use it:\n\n---\n${materialContent.trim()}\n---`;
+    
+    await sendMessage(prompt, 'teacher');
+    setMaterialContent('');
+    setShowMaterialDialog(false);
+    toast.success('Material shared with AI Tutor');
+  }, [materialContent, sendMessage]);
   
   // ---------------------------------------------------------------------------
   // COMPUTED
@@ -255,6 +294,43 @@ export function TeacherAIClassView({
           
           {/* Right: Controls */}
           <div className="flex items-center gap-2">
+            {/* Import Material Button */}
+            <Dialog open={showMaterialDialog} onOpenChange={setShowMaterialDialog}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <FileText className="h-4 w-4 mr-1" /> Import Material
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-lg">
+                <DialogHeader>
+                  <DialogTitle>Import Material</DialogTitle>
+                  <DialogDescription>
+                    Paste lecture notes, article excerpts, or other content to share with the AI Tutor.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="material-content">Material Content</Label>
+                    <Textarea
+                      id="material-content"
+                      value={materialContent}
+                      onChange={(e) => setMaterialContent(e.target.value)}
+                      placeholder="Paste your content here..."
+                      rows={8}
+                      className="font-mono text-sm"
+                    />
+                  </div>
+                  <Button 
+                    onClick={handleImportMaterial}
+                    disabled={!materialContent.trim() || isGenerating}
+                    className="w-full"
+                  >
+                    <Plus className="h-4 w-4 mr-2" /> Share with AI Tutor
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+            
             {session.status === 'waiting' && (
               <Button onClick={startSession} size="sm">
                 <Play className="h-4 w-4 mr-1" /> Start
@@ -306,10 +382,16 @@ export function TeacherAIClassView({
               <div className="space-y-4 py-4">
                 {parsedMessages.length === 0 ? (
                   <div className="text-center text-muted-foreground py-12">
-                    <MessageCircle className="h-12 w-12 mx-auto mb-4 opacity-30" />
-                    <p>Start the conversation by sending a message.</p>
+                    <Sparkles className="h-12 w-12 mx-auto mb-4 opacity-30 text-primary" />
+                    <p className="text-lg font-medium">
+                      {session.status === 'waiting' 
+                        ? 'Click "Start" to begin the session'
+                        : 'Connecting with AI Tutor...'}
+                    </p>
                     <p className="text-sm mt-1">
-                      Students can watch and submit questions.
+                      {session.status === 'waiting' 
+                        ? 'The AI will greet you automatically when the session starts.'
+                        : 'Students can watch and submit questions.'}
                     </p>
                   </div>
                 ) : (
