@@ -29,6 +29,7 @@ interface LabTask {
   options?: string[]; // For MCQ/Poll
   timeLimit?: number; // seconds
   createdAt: string;
+  taskIndex: number; // The index used for matching responses
 }
 
 interface SpotlightResponse {
@@ -776,6 +777,8 @@ function StudentLabView() {
   const [response, setResponse] = useState('');
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [submittedResponse, setSubmittedResponse] = useState<string>('');
   const [spotlight, setSpotlight] = useState<SpotlightResponse | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
   const [liveSessions, setLiveSessions] = useState<Array<{
@@ -929,9 +932,12 @@ function StudentLabView() {
             options: data.options,
             timeLimit: data.timeLimit,
             createdAt: latestPrompt.created_at,
+            taskIndex: data.taskIndex ?? 0,
           });
           setResponse('');
           setSelectedOption(null);
+          setHasSubmitted(false);
+          setSubmittedResponse('');
           setTimeRemaining(data.timeLimit || null);
         }
         
@@ -964,19 +970,24 @@ function StudentLabView() {
     
     setIsSubmitting(true);
     try {
+      const submittedText = currentTask.type === 'writing' 
+        ? response
+        : (selectedOption !== null ? currentTask.options?.[selectedOption] : '') || '';
+      
       const responseData = currentTask.type === 'writing' 
         ? { text: response }
-        : { answer: selectedOption !== null ? currentTask.options?.[selectedOption] : '' };
+        : { answer: submittedText };
       
       await submitResponse(
         'lab_task',
-        parseInt(currentTask.id.split('-').pop() || '0'),
+        currentTask.taskIndex,
         responseData
       );
       
       toast({ title: 'Response submitted!' });
-      setResponse('');
-      setSelectedOption(null);
+      setSubmittedResponse(submittedText);
+      setHasSubmitted(true);
+      // Don't clear response so student can see what they submitted
     } catch (e) {
       toast({ title: 'Error submitting', variant: 'destructive' });
     } finally {
@@ -1189,19 +1200,31 @@ function StudentLabView() {
 
       {/* Current Task (if any) */}
       {currentTask && (
-        <Card className="border-amber-500/50 bg-amber-500/5">
+        <Card className={hasSubmitted ? "border-green-500/50 bg-green-500/5" : "border-amber-500/50 bg-amber-500/5"}>
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
-                {currentTask.type === 'writing' && <PenLine className="h-5 w-5" />}
-                {currentTask.type === 'mcq' && <CheckCircle2 className="h-5 w-5" />}
-                {currentTask.type === 'poll' && <MessageSquare className="h-5 w-5" />}
-                Task from Teacher
+                {hasSubmitted ? (
+                  <CheckCircle2 className="h-5 w-5 text-green-600" />
+                ) : (
+                  <>
+                    {currentTask.type === 'writing' && <PenLine className="h-5 w-5" />}
+                    {currentTask.type === 'mcq' && <CheckCircle2 className="h-5 w-5" />}
+                    {currentTask.type === 'poll' && <MessageSquare className="h-5 w-5" />}
+                  </>
+                )}
+                {hasSubmitted ? 'Response Submitted' : 'Task from Teacher'}
               </CardTitle>
-              {timeRemaining !== null && timeRemaining > 0 && (
+              {!hasSubmitted && timeRemaining !== null && timeRemaining > 0 && (
                 <Badge variant="outline" className="text-lg">
                   <Clock className="h-4 w-4 mr-1" />
                   {Math.floor(timeRemaining / 60)}:{String(timeRemaining % 60).padStart(2, '0')}
+                </Badge>
+              )}
+              {hasSubmitted && (
+                <Badge variant="default" className="bg-green-600">
+                  <CheckCircle2 className="h-3 w-3 mr-1" />
+                  Submitted
                 </Badge>
               )}
             </div>
@@ -1209,7 +1232,12 @@ function StudentLabView() {
           <CardContent className="space-y-4">
             <p className="text-lg">{currentTask.prompt}</p>
 
-            {currentTask.type === 'writing' ? (
+            {hasSubmitted ? (
+              <div className="bg-background border rounded-lg p-4">
+                <p className="text-sm text-muted-foreground mb-2">Your response:</p>
+                <p className="text-base whitespace-pre-wrap">{submittedResponse}</p>
+              </div>
+            ) : currentTask.type === 'writing' ? (
               <Textarea
                 value={response}
                 onChange={(e) => setResponse(e.target.value)}
@@ -1233,22 +1261,24 @@ function StudentLabView() {
               </div>
             )}
 
-            <Button 
-              onClick={handleSubmit}
-              disabled={
-                isSubmitting || 
-                (currentTask.type === 'writing' && !response.trim()) ||
-                (currentTask.type !== 'writing' && selectedOption === null)
-              }
-              className="w-full"
-              size="lg"
-            >
-              {isSubmitting ? (
-                <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Submitting...</>
-              ) : (
-                'Submit Response'
-              )}
-            </Button>
+            {!hasSubmitted && (
+              <Button 
+                onClick={handleSubmit}
+                disabled={
+                  isSubmitting || 
+                  (currentTask.type === 'writing' && !response.trim()) ||
+                  (currentTask.type !== 'writing' && selectedOption === null)
+                }
+                className="w-full"
+                size="lg"
+              >
+                {isSubmitting ? (
+                  <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Submitting...</>
+                ) : (
+                  'Submit Response'
+                )}
+              </Button>
+            )}
           </CardContent>
         </Card>
       )}
