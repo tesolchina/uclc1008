@@ -19,6 +19,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useTeacherSession, useStudentSession } from '@/features/live-session';
 import { useAIConversation } from '@/features/ai-live-class/hooks/useAIConversation';
 import { DEFAULT_PROMPTS } from '@/features/ai-live-class/constants';
+import ReactMarkdown from 'react-markdown';
 
 // Types
 interface LabTask {
@@ -545,7 +546,13 @@ function TeacherLabView() {
                         AI Tutor
                       </div>
                     )}
-                    <div className="whitespace-pre-wrap text-sm">{msg.content}</div>
+                    {msg.author === 'ai' ? (
+                      <div className="prose prose-sm dark:prose-invert max-w-none">
+                        <ReactMarkdown>{msg.content}</ReactMarkdown>
+                      </div>
+                    ) : (
+                      <div className="whitespace-pre-wrap text-sm">{msg.content}</div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -780,6 +787,15 @@ function StudentLabView() {
   }>>([]);
   const [isLoadingSessions, setIsLoadingSessions] = useState(true);
   const [joiningSessionId, setJoiningSessionId] = useState<string | null>(null);
+  
+  // AI Chat state for students
+  const [aiMessages, setAiMessages] = useState<Array<{
+    id: string;
+    author: string;
+    content: string;
+    created_at: string;
+  }>>([]);
+  const chatScrollRef = useRef<HTMLDivElement>(null);
 
   // Get student identifier
   const studentId = localStorage.getItem('studentIdentifier') || 
@@ -809,7 +825,7 @@ function StudentLabView() {
         .from('live_sessions')
         .select('id, session_code, title, status, created_at')
         .in('status', ['waiting', 'active', 'paused'])
-        .eq('session_type', 'lab-space')
+        .eq('lesson_id', 'lab-space')
         .order('created_at', { ascending: false });
       
       if (!error && data) {
@@ -826,7 +842,71 @@ function StudentLabView() {
     }
   }, [session]);
 
-  // Process incoming prompts
+  // Subscribe to AI conversation messages when in session
+  useEffect(() => {
+    if (!session?.id) return;
+
+    // Fetch existing messages
+    const fetchMessages = async () => {
+      const { data, error } = await supabase
+        .from('ai_conversation_messages')
+        .select('id, author, content, created_at')
+        .eq('session_id', session.id)
+        .order('created_at', { ascending: true });
+      
+      if (!error && data) {
+        setAiMessages(data);
+      }
+    };
+
+    fetchMessages();
+
+    // Subscribe to new messages
+    const channel = supabase
+      .channel(`ai-chat-${session.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'ai_conversation_messages',
+          filter: `session_id=eq.${session.id}`,
+        },
+        (payload) => {
+          const newMsg = payload.new as typeof aiMessages[0];
+          setAiMessages(prev => [...prev, newMsg]);
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'ai_conversation_messages',
+          filter: `session_id=eq.${session.id}`,
+        },
+        (payload) => {
+          const updatedMsg = payload.new as typeof aiMessages[0];
+          setAiMessages(prev => 
+            prev.map(m => m.id === updatedMsg.id ? updatedMsg : m)
+          );
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [session?.id]);
+
+  // Auto-scroll chat
+  useEffect(() => {
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+    }
+  }, [aiMessages]);
+
+  // Process incoming prompts (for tasks)
   useEffect(() => {
     if (latestPrompt) {
       try {
@@ -1006,9 +1086,9 @@ function StudentLabView() {
     );
   }
 
-  // In session - show task view
+  // In session - show AI chat and tasks
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto space-y-4">
       {/* Session Header */}
       <div className="flex items-center justify-between bg-card border rounded-lg p-4">
         <div>
@@ -1040,16 +1120,83 @@ function StudentLabView() {
         </Card>
       )}
 
-      {/* Current Task */}
-      {currentTask ? (
-        <Card>
+      {/* AI Chat - Live from teacher */}
+      <Card className="flex flex-col" style={{ height: 'calc(100vh - 380px)', minHeight: '300px' }}>
+        <CardHeader className="pb-2 flex-shrink-0">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Sparkles className="h-5 w-5 text-primary" />
+            Live AI Tutor Conversation
+          </CardTitle>
+          <CardDescription>
+            Watch the teacher's discussion with the AI Tutor in real-time
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex-1 overflow-hidden p-4 pt-0">
+          <div 
+            ref={chatScrollRef}
+            className="h-full overflow-y-auto space-y-4 pr-2"
+          >
+            {aiMessages.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
+                <Bot className="h-12 w-12 mb-4 text-primary/30" />
+                <p className="text-lg font-medium">Waiting for conversation to start</p>
+                <p className="text-sm">
+                  The teacher will begin chatting with the AI Tutor shortly.
+                </p>
+              </div>
+            ) : (
+              aiMessages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`flex ${msg.author === 'teacher' ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div
+                    className={`max-w-[85%] rounded-lg px-4 py-3 ${
+                      msg.author === 'teacher'
+                        ? 'bg-primary/10 border border-primary/20'
+                        : msg.author === 'ai'
+                        ? 'bg-muted border'
+                        : 'bg-secondary'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1 mb-1 text-xs text-muted-foreground">
+                      {msg.author === 'ai' ? (
+                        <>
+                          <Sparkles className="h-3 w-3" />
+                          AI Tutor
+                        </>
+                      ) : (
+                        <>
+                          <Users className="h-3 w-3" />
+                          Teacher
+                        </>
+                      )}
+                    </div>
+                    {msg.author === 'ai' ? (
+                      <div className="prose prose-sm dark:prose-invert max-w-none">
+                        <ReactMarkdown>{msg.content}</ReactMarkdown>
+                      </div>
+                    ) : (
+                      <div className="whitespace-pre-wrap text-sm">{msg.content}</div>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Current Task (if any) */}
+      {currentTask && (
+        <Card className="border-amber-500/50 bg-amber-500/5">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 {currentTask.type === 'writing' && <PenLine className="h-5 w-5" />}
                 {currentTask.type === 'mcq' && <CheckCircle2 className="h-5 w-5" />}
                 {currentTask.type === 'poll' && <MessageSquare className="h-5 w-5" />}
-                Task
+                Task from Teacher
               </CardTitle>
               {timeRemaining !== null && timeRemaining > 0 && (
                 <Badge variant="outline" className="text-lg">
@@ -1067,7 +1214,7 @@ function StudentLabView() {
                 value={response}
                 onChange={(e) => setResponse(e.target.value)}
                 placeholder="Type your response here..."
-                rows={5}
+                rows={4}
                 className="text-base"
               />
             ) : (
@@ -1102,16 +1249,6 @@ function StudentLabView() {
                 'Submit Response'
               )}
             </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <Radio className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="font-semibold text-lg mb-2">Waiting for Task</h3>
-            <p className="text-muted-foreground">
-              Your teacher will send a task shortly. Stay tuned!
-            </p>
           </CardContent>
         </Card>
       )}
