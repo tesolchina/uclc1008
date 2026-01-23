@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,18 +8,21 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { 
   Users, Play, Pause, StopCircle, Send, Eye, EyeOff, 
   Loader2, QrCode, Copy, CheckCircle2, Clock, 
-  MessageSquare, PenLine, Radio, Sparkles, Bot
+  MessageSquare, PenLine, Radio, Sparkles, Bot, ChevronDown, ChevronUp, X, ArrowUp, Hand
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useTeacherSession, useStudentSession } from '@/features/live-session';
 import { useAIConversation } from '@/features/ai-live-class/hooks/useAIConversation';
+import { useMessageQueue } from '@/features/ai-live-class/hooks/useMessageQueue';
 import { DEFAULT_PROMPTS } from '@/features/ai-live-class/constants';
 import ReactMarkdown from 'react-markdown';
+import { toast } from 'sonner';
 
 // Types
 interface LabTask {
@@ -89,12 +92,44 @@ function TeacherLabView() {
     messages,
     sendMessage: sendAIMessage,
     isGenerating,
+    promoteMessage,
   } = useAIConversation({
     sessionId: session?.id || '',
     systemPrompt: DEFAULT_PROMPTS.ACADEMIC_GENERAL,
     userId: user?.id,
     persistMessages: true,
   });
+
+  // Student message queue
+  const [isQueueOpen, setIsQueueOpen] = useState(true);
+  const {
+    queue,
+    pendingCount,
+    promote: promoteQueueStatus,
+    dismiss: dismissQueueMessage,
+    isLoading: isQueueLoading,
+  } = useMessageQueue({
+    sessionId: session?.id || '',
+  });
+
+  // Handler for promoting a student question
+  const handlePromoteQuestion = async (message: typeof queue[0]) => {
+    // Add to AI conversation
+    await promoteMessage({
+      id: message.id,
+      content: message.content,
+      student_name: message.student_name,
+      student_id: message.student_id,
+      status: message.status,
+      session_id: message.session_id || '',
+      submitted_at: message.submitted_at || '',
+      is_highlighted: message.is_highlighted || false,
+      reviewed_at: message.reviewed_at || null,
+      promoted_message_id: message.promoted_message_id || null,
+    });
+    // Update queue status
+    await promoteQueueStatus(message.id);
+  };
 
   // Auto-greet AI when session becomes active
   useEffect(() => {
@@ -499,108 +534,207 @@ function TeacherLabView() {
 
       {/* AI Chat Mode */}
       {labMode === 'ai-chat' && (
-        <Card className="flex flex-col" style={{ height: 'calc(100vh - 320px)', minHeight: '400px' }}>
-          <CardHeader className="pb-2 flex-shrink-0">
-            <CardTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
-              AI Tutor Conversation
-            </CardTitle>
-            <CardDescription>
-              Chat with the AI Tutor. Students in this session will see this conversation.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex-1 flex flex-col overflow-hidden p-4 pt-0">
-            {/* Chat Messages */}
-            <div 
-              ref={chatScrollRef}
-              className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2"
-            >
-              {messages.length === 0 && !isGenerating && (
-                <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
-                  <Bot className="h-12 w-12 mb-4 text-primary/30" />
-                  <p className="text-lg font-medium">Start a conversation with AI Tutor</p>
-                  <p className="text-sm">
-                    {session.status === 'active' 
-                      ? "The AI will greet you shortly, or type a message to begin." 
-                      : "Click 'Start' above to begin the session."}
-                  </p>
-                </div>
-              )}
-              
-              {messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex ${msg.author === 'teacher' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-[80%] rounded-lg px-4 py-3 ${
-                      msg.author === 'teacher'
-                        ? 'bg-primary text-primary-foreground'
-                        : msg.author === 'ai'
-                        ? 'bg-muted border'
-                        : 'bg-secondary'
-                    }`}
-                  >
-                    {msg.author === 'ai' && (
-                      <div className="flex items-center gap-1 mb-1 text-xs text-muted-foreground">
-                        <Sparkles className="h-3 w-3" />
-                        AI Tutor
-                      </div>
-                    )}
-                    {msg.author === 'ai' ? (
-                      <div className="prose prose-sm dark:prose-invert max-w-none">
-                        <ReactMarkdown>{msg.content}</ReactMarkdown>
-                      </div>
-                    ) : (
-                      <div className="whitespace-pre-wrap text-sm">{msg.content}</div>
-                    )}
+        <div className="space-y-4">
+          {/* Main Chat Area */}
+          <Card className="flex flex-col" style={{ height: 'calc(100vh - 420px)', minHeight: '300px' }}>
+            <CardHeader className="pb-2 flex-shrink-0">
+              <CardTitle className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-primary" />
+                AI Tutor Conversation
+              </CardTitle>
+              <CardDescription>
+                Chat with the AI Tutor. Students in this session will see this conversation.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex-1 flex flex-col overflow-hidden p-4 pt-0">
+              {/* Chat Messages */}
+              <div 
+                ref={chatScrollRef}
+                className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2"
+              >
+                {messages.length === 0 && !isGenerating && (
+                  <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
+                    <Bot className="h-12 w-12 mb-4 text-primary/30" />
+                    <p className="text-lg font-medium">Start a conversation with AI Tutor</p>
+                    <p className="text-sm">
+                      {session.status === 'active' 
+                        ? "The AI will greet you shortly, or type a message to begin." 
+                        : "Click 'Start' above to begin the session."}
+                    </p>
                   </div>
-                </div>
-              ))}
-              
-              {isGenerating && (
-                <div className="flex justify-start">
-                  <div className="bg-muted border rounded-lg px-4 py-3">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      AI is thinking...
+                )}
+                
+                {messages.map((msg) => (
+                  <div
+                    key={msg.id}
+                    className={`flex ${msg.author === 'teacher' ? 'justify-end' : msg.author === 'student' ? 'justify-start' : 'justify-start'}`}
+                  >
+                    <div
+                      className={`max-w-[80%] rounded-lg px-4 py-3 ${
+                        msg.author === 'teacher'
+                          ? 'bg-primary text-primary-foreground'
+                          : msg.author === 'ai'
+                          ? 'bg-muted border'
+                          : 'bg-blue-500/10 border border-blue-500/30'
+                      }`}
+                    >
+                      {msg.author === 'ai' && (
+                        <div className="flex items-center gap-1 mb-1 text-xs text-muted-foreground">
+                          <Sparkles className="h-3 w-3" />
+                          AI Tutor
+                        </div>
+                      )}
+                      {msg.author === 'student' && (
+                        <div className="flex items-center gap-1 mb-1 text-xs text-blue-600">
+                          <Hand className="h-3 w-3" />
+                          Student Question: {msg.student_name || 'Student'}
+                        </div>
+                      )}
+                      {msg.author === 'ai' ? (
+                        <div className="prose prose-sm dark:prose-invert max-w-none">
+                          <ReactMarkdown>{msg.content}</ReactMarkdown>
+                        </div>
+                      ) : (
+                        <div className="whitespace-pre-wrap text-sm">{msg.content}</div>
+                      )}
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
-            
-            {/* Chat Input */}
-            <div className="flex gap-2 flex-shrink-0">
-              <Textarea
-                value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
-                placeholder="Type your message to AI Tutor..."
-                className="resize-none"
-                rows={2}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSendChatMessage();
-                  }
-                }}
-                disabled={session.status !== 'active'}
-              />
-              <Button 
-                onClick={handleSendChatMessage}
-                disabled={!chatInput.trim() || isGenerating || session.status !== 'active'}
-                size="icon"
-                className="h-auto"
-              >
-                {isGenerating ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Send className="h-4 w-4" />
+                ))}
+                
+                {isGenerating && (
+                  <div className="flex justify-start">
+                    <div className="bg-muted border rounded-lg px-4 py-3">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        AI is thinking...
+                      </div>
+                    </div>
+                  </div>
                 )}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+              </div>
+              
+              {/* Chat Input */}
+              <div className="flex gap-2 flex-shrink-0">
+                <Textarea
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  placeholder="Type your message to AI Tutor..."
+                  className="resize-none"
+                  rows={2}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendChatMessage();
+                    }
+                  }}
+                  disabled={session.status !== 'active'}
+                />
+                <Button 
+                  onClick={handleSendChatMessage}
+                  disabled={!chatInput.trim() || isGenerating || session.status !== 'active'}
+                  size="icon"
+                  className="h-auto"
+                >
+                  {isGenerating ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Student Questions Queue */}
+          <Collapsible open={isQueueOpen} onOpenChange={setIsQueueOpen}>
+            <Card className="border-blue-500/30 bg-blue-500/5">
+              <CollapsibleTrigger asChild>
+                <CardHeader className="pb-2 cursor-pointer hover:bg-muted/30 transition-colors">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <Hand className="h-5 w-5 text-blue-500" />
+                      Student Questions
+                      {pendingCount > 0 && (
+                        <Badge variant="default" className="bg-blue-500 text-white">
+                          {pendingCount} pending
+                        </Badge>
+                      )}
+                    </CardTitle>
+                    {isQueueOpen ? (
+                      <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                    ) : (
+                      <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                    )}
+                  </div>
+                  <CardDescription>
+                    Review and promote student questions to the AI conversation
+                  </CardDescription>
+                </CardHeader>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <CardContent className="pt-0">
+                  {isQueueLoading ? (
+                    <div className="flex items-center justify-center py-4">
+                      <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                    </div>
+                  ) : queue.filter(m => m.status === 'pending').length === 0 ? (
+                    <div className="text-center py-6 text-muted-foreground">
+                      <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p className="text-sm">No pending questions from students</p>
+                      <p className="text-xs mt-1">Students can submit questions that appear here for review</p>
+                    </div>
+                  ) : (
+                    <ScrollArea className="h-[200px]">
+                      <div className="space-y-2">
+                        {queue
+                          .filter(m => m.status === 'pending')
+                          .map((msg) => (
+                            <div
+                              key={msg.id}
+                              className={`flex items-start gap-3 p-3 rounded-lg border bg-card ${
+                                msg.is_highlighted ? 'border-amber-500 bg-amber-500/5' : ''
+                              }`}
+                            >
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-blue-600">
+                                  {msg.student_name}
+                                </p>
+                                <p className="text-sm mt-1 text-foreground">
+                                  {msg.content}
+                                </p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {msg.submitted_at && new Date(msg.submitted_at).toLocaleTimeString()}
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-1 flex-shrink-0">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => dismissQueueMessage(msg.id)}
+                                  className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="default"
+                                  size="sm"
+                                  onClick={() => handlePromoteQuestion(msg)}
+                                  className="h-8 gap-1 bg-blue-500 hover:bg-blue-600"
+                                >
+                                  <ArrowUp className="h-3 w-3" />
+                                  Ask AI
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    </ScrollArea>
+                  )}
+                </CardContent>
+              </CollapsibleContent>
+            </Card>
+          </Collapsible>
+        </div>
       )}
 
       {/* Tasks Mode */}
@@ -797,8 +931,19 @@ function StudentLabView() {
     author: string;
     content: string;
     created_at: string;
+    student_name?: string | null;
   }>>([]);
   const chatScrollRef = useRef<HTMLDivElement>(null);
+
+  // Student question submission
+  const [questionInput, setQuestionInput] = useState('');
+  const [isSubmittingQuestion, setIsSubmittingQuestion] = useState(false);
+  const [myQuestions, setMyQuestions] = useState<Array<{
+    id: string;
+    content: string;
+    status: string;
+    submitted_at: string;
+  }>>([]);
 
   // Get student identifier
   const studentId = localStorage.getItem('studentIdentifier') || 
@@ -853,7 +998,7 @@ function StudentLabView() {
     const fetchMessages = async () => {
       const { data, error } = await supabase
         .from('ai_conversation_messages')
-        .select('id, author, content, created_at')
+        .select('id, author, content, created_at, student_name')
         .eq('session_id', session.id)
         .order('created_at', { ascending: true });
       
@@ -901,6 +1046,90 @@ function StudentLabView() {
       supabase.removeChannel(channel);
     };
   }, [session?.id]);
+
+  // Subscribe to my own questions
+  useEffect(() => {
+    if (!session?.id) return;
+
+    // Fetch my existing questions
+    const fetchMyQuestions = async () => {
+      const { data, error } = await supabase
+        .from('ai_message_queue')
+        .select('id, content, status, submitted_at')
+        .eq('session_id', session.id)
+        .eq('student_id', studentId)
+        .order('submitted_at', { ascending: false });
+      
+      if (!error && data) {
+        setMyQuestions(data);
+      }
+    };
+
+    fetchMyQuestions();
+
+    // Subscribe to updates on my questions
+    const channel = supabase
+      .channel(`my-questions-${session.id}-${studentId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'ai_message_queue',
+          filter: `session_id=eq.${session.id}`,
+        },
+        (payload) => {
+          const msg = payload.new as typeof myQuestions[0] & { student_id: string };
+          if (msg.student_id === studentId) {
+            if (payload.eventType === 'INSERT') {
+              setMyQuestions(prev => [msg, ...prev]);
+            } else if (payload.eventType === 'UPDATE') {
+              setMyQuestions(prev => prev.map(q => q.id === msg.id ? msg : q));
+            }
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [session?.id, studentId]);
+
+  // Submit question handler
+  const handleSubmitQuestion = useCallback(async () => {
+    if (!session?.id || !questionInput.trim()) return;
+
+    setIsSubmittingQuestion(true);
+    try {
+      const studentName = displayName || participant?.display_name || 'Student';
+      
+      const { error } = await supabase
+        .from('ai_message_queue')
+        .insert({
+          session_id: session.id,
+          student_id: studentId,
+          student_name: studentName,
+          content: questionInput.trim(),
+          status: 'pending',
+          submitted_at: new Date().toISOString(),
+        });
+
+      if (error) {
+        console.error('Error submitting question:', error);
+        toast({ title: 'Failed to submit question', variant: 'destructive' });
+        return;
+      }
+
+      toast({ title: 'Question submitted!', description: 'Your teacher will review it.' });
+      setQuestionInput('');
+    } catch (err) {
+      console.error('Error:', err);
+      toast({ title: 'Failed to submit question', variant: 'destructive' });
+    } finally {
+      setIsSubmittingQuestion(false);
+    }
+  }, [session?.id, questionInput, studentId, displayName, participant?.display_name, toast]);
 
   // Auto-scroll chat
   useEffect(() => {
@@ -1132,7 +1361,7 @@ function StudentLabView() {
       )}
 
       {/* AI Chat - Live from teacher */}
-      <Card className="flex flex-col" style={{ height: 'calc(100vh - 380px)', minHeight: '300px' }}>
+      <Card className="flex flex-col" style={{ height: 'calc(100vh - 480px)', minHeight: '250px' }}>
         <CardHeader className="pb-2 flex-shrink-0">
           <CardTitle className="flex items-center gap-2 text-base">
             <Sparkles className="h-5 w-5 text-primary" />
@@ -1159,7 +1388,7 @@ function StudentLabView() {
               aiMessages.map((msg) => (
                 <div
                   key={msg.id}
-                  className={`flex ${msg.author === 'teacher' ? 'justify-end' : 'justify-start'}`}
+                  className={`flex ${msg.author === 'teacher' ? 'justify-end' : msg.author === 'student' ? 'justify-start' : 'justify-start'}`}
                 >
                   <div
                     className={`max-w-[85%] rounded-lg px-4 py-3 ${
@@ -1167,7 +1396,7 @@ function StudentLabView() {
                         ? 'bg-primary/10 border border-primary/20'
                         : msg.author === 'ai'
                         ? 'bg-muted border'
-                        : 'bg-secondary'
+                        : 'bg-blue-500/10 border border-blue-500/30'
                     }`}
                   >
                     <div className="flex items-center gap-1 mb-1 text-xs text-muted-foreground">
@@ -1176,6 +1405,11 @@ function StudentLabView() {
                           <Sparkles className="h-3 w-3" />
                           AI Tutor
                         </>
+                      ) : msg.author === 'student' ? (
+                        <span className="text-blue-600">
+                          <Hand className="h-3 w-3 inline mr-1" />
+                          Student Question: {msg.student_name || 'Student'}
+                        </span>
                       ) : (
                         <>
                           <Users className="h-3 w-3" />
@@ -1195,6 +1429,64 @@ function StudentLabView() {
               ))
             )}
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Question Submission */}
+      <Card className="border-blue-500/30">
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Hand className="h-5 w-5 text-blue-500" />
+            Ask a Question
+          </CardTitle>
+          <CardDescription>
+            Submit a question for the teacher to share with the AI Tutor
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex gap-2">
+            <Input
+              value={questionInput}
+              onChange={(e) => setQuestionInput(e.target.value)}
+              placeholder="Type your question here..."
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSubmitQuestion();
+                }
+              }}
+              disabled={session.status !== 'active' || isSubmittingQuestion}
+            />
+            <Button
+              onClick={handleSubmitQuestion}
+              disabled={!questionInput.trim() || session.status !== 'active' || isSubmittingQuestion}
+              className="bg-blue-500 hover:bg-blue-600"
+            >
+              {isSubmittingQuestion ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+          
+          {/* My submitted questions */}
+          {myQuestions.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground font-medium">Your Questions:</p>
+              {myQuestions.slice(0, 3).map((q) => (
+                <div key={q.id} className="flex items-center gap-2 text-sm p-2 rounded bg-muted/50">
+                  <Badge 
+                    variant={q.status === 'promoted' ? 'default' : q.status === 'dismissed' ? 'secondary' : 'outline'}
+                    className={q.status === 'promoted' ? 'bg-green-500' : q.status === 'dismissed' ? 'bg-muted' : ''}
+                  >
+                    {q.status === 'promoted' ? '✓ Asked' : q.status === 'dismissed' ? 'Skipped' : 'Pending'}
+                  </Badge>
+                  <span className="truncate flex-1">{q.content}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
