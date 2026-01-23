@@ -30,5 +30,9 @@ export type { StudentAIClassViewProps } from './StudentAIClassView';
 
 // Task Components
 export { ChatTaskDisplay } from './ChatTaskDisplay';
-export { TaskGenerationPanel } from './TaskGenerationPanel';
+export { TaskBankSelector } from './TaskBankSelector';
 export { TaskLibrarySelector } from './TaskLibrarySelector';
+
+// Reading Passage Module
+export { ReadingPassageModule, StudentReadingPassage } from './ReadingPassageModule';
+export type { ReadingPassageModuleProps, StudentReadingPassageProps } from './ReadingPassageModule';

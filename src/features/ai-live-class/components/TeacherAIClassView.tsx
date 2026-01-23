@@ -33,6 +33,7 @@ import {
   Copy,
   FileText,
   Plus,
+  BookOpen,
 } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -52,14 +53,16 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 import { useTeacherAISession } from '../hooks/useTeacherAISession';
 import { useAIConversation } from '../hooks/useAIConversation';
 import { useMessageQueue } from '../hooks/useMessageQueue';
 import { formatSessionCodeForDisplay } from '../utils/sessionCode';
 import { parseTasksFromMessage, TASK_GENERATION_INSTRUCTION } from '../utils/taskParser';
 import { STATUS_DISPLAY, DEFAULT_PROMPTS } from '../constants';
-import { TaskGenerationPanel } from './TaskGenerationPanel';
+import { TaskBankSelector } from './TaskBankSelector';
 import { ChatTaskDisplay } from './ChatTaskDisplay';
+import { ReadingPassageModule } from './ReadingPassageModule';
 import type { AILiveSession, ConversationMessage, QueuedMessage } from '../types';
 import type { TaskLibraryItem, GeneratedTask } from '../types/tasks';
 
@@ -107,6 +110,8 @@ export function TeacherAIClassView({
   const [isQueueExpanded, setIsQueueExpanded] = useState(false);
   const [showMaterialDialog, setShowMaterialDialog] = useState(false);
   const [materialContent, setMaterialContent] = useState('');
+  const [readingPassage, setReadingPassage] = useState('');
+  const [showReadingPassage, setShowReadingPassage] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const hasGreeted = useRef(false);
   
@@ -209,11 +214,6 @@ export function TeacherAIClassView({
     onSessionEnd?.();
   };
   
-  // Handle task generation request from panel
-  const handleRequestTask = async (prompt: string) => {
-    await sendMessage(prompt, 'teacher');
-  };
-  
   // Handle library task selection - inject into conversation
   const handleSelectLibraryTask = async (task: TaskLibraryItem) => {
     const prompt = `Please create a task for the students based on this:\n\nTitle: ${task.title}\n\nPrompt: ${task.prompt}${task.context ? `\n\nContext: ${task.context}` : ''}${task.wordLimit ? `\n\nWord limit: ${task.wordLimit} words` : ''}`;
@@ -233,6 +233,47 @@ export function TeacherAIClassView({
     setShowMaterialDialog(false);
     toast.success('Material shared with AI Tutor');
   }, [materialContent, sendMessage]);
+  
+  // Handle showing reading passage to students (syncs via session description)
+  const handleShowReadingPassage = useCallback(async () => {
+    if (!materialContent.trim()) return;
+    
+    const passage = materialContent.trim();
+    setReadingPassage(passage);
+    setShowReadingPassage(true);
+    setMaterialContent('');
+    setShowMaterialDialog(false);
+    
+    // Sync to database so students see it
+    try {
+      await supabase
+        .from('ai_live_sessions')
+        .update({ description: passage })
+        .eq('id', session.id);
+    } catch (err) {
+      console.error('Failed to sync reading passage:', err);
+    }
+    
+    toast.success('Reading passage now visible to students');
+  }, [materialContent, session.id]);
+  
+  // Handle hiding reading passage
+  const handleHideReadingPassage = useCallback(async () => {
+    setShowReadingPassage(false);
+    setReadingPassage('');
+    
+    // Clear from database
+    try {
+      await supabase
+        .from('ai_live_sessions')
+        .update({ description: null })
+        .eq('id', session.id);
+    } catch (err) {
+      console.error('Failed to clear reading passage:', err);
+    }
+    
+    toast.info('Reading passage hidden from students');
+  }, [session.id]);
   
   // ---------------------------------------------------------------------------
   // COMPUTED
@@ -305,7 +346,7 @@ export function TeacherAIClassView({
                 <DialogHeader>
                   <DialogTitle>Import Material</DialogTitle>
                   <DialogDescription>
-                    Paste lecture notes, article excerpts, or other content to share with the AI Tutor.
+                    Paste lecture notes, article excerpts, or reading passages for the session.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
@@ -320,13 +361,26 @@ export function TeacherAIClassView({
                       className="font-mono text-sm"
                     />
                   </div>
-                  <Button 
-                    onClick={handleImportMaterial}
-                    disabled={!materialContent.trim() || isGenerating}
-                    className="w-full"
-                  >
-                    <Plus className="h-4 w-4 mr-2" /> Share with AI Tutor
-                  </Button>
+                  
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button 
+                      onClick={handleImportMaterial}
+                      disabled={!materialContent.trim() || isGenerating}
+                      variant="outline"
+                    >
+                      <Sparkles className="h-4 w-4 mr-2" /> Share with AI
+                    </Button>
+                    <Button 
+                      onClick={handleShowReadingPassage}
+                      disabled={!materialContent.trim()}
+                    >
+                      <BookOpen className="h-4 w-4 mr-2" /> Show to Students
+                    </Button>
+                  </div>
+                  
+                  <p className="text-xs text-muted-foreground text-center">
+                    "Share with AI" adds context for the AI Tutor. "Show to Students" displays a reading passage module.
+                  </p>
                 </div>
               </DialogContent>
             </Dialog>
@@ -354,7 +408,16 @@ export function TeacherAIClassView({
       </div>
       
       {/* ===== MAIN STAGE: AI Conversation ===== */}
-      <div className="flex-1 flex flex-col min-h-0 p-4">
+      <div className="flex-1 flex flex-col min-h-0 p-4 gap-4">
+        {/* Reading Passage Module (Teacher View) */}
+        <ReadingPassageModule
+          content={readingPassage}
+          title="Reading Passage"
+          isVisible={showReadingPassage}
+          onClose={handleHideReadingPassage}
+          isTeacher={true}
+        />
+        
         <Card className="flex-1 flex flex-col min-h-0">
           <CardHeader className="flex-shrink-0 pb-2">
             <div className="flex items-center justify-between">
@@ -366,12 +429,10 @@ export function TeacherAIClassView({
                 </Badge>
               </CardTitle>
               
-              {/* Task Generation Button */}
-              <TaskGenerationPanel
-                onRequestTask={handleRequestTask}
-                onSelectLibraryTask={handleSelectLibraryTask}
-                isGenerating={isGenerating}
-                currentTopic={session.topic || undefined}
+              {/* Task Bank Button */}
+              <TaskBankSelector
+                onSelectTask={handleSelectLibraryTask}
+                disabled={isGenerating}
               />
             </div>
           </CardHeader>
