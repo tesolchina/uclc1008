@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,12 +11,14 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   Users, Play, Pause, StopCircle, Send, Eye, EyeOff, 
   Loader2, QrCode, Copy, CheckCircle2, Clock, 
-  MessageSquare, PenLine, Radio, Sparkles
+  MessageSquare, PenLine, Radio, Sparkles, Bot
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useTeacherSession, useStudentSession } from '@/features/live-session';
+import { useAIConversation } from '@/features/ai-live-class/hooks/useAIConversation';
+import { DEFAULT_PROMPTS } from '@/features/ai-live-class/constants';
 
 // Types
 interface LabTask {
@@ -47,6 +49,14 @@ function TeacherLabView() {
   const [spotlight, setSpotlight] = useState<SpotlightResponse | null>(null);
   const [showQRDialog, setShowQRDialog] = useState(false);
   
+  // Lab mode: 'tasks' for sending tasks, 'ai-chat' for AI Tutor conversation
+  const [labMode, setLabMode] = useState<'tasks' | 'ai-chat'>('ai-chat');
+  
+  // AI Chat state
+  const [chatInput, setChatInput] = useState('');
+  const chatScrollRef = useRef<HTMLDivElement>(null);
+  const hasGreeted = useRef(false);
+  
   // Previous sessions state
   const [previousSessions, setPreviousSessions] = useState<Array<{
     id: string;
@@ -72,7 +82,42 @@ function TeacherLabView() {
     refreshResponses,
   } = useTeacherSession('lab-space');
 
-  // Fetch previous/existing sessions for this teacher
+  // AI Conversation hook for AI Tutor chat
+  const {
+    messages,
+    sendMessage: sendAIMessage,
+    isGenerating,
+  } = useAIConversation({
+    sessionId: session?.id || '',
+    systemPrompt: DEFAULT_PROMPTS.ACADEMIC_GENERAL,
+    userId: user?.id,
+    persistMessages: true,
+  });
+
+  // Auto-greet AI when session becomes active
+  useEffect(() => {
+    if (session?.status === 'active' && messages.length === 0 && !isGenerating && !hasGreeted.current && labMode === 'ai-chat') {
+      hasGreeted.current = true;
+      const greetingMessage = session.title 
+        ? `Hi! Let's start our session on "${session.title}". I'm ready to assist with today's discussion.`
+        : `Hi! Let's start our live session. I'm ready to help with any questions.`;
+      sendAIMessage(greetingMessage, 'teacher');
+    }
+  }, [session?.status, session?.title, messages.length, isGenerating, labMode, sendAIMessage]);
+
+  // Auto-scroll chat to bottom
+  useEffect(() => {
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  // Handle sending chat message
+  const handleSendChatMessage = () => {
+    if (!chatInput.trim() || isGenerating) return;
+    sendAIMessage(chatInput.trim(), 'teacher');
+    setChatInput('');
+  };
   useEffect(() => {
     const fetchPreviousSessions = async () => {
       if (!user) return;
@@ -428,139 +473,264 @@ function TeacherLabView() {
         </Card>
       )}
 
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Task Creator */}
-        <Card>
-          <CardHeader>
+      {/* Mode Toggle */}
+      <div className="flex items-center gap-2 bg-muted/50 p-1 rounded-lg w-fit">
+        <Button
+          variant={labMode === 'ai-chat' ? 'default' : 'ghost'}
+          size="sm"
+          onClick={() => setLabMode('ai-chat')}
+          className="gap-2"
+        >
+          <Bot className="h-4 w-4" />
+          AI Tutor Chat
+        </Button>
+        <Button
+          variant={labMode === 'tasks' ? 'default' : 'ghost'}
+          size="sm"
+          onClick={() => setLabMode('tasks')}
+          className="gap-2"
+        >
+          <Send className="h-4 w-4" />
+          Send Tasks
+        </Button>
+      </div>
+
+      {/* AI Chat Mode */}
+      {labMode === 'ai-chat' && (
+        <Card className="flex flex-col" style={{ height: 'calc(100vh - 320px)', minHeight: '400px' }}>
+          <CardHeader className="pb-2 flex-shrink-0">
             <CardTitle className="flex items-center gap-2">
-              <Send className="h-5 w-5" />
-              Send Task
+              <Sparkles className="h-5 w-5 text-primary" />
+              AI Tutor Conversation
             </CardTitle>
+            <CardDescription>
+              Chat with the AI Tutor. Students in this session will see this conversation.
+            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <Tabs value={taskType} onValueChange={(v) => setTaskType(v as typeof taskType)}>
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="writing">
-                  <PenLine className="h-4 w-4 mr-1" /> Writing
-                </TabsTrigger>
-                <TabsTrigger value="mcq">
-                  <CheckCircle2 className="h-4 w-4 mr-1" /> MCQ
-                </TabsTrigger>
-                <TabsTrigger value="poll">
-                  <MessageSquare className="h-4 w-4 mr-1" /> Poll
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Task Prompt</label>
-              <Textarea
-                value={taskPrompt}
-                onChange={(e) => setTaskPrompt(e.target.value)}
-                placeholder={
-                  taskType === 'writing' 
-                    ? "Paraphrase the following sentence: ..." 
-                    : taskType === 'mcq'
-                    ? "Which of the following is correct?"
-                    : "What do you think about...?"
-                }
-                rows={3}
-              />
-            </div>
-
-            {(taskType === 'mcq' || taskType === 'poll') && (
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Options</label>
-                {taskOptions.map((opt, i) => (
-                  <Input
-                    key={i}
-                    value={opt}
-                    onChange={(e) => {
-                      const newOptions = [...taskOptions];
-                      newOptions[i] = e.target.value;
-                      setTaskOptions(newOptions);
-                    }}
-                    placeholder={`Option ${String.fromCharCode(65 + i)}`}
-                  />
-                ))}
-              </div>
-            )}
-
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="number"
-                  value={timeLimit}
-                  onChange={(e) => setTimeLimit(parseInt(e.target.value) || 300)}
-                  className="w-20"
-                />
-                <span className="text-sm text-muted-foreground">seconds</span>
-              </div>
-              <Button onClick={handleSendTask} className="ml-auto">
-                <Send className="h-4 w-4 mr-2" /> Send Task
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Response Dashboard */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Responses ({currentResponses.length}/{onlineParticipants.length})
-              </CardTitle>
-              <Button variant="ghost" size="sm" onClick={refreshResponses}>
-                Refresh
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-[300px]">
-              {currentResponses.length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">
-                  No responses yet. Send a task to get started.
-                </p>
-              ) : (
-                <div className="space-y-3">
-                  {currentResponses.map((response) => {
-                    const participant = participants.find(p => p.id === response.participant_id);
-                    const responseData = response.response as { text?: string; answer?: string };
-                    const displayText = responseData.text || responseData.answer || JSON.stringify(responseData);
-                    
-                    return (
-                      <div 
-                        key={response.id}
-                        className="p-3 border rounded-lg hover:bg-muted/50 cursor-pointer group"
-                        onClick={() => handleSpotlight(response.participant_id)}
-                      >
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-medium text-sm">
-                            {participant?.display_name || `Student ${participants.indexOf(participant!) + 1}`}
-                          </span>
-                          <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100">
-                            <Eye className="h-3 w-3 mr-1" /> Spotlight
-                          </Button>
-                        </div>
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {displayText}
-                        </p>
-                      </div>
-                    );
-                  })}
+          <CardContent className="flex-1 flex flex-col overflow-hidden p-4 pt-0">
+            {/* Chat Messages */}
+            <div 
+              ref={chatScrollRef}
+              className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2"
+            >
+              {messages.length === 0 && !isGenerating && (
+                <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
+                  <Bot className="h-12 w-12 mb-4 text-primary/30" />
+                  <p className="text-lg font-medium">Start a conversation with AI Tutor</p>
+                  <p className="text-sm">
+                    {session.status === 'active' 
+                      ? "The AI will greet you shortly, or type a message to begin." 
+                      : "Click 'Start' above to begin the session."}
+                  </p>
                 </div>
               )}
-            </ScrollArea>
+              
+              {messages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`flex ${msg.author === 'teacher' ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div
+                    className={`max-w-[80%] rounded-lg px-4 py-3 ${
+                      msg.author === 'teacher'
+                        ? 'bg-primary text-primary-foreground'
+                        : msg.author === 'ai'
+                        ? 'bg-muted border'
+                        : 'bg-secondary'
+                    }`}
+                  >
+                    {msg.author === 'ai' && (
+                      <div className="flex items-center gap-1 mb-1 text-xs text-muted-foreground">
+                        <Sparkles className="h-3 w-3" />
+                        AI Tutor
+                      </div>
+                    )}
+                    <div className="whitespace-pre-wrap text-sm">{msg.content}</div>
+                  </div>
+                </div>
+              ))}
+              
+              {isGenerating && (
+                <div className="flex justify-start">
+                  <div className="bg-muted border rounded-lg px-4 py-3">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      AI is thinking...
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {/* Chat Input */}
+            <div className="flex gap-2 flex-shrink-0">
+              <Textarea
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                placeholder="Type your message to AI Tutor..."
+                className="resize-none"
+                rows={2}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendChatMessage();
+                  }
+                }}
+                disabled={session.status !== 'active'}
+              />
+              <Button 
+                onClick={handleSendChatMessage}
+                disabled={!chatInput.trim() || isGenerating || session.status !== 'active'}
+                size="icon"
+                className="h-auto"
+              >
+                {isGenerating ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
           </CardContent>
         </Card>
-      </div>
+      )}
+
+      {/* Tasks Mode */}
+      {labMode === 'tasks' && (
+        <div className="grid lg:grid-cols-2 gap-6">
+          {/* Task Creator */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Send className="h-5 w-5" />
+                Send Task
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Tabs value={taskType} onValueChange={(v) => setTaskType(v as typeof taskType)}>
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="writing">
+                    <PenLine className="h-4 w-4 mr-1" /> Writing
+                  </TabsTrigger>
+                  <TabsTrigger value="mcq">
+                    <CheckCircle2 className="h-4 w-4 mr-1" /> MCQ
+                  </TabsTrigger>
+                  <TabsTrigger value="poll">
+                    <MessageSquare className="h-4 w-4 mr-1" /> Poll
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Task Prompt</label>
+                <Textarea
+                  value={taskPrompt}
+                  onChange={(e) => setTaskPrompt(e.target.value)}
+                  placeholder={
+                    taskType === 'writing' 
+                      ? "Paraphrase the following sentence: ..." 
+                      : taskType === 'mcq'
+                      ? "Which of the following is correct?"
+                      : "What do you think about...?"
+                  }
+                  rows={3}
+                />
+              </div>
+
+              {(taskType === 'mcq' || taskType === 'poll') && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Options</label>
+                  {taskOptions.map((opt, i) => (
+                    <Input
+                      key={i}
+                      value={opt}
+                      onChange={(e) => {
+                        const newOptions = [...taskOptions];
+                        newOptions[i] = e.target.value;
+                        setTaskOptions(newOptions);
+                      }}
+                      placeholder={`Option ${String.fromCharCode(65 + i)}`}
+                    />
+                  ))}
+                </div>
+              )}
+
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="number"
+                    value={timeLimit}
+                    onChange={(e) => setTimeLimit(parseInt(e.target.value) || 300)}
+                    className="w-20"
+                  />
+                  <span className="text-sm text-muted-foreground">seconds</span>
+                </div>
+                <Button onClick={handleSendTask} className="ml-auto">
+                  <Send className="h-4 w-4 mr-2" /> Send Task
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Response Dashboard */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  Responses ({currentResponses.length}/{onlineParticipants.length})
+                </CardTitle>
+                <Button variant="ghost" size="sm" onClick={refreshResponses}>
+                  Refresh
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-[300px]">
+                {currentResponses.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">
+                    No responses yet. Send a task to get started.
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {currentResponses.map((response) => {
+                      const participant = participants.find(p => p.id === response.participant_id);
+                      const responseData = response.response as { text?: string; answer?: string };
+                      const displayText = responseData.text || responseData.answer || JSON.stringify(responseData);
+                      
+                      return (
+                        <div 
+                          key={response.id}
+                          className="p-3 border rounded-lg hover:bg-muted/50 cursor-pointer group"
+                          onClick={() => handleSpotlight(response.participant_id)}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="font-medium text-sm">
+                              {participant?.display_name || `Student ${participants.indexOf(participant!) + 1}`}
+                            </span>
+                            <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100">
+                              <Eye className="h-3 w-3 mr-1" /> Spotlight
+                            </Button>
+                          </div>
+                          <p className="text-sm text-muted-foreground line-clamp-2">
+                            {displayText}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Participants Grid */}
       <Card>
         <CardHeader>
-          <CardTitle>Participants</CardTitle>
+          <CardTitle>Participants ({onlineParticipants.length} online)</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
