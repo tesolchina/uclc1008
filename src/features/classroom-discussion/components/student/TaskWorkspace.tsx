@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
+import ReactMarkdown from 'react-markdown';
 import type { Hour3Task, StudentTaskProgress } from '@/features/classroom-discussion/types';
 
 interface TaskWorkspaceProps {
@@ -226,9 +227,9 @@ export function TaskWorkspace({
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ScrollArea className="max-h-[200px]">
-                    <div className="prose prose-sm max-w-none">
-                      {aiFeedback}
+                  <ScrollArea className="max-h-[300px]">
+                    <div className="prose prose-sm max-w-none dark:prose-invert">
+                      <ReactMarkdown>{aiFeedback}</ReactMarkdown>
                     </div>
                   </ScrollArea>
                 </CardContent>
