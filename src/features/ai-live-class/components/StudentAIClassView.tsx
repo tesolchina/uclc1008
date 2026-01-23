@@ -27,7 +27,8 @@ import {
   Clock,
   CheckCircle,
   XCircle,
-  Loader2
+  Loader2,
+  BookOpen
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -39,6 +40,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useStudentAISession } from '../hooks/useStudentAISession';
 import { STATUS_DISPLAY, QUEUE_CONFIG } from '../constants';
+import { StudentReadingPassage } from './ReadingPassageModule';
 import type { AILiveSession, ConversationMessage, QueuedMessage } from '../types';
 
 // =============================================================================
@@ -210,7 +212,14 @@ export function StudentAIClassView({
       )}
       
       {/* ===== MAIN AREA: Conversation (Read-Only) ===== */}
-      <div className="flex-1 flex flex-col min-h-0 p-4">
+      <div className="flex-1 flex flex-col min-h-0 p-4 gap-4">
+        {/* Reading Passage (if teacher shared one) */}
+        {session.description && (
+          <StudentReadingPassage
+            content={session.description}
+            title="Reading Passage"
+          />
+        )}
         <Card className="flex-1 flex flex-col min-h-0">
           <CardHeader className="flex-shrink-0 pb-2">
             <CardTitle className="flex items-center gap-2 text-base">
