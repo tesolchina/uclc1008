@@ -37,6 +37,7 @@ interface SpotlightResponse {
 // ============ TEACHER VIEW ============
 function TeacherLabView() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [sessionTitle, setSessionTitle] = useState('Lab Session');
   const [taskType, setTaskType] = useState<'writing' | 'mcq' | 'poll'>('writing');
   const [taskPrompt, setTaskPrompt] = useState('');
@@ -45,6 +46,17 @@ function TeacherLabView() {
   const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
   const [spotlight, setSpotlight] = useState<SpotlightResponse | null>(null);
   const [showQRDialog, setShowQRDialog] = useState(false);
+  
+  // Previous sessions state
+  const [previousSessions, setPreviousSessions] = useState<Array<{
+    id: string;
+    session_code: string;
+    title: string | null;
+    status: string;
+    created_at: string;
+    started_at: string | null;
+  }>>([]);
+  const [isLoadingPrevious, setIsLoadingPrevious] = useState(true);
 
   const {
     session,
@@ -59,6 +71,64 @@ function TeacherLabView() {
     sendPrompt,
     refreshResponses,
   } = useTeacherSession('lab-space');
+
+  // Fetch previous/existing sessions for this teacher
+  useEffect(() => {
+    const fetchPreviousSessions = async () => {
+      if (!user) return;
+      
+      setIsLoadingPrevious(true);
+      try {
+        const { data, error } = await supabase
+          .from('live_sessions')
+          .select('id, session_code, title, status, created_at, started_at')
+          .eq('teacher_id', user.id)
+          .eq('lesson_id', 'lab-space')
+          .order('created_at', { ascending: false })
+          .limit(10);
+        
+        if (error) throw error;
+        setPreviousSessions(data || []);
+      } catch (error) {
+        console.error('Error fetching previous sessions:', error);
+      } finally {
+        setIsLoadingPrevious(false);
+      }
+    };
+
+    fetchPreviousSessions();
+  }, [user]);
+
+  // Function to rejoin an existing session
+  const handleRejoinSession = async (sessionId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('live_sessions')
+        .select('*')
+        .eq('id', sessionId)
+        .single();
+
+      if (error) throw error;
+      
+      // The useTeacherSession hook will pick this up via realtime
+      // We need to save to localStorage so the hook can reconnect
+      if (data) {
+        localStorage.setItem('live_session_state', JSON.stringify({
+          sessionId: data.id,
+          sessionCode: data.session_code,
+          lessonId: 'lab-space',
+          role: 'teacher',
+          joinedAt: new Date().toISOString(),
+        }));
+        
+        // Reload the page to trigger reconnection
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error('Error rejoining session:', error);
+      toast({ title: 'Error', description: 'Failed to rejoin session', variant: 'destructive' });
+    }
+  };
 
   const onlineParticipants = participants.filter(p => p.is_online);
   
@@ -144,10 +214,55 @@ function TeacherLabView() {
     );
   }
 
-  // No session yet - show create screen
+  // Filter sessions: active ones and recent ended ones
+  const activeSessions = previousSessions.filter(s => s.status !== 'ended');
+  const recentSessions = previousSessions.filter(s => s.status === 'ended').slice(0, 5);
+
+  // No session yet - show create screen with previous sessions
   if (!session) {
     return (
-      <div className="max-w-xl mx-auto py-12 space-y-6">
+      <div className="max-w-2xl mx-auto py-12 space-y-6">
+        {/* Active Sessions */}
+        {activeSessions.length > 0 && (
+          <Card className="border-primary/30 bg-primary/5">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Radio className="h-5 w-5 text-primary animate-pulse" />
+                Active Sessions
+              </CardTitle>
+              <CardDescription>
+                You have sessions still in progress
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {activeSessions.map((s) => (
+                <div 
+                  key={s.id}
+                  className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <Badge variant={s.status === 'active' ? 'default' : s.status === 'paused' ? 'secondary' : 'outline'}>
+                      {s.status}
+                    </Badge>
+                    <div>
+                      <p className="font-medium">{s.title || 'Lab Session'}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Code: <span className="font-mono">{s.session_code}</span>
+                        {' · '}
+                        {new Date(s.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                  <Button onClick={() => handleRejoinSession(s.id)}>
+                    <Play className="h-4 w-4 mr-2" /> Rejoin
+                  </Button>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Create New Session */}
         <Card>
           <CardHeader className="text-center">
             <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4">
@@ -176,11 +291,49 @@ function TeacherLabView() {
               {isLoading ? (
                 <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Creating...</>
               ) : (
-                <>Create Session</>
+                <>Create New Session</>
               )}
             </Button>
           </CardContent>
         </Card>
+
+        {/* Recent Past Sessions */}
+        {recentSessions.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Recent Sessions</CardTitle>
+              <CardDescription>Your past lab sessions</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {recentSessions.map((s) => (
+                  <div 
+                    key={s.id}
+                    className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 transition-colors"
+                  >
+                    <div>
+                      <p className="font-medium text-sm">{s.title || 'Lab Session'}</p>
+                      <p className="text-xs text-muted-foreground">
+                        <span className="font-mono">{s.session_code}</span>
+                        {' · '}
+                        {new Date(s.created_at).toLocaleDateString()}
+                        {s.started_at && ` · Started ${new Date(s.started_at).toLocaleTimeString()}`}
+                      </p>
+                    </div>
+                    <Badge variant="outline">Ended</Badge>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Loading state */}
+        {isLoadingPrevious && (
+          <div className="flex items-center justify-center py-4">
+            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+          </div>
+        )}
       </div>
     );
   }
