@@ -347,26 +347,28 @@ Remember to also save any written responses separately.
           </Collapsible>
         )}
 
-        {/* Learning Goals - moved to top */}
-        <Card className="border-primary/20 bg-primary/5">
-          <CardHeader className="pb-2">
-            <div className="flex items-center gap-2">
-              <Target className="h-5 w-5 text-primary" />
-              <CardTitle className="text-lg">Learning Goals</CardTitle>
-            </div>
-            <CardDescription>What you'll achieve in this hour</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              {hourData.learningGoals.map((goal, idx) => (
-                <li key={idx} className="flex items-start gap-2 text-sm">
-                  <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-                  {goal}
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
+        {/* Learning Goals - moved to top (hidden for Week 3 Hour 1 which has custom layout) */}
+        {!(weekNumber === 3 && hourNumber === 1) && (
+          <Card className="border-primary/20 bg-primary/5">
+            <CardHeader className="pb-2">
+              <div className="flex items-center gap-2">
+                <Target className="h-5 w-5 text-primary" />
+                <CardTitle className="text-lg">Learning Goals</CardTitle>
+              </div>
+              <CardDescription>What you'll achieve in this hour</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2">
+                {hourData.learningGoals.map((goal, idx) => (
+                  <li key={idx} className="flex items-start gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                    {goal}
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Week 1 Hour 2: Paraphrasing Fundamentals - Structured like Hour 1 */}
         {weekNumber === 1 && hourNumber === 2 && (
@@ -2687,6 +2689,86 @@ Provide focused feedback (4-5 sentences):
             studentId={studentId || "anonymous"}
             onComplete={() => handleTaskComplete("w2h3-practice-complete")}
           />
+        )}
+
+        {/* Week 3 Hour 1: Summarising Skills (Moodle Tasks) */}
+        {weekNumber === 3 && hourNumber === 1 && (
+          <section className="space-y-6">
+            {/* Simplified Learning Goals */}
+            <Card className="border-primary/20 bg-primary/5">
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <Target className="h-5 w-5 text-primary" />
+                  <CardTitle className="text-lg">Learning Goals</CardTitle>
+                </div>
+                <CardDescription>Focus on writing effective summaries</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2">
+                  <li className="flex items-start gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                    Distinguish claims from evidence — keep claims, skip data
+                  </li>
+                  <li className="flex items-start gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                    Maintain neutrality — no personal opinions in summaries
+                  </li>
+                  <li className="flex items-start gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                    Write concise summaries in your own words
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            {/* Moodle Task Instructions - Google Doc Embed */}
+            <Card className="border-2 border-blue-500/30 bg-blue-500/5">
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-blue-600" />
+                  <CardTitle className="text-lg">Summarising Tasks</CardTitle>
+                </div>
+                <CardDescription>Complete the summarising exercises below</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Embedded Google Doc */}
+                <div className="aspect-[4/3] w-full rounded-lg overflow-hidden border bg-white">
+                  <iframe
+                    src="https://docs.google.com/document/d/182xbd3rh66VcnqXugXg3UKxF-ZdXQWtgWOR11LDmL8Y/preview"
+                    width="100%"
+                    height="100%"
+                    className="border-0"
+                    title="Week 3 Hour 1 - Summarising Tasks"
+                    allow="autoplay"
+                  />
+                </div>
+                
+                {/* Open in new tab button */}
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" asChild>
+                    <a
+                      href="https://docs.google.com/document/d/182xbd3rh66VcnqXugXg3UKxF-ZdXQWtgWOR11LDmL8Y/edit?usp=sharing"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="gap-2"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      Open in Google Docs
+                    </a>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Key Reminder */}
+            <Alert className="border-amber-500/30 bg-amber-500/5">
+              <Lightbulb className="h-4 w-4 text-amber-600" />
+              <AlertTitle className="text-amber-700">Remember</AlertTitle>
+              <AlertDescription className="text-amber-600">
+                <strong>Claims = KEEP</strong> (what the author argues) | <strong>Data = SKIP</strong> (numbers, methodology, specific examples)
+              </AlertDescription>
+            </Alert>
+          </section>
         )}
 
         {/* Progress & Navigation */}
