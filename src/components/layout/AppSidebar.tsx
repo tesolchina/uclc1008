@@ -42,12 +42,17 @@ const weeks: WeekNavItem[] = Array.from({ length: 13 }, (_, index) => {
     })
     .filter((a): a is { id: string; title: string; weight: string } => a !== null);
 
-  // Add hours for weeks 1-5
-  const hours = id <= 5 ? [
-    { number: 1, title: "Hour 1" },
-    { number: 2, title: "Hour 2" },
-    { number: 3, title: "Hour 3" },
-  ] : undefined;
+  // Add hours for weeks 1-5 (Week 3 has merged Hour 2-3)
+  const hours = id <= 5 ? (
+    id === 3 ? [
+      { number: 1, title: "Hour 1" },
+      { number: 2, title: "Hour 2-3" },
+    ] : [
+      { number: 1, title: "Hour 1" },
+      { number: 2, title: "Hour 2" },
+      { number: 3, title: "Hour 3" },
+    ]
+  ) : undefined;
 
   // Special pages for specific weeks
   const specialPages = id === 2 ? [
