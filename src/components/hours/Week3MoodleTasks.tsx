@@ -5,7 +5,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, FileText, PenLine, BookOpen, CheckCircle2, Target } from "lucide-react";
+import { ExternalLink, FileText, PenLine, BookOpen, CheckCircle2, Target, Clock } from "lucide-react";
 
 interface MoodleTask {
   id: number;
@@ -153,6 +153,26 @@ export function Week3MoodleTasks() {
               Summarise sources without personal bias, covering main ideas
             </li>
           </ul>
+        </CardContent>
+      </Card>
+
+      {/* Self-paced completion notice */}
+      <Card className="border-amber-500/30 bg-amber-500/5">
+        <CardContent className="pt-4">
+          <div className="flex items-start gap-3">
+            <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                Complete tasks on your own time
+              </p>
+              <p className="text-sm text-amber-700 dark:text-amber-300">
+                If we cannot cover all tasks in class, you are encouraged to complete them on Moodle at your own pace.
+              </p>
+              <p className="text-sm font-semibold text-amber-800 dark:text-amber-200 mt-2">
+                📅 Feedback cutoff: <span className="underline">Monday, 2 February, 10:00 PM</span>
+              </p>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
