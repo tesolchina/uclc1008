@@ -36,7 +36,7 @@ import {
 import type { ConceptOption } from "@/components/tasks";
 
 // Hour-specific components (extracted for modularity)
-import { WritingTaskWithFeedback, MicroLevelPractice } from "@/components/hours";
+import { WritingTaskWithFeedback, MicroLevelPractice, Week3MoodleTasks } from "@/components/hours";
 
 // Data imports (extracted to separate module)
 import {
@@ -347,8 +347,8 @@ Remember to also save any written responses separately.
           </Collapsible>
         )}
 
-        {/* Learning Goals - moved to top (hidden for Week 3 Hour 1 which has custom layout) */}
-        {!(weekNumber === 3 && hourNumber === 1) && (
+        {/* Learning Goals - moved to top (hidden for Week 3 which has custom layouts) */}
+        {!(weekNumber === 3) && (
           <Card className="border-primary/20 bg-primary/5">
             <CardHeader className="pb-2">
               <div className="flex items-center gap-2">
@@ -2689,6 +2689,11 @@ Provide focused feedback (4-5 sentences):
             studentId={studentId || "anonymous"}
             onComplete={() => handleTaskComplete("w2h3-practice-complete")}
           />
+        )}
+
+        {/* Week 3 Hour 2 & 3: Moodle Forum Tasks */}
+        {weekNumber === 3 && (hourNumber === 2 || hourNumber === 3) && (
+          <Week3MoodleTasks hourNumber={hourNumber as 2 | 3} />
         )}
 
         {/* Week 3 Hour 1: Summarising Skills (Moodle Tasks) */}
