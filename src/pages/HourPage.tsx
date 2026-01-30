@@ -2693,7 +2693,7 @@ Provide focused feedback (4-5 sentences):
 
         {/* Week 3 Hour 2 & 3: Moodle Forum Tasks */}
         {weekNumber === 3 && (hourNumber === 2 || hourNumber === 3) && (
-          <Week3MoodleTasks hourNumber={hourNumber as 2 | 3} />
+          <Week3MoodleTasks />
         )}
 
         {/* Week 3 Hour 1: Summarising Skills (Moodle Tasks) */}
