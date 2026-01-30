@@ -105,14 +105,15 @@ interface HourCardProps {
   title: string;
   theme: string;
   unitCount: number;
+  label?: string;
 }
 
-const HourCard = ({ weekId, hour, title, theme, unitCount }: HourCardProps) => (
+const HourCard = ({ weekId, hour, title, theme, unitCount, label }: HourCardProps) => (
   <Link to={`/week/${weekId}/hour/${hour}`} className="block group">
     <Card className="h-full transition-all hover:border-primary/50 hover:shadow-md group-hover:bg-accent/5">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <Badge variant="outline" className="text-xs">Hour {hour}</Badge>
+          <Badge variant="outline" className="text-xs">{label || `Hour ${hour}`}</Badge>
           <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
         </div>
         <CardTitle className="text-base mt-2">{title}</CardTitle>
@@ -141,7 +142,7 @@ const AssignmentBadge = ({ assignment, weekId }: { assignment: Assignment; weekI
 interface WeekOverviewProps {
   week: WeekData;
   meta?: WeekMeta;
-  classHours?: { hour: number; title: string; theme: string; unitCount: number }[];
+  classHours?: { hour: number; title: string; theme: string; unitCount: number; label?: string }[];
 }
 
 export const WeekOverviewTemplate = ({ week, meta, classHours }: WeekOverviewProps) => {
@@ -232,6 +233,7 @@ export const WeekOverviewTemplate = ({ week, meta, classHours }: WeekOverviewPro
               title={ch.title}
               theme={ch.theme}
               unitCount={ch.unitCount}
+              label={ch.label}
             />
           ))}
         </div>

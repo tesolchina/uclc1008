@@ -1,12 +1,11 @@
 /**
  * Week 3 Moodle Forum Tasks Component
- * Displays organized task links for Week 3 Hour 2 and Hour 3
+ * Displays organized task links for Week 3 Hour 2-3 (merged)
  */
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, FileText, PenLine, BookOpen, CheckCircle2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { ExternalLink, FileText, PenLine, BookOpen, CheckCircle2, Target } from "lucide-react";
 
 interface MoodleTask {
   id: number;
@@ -15,22 +14,7 @@ interface MoodleTask {
   skillFocus: string;
 }
 
-const WEEK3_HOUR1_TASKS: MoodleTask[] = [
-  {
-    id: 1,
-    title: "Intro and concluding paragraph",
-    url: "https://buelearning.hkbu.edu.hk/mod/forum/discuss.php?d=347214",
-    skillFocus: "Summary Writing"
-  },
-  {
-    id: 2,
-    title: "Rewrite the middle part of the summary",
-    url: "https://buelearning.hkbu.edu.hk/mod/forum/discuss.php?d=347213",
-    skillFocus: "Summary Writing"
-  },
-];
-
-const WEEK3_HOUR2_TASKS: MoodleTask[] = [
+const WEEK3_STRUCTURE_TASKS: MoodleTask[] = [
   {
     id: 3,
     title: "Purpose statement",
@@ -51,7 +35,7 @@ const WEEK3_HOUR2_TASKS: MoodleTask[] = [
   },
 ];
 
-const WEEK3_HOUR3_TASKS: MoodleTask[] = [
+const WEEK3_PARAPHRASE_TASKS: MoodleTask[] = [
   {
     id: 6,
     title: "Paraphrasing strategies (synonyms, word form, voice)",
@@ -64,6 +48,9 @@ const WEEK3_HOUR3_TASKS: MoodleTask[] = [
     url: "https://buelearning.hkbu.edu.hk/mod/forum/discuss.php?d=348083",
     skillFocus: "Paraphrasing"
   },
+];
+
+const WEEK3_SUMMARISE_TASKS: MoodleTask[] = [
   {
     id: 8,
     title: "Summarising (key points, own words)",
@@ -114,16 +101,26 @@ function TaskCard({ task }: TaskCardProps) {
   );
 }
 
-interface Week3MoodleTasksProps {
-  hourNumber: 2 | 3;
-}
-
-export function Week3MoodleTasks({ hourNumber }: Week3MoodleTasksProps) {
-  // For Hour 2 and 3, we show all tasks organized by hour
-  const allTasks = [
-    { hour: 1, tasks: WEEK3_HOUR1_TASKS, title: "Hour 1: Summary Writing", icon: FileText },
-    { hour: 2, tasks: WEEK3_HOUR2_TASKS, title: "Hour 2: AWQ Structure", icon: BookOpen },
-    { hour: 3, tasks: WEEK3_HOUR3_TASKS, title: "Hour 3: Paraphrasing & Summarising", icon: PenLine },
+export function Week3MoodleTasks() {
+  const taskSections = [
+    { 
+      title: "Part 1: AWQ Structure", 
+      tasks: WEEK3_STRUCTURE_TASKS, 
+      icon: BookOpen,
+      description: "Purpose statements, headings, and topic sentences"
+    },
+    { 
+      title: "Part 2: Paraphrasing", 
+      tasks: WEEK3_PARAPHRASE_TASKS, 
+      icon: PenLine,
+      description: "Strategies and avoiding plagiarism"
+    },
+    { 
+      title: "Part 3: Summarising", 
+      tasks: WEEK3_SUMMARISE_TASKS, 
+      icon: FileText,
+      description: "Key points, neutrality, and coverage"
+    },
   ];
 
   return (
@@ -132,56 +129,53 @@ export function Week3MoodleTasks({ hourNumber }: Week3MoodleTasksProps) {
       <Card className="border-primary/20 bg-primary/5">
         <CardHeader className="pb-2">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="h-5 w-5 text-primary" />
-            <CardTitle className="text-lg">Week 3 Learning Goals</CardTitle>
+            <Target className="h-5 w-5 text-primary" />
+            <CardTitle className="text-lg">Learning Goals</CardTitle>
           </div>
-          <CardDescription>Complete all 10 tasks in Moodle forums</CardDescription>
+          <CardDescription>What you'll achieve in Hour 2-3</CardDescription>
         </CardHeader>
         <CardContent>
           <ul className="space-y-2">
             <li className="flex items-start gap-2 text-sm">
               <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-              Write effective summaries with intro and conclusion
+              Write clear purpose statements and effective topic sentences
             </li>
             <li className="flex items-start gap-2 text-sm">
               <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-              Understand AWQ structure: purpose statements and topic sentences
+              Apply paraphrasing strategies (synonyms, word forms, voice changes)
             </li>
             <li className="flex items-start gap-2 text-sm">
               <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-              Apply paraphrasing strategies to avoid plagiarism
+              Avoid plagiarism through proper paraphrasing techniques
             </li>
             <li className="flex items-start gap-2 text-sm">
               <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-              Report source ideas without personal bias
+              Summarise sources without personal bias, covering main ideas
             </li>
           </ul>
         </CardContent>
       </Card>
 
-      {/* All Tasks by Hour */}
+      {/* All Tasks by Section */}
       <Card className="border-2 border-blue-500/30 bg-blue-500/5">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <FileText className="h-5 w-5 text-blue-600" />
-            <CardTitle className="text-lg">Week 3 Moodle Tasks</CardTitle>
+            <CardTitle className="text-lg">Hour 2-3: Moodle Forum Tasks</CardTitle>
           </div>
           <CardDescription>
-            Complete all 10 tasks in the Moodle forums. Click each task to open in a new tab.
+            Complete Tasks 3-10 in the Moodle forums. Click each task to open in a new tab.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {allTasks.map(({ hour, tasks, title, icon: Icon }) => (
-            <div key={hour} className="space-y-3">
-              <div className={cn(
-                "flex items-center gap-2 pb-2 border-b",
-                hourNumber === hour && "text-primary"
-              )}>
-                <Icon className="h-4 w-4" />
-                <h3 className="font-medium text-sm">{title}</h3>
-                {hourNumber === hour && (
-                  <Badge variant="default" className="ml-auto text-xs">Current</Badge>
-                )}
+          {taskSections.map(({ title, tasks, icon: Icon, description }) => (
+            <div key={title} className="space-y-3">
+              <div className="flex items-center gap-2 pb-2 border-b">
+                <Icon className="h-4 w-4 text-primary" />
+                <div>
+                  <h3 className="font-medium text-sm">{title}</h3>
+                  <p className="text-xs text-muted-foreground">{description}</p>
+                </div>
               </div>
               <div className="space-y-2">
                 {tasks.map((task) => (
