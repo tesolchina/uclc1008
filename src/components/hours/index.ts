@@ -6,3 +6,4 @@
 
 export { WritingTaskWithFeedback } from './WritingTaskWithFeedback';
 export { MicroLevelPractice } from './MicroLevelPractice';
+export { Week3MoodleTasks } from './Week3MoodleTasks';
