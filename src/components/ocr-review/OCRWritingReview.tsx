@@ -372,6 +372,18 @@ export function OCRWritingReview({ weekNumber = 4, hourNumber = 3 }: OCRWritingR
 
   return (
     <div className="space-y-6">
+      {/* Beta Warning Banner */}
+      <Alert className="border-amber-300 bg-amber-50">
+        <AlertTitle className="flex items-center gap-2 text-amber-800">
+          ⚠️ Beta Platform Notice
+        </AlertTitle>
+        <AlertDescription className="text-amber-700 space-y-2">
+          <p><strong>The actual test paper will be provided in class.</strong></p>
+          <p>This platform is in <strong>beta testing mode</strong>. If OCR doesn't work properly, please type your summary manually using the button below. We apologize for any inconvenience!</p>
+          <p>💡 <strong>Tip:</strong> Take screenshots of everything you see to save your progress.</p>
+        </AlertDescription>
+      </Alert>
+
       {/* Progress Header */}
       <Card>
         <CardHeader className="pb-2">
@@ -453,6 +465,24 @@ export function OCRWritingReview({ weekNumber = 4, hourNumber = 3 }: OCRWritingR
                       </p>
                     </>
                   )}
+                </div>
+
+                {/* Manual Text Entry Fallback */}
+                <div className="border-t pt-4">
+                  <p className="text-sm text-muted-foreground mb-3 text-center">
+                    OCR not working? Type your summary manually instead:
+                  </p>
+                  <Button 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => {
+                      setStep("edit");
+                      toast.info("Type your summary in the text box below");
+                    }}
+                  >
+                    <Edit3 className="h-4 w-4 mr-2" />
+                    Skip OCR - Type Manually
+                  </Button>
                 </div>
 
                 <Alert>
