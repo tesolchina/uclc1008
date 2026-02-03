@@ -12,6 +12,7 @@
  */
 
 import { useParams, Link } from "react-router-dom";
+import ReactMarkdown from "react-markdown";
 import { getHourData } from "@/data/hourContent";
 import { useAuth } from "@/features/auth";
 import { Badge } from "@/components/ui/badge";
@@ -2732,9 +2733,19 @@ Provide focused feedback (4-5 sentences):
                   {section.subsections.map((subsection, subIndex) => (
                     <div key={subIndex} className="space-y-2">
                       <h4 className="font-medium text-sm">{subsection.title}</h4>
-                      <p className="text-sm text-muted-foreground whitespace-pre-line">
-                        {subsection.content}
-                      </p>
+                      <div className="text-sm text-muted-foreground prose prose-sm max-w-none prose-a:text-primary prose-a:underline">
+                        <ReactMarkdown
+                          components={{
+                            a: ({ href, children }) => (
+                              <a href={href} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                                {children}
+                              </a>
+                            )
+                          }}
+                        >
+                          {subsection.content}
+                        </ReactMarkdown>
+                      </div>
                     </div>
                   ))}
 
