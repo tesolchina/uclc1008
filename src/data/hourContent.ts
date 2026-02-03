@@ -2212,21 +2212,7 @@ export const week4Hours: HourData[] = [
       "Build confidence for the real AWQ"
     ],
     ciloLinks: ["CILO 2: All Skills", "CILO 3: Drafting", "CILO 5: AI as Learning Partner"],
-    keyConcepts: [
-      {
-        term: "Step-by-Step Writing",
-        definition: "Breaking the AWQ into manageable stages: Read → Plan → Intro → Body → Conclusion → Review",
-        example: "Each step gets AI feedback before moving on, so you can correct mistakes early.",
-        tip: "Don't rush! The AI tutor (Dr. Write) will guide you through each step."
-      },
-      {
-        term: "Synthesis Focus",
-        definition: "The body paragraph is where synthesis happens - showing relationships between sources, not just listing them.",
-        example: "Instead of 'Hong et al. says X. Andrejevic says Y.' write 'While Hong et al. highlight benefits, Andrejevic & Selwyn counter that...'",
-        tip: "Look for agreement, contrast, or elaboration between the two sources."
-      }
-    ],
-    articles: [ARTICLE_A, ARTICLE_B],
+    keyConcepts: [],
     agenda: [
       { 
         title: "Read & Understand", 
@@ -2265,12 +2251,7 @@ export const week4Hours: HourData[] = [
         ] 
       }
     ],
-    tasks: [],
-    writingTask: {
-      prompt: "Complete a 200-word mini-AWQ with AI guidance. The AI tutor will help you at each step.",
-      wordLimit: 220,
-      rubricCriteria: ["Summary Accuracy (20%)", "Synthesis (20%)", "Paraphrasing (20%)", "Academic Tone (20%)", "Citations (20%)"]
-    }
+    tasks: []
   },
   {
     weekNumber: 4,
