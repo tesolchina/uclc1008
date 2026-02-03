@@ -97,12 +97,44 @@ export const QuickCheckMC = ({
     if (!studentId) return;
     
     try {
-      const { data } = await supabase
+      // First, try to find data with the new format key
+      let { data } = await supabase
         .from('student_task_responses')
-        .select('response, ai_feedback')
+        .select('response, ai_feedback, question_key')
         .eq('student_id', studentId)
         .eq('question_key', uniqueQuestionId)
         .maybeSingle();
+      
+      // If not found, try to find old format data by searching responses that match this question
+      if (!data) {
+        // Generate old format key pattern (q1-First-words-of-question)
+        const oldFormatKey = `q${questionNumber}-${question.slice(0, 20).replace(/\s/g, '-')}`;
+        
+        const { data: oldData } = await supabase
+          .from('student_task_responses')
+          .select('response, ai_feedback, question_key')
+          .eq('student_id', studentId)
+          .ilike('question_key', `${oldFormatKey.substring(0, 15)}%`);
+        
+        // Find a match by comparing the question text stored in the response
+        if (oldData && oldData.length > 0) {
+          for (const record of oldData) {
+            try {
+              const responseData = JSON.parse(record.response as string);
+              if (responseData.question) {
+                const storedQ = responseData.question.toLowerCase().trim().replace(/\s+/g, ' ');
+                const currentQ = question.toLowerCase().trim().replace(/\s+/g, ' ');
+                if (storedQ === currentQ || 
+                    (storedQ.length > 30 && currentQ.length > 30 && 
+                     storedQ.substring(0, 50) === currentQ.substring(0, 50))) {
+                  data = record;
+                  break;
+                }
+              }
+            } catch {}
+          }
+        }
+      }
       
       if (data) {
         try {
