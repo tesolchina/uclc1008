@@ -59,7 +59,7 @@ import { Hour3PracticeSession } from "@/components/lessons/Hour3PracticeSession"
 import { ClassroomDiscussionPage } from "@/features/classroom-discussion";
 import { AWQWritingGame } from "@/components/awq-game";
 import { OCRWritingReview } from "@/components/ocr-review";
-import { AWQGuideGame, SampleAWQQuiz } from "@/components/awq-guide";
+import { AWQGuideGame, SampleAWQQuiz, HTMLGameWithAI } from "@/components/awq-guide";
 
 // UI components and icons
 import { 
@@ -2842,23 +2842,14 @@ Provide focused feedback (4-5 sentences):
           </section>
         )}
 
-        {/* Week 4 Hour 2: AI-Guided AWQ Writing Game + Sample Quiz */}
+        {/* Week 4 Hour 2: HTML Game with AI Feedback + Sample Quiz */}
         {weekNumber === 4 && hourNumber === 2 && (
           <section className="space-y-6">
-            <Alert className="border-primary/30 bg-primary/5">
-              <Sparkles className="h-4 w-4 text-primary" />
-              <AlertTitle>AWQ Writing Guide with AI Feedback</AlertTitle>
-              <AlertDescription>
-                Work through the 12-step AWQ writing process with AI guidance on each step.
-                Review the sample quiz materials and compare A vs C+ scripts.
-              </AlertDescription>
-            </Alert>
-            
-            {/* Sample AWQ Quiz Materials */}
+            {/* Sample AWQ Quiz Materials (Articles, Rubric, Sample Scripts) */}
             <SampleAWQQuiz />
             
-            {/* Interactive Writing Game */}
-            <AWQGuideGame weekNumber={weekNumber} hourNumber={hourNumber} />
+            {/* HTML Game with AI Feedback Chat */}
+            <HTMLGameWithAI weekNumber={weekNumber} hourNumber={hourNumber} />
           </section>
         )}
 
