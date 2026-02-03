@@ -5,10 +5,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { AlertCircle, ArrowLeft, KeyRound, LogIn } from 'lucide-react';
+import { AlertCircle, ArrowLeft, KeyRound, LogIn, Loader2 } from 'lucide-react';
 import { validateStudentIdFormat, getStoredStudentId } from '../utils/studentId';
 import { AUTH_ERROR_MESSAGES, STORAGE_KEYS } from '../constants';
 import { useAuth } from '../context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface StudentLoginFormProps {
   onBack: () => void;
@@ -23,6 +24,7 @@ export function StudentLoginForm({ onBack, onSwitchToRegister }: StudentLoginFor
   const [suffix, setSuffix] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const digitsRef = useRef<HTMLInputElement>(null);
   const initialsRef = useRef<HTMLInputElement>(null);
@@ -92,7 +94,7 @@ export function StudentLoginForm({ onBack, onSwitchToRegister }: StudentLoginFor
     return '';
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     setError(null);
     const fullId = getFullId();
     
@@ -101,12 +103,52 @@ export function StudentLoginForm({ onBack, onSwitchToRegister }: StudentLoginFor
       return;
     }
     
-    loginAsStudent(fullId.toUpperCase());
-    setSuccess('Welcome back! Logging you in...');
+    setIsLoading(true);
     
-    setTimeout(() => {
-      navigate('/');
-    }, 500);
+    try {
+      // Check if student ID exists in the database
+      const { data: existingStudent, error: dbError } = await supabase
+        .from('students')
+        .select('student_id')
+        .eq('student_id', fullId.toUpperCase())
+        .maybeSingle();
+      
+      if (dbError) {
+        console.error('Error checking student ID:', dbError);
+        setError('Unable to verify your ID. Please try again.');
+        setIsLoading(false);
+        return;
+      }
+      
+      if (!existingStudent) {
+        // Try to find similar IDs to help the user
+        const baseId = `${digits}-${initials}`;
+        const { data: similarStudents } = await supabase
+          .from('students')
+          .select('student_id')
+          .ilike('student_id', `${baseId}-%`)
+          .limit(1);
+        
+        if (similarStudents && similarStudents.length > 0) {
+          setError(`ID not found. Did you mean ${similarStudents[0].student_id}? Check your last 2 characters.`);
+        } else {
+          setError('This ID is not registered. Please check your ID or register if you\'re new.');
+        }
+        setIsLoading(false);
+        return;
+      }
+      
+      loginAsStudent(fullId.toUpperCase());
+      setSuccess('Welcome back! Logging you in...');
+      
+      setTimeout(() => {
+        navigate('/');
+      }, 500);
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('An error occurred. Please try again.');
+      setIsLoading(false);
+    }
   };
 
   const isComplete = digits.length === 4 && initials.length === 2 && suffix.length === 2;
@@ -210,10 +252,14 @@ export function StudentLoginForm({ onBack, onSwitchToRegister }: StudentLoginFor
             <Button 
               className="w-full" 
               onClick={handleLogin}
-              disabled={!isComplete}
+              disabled={!isComplete || isLoading}
             >
-              <LogIn className="h-4 w-4 mr-2" />
-              Continue
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <LogIn className="h-4 w-4 mr-2" />
+              )}
+              {isLoading ? 'Verifying...' : 'Continue'}
             </Button>
           </div>
 
