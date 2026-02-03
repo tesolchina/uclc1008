@@ -43,57 +43,48 @@ interface StudentTaskProgressProps {
   paragraphNotes: ParagraphNote[];
 }
 
-// Check if a response matches a task - STRICT matching only
-// Removed text-based matching which caused false positives
-const responseMatchesTask = (response: TaskResponse, taskId: string, weekNum: number, hourNum: number, taskIndex?: number): boolean => {
+// Check if a response matches a task
+// Supports both new format (w1h1-q1) and old format (q1-Question-text)
+const responseMatchesTask = (response: TaskResponse, taskId: string, weekNum: number, hourNum: number, taskIndex?: number, taskQuestion?: string): boolean => {
   const questionKey = response.question_key?.toLowerCase() || "";
   
-  // Only match if the key contains BOTH week/hour info AND task identifier
-  // This prevents matching generic keys like "q1-What-is-the" to wrong tasks
-  
-  // Check for properly formatted keys with week/hour prefix
+  // METHOD 1: New format - week/hour prefixed keys (e.g., "w1h1-q1", "w1h1-scan1")
   const weekHourPatterns = [
-    `week${weekNum}-hour${hourNum}-${taskId}`.toLowerCase(),
-    `week${weekNum}_hour${hourNum}_${taskId}`.toLowerCase(),
-    `week-${weekNum}-hour${hourNum}-${taskId}`.toLowerCase(),
-    `week-${weekNum}-hour-${hourNum}-${taskId}`.toLowerCase(),
-    `w${weekNum}h${hourNum}-${taskId}`.toLowerCase(),
-    `w${weekNum}h${hourNum}_${taskId}`.toLowerCase(),
+    `w${weekNum}h${hourNum}-`,
+    `week${weekNum}-hour${hourNum}-`,
+    `week${weekNum}_hour${hourNum}_`,
   ];
   
-  // Check exact match with taskId that already contains week/hour (e.g., "w1h1-scan1")
-  if (taskId.match(/^w\d+h\d+-/)) {
-    if (questionKey === taskId.toLowerCase()) {
-      return true;
-    }
-    // Also check if key starts with the taskId
-    if (questionKey.startsWith(taskId.toLowerCase())) {
-      return true;
-    }
-  }
-  
-  // Check week-hour prefixed patterns
-  if (weekHourPatterns.some(p => questionKey === p || questionKey.startsWith(p))) {
+  if (weekHourPatterns.some(p => questionKey.startsWith(p.toLowerCase()))) {
     return true;
   }
   
-  // Check if response JSON contains matching week/hour/taskId
-  try {
-    const parsed = JSON.parse(response.response);
-    if (parsed.weekNumber === weekNum && parsed.hourNumber === hourNum) {
-      // Must also have a matching question indicator
-      if (parsed.taskId === taskId || parsed.questionId === taskId) {
-        return true;
-      }
-      // Check for question number match only if key has proper week/hour prefix
-      if (taskIndex !== undefined && questionKey.includes(`week${weekNum}`) && questionKey.includes(`hour${hourNum}`)) {
-        const qNumMatch = questionKey.match(/q(\d+)/);
-        if (qNumMatch && parseInt(qNumMatch[1]) === taskIndex + 1) {
+  // Check exact match with taskId that already contains week/hour
+  if (taskId.match(/^w\d+h\d+-/)) {
+    if (questionKey === taskId.toLowerCase() || questionKey.startsWith(taskId.toLowerCase())) {
+      return true;
+    }
+  }
+  
+  // METHOD 2: Old format - match by question text stored in response JSON
+  // This handles responses like "q1-In-the-passage-above" where the question is stored in response.question
+  if (taskQuestion) {
+    try {
+      const parsed = JSON.parse(response.response);
+      if (parsed.question && typeof parsed.question === 'string') {
+        // Normalize both questions for comparison (remove extra spaces, lowercase)
+        const storedQuestion = parsed.question.toLowerCase().trim().replace(/\s+/g, ' ');
+        const currentQuestion = taskQuestion.toLowerCase().trim().replace(/\s+/g, ' ');
+        
+        // Exact match or very close match (first 50 chars to handle minor differences)
+        if (storedQuestion === currentQuestion || 
+            (storedQuestion.length > 30 && currentQuestion.length > 30 && 
+             storedQuestion.substring(0, 50) === currentQuestion.substring(0, 50))) {
           return true;
         }
       }
-    }
-  } catch {}
+    } catch {}
+  }
   
   return false;
 };
@@ -161,7 +152,7 @@ export function StudentTaskProgress({
 
   // Check if task is completed
   const isTaskCompleted = (task: HourTask, weekNum: number, hourNum: number, taskIndex: number): boolean => {
-    return responses.some(r => responseMatchesTask(r, task.id, weekNum, hourNum, taskIndex));
+    return responses.some(r => responseMatchesTask(r, task.id, weekNum, hourNum, taskIndex, task.question));
   };
 
   // Check if writing task is completed
