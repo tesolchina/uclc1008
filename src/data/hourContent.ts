@@ -61,6 +61,24 @@ export interface WritingTask {
   examples?: ExampleItem[];
 }
 
+export interface IframeEmbed {
+  url: string;
+  title: string;
+  height?: number;
+}
+
+export interface IntegratedSubsection {
+  title: string;
+  content: string;
+}
+
+export interface IntegratedSection {
+  id: string;
+  title: string;
+  subsections: IntegratedSubsection[];
+  iframeEmbed?: IframeEmbed;
+}
+
 export interface HourData {
   weekNumber: number;
   hourNumber: number;
@@ -74,6 +92,7 @@ export interface HourData {
   tasks: HourTask[];
   writingTask?: WritingTask;
   behaviourChange?: string;
+  integratedSections?: IntegratedSection[];
 }
 
 // ============ ARTICLE EXCERPTS (Reused across hours) ============
@@ -2007,105 +2026,136 @@ export const week4Hours: HourData[] = [
   {
     weekNumber: 4,
     hourNumber: 1,
-    title: "Speed Drills",
-    theme: "Building Fluency Under Pressure",
-    behaviourChange: "Speed comes from automaticity. Practice citation formats until they're automatic.",
+    title: "AI Agent Demo",
+    theme: "Learning with AI Agents",
+    behaviourChange: "AI agents can help you prepare systematically by organizing materials and creating practice tasks.",
     learningGoals: [
-      "Complete citation and paraphrasing tasks quickly",
-      "Identify stance and structure rapidly",
-      "Build confidence for timed writing"
+      "Understand how AI agents work with files and context",
+      "See how to use AI for AWQ preparation",
+      "Explore the demo materials on GitHub"
     ],
-    ciloLinks: ["CILO 2: All Skills"],
+    ciloLinks: ["CILO 5: AI as Learning Partner"],
     keyConcepts: [
       {
-        term: "Automaticity",
-        definition: "The ability to perform skills automatically without conscious thought, freeing mental energy for higher-level tasks.",
-        example: "Typing 'Hong et al. (2022)' should be automatic so you can focus on WHAT you're arguing.",
-        tip: "Practice citation formats repeatedly until you don't have to think about them."
+        term: "AI Agent",
+        definition: "An AI system that can read files, access context, and perform multi-step tasks to help you achieve goals.",
+        example: "An agent can read a review article, extract the reference list, and identify which articles might appear in your quiz.",
+        tip: "Think of AI agents as research assistants that can process large amounts of information quickly."
       },
       {
-        term: "Scan & Plan",
-        definition: "A speed reading strategy: scan headings/topic sentences, plan your summary structure before writing.",
-        example: "2 minutes scanning saves 10 minutes of confused writing.",
-        tip: "Identify the 3-4 main points BEFORE you start writing."
+        term: "Context Window",
+        definition: "The amount of information an AI can 'remember' during a conversation. More context = better responses.",
+        example: "Sharing the context.md file gives the agent crucial info: quiz date, topic, source materials.",
+        tip: "Always provide relevant context when working with AI agents."
       }
     ],
-    articles: [ARTICLE_A, ARTICLE_B],
+    articles: [],
     agenda: [
       { 
-        title: "Rapid Citation Quiz", 
-        duration: "10 min", 
+        title: "Class Roleplay Demo", 
+        duration: "15 min", 
         activities: [
-          "10 citation format questions",
-          "Timed challenge: 1 minute per question",
-          "Build automaticity"
+          "Watch the Poe chat roleplay below",
+          "Dr. Wang explains AI agents to John & Karen",
+          "See how context files guide agent behavior"
         ] 
       },
       { 
-        title: "Stance Speed Round", 
-        duration: "8 min", 
+        title: "GitHub Materials Walkthrough", 
+        duration: "15 min", 
         activities: [
-          "Identify stance from titles quickly",
-          "Predict content from headings"
+          "Explore the AIagentDemo folder",
+          "Review context.md, taskOrientation.md",
+          "Understand the file structure"
         ] 
       },
       { 
-        title: "Paraphrase Challenge", 
-        duration: "8 min", 
+        title: "Interactive Practice", 
+        duration: "14 min", 
         activities: [
-          "Quick paraphrase exercises",
-          "30 seconds per sentence"
-        ] 
-      },
-      { 
-        title: "Mini-Summary Task", 
-        duration: "18 min", 
-        activities: [
-          "100-word summary in 12 minutes",
-          "Apply all skills under pressure"
+          "Try the interactive writing guide",
+          "Practice with mock AWQ materials"
         ] 
       }
     ],
-    tasks: [
+    integratedSections: [
       {
-        id: "w4h1-mc1",
-        type: "mc",
-        question: "Quick! Which is correct APA format?",
-        options: ["(Hong, et al., 2022)", "(Hong et al., 2022)", "Hong et al (2022)", "(Hong et al 2022)"],
-        correctAnswer: 1,
-        explanation: "Correct: (Hong et al., 2022) - no comma after 'al', period after 'al', comma before year, inside parentheses.",
-        skillFocus: ["apa-citation"]
+        id: "w4h1-intro",
+        title: "Introduction: AI Agents for AWQ Prep",
+        subsections: [
+          {
+            title: "What is an AI Agent?",
+            content: "An AI agent is more than just a chatbot - it can read files, follow multi-step instructions, and help you work through complex tasks systematically. In this demo, Dr. Simon Wang shows students John and Karen how AI agents can help prepare for the Academic Writing Quiz (AWQ)."
+          },
+          {
+            title: "Key Takeaway",
+            content: "AI agents work best when you give them clear context. The 'context.md' file tells the agent everything it needs: quiz date, topic, available materials. With this information, the agent can help extract references, create study guides, and generate practice tasks."
+          }
+        ]
       },
       {
-        id: "w4h1-tf1",
-        type: "true-false",
-        question: "'Critical questions about...' in a title suggests positive stance.",
-        correctAnswer: "false",
-        explanation: "'Critical questions' = negative/skeptical stance. The word 'critical' signals doubt or opposition.",
-        skillFocus: ["stance-prediction"]
+        id: "w4h1-chat-demo",
+        title: "Part 1: Class Roleplay Demo (Poe Chat)",
+        subsections: [
+          {
+            title: "About This Chat",
+            content: "This is a roleplay conversation between Dr. Simon Wang (teacher) and two AI-simulated students: John (highly motivated) and Karen (a bit laid-back). The conversation demonstrates how to use AI agents for AWQ preparation, including reading context files and extracting useful information from source materials."
+          },
+          {
+            title: "Key Points Covered",
+            content: "• AWQ format: 50 minutes, 300 words max, synthesise two excerpts\\n• Source: Excerpts come from Ho et al. (2025) systematic review references\\n• Strategy: Use AI to extract the 23 included studies from the review\\n• Practice: Create focused reading materials and mock tasks"
+          }
+        ],
+        iframeEmbed: {
+          url: "https://poe.com/s/e4bKuU0Pg2KNCWZDzHhu",
+          title: "AI Agent Demo - Poe Chat",
+          height: 600
+        }
       },
       {
-        id: "w4h1-fb1",
-        type: "fill-blank",
-        question: "Quick! In narrative citations, use 'and' but in parenthetical citations use '_______'.",
-        correctAnswer: "&",
-        explanation: "& in parentheses: (Hong & Lee, 2022). 'And' in sentence: Hong and Lee (2022).",
-        skillFocus: ["apa-citation"]
+        id: "w4h1-github",
+        title: "Part 2: GitHub Materials Walkthrough",
+        subsections: [
+          {
+            title: "Repository Overview",
+            content: "The demo materials are available on GitHub. This repository contains context files, extracted references, focused reading materials, and interactive practice tools."
+          },
+          {
+            title: "Key Files",
+            content: "**context.md** - Background info for the AI agent (quiz date, topic, materials)\\n\\n**Ho2025.md** - The review article with all references\\n\\n**extractFilterRef.md** - Instructions for extracting relevant references\\n\\n**taskOrientation.md** - 10 key facts about the AWQ with sources\\n\\n**focusReading.md** - Focused reading strategy\\n\\n**StudyGuideAWQ.md** - Comprehensive study guide"
+          },
+          {
+            title: "Interactive Tools",
+            content: "The **teacherJumpIntoWater** folder contains an interactive writing guide game that walks you through the AWQ writing process step by step."
+          }
+        ],
+        iframeEmbed: {
+          url: "https://github.com/tesolchina/genAI2026/tree/main/courses/UCLC1008/AIagentDemo",
+          title: "GitHub Repository - AIagentDemo",
+          height: 500
+        }
       },
       {
-        id: "w4h1-paragraph1",
-        type: "paragraph",
-        question: "TIMED (12 min): Write a 100-word summary of Hong et al.'s (2022) main findings. Focus on claims only, skip data.",
-        wordLimit: 110,
-        hints: ["Focus on main claims only", "Don't include statistics", "Use proper citation", "Watch your time!"],
-        skillFocus: ["summarising", "time-management"],
-        modelAnswer: "Hong et al. (2022) investigated parental attitudes toward facial recognition technology in Chinese elementary schools. Their findings indicate that despite concerns about privacy risks, parents generally accept and support FRT implementation. This acceptance stems from parents' recognition of the technology's practical value, including enhanced security and convenience. The study suggests that parents' willingness to embrace technological innovation outweighs their apprehensions about potential dangers, leading to continued support for FRT use in educational settings."
+        id: "w4h1-practice",
+        title: "Part 3: Try the Interactive Guide",
+        subsections: [
+          {
+            title: "Interactive Writing Guide",
+            content: "The interactive writing guide game takes you through a 12-step AWQ writing process with progress tracking, citation references, and word count monitoring."
+          }
+        ],
+        iframeEmbed: {
+          url: "https://tesolchina.github.io/genAI2026/courses/UCLC1008/AIagentDemo/teacherJumpIntoWater/guide_game_FRT.html",
+          title: "Interactive AWQ Writing Guide",
+          height: 700
+        }
       }
     ],
+    tasks: [],
     writingTask: {
-      prompt: "SPEED TASK: Write a 100-word summary of Article A's main argument in exactly 12 minutes. Focus on claims only.",
-      wordLimit: 110,
-      rubricCriteria: ["Main claims captured", "No excessive data", "Proper citation", "Completed in time"]
+      prompt: "After exploring the demo materials, write a brief reflection (100-150 words) on how you could use AI agents to help prepare for the AWQ.",
+      wordLimit: 150,
+      rubricCriteria: ["Understanding of AI agents", "Practical application ideas", "Clear writing"]
     }
   },
   {

@@ -4,8 +4,8 @@ import { WeekOverviewTemplate } from "./WeekOverviewTemplate";
 const classHours = [
   { 
     hour: 1, 
-    title: "Synthesizing Multiple Sources", 
-    theme: "Listing vs synthesis; agreement, contrast, elaboration",
+    title: "AI Agent Demo", 
+    theme: "Learning with AI Agents for AWQ Prep",
     unitCount: 3
   },
   { 
