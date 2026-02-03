@@ -43,52 +43,50 @@ interface StudentTaskProgressProps {
   paragraphNotes: ParagraphNote[];
 }
 
-// Check if a response matches a task based on question text similarity
-const matchesByQuestionText = (responseJson: string, taskQuestion: string): boolean => {
-  try {
-    const parsed = JSON.parse(responseJson);
-    if (parsed.question) {
-      // Check if the first 30 chars of questions match
-      const responseQ = parsed.question.toLowerCase().slice(0, 30);
-      const taskQ = taskQuestion.toLowerCase().slice(0, 30);
-      return responseQ === taskQ;
-    }
-  } catch {}
-  return false;
-};
-
-// Check if a response matches a task
-const responseMatchesTask = (response: TaskResponse, taskId: string, weekNum: number, hourNum: number, taskIndex?: number, taskQuestion?: string): boolean => {
+// Check if a response matches a task - STRICT matching only
+// Removed text-based matching which caused false positives
+const responseMatchesTask = (response: TaskResponse, taskId: string, weekNum: number, hourNum: number, taskIndex?: number): boolean => {
   const questionKey = response.question_key?.toLowerCase() || "";
-  const patterns = [
-    taskId.toLowerCase(),
-    `week${weekNum}_hour${hourNum}_${taskId}`.toLowerCase(),
-    `week${weekNum}-hour${hourNum}_${taskId}`.toLowerCase(),
-    `w${weekNum}h${hourNum}_${taskId}`.toLowerCase(),
+  
+  // Only match if the key contains BOTH week/hour info AND task identifier
+  // This prevents matching generic keys like "q1-What-is-the" to wrong tasks
+  
+  // Check for properly formatted keys with week/hour prefix
+  const weekHourPatterns = [
     `week${weekNum}-hour${hourNum}-${taskId}`.toLowerCase(),
+    `week${weekNum}_hour${hourNum}_${taskId}`.toLowerCase(),
+    `week-${weekNum}-hour${hourNum}-${taskId}`.toLowerCase(),
+    `week-${weekNum}-hour-${hourNum}-${taskId}`.toLowerCase(),
+    `w${weekNum}h${hourNum}-${taskId}`.toLowerCase(),
+    `w${weekNum}h${hourNum}_${taskId}`.toLowerCase(),
   ];
   
-  // Add question number patterns for QuickCheckMC
-  if (taskIndex !== undefined) {
-    patterns.push(`week${weekNum}-hour${hourNum}-q${taskIndex + 1}`.toLowerCase());
-    patterns.push(`q${taskIndex + 1}-`); // Simple pattern without week/hour
-  }
-  
-  if (patterns.some(p => questionKey.includes(p) || questionKey.startsWith(p))) {
-    return true;
-  }
-  
-  if (questionKey.includes(taskId.toLowerCase())) {
-    return true;
-  }
-  
-  try {
-    const parsed = JSON.parse(response.response);
-    if (parsed.taskId === taskId || parsed.questionId === taskId) {
+  // Check exact match with taskId that already contains week/hour (e.g., "w1h1-scan1")
+  if (taskId.match(/^w\d+h\d+-/)) {
+    if (questionKey === taskId.toLowerCase()) {
       return true;
     }
+    // Also check if key starts with the taskId
+    if (questionKey.startsWith(taskId.toLowerCase())) {
+      return true;
+    }
+  }
+  
+  // Check week-hour prefixed patterns
+  if (weekHourPatterns.some(p => questionKey === p || questionKey.startsWith(p))) {
+    return true;
+  }
+  
+  // Check if response JSON contains matching week/hour/taskId
+  try {
+    const parsed = JSON.parse(response.response);
     if (parsed.weekNumber === weekNum && parsed.hourNumber === hourNum) {
-      if (taskIndex !== undefined) {
+      // Must also have a matching question indicator
+      if (parsed.taskId === taskId || parsed.questionId === taskId) {
+        return true;
+      }
+      // Check for question number match only if key has proper week/hour prefix
+      if (taskIndex !== undefined && questionKey.includes(`week${weekNum}`) && questionKey.includes(`hour${hourNum}`)) {
         const qNumMatch = questionKey.match(/q(\d+)/);
         if (qNumMatch && parseInt(qNumMatch[1]) === taskIndex + 1) {
           return true;
@@ -96,11 +94,6 @@ const responseMatchesTask = (response: TaskResponse, taskId: string, weekNum: nu
       }
     }
   } catch {}
-  
-  // Check by question text similarity if provided
-  if (taskQuestion && matchesByQuestionText(response.response, taskQuestion)) {
-    return true;
-  }
   
   return false;
 };

@@ -23,7 +23,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 // Task components
 import { 
   ObjectiveTask, 
-  QuickCheckMC, 
+  QuickCheckMC,
+  HourQuickCheckMC,
   WritingTask, 
   ParaphraseCoach, 
   AskQuestionButton, 
@@ -1053,7 +1054,9 @@ Provide focused feedback (4-5 sentences):
                   className="border border-blue-500/20 bg-blue-500/5"
                 >
                   <div className="space-y-3">
-                    <QuickCheckMC
+                    <HourQuickCheckMC
+                      weekNumber={weekNumber}
+                      hourNumber={hourNumber}
                       questionNumber={1}
                       question="Who is the publisher of this article?"
                       options={[
@@ -1066,7 +1069,9 @@ Provide focused feedback (4-5 sentences):
                       explanation="Taylor & Francis publishes the journal 'Learning, Media and Technology'. You can see the T&F logo at the top of the article page."
                     />
 
-                    <QuickCheckMC
+                    <HourQuickCheckMC
+                      weekNumber={weekNumber}
+                      hourNumber={hourNumber}
                       questionNumber={2}
                       question="What is the journal name?"
                       options={[
@@ -1079,7 +1084,9 @@ Provide focused feedback (4-5 sentences):
                       explanation="The journal name appears in the article header and citation information. It's 'Learning, Media and Technology', Volume 45, Issue 2."
                     />
 
-                    <QuickCheckMC
+                    <HourQuickCheckMC
+                      weekNumber={weekNumber}
+                      hourNumber={hourNumber}
                       questionNumber={3}
                       question="Which universities do the authors come from?"
                       options={[
@@ -1092,7 +1099,9 @@ Provide focused feedback (4-5 sentences):
                       explanation="Both Mark Andrejevic and Neil Selwyn are affiliated with Monash University in Australia. This is shown in the author information section."
                     />
 
-                    <QuickCheckMC
+                    <HourQuickCheckMC
+                      weekNumber={weekNumber}
+                      hourNumber={hourNumber}
                       questionNumber={4}
                       question="When was this article published online?"
                       options={[
@@ -1116,7 +1125,9 @@ Provide focused feedback (4-5 sentences):
                   className="border border-green-500/20 bg-green-500/5"
                 >
                   <div className="space-y-3">
-                    <QuickCheckMC
+                    <HourQuickCheckMC
+                      weekNumber={weekNumber}
+                      hourNumber={hourNumber}
                       questionNumber={5}
                       question="What is the main topic of this article?"
                       options={[
@@ -1129,7 +1140,9 @@ Provide focused feedback (4-5 sentences):
                       explanation="The title and abstract clearly indicate this is a critical examination of FRT in schools, raising 'critical questions and concerns' rather than promoting its use."
                     />
 
-                    <QuickCheckMC
+                    <HourQuickCheckMC
+                      weekNumber={weekNumber}
+                      hourNumber={hourNumber}
                       questionNumber={6}
                       question="Based on the headings, what is the authors' overall stance on FRT in schools?"
                       options={[
@@ -1142,7 +1155,9 @@ Provide focused feedback (4-5 sentences):
                       explanation="Headings like 'Problematising the rise of facial recognition' and 'Challenging the take-up of facial recognition in schools' indicate a critical, questioning stance."
                     />
 
-                    <QuickCheckMC
+                    <HourQuickCheckMC
+                      weekNumber={weekNumber}
+                      hourNumber={hourNumber}
                       questionNumber={7}
                       question="What type of article structure does this paper follow?"
                       options={[

@@ -1,7 +1,7 @@
 // Task Components Index
 
 // Objective tasks (MC, true-false, fill-blank)
-export { ObjectiveTask, QuickCheckMC } from './objective';
+export { ObjectiveTask, QuickCheckMC, HourQuickCheckMC } from './objective';
 
 // Open-ended tasks (writing, paraphrasing)
 export { WritingTask, ParaphraseCoach, IntegratedParaphraseTask, StrategyPracticeTask, ConceptSelectTask } from './open-ended';
