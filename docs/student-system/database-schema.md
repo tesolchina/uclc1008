@@ -1,435 +1,306 @@
 # Database Schema
 
+> **Last Updated:** 2025-02-03
+
 ## Overview
 
-The student identification and dashboard system uses three main tables:
+The UCLC 1008 Learning Hub uses Lovable Cloud (Supabase) for data persistence. This document describes the actual database schema in production.
 
-1. **student_registrations** - Student identity and profile
-2. **assigned_tasks** - Tasks created by teachers
-3. **student_task_progress** - Student completion tracking
+## Table Size Summary (as of Feb 2025)
 
-## Entity Relationship Diagram
+| Table | Size | Description |
+|-------|------|-------------|
+| `process_logs` | ~1.6 MB | Debug/operation logs (auto-cleanup to 500 rows) |
+| `student_task_responses` | ~544 KB | Student answers to tasks |
+| `writing_drafts` | ~256 KB | Student writing submissions |
+| `staff_materials` | ~192 KB | Teacher-uploaded content |
+| `assignment_chat_history` | ~152 KB | AI chat sessions per assignment |
+| `students` | ~112 KB | Student profiles and API keys |
 
-```
-┌─────────────────────────────┐
-│     student_registrations   │
-├─────────────────────────────┤
-│ id (PK)                     │
-│ unique_id (UNIQUE)          │◄────────────────────────┐
-│ last_four_digits            │                         │
-│ first_initial               │                         │
-│ last_initial                │                         │
-│ section_number              │                         │
-│ teacher_name                │                         │
-│ browser_session_id          │                         │
-│ is_active                   │                         │
-│ last_active_at              │                         │
-│ created_at                  │                         │
-│ updated_at                  │                         │
-└─────────────────────────────┘                         │
-                                                        │
-┌─────────────────────────────┐                         │
-│       assigned_tasks        │                         │
-├─────────────────────────────┤                         │
-│ id (PK)                     │◄──────────────┐         │
-│ teacher_id (FK → auth.users)│               │         │
-│ target_type                 │               │         │
-│ target_student_id ──────────┼───────────────┼─────────┤
-│ target_section              │               │         │
-│ title                       │               │         │
-│ description                 │               │         │
-│ instructions                │               │         │
-│ linked_page                 │               │         │
-│ linked_assignment_id        │               │         │
-│ linked_unit_id              │               │         │
-│ due_date                    │               │         │
-│ assigned_at                 │               │         │
-│ is_active                   │               │         │
-│ priority                    │               │         │
-│ created_at                  │               │         │
-│ updated_at                  │               │         │
-└─────────────────────────────┘               │         │
-                                              │         │
-┌─────────────────────────────┐               │         │
-│   student_task_progress     │               │         │
-├─────────────────────────────┤               │         │
-│ id (PK)                     │               │         │
-│ student_unique_id ──────────┼───────────────┼─────────┘
-│ assigned_task_id (FK) ──────┼───────────────┘
-│ status                      │
-│ started_at                  │
-│ completed_at                │
-│ response_data               │
-│ created_at                  │
-│ updated_at                  │
-└─────────────────────────────┘
-```
+## Core Tables
 
-## Table Definitions
-
-### student_registrations
-
-Stores student registration data. This table is the core identity table.
+### students
+Primary student identity table (NOT using Supabase Auth).
 
 ```sql
-/**
- * student_registrations
- * 
- * PURPOSE: Store student identity without requiring email/password auth.
- * 
- * DESIGN NOTES:
- * - unique_id is human-readable and memorable (e.g., "1234-JD-7X")
- * - Only last 4 digits stored for privacy
- * - browser_session_id enables "remember me" on same device
- * - is_active flag for soft deletes
- * - last_active_at for engagement tracking
- */
-CREATE TABLE public.student_registrations (
-  -- Primary key: UUID for database operations
+CREATE TABLE public.students (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  
-  -- Human-readable unique identifier
-  -- Format: {last4}-{initials}-{random2}, e.g., "1234-JD-7X"
-  -- This is what students remember and use to log in
-  unique_id TEXT NOT NULL UNIQUE,
-  
-  -- Partial student ID (privacy-preserving)
-  -- Only stores last 4 digits, not full student number
-  last_four_digits TEXT NOT NULL,
-  
-  -- Name initials (single characters, uppercase)
-  first_initial TEXT NOT NULL,
-  last_initial TEXT NOT NULL,
-  
-  -- Optional class information (nullable)
-  -- Used for filtering and teacher assignment
-  section_number TEXT,
-  teacher_name TEXT,
-  
-  -- Device tracking for "remember me" functionality
-  -- Generated on client side and stored in localStorage
-  browser_session_id TEXT NOT NULL,
-  
-  -- Soft delete flag (never hard delete student data)
+  student_id TEXT NOT NULL UNIQUE,      -- Human-readable ID (e.g., "1234-JD")
+  student_number TEXT,                  -- Full HKBU student number (optional)
+  display_name TEXT,                    -- Preferred name
+  email TEXT,                           -- Optional email
+  section_number TEXT,                  -- Class section (e.g., "A01")
+  hkbu_api_key TEXT,                    -- Encrypted HKBU GenAI API key
+  notes TEXT,                           -- Teacher notes
   is_active BOOLEAN DEFAULT true,
-  
-  -- Engagement tracking
-  last_active_at TIMESTAMPTZ DEFAULT now(),
-  
-  -- Standard timestamps
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );
-
--- Indexes for common query patterns
-CREATE INDEX idx_student_reg_unique_id ON student_registrations(unique_id);
-CREATE INDEX idx_student_reg_section ON student_registrations(section_number);
-CREATE INDEX idx_student_reg_teacher ON student_registrations(teacher_name);
-CREATE INDEX idx_student_reg_active ON student_registrations(is_active);
-CREATE INDEX idx_student_reg_last_active ON student_registrations(last_active_at DESC);
 ```
 
-### assigned_tasks
-
-Stores tasks created by teachers for students.
+### profiles
+Authenticated users (teachers/admins) via HKBU OAuth.
 
 ```sql
-/**
- * assigned_tasks
- * 
- * PURPOSE: Store teacher-created assignments with targeting options.
- * 
- * TARGETING SYSTEM:
- * - target_type = 'all': Task visible to all students
- * - target_type = 'section': Task visible to students in target_section
- * - target_type = 'individual': Task visible only to target_student_id
- * 
- * CONTENT LINKING:
- * - linked_page: Route path (e.g., "/week/1/unit/unit1_1")
- * - linked_unit_id: References content in application
- * - linked_assignment_id: References assignment definitions
- */
-CREATE TABLE public.assigned_tasks (
-  -- Primary key
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  
-  -- Who created this task (teacher's auth.users ID)
-  teacher_id UUID REFERENCES auth.users(id) NOT NULL,
-  
-  -- Targeting: who should see this task
-  target_type TEXT NOT NULL CHECK (target_type IN ('individual', 'section', 'all')),
-  target_student_id TEXT,         -- Used when target_type = 'individual'
-  target_section TEXT,            -- Used when target_type = 'section'
-  
-  -- Task content
-  title TEXT NOT NULL,
-  description TEXT,               -- Brief summary
-  instructions TEXT,              -- Detailed instructions (shown in expandable panel)
-  
-  -- Content linking (all optional, use what's relevant)
-  linked_page TEXT,               -- Direct route path for navigation
-  linked_assignment_id TEXT,      -- Reference to assignment in code
-  linked_unit_id TEXT,            -- Reference to unit in code
-  
-  -- Timing
-  due_date TIMESTAMPTZ,           -- Optional deadline
-  assigned_at TIMESTAMPTZ DEFAULT now(),
-  
-  -- Status and priority
-  is_active BOOLEAN DEFAULT true,
-  priority TEXT DEFAULT 'normal' CHECK (priority IN ('low', 'normal', 'high', 'urgent')),
-  
-  -- Standard timestamps
+CREATE TABLE public.profiles (
+  id UUID PRIMARY KEY,                  -- Same as auth.users.id
+  hkbu_user_id TEXT NOT NULL,           -- HKBU OAuth user ID
+  email TEXT,
+  display_name TEXT,
+  role app_role DEFAULT 'student',      -- ENUM: 'teacher', 'student', 'admin'
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );
-
--- Indexes for efficient querying
-CREATE INDEX idx_tasks_teacher ON assigned_tasks(teacher_id);
-CREATE INDEX idx_tasks_target_type ON assigned_tasks(target_type);
-CREATE INDEX idx_tasks_section ON assigned_tasks(target_section);
-CREATE INDEX idx_tasks_student ON assigned_tasks(target_student_id);
-CREATE INDEX idx_tasks_due_date ON assigned_tasks(due_date);
-CREATE INDEX idx_tasks_active ON assigned_tasks(is_active);
 ```
 
-### student_task_progress
-
-Tracks student progress on assigned tasks.
+### student_task_responses
+Student answers to tasks (Hour tasks, discussion questions).
 
 ```sql
-/**
- * student_task_progress
- * 
- * PURPOSE: Track each student's progress on each assigned task.
- * 
- * STATUS FLOW:
- * pending → in_progress → completed
- *                      → skipped
- * 
- * UPSERT PATTERN:
- * Records are upserted (created if not exists, updated if exists)
- * using the unique constraint on (student_unique_id, assigned_task_id)
- */
-CREATE TABLE public.student_task_progress (
-  -- Primary key
+CREATE TABLE public.student_task_responses (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  
-  -- Links to student (by unique_id, not by UUID)
-  -- This allows tracking even if student re-registers
-  student_unique_id TEXT NOT NULL,
-  
-  -- Links to assigned task
-  assigned_task_id UUID REFERENCES assigned_tasks(id) ON DELETE CASCADE,
-  
-  -- Current status
-  status TEXT NOT NULL DEFAULT 'pending' 
-    CHECK (status IN ('pending', 'in_progress', 'completed', 'skipped')),
-  
-  -- Timing for analytics
-  started_at TIMESTAMPTZ,         -- When student first clicked "Start"
-  completed_at TIMESTAMPTZ,       -- When student marked complete
-  
-  -- Optional response data (for tasks that collect input)
-  -- Stored as JSONB for flexibility
-  response_data JSONB DEFAULT '{}'::jsonb,
-  
-  -- Standard timestamps
-  created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now(),
-  
-  -- Ensure one progress record per student per task
-  UNIQUE(student_unique_id, assigned_task_id)
+  student_id TEXT NOT NULL,             -- References students.student_id
+  task_id UUID REFERENCES hour_tasks(id),
+  question_key TEXT,                    -- Alternative key for static questions
+  response TEXT NOT NULL,
+  is_correct BOOLEAN,
+  score NUMERIC,
+  ai_feedback TEXT,                     -- AI-generated feedback
+  submitted_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
 );
-
--- Indexes for common queries
-CREATE INDEX idx_progress_student ON student_task_progress(student_unique_id);
-CREATE INDEX idx_progress_task ON student_task_progress(assigned_task_id);
-CREATE INDEX idx_progress_status ON student_task_progress(status);
 ```
 
-## Row Level Security (RLS) Policies
-
-### student_registrations Policies
+### hour_tasks
+Database-driven task definitions for classroom hours.
 
 ```sql
--- Enable RLS
-ALTER TABLE student_registrations ENABLE ROW LEVEL SECURITY;
-
-/**
- * Policy: Anyone can register (INSERT)
- * 
- * PURPOSE: Allow anonymous registration without auth
- * SECURITY: No sensitive data exposed; only creates new records
- */
-CREATE POLICY "Anyone can register"
-  ON student_registrations
-  FOR INSERT
-  WITH CHECK (true);
-
-/**
- * Policy: Anyone can read by unique_id (SELECT)
- * 
- * PURPOSE: Allow login by unique_id
- * SECURITY: Must know the unique_id to read
- */
-CREATE POLICY "Anyone can select by unique_id"
-  ON student_registrations
-  FOR SELECT
-  USING (true);
-
-/**
- * Policy: Students can update own registration (UPDATE)
- * 
- * PURPOSE: Allow students to update their section/teacher info
- * SECURITY: Matches browser_session_id from request headers
- * NOTE: Requires edge function or custom header to work
- */
-CREATE POLICY "Students can update own"
-  ON student_registrations
-  FOR UPDATE
-  USING (
-    browser_session_id = current_setting('request.headers', true)::json->>'x-browser-session-id'
-  );
-
-/**
- * Policy: Only admins can delete (DELETE)
- * 
- * PURPOSE: Prevent accidental deletion; soft delete preferred
- * SECURITY: Requires admin role check via has_role function
- */
-CREATE POLICY "Admins can delete"
-  ON student_registrations
-  FOR DELETE
-  USING (has_role(auth.uid(), 'admin'));
+CREATE TABLE public.hour_tasks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  week_number INTEGER NOT NULL,
+  hour_number INTEGER NOT NULL,
+  task_order INTEGER DEFAULT 0,
+  task_type TEXT NOT NULL,              -- 'mc', 'short-answer', 'paragraph', etc.
+  question TEXT NOT NULL,
+  context TEXT,                         -- Background reading material
+  options JSONB,                        -- For MC questions
+  correct_answer TEXT,
+  hints JSONB,
+  explanation TEXT,
+  word_limit INTEGER,
+  skill_focus TEXT[],                   -- Skills being assessed
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
 ```
 
-### assigned_tasks Policies
+### writing_drafts
+Versioned student writing with AI feedback.
 
 ```sql
--- Enable RLS
-ALTER TABLE assigned_tasks ENABLE ROW LEVEL SECURITY;
-
-/**
- * Policy: Teachers and admins can manage all tasks
- * 
- * PURPOSE: Full CRUD for teachers/admins
- */
-CREATE POLICY "Teachers can manage tasks"
-  ON assigned_tasks
-  FOR ALL
-  USING (
-    has_role(auth.uid(), 'teacher') OR 
-    has_role(auth.uid(), 'admin')
-  );
-
-/**
- * Policy: Students can view tasks assigned to them
- * 
- * PURPOSE: Students see tasks targeted at them
- * SECURITY: Checks target_type and matches student info
- * 
- * IMPLEMENTATION NOTE:
- * In practice, you may need to pass student info via RPC or edge function
- * since students aren't authenticated via auth.uid()
- */
-CREATE POLICY "Students can view assigned tasks"
-  ON assigned_tasks
-  FOR SELECT
-  USING (
-    target_type = 'all'
-    OR (
-      target_type = 'section' 
-      AND target_section = current_setting('app.student_section', true)
-    )
-    OR (
-      target_type = 'individual' 
-      AND target_student_id = current_setting('app.student_unique_id', true)
-    )
-  );
+CREATE TABLE public.writing_drafts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  student_id TEXT NOT NULL,
+  task_key TEXT NOT NULL,               -- e.g., "week3_summary_draft"
+  content TEXT NOT NULL,
+  version INTEGER DEFAULT 1,
+  ai_feedback TEXT,
+  is_submitted BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
 ```
 
-### student_task_progress Policies
+## Live Session Tables
+
+### live_sessions
+Teacher-initiated classroom sessions.
 
 ```sql
--- Enable RLS
-ALTER TABLE student_task_progress ENABLE ROW LEVEL SECURITY;
-
-/**
- * Policy: Students can manage their own progress
- * 
- * PURPOSE: Allow students to update their task status
- */
-CREATE POLICY "Students manage own progress"
-  ON student_task_progress
-  FOR ALL
-  USING (
-    student_unique_id = current_setting('app.student_unique_id', true)
-  );
-
-/**
- * Policy: Teachers can view all progress
- * 
- * PURPOSE: Allow teachers to monitor student progress
- */
-CREATE POLICY "Teachers view all progress"
-  ON student_task_progress
-  FOR SELECT
-  USING (
-    has_role(auth.uid(), 'teacher') OR 
-    has_role(auth.uid(), 'admin')
-  );
+CREATE TABLE public.live_sessions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  teacher_id UUID REFERENCES profiles(id) NOT NULL,
+  session_code VARCHAR(6) NOT NULL,     -- Auto-generated join code
+  lesson_id TEXT NOT NULL,              -- e.g., "week3-hour2"
+  title TEXT,
+  status TEXT DEFAULT 'pending',        -- 'pending', 'active', 'ended'
+  session_type TEXT,                    -- 'discussion', 'lecture', etc.
+  current_section TEXT,
+  current_question_index INTEGER,
+  settings JSONB,
+  allow_ahead BOOLEAN DEFAULT false,
+  started_at TIMESTAMPTZ,
+  ended_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
 ```
 
-## Alternative: Using Edge Functions for Student Queries
-
-Since students aren't authenticated via `auth.uid()`, an alternative approach is to use edge functions that set the student context:
-
-```typescript
-/**
- * Edge Function: get-student-tasks
- * 
- * Sets student context and queries tasks with RLS applied.
- */
-export async function handler(req: Request) {
-  const { studentUniqueId, sectionNumber } = await req.json();
-  
-  // Create admin client to set context
-  const supabaseAdmin = createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-  );
-  
-  // Set student context for RLS
-  await supabaseAdmin.rpc('set_student_context', {
-    student_id: studentUniqueId,
-    section: sectionNumber,
-  });
-  
-  // Now query with RLS applied
-  const { data, error } = await supabaseAdmin
-    .from('assigned_tasks')
-    .select('*');
-  
-  return new Response(JSON.stringify({ data, error }));
-}
-```
-
-## Migration Order
-
-When implementing this schema, apply migrations in this order:
-
-1. **student_registrations** (no dependencies)
-2. **assigned_tasks** (depends on auth.users)
-3. **student_task_progress** (depends on assigned_tasks)
+### session_participants
+Students joined to a live session.
 
 ```sql
--- Migration 001: Create student_registrations
--- (paste student_registrations table + policies)
+CREATE TABLE public.session_participants (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  session_id UUID REFERENCES live_sessions(id) NOT NULL,
+  student_identifier TEXT NOT NULL,     -- References students.student_id
+  display_name TEXT,
+  is_online BOOLEAN DEFAULT true,
+  current_section TEXT,
+  last_seen_at TIMESTAMPTZ,
+  joined_at TIMESTAMPTZ DEFAULT now()
+);
+```
 
--- Migration 002: Create assigned_tasks
--- (paste assigned_tasks table + policies)
+### session_responses
+Real-time responses during live sessions.
 
--- Migration 003: Create student_task_progress
--- (paste student_task_progress table + policies)
+```sql
+CREATE TABLE public.session_responses (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  session_id UUID REFERENCES live_sessions(id) NOT NULL,
+  participant_id UUID REFERENCES session_participants(id) NOT NULL,
+  question_index INTEGER NOT NULL,
+  question_type TEXT NOT NULL,
+  response JSONB NOT NULL,
+  is_correct BOOLEAN,
+  ai_feedback TEXT,
+  submitted_at TIMESTAMPTZ DEFAULT now()
+);
+```
+
+## AI & Chat Tables
+
+### ai_tutor_reports
+AI-generated progress reports per student per topic.
+
+```sql
+CREATE TABLE public.ai_tutor_reports (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  student_id TEXT NOT NULL,
+  week_number INTEGER NOT NULL,
+  hour_number INTEGER NOT NULL,
+  topic_id TEXT NOT NULL,               -- e.g., "paraphrasing"
+  star_rating INTEGER CHECK (star_rating BETWEEN 1 AND 5),
+  qualitative_report TEXT NOT NULL,
+  performance_data JSONB,
+  tasks_completed INTEGER,
+  tasks_total INTEGER,
+  student_notes TEXT,                   -- Student's self-reflection
+  teacher_comment TEXT,
+  teacher_id UUID REFERENCES profiles(id),
+  commented_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+```
+
+### assignment_chat_history
+Persistent AI chat per student per assignment context.
+
+```sql
+CREATE TABLE public.assignment_chat_history (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  student_id TEXT NOT NULL,
+  assignment_key TEXT NOT NULL,         -- e.g., "precourse", "ace-final"
+  week_number INTEGER,
+  hour_number INTEGER,
+  lesson_id TEXT,
+  context_type TEXT,                    -- 'assignment', 'lesson', 'general'
+  messages JSONB DEFAULT '[]',          -- Array of {role, content, timestamp}
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+```
+
+## Staff Collaboration Tables
+
+### staff_threads
+Discussion threads for teacher collaboration.
+
+### staff_comments
+Comments on staff threads.
+
+### staff_materials
+Uploaded teaching materials with markdown conversion.
+
+### staff_library_files / staff_library_folders
+Organized file storage for shared materials.
+
+## System Tables
+
+### process_logs
+Debug and operation logging (auto-cleanup keeps last 500).
+
+### system_settings
+Key-value store for app configuration.
+
+### api_keys
+Shared API keys for platform services.
+
+## Enums
+
+```sql
+CREATE TYPE public.app_role AS ENUM ('teacher', 'student', 'admin');
+```
+
+## Key Relationships
+
+```
+students (student_id)
+    ├── student_task_responses
+    ├── writing_drafts
+    ├── ai_tutor_reports
+    ├── assignment_chat_history
+    └── session_participants (as student_identifier)
+
+profiles (id = auth.users.id)
+    ├── live_sessions (teacher_id)
+    ├── ai_tutor_reports (teacher_id for comments)
+    ├── user_roles
+    └── teacher_sections
+
+live_sessions
+    ├── session_participants
+    ├── session_responses
+    ├── session_prompts
+    └── discussion_sessions
+```
+
+## Security Notes
+
+### RLS Policy Pattern
+Most tables use permissive `USING (true)` policies for educational accessibility. This is **intentional** for this learning platform where:
+- Students aren't authenticated via Supabase Auth
+- Data is class-related, not sensitive PII
+- Teachers need visibility across all student work
+
+### Sensitive Data Protection
+- `students.hkbu_api_key` - Encrypted API keys, never exposed via SELECT
+- `profiles.email` - Protected by RLS for teachers/admins only
+
+### Known Security Warnings
+The linter reports 34 "permissive RLS" warnings - these are accepted tradeoffs for educational functionality. Critical tables like `students` and `profiles` have proper restrictions.
+
+## Maintenance
+
+### Process Logs Cleanup
+The `cleanupOldLogs()` function in edge functions keeps logs at ~500 rows. Manual cleanup:
+
+```sql
+DELETE FROM process_logs WHERE created_at < (
+  SELECT created_at FROM process_logs 
+  ORDER BY created_at DESC OFFSET 499 LIMIT 1
+);
+```
+
+### Realtime Enabled Tables
+```sql
+-- These tables are in supabase_realtime publication
+live_sessions
+session_participants
+session_responses
+session_prompts
+ai_conversation_messages
+ai_message_queue
 ```
