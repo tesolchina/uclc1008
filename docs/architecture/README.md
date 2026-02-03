@@ -140,12 +140,22 @@ User Action → Component → Hook/Context → Supabase Client → Edge Function
 
 See `docs/student-system/database-schema.md` for detailed schema documentation.
 
-Key tables:
-- `students` - Student profiles and API keys
-- `ai_tutor_reports` - AI tutor session reports
-- `student_task_responses` - Task submission tracking
-- `lesson_progress` - Lesson completion tracking
-- `live_sessions` - Active classroom sessions
+**Core Tables (30+):**
+- `students` - Student profiles and encrypted API keys
+- `profiles` - Authenticated teachers/admins (via HKBU OAuth)
+- `student_task_responses` - Task answers with AI feedback
+- `writing_drafts` - Versioned student writing
+- `ai_tutor_reports` - AI-generated progress reports
+- `hour_tasks` - Database-driven task definitions
+- `live_sessions` - Real-time classroom sessions
+- `session_participants` / `session_responses` - Live session data
+- `assignment_chat_history` - Persistent AI chat per context
+
+**Security Model:**
+- Students use simple ID auth (not Supabase Auth)
+- Teachers/admins use HKBU OAuth → profiles table
+- RLS policies are intentionally permissive for educational access
+- Sensitive fields (API keys) protected via restricted SELECT
 
 ## Adding New Features
 
