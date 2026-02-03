@@ -43,6 +43,23 @@ interface StudentTaskProgressProps {
   paragraphNotes: ParagraphNote[];
 }
 
+// Extract question stem (the main question without quotes/examples)
+// e.g., "Which citation style is this? 'Some example...'" → "which citation style is this?"
+const extractQuestionStem = (question: string): string => {
+  const normalized = question.toLowerCase().trim().replace(/\s+/g, ' ');
+  // Try to extract up to the first quote or specific example marker
+  const quoteIndex = normalized.search(/['"]/);
+  if (quoteIndex > 10) {
+    return normalized.substring(0, quoteIndex).trim();
+  }
+  // For questions without quotes, use first 40 chars or up to first specific content
+  const parenIndex = normalized.indexOf('(');
+  if (parenIndex > 10 && parenIndex < 60) {
+    return normalized.substring(0, parenIndex).trim();
+  }
+  return normalized.substring(0, 50);
+};
+
 // Check if a response matches a task
 // Supports both new format (w1h1-q1) and old format (q1-Question-text)
 const responseMatchesTask = (response: TaskResponse, taskId: string, weekNum: number, hourNum: number, taskIndex?: number, taskQuestion?: string): boolean => {
@@ -76,10 +93,29 @@ const responseMatchesTask = (response: TaskResponse, taskId: string, weekNum: nu
         const storedQuestion = parsed.question.toLowerCase().trim().replace(/\s+/g, ' ');
         const currentQuestion = taskQuestion.toLowerCase().trim().replace(/\s+/g, ' ');
         
-        // Exact match or very close match (first 50 chars to handle minor differences)
-        if (storedQuestion === currentQuestion || 
-            (storedQuestion.length > 30 && currentQuestion.length > 30 && 
-             storedQuestion.substring(0, 50) === currentQuestion.substring(0, 50))) {
+        // Exact match
+        if (storedQuestion === currentQuestion) {
+          return true;
+        }
+        
+        // First 50 chars match (for minor text differences)
+        if (storedQuestion.length > 30 && currentQuestion.length > 30 && 
+            storedQuestion.substring(0, 50) === currentQuestion.substring(0, 50)) {
+          return true;
+        }
+        
+        // Question stem match (for when examples/quotes changed but question type is same)
+        // This helps match old data where the example text changed but the question type is the same
+        const storedStem = extractQuestionStem(parsed.question);
+        const currentStem = extractQuestionStem(taskQuestion);
+        if (storedStem.length > 15 && currentStem.length > 15 && storedStem === currentStem) {
+          // If stored data has week/hour metadata, verify it matches
+          if (parsed.weekNumber !== undefined && parsed.hourNumber !== undefined) {
+            return parsed.weekNumber === weekNum && parsed.hourNumber === hourNum;
+          }
+          // For old data without metadata, allow match if stems are identical
+          // This is acceptable because question stems like "Which citation style is this?" 
+          // are unique enough to identify the task type
           return true;
         }
       }
