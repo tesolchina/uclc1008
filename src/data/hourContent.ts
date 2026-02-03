@@ -2181,73 +2181,74 @@ export const week4Hours: HourData[] = [
   {
     weekNumber: 4,
     hourNumber: 2,
-    title: "Timed Practice",
-    theme: "AWQ Simulation",
-    behaviourChange: "Plan BEFORE you write. 2 minutes of planning saves 10 minutes of confusion.",
+    title: "AI-Guided Writing Game",
+    theme: "Step-by-Step AWQ Practice with AI Feedback",
+    behaviourChange: "Get feedback at EACH step, not just at the end. Learning happens during the process.",
     learningGoals: [
-      "Complete a mini-AWQ under time pressure",
-      "Apply time management strategies",
-      "Experience exam conditions"
+      "Practice AWQ writing with step-by-step AI guidance",
+      "Receive immediate feedback on introduction, body, and conclusion",
+      "Learn to synthesise sources through guided practice",
+      "Build confidence for the real AWQ"
     ],
-    ciloLinks: ["CILO 2: All Skills", "CILO 3: Drafting"],
+    ciloLinks: ["CILO 2: All Skills", "CILO 3: Drafting", "CILO 5: AI as Learning Partner"],
     keyConcepts: [
       {
-        term: "Mini-AWQ",
-        definition: "A 25-minute practice version: 200 words covering both sources with intro, body, and conclusion.",
-        example: "Half the time, half the words - same skills. Good practice for the real thing.",
-        tip: "Treat it like the real exam. No phone, no notes, just you and the excerpts."
+        term: "Step-by-Step Writing",
+        definition: "Breaking the AWQ into manageable stages: Read → Plan → Intro → Body → Conclusion → Review",
+        example: "Each step gets AI feedback before moving on, so you can correct mistakes early.",
+        tip: "Don't rush! The AI tutor (Dr. Write) will guide you through each step."
       },
       {
-        term: "Time Allocation (Mini-AWQ)",
-        definition: "5 min planning → 15 min writing → 5 min reviewing.",
-        example: "Plan: list 3-4 main points from each source. Write: intro, body, conclusion. Review: check citations.",
-        tip: "STICK TO THE TIMES. Don't spend 20 minutes writing and 0 reviewing."
+        term: "Synthesis Focus",
+        definition: "The body paragraph is where synthesis happens - showing relationships between sources, not just listing them.",
+        example: "Instead of 'Hong et al. says X. Andrejevic says Y.' write 'While Hong et al. highlight benefits, Andrejevic & Selwyn counter that...'",
+        tip: "Look for agreement, contrast, or elaboration between the two sources."
       }
     ],
     articles: [ARTICLE_A, ARTICLE_B],
     agenda: [
       { 
-        title: "Time Management Strategy", 
+        title: "Read & Understand", 
         duration: "5 min", 
         activities: [
-          "5-15-5 breakdown for mini-AWQ",
-          "Planning template",
-          "What to check in review"
+          "Read both article excerpts",
+          "Identify main argument of each",
+          "Chat with AI tutor for clarification"
         ] 
       },
       { 
-        title: "Mini-AWQ Simulation", 
+        title: "Plan Your Response", 
+        duration: "5 min", 
+        activities: [
+          "List 2-3 key points from each source",
+          "Identify relationships (agree/contrast/elaborate)",
+          "Get AI feedback on your plan"
+        ] 
+      },
+      { 
+        title: "Write with AI Guidance", 
         duration: "25 min", 
         activities: [
-          "200-word response",
-          "Both sources",
-          "Exam conditions"
+          "Write introduction (2-3 sentences) → Get feedback",
+          "Write body paragraph (4-6 sentences) → Get feedback",
+          "Write conclusion (1-2 sentences) → Get feedback"
         ] 
       },
       { 
-        title: "Self-Assessment", 
-        duration: "14 min", 
+        title: "Final Review", 
+        duration: "10 min", 
         activities: [
-          "Score using AWQ rubric",
-          "Identify strengths and gaps"
+          "Get comprehensive AI review",
+          "Check word count and citations",
+          "Receive score on 5 AWQ criteria"
         ] 
       }
     ],
-    tasks: [
-      {
-        id: "w4h2-paragraph1",
-        type: "paragraph",
-        question: "MINI-AWQ (25 min): Write a 200-word synthesis of Hong et al. (2022) and Andrejevic & Selwyn (2020) on FRT in schools. Include introduction, body, and conclusion.",
-        wordLimit: 220,
-        hints: ["5 min planning", "15 min writing", "5 min reviewing", "Synthesise - don't list!"],
-        skillFocus: ["awq-structure", "synthesising", "time-management"],
-        modelAnswer: "Facial recognition technology (FRT) is increasingly being adopted in schools, sparking debate among researchers. This summary examines contrasting perspectives on FRT implementation from parental acceptance (Hong et al., 2022) to ethical concerns (Andrejevic & Selwyn, 2020).\n\nThe debate surrounding FRT in schools reveals fundamental tensions between practical benefits and ethical risks. Hong et al. (2022) demonstrate that parents generally accept FRT despite acknowledging privacy concerns, valuing the technology's practical advantages for school security. Conversely, Andrejevic and Selwyn (2020) challenge this acceptance by highlighting the inescapable nature of facial surveillance. They argue that students cannot meaningfully consent to constant monitoring, as FRT systems require complete coverage to function effectively.\n\nIn conclusion, while FRT offers practical benefits that parents value, ongoing concerns about student consent and surveillance require careful consideration before implementation in educational settings."
-      }
-    ],
+    tasks: [],
     writingTask: {
-      prompt: "Complete a 200-word mini-AWQ in 25 minutes. Include: Introduction (with thesis), Body (synthesised summary), Conclusion. Both sources required.",
+      prompt: "Complete a 200-word mini-AWQ with AI guidance. The AI tutor will help you at each step.",
       wordLimit: 220,
-      rubricCriteria: ["All 3 sections present", "Sources synthesised not listed", "Proper citations", "Academic tone", "Completed in time"]
+      rubricCriteria: ["Summary Accuracy (20%)", "Synthesis (20%)", "Paraphrasing (20%)", "Academic Tone (20%)", "Citations (20%)"]
     }
   },
   {

@@ -57,6 +57,7 @@ import type { AgendaSectionEnhanced } from "@/features/lecture-mode";
 import { TeacherQuestionDashboard } from "@/components/teacher/TeacherQuestionDashboard";
 import { Hour3PracticeSession } from "@/components/lessons/Hour3PracticeSession";
 import { ClassroomDiscussionPage } from "@/features/classroom-discussion";
+import { AWQWritingGame } from "@/components/awq-game";
 
 // UI components and icons
 import { 
@@ -2836,6 +2837,22 @@ Provide focused feedback (4-5 sentences):
                 to help agents assist with AWQ preparation systematically.
               </AlertDescription>
             </Alert>
+          </section>
+        )}
+
+        {/* Week 4 Hour 2: AI-Guided AWQ Writing Game */}
+        {weekNumber === 4 && hourNumber === 2 && (
+          <section className="space-y-6">
+            <Alert className="border-primary/30 bg-primary/5">
+              <Sparkles className="h-4 w-4 text-primary" />
+              <AlertTitle>AI-Guided Writing Practice</AlertTitle>
+              <AlertDescription>
+                Work through the AWQ writing process step-by-step with AI guidance. 
+                Your progress and chat history are saved automatically.
+              </AlertDescription>
+            </Alert>
+            
+            <AWQWritingGame weekNumber={weekNumber} hourNumber={hourNumber} />
           </section>
         )}
 
