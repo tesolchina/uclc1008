@@ -2706,6 +2706,79 @@ Provide focused feedback (4-5 sentences):
           />
         )}
 
+        {/* Week 4 Hour 1: AI Agent Demo with Embedded Iframes */}
+        {weekNumber === 4 && hourNumber === 1 && hourData.integratedSections && (
+          <section className="space-y-6">
+            {hourData.integratedSections.map((section, sectionIndex) => (
+              <CollapsibleSection
+                key={section.id}
+                title={section.title}
+                description={section.subsections[0]?.content?.substring(0, 100) + "..."}
+                icon={sectionIndex === 0 ? <Lightbulb className="h-4 w-4 text-amber-600" /> : 
+                      sectionIndex === 1 ? <BookOpen className="h-4 w-4 text-blue-600" /> :
+                      <FileText className="h-4 w-4 text-green-600" />}
+                defaultOpen={sectionIndex === 0}
+                className={sectionIndex === 0 ? "border-2 border-amber-500/30 bg-amber-500/5" :
+                          sectionIndex === 1 ? "border-2 border-blue-500/30 bg-blue-500/5" :
+                          "border-2 border-green-500/30 bg-green-500/5"}
+              >
+                <div className="space-y-4">
+                  {/* Subsection Content */}
+                  {section.subsections.map((subsection, subIndex) => (
+                    <div key={subIndex} className="space-y-2">
+                      <h4 className="font-medium text-sm">{subsection.title}</h4>
+                      <p className="text-sm text-muted-foreground whitespace-pre-line">
+                        {subsection.content}
+                      </p>
+                    </div>
+                  ))}
+
+                  {/* Iframe Embed */}
+                  {section.iframeEmbed && (
+                    <div className="space-y-3 pt-4 border-t">
+                      <div 
+                        className="w-full rounded-lg overflow-hidden border bg-white"
+                        style={{ height: section.iframeEmbed.height || 500 }}
+                      >
+                        <iframe
+                          src={section.iframeEmbed.url}
+                          width="100%"
+                          height="100%"
+                          className="border-0"
+                          title={section.iframeEmbed.title}
+                          allow="autoplay; encrypted-media"
+                          sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                        />
+                      </div>
+                      <Button variant="outline" size="sm" asChild>
+                        <a
+                          href={section.iframeEmbed.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="gap-2"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                          Open in new tab
+                        </a>
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </CollapsibleSection>
+            ))}
+
+            {/* Key Takeaway */}
+            <Alert className="border-primary/30 bg-primary/5">
+              <Sparkles className="h-4 w-4 text-primary" />
+              <AlertTitle>Key Takeaway</AlertTitle>
+              <AlertDescription>
+                AI agents work best with clear context. The demo shows how to organize materials (context.md, extractFilterRef.md) 
+                to help agents assist with AWQ preparation systematically.
+              </AlertDescription>
+            </Alert>
+          </section>
+        )}
+
         {/* Week 3 Hour 2 & 3: Moodle Forum Tasks */}
         {weekNumber === 3 && (hourNumber === 2 || hourNumber === 3) && (
           <Week3MoodleTasks />
