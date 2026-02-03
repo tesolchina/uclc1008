@@ -58,13 +58,14 @@ import { TeacherQuestionDashboard } from "@/components/teacher/TeacherQuestionDa
 import { Hour3PracticeSession } from "@/components/lessons/Hour3PracticeSession";
 import { ClassroomDiscussionPage } from "@/features/classroom-discussion";
 import { AWQWritingGame } from "@/components/awq-game";
+import { OCRWritingReview } from "@/components/ocr-review";
 
 // UI components and icons
 import { 
   ArrowLeft, ArrowRight, Clock, Target, BookOpen, PenLine, 
   CheckCircle2, Lightbulb, FileText, Sparkles, ExternalLink, 
   AlertCircle, Calendar, GraduationCap, ScrollText, ChevronDown, 
-  Download, LogIn, Loader2, Trophy, Users 
+  Download, LogIn, Loader2, Trophy, Users, Camera 
 } from "lucide-react";
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -2853,6 +2854,22 @@ Provide focused feedback (4-5 sentences):
             </Alert>
             
             <AWQWritingGame weekNumber={weekNumber} hourNumber={hourNumber} />
+          </section>
+        )}
+
+        {/* Week 4 Hour 3: OCR Writing Review */}
+        {weekNumber === 4 && hourNumber === 3 && (
+          <section className="space-y-6">
+            <Alert className="border-primary/30 bg-primary/5">
+              <Camera className="h-4 w-4 text-primary" />
+              <AlertTitle>OCR Writing Review</AlertTitle>
+              <AlertDescription>
+                Upload a photo of your handwritten AWQ summary. The AI will extract the text, 
+                let you edit it, then provide feedback based on your teacher's criteria.
+              </AlertDescription>
+            </Alert>
+            
+            <OCRWritingReview weekNumber={weekNumber} hourNumber={hourNumber} />
           </section>
         )}
 

@@ -2254,100 +2254,73 @@ export const week4Hours: HourData[] = [
   {
     weekNumber: 4,
     hourNumber: 3,
-    title: "Self-Correction Lab",
-    theme: "Learning from Mistakes",
-    behaviourChange: "After every practice: identify your top 3 errors and fix them in the next attempt.",
+    title: "OCR Writing Review",
+    theme: "AI-Assisted Handwriting Analysis",
+    behaviourChange: "Get feedback on your handwritten work immediately - no need to retype!",
     learningGoals: [
-      "Use the AWQ rubric for self-assessment",
-      "Identify patterns in your errors",
-      "Revise and improve your work"
+      "Upload a photo of your handwritten AWQ summary",
+      "Review and correct OCR-extracted text",
+      "Receive AI feedback based on teacher's criteria",
+      "Discuss improvements with the AI tutor"
     ],
     ciloLinks: ["CILO 3: Revision Skills", "CILO 5: AI as Learning Partner"],
     keyConcepts: [
       {
-        term: "AWQ Rubric",
-        definition: "5 criteria, 20% each: Summary Accuracy, Synthesis, Paraphrasing, Academic Tone, Citations.",
-        example: "A score of 80% might be: Accuracy 16, Synthesis 18, Paraphrasing 14, Tone 16, Citations 16.",
-        tip: "Identify your WEAKEST criterion and focus practice there."
+        term: "OCR (Optical Character Recognition)",
+        definition: "Technology that converts images of text into editable digital text.",
+        example: "Upload a photo of your handwritten notes and the AI extracts the text for review.",
+        tip: "Take clear, well-lit photos for best results. Ensure your handwriting is reasonably neat."
       },
       {
-        term: "Student A vs. Student B",
-        definition: "Model answer comparison: Student A (80%) synthesises; Student B (61%) lists and includes too much data.",
-        example: "A: 'While Hong et al. support FRT, Andrejevic and Selwyn challenge...' vs. B: 'Article A says X. Article B says Y.'",
-        tip: "The difference is SYNTHESIS. A shows relationships; B just describes."
+        term: "Self-Correction",
+        definition: "The skill of identifying and fixing your own mistakes before submitting work.",
+        example: "After OCR extraction, check for typos, missing words, and formatting errors.",
+        tip: "Read the extracted text aloud to catch errors the OCR might have introduced."
       }
     ],
     articles: [ARTICLE_A, ARTICLE_B],
     agenda: [
       { 
-        title: "Rubric Review", 
+        title: "Upload & Extract", 
+        duration: "5 min", 
+        activities: [
+          "Take a clear photo of your handwritten summary",
+          "Upload to the OCR tool",
+          "Review extracted text"
+        ] 
+      },
+      { 
+        title: "Edit & Correct", 
         duration: "10 min", 
         activities: [
-          "Understand each of 5 criteria",
-          "What distinguishes high from low scores",
-          "Scoring practice"
+          "Fix any OCR errors",
+          "Correct spelling and grammar",
+          "Ensure proper citations are included"
         ] 
       },
       { 
-        title: "Sample Analysis", 
-        duration: "14 min", 
+        title: "AI Review", 
+        duration: "15 min", 
         activities: [
-          "Compare Student A (80%) vs Student B (61%)",
-          "Identify what makes A better"
+          "Get comprehensive feedback on your summary",
+          "Ask follow-up questions",
+          "Identify areas for improvement"
         ] 
       },
       { 
-        title: "Error Identification", 
-        duration: "8 min", 
+        title: "Revision", 
+        duration: "15 min", 
         activities: [
-          "Common mistake checklist",
-          "Find your patterns"
-        ] 
-      },
-      { 
-        title: "Revision Task", 
-        duration: "12 min", 
-        activities: [
-          "Revise your mini-AWQ from Hour 4.2"
+          "Apply feedback to improve your work",
+          "Re-submit for updated feedback if time permits"
         ] 
       }
     ],
-    tasks: [
-      {
-        id: "w4h3-mc1",
-        type: "mc",
-        question: "What distinguishes Student A's response (80%) from Student B's (61%)?",
-        options: [
-          "Student A used more direct quotes",
-          "Student A synthesised sources while Student B listed them separately",
-          "Student A wrote more words",
-          "Student A included more statistics"
-        ],
-        correctAnswer: 1,
-        explanation: "Synthesis is the key differentiator. A shows relationships between sources ('While... however...'); B treats them separately ('Article A says... Article B says...').",
-        skillFocus: ["synthesising", "self-assessment"]
-      },
-      {
-        id: "w4h3-tf1",
-        type: "true-false",
-        question: "Including specific data like '3.865 mean score' improves your AWQ score.",
-        correctAnswer: "false",
-        explanation: "Wrong! AWQ summaries should focus on CLAIMS, not detailed data. Skip statistics and focus on what the numbers MEAN.",
-        skillFocus: ["summarising"]
-      },
-      {
-        id: "w4h3-paragraph1",
-        type: "paragraph",
-        question: "Revise ONE paragraph from your mini-AWQ to improve synthesis. Then explain (30 words) what changes you made and why.",
-        wordLimit: 120,
-        hints: ["Look for listing patterns", "Add contrast connectives", "Show relationships between sources"],
-        skillFocus: ["revision", "synthesising"]
-      }
-    ],
+    tasks: [],
     writingTask: {
-      prompt: "Revise your mini-AWQ body paragraph. Focus on improving synthesis. Write the revised version and a brief explanation (30 words) of your changes.",
-      wordLimit: 160,
-      rubricCriteria: ["Clear improvement visible", "Better synthesis", "Changes explained"]
+      prompt: "Upload a photo of your handwritten AWQ summary. The AI will extract and review it.",
+      wordLimit: 220,
+      rubricCriteria: ["Summary Accuracy (20%)", "Synthesis (20%)", "Paraphrasing (20%)", "Academic Tone (20%)", "Citations (20%)"]
     }
   }
 ];

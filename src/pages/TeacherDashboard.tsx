@@ -15,6 +15,7 @@ import { StudentTasksByWeek } from "@/components/teacher/StudentTasksByWeek";
 import { TeacherStudentModeSwitch } from "@/components/teacher/TeacherStudentModeSwitch";
 import { StudentProgressPieChart } from "@/components/teacher/StudentProgressPieChart";
 import { StudentProgressDetails } from "@/components/teacher/StudentProgressDetails";
+import { W4H3PromptSettings } from "@/components/teacher/W4H3PromptSettings";
 import { 
   MessageCircle, 
   Users, 
@@ -1019,6 +1020,22 @@ export default function TeacherDashboard() {
         </CollapsibleTrigger>
         <CollapsibleContent className="pt-4">
           <StudentApiUsageTable />
+        </CollapsibleContent>
+      </Collapsible>
+
+      {/* AI Feedback Settings - Collapsible */}
+      <Collapsible>
+        <CollapsibleTrigger asChild>
+          <Button variant="outline" className="w-full justify-between">
+            <span className="flex items-center gap-2">
+              <MessageCircle className="h-4 w-4" />
+              AI Feedback Settings
+            </span>
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="pt-4">
+          <W4H3PromptSettings />
         </CollapsibleContent>
       </Collapsible>
 
