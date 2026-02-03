@@ -241,28 +241,40 @@ export function StudentTaskProgress({
           <Card key={weekNum} className={progressPercent === 100 ? "border-green-200 bg-green-50/30" : ""}>
             <Collapsible open={isWeekOpen} onOpenChange={() => toggleWeek(weekNum)}>
               <CollapsibleTrigger asChild>
-                <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors pb-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-base flex items-center gap-2">
-                      {isWeekOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                      Week {weekNum}
-                      {progressPercent === 100 && (
-                        <CheckCircle2 className="h-4 w-4 text-green-600" />
-                      )}
-                    </CardTitle>
-                    <div className="flex items-center gap-3">
-                      <div className="text-sm text-muted-foreground">
-                        {weekStats.completed}/{weekStats.total} tasks
+                <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors py-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-2 min-w-0">
+                      {isWeekOpen ? <ChevronDown className="h-4 w-4 shrink-0" /> : <ChevronRight className="h-4 w-4 shrink-0" />}
+                      <CardTitle className="text-base flex items-center gap-2">
+                        Week {weekNum}
+                        {progressPercent === 100 && (
+                          <CheckCircle2 className="h-4 w-4 text-green-600" />
+                        )}
+                      </CardTitle>
+                    </div>
+                    
+                    {/* Week progress summary - prominent display */}
+                    <div className="flex items-center gap-4 shrink-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl font-bold text-primary">{weekStats.completed}</span>
+                        <span className="text-muted-foreground">/</span>
+                        <span className="text-lg text-muted-foreground">{weekStats.total}</span>
                       </div>
-                      <div className="w-24">
-                        <Progress value={progressPercent} className="h-2" />
+                      <div className="w-32 hidden sm:block">
+                        <Progress value={progressPercent} className="h-2.5" />
                       </div>
+                      <Badge 
+                        variant={progressPercent === 100 ? "default" : progressPercent > 0 ? "secondary" : "outline"}
+                        className="text-xs w-14 justify-center"
+                      >
+                        {Math.round(progressPercent)}%
+                      </Badge>
                     </div>
                   </div>
                 </CardHeader>
               </CollapsibleTrigger>
               <CollapsibleContent>
-                <CardContent className="pt-0 space-y-4">
+                <CardContent className="pt-0 space-y-3">
                   {/* Quick action for incomplete tasks */}
                   {incompleteTasks.length > 0 && (
                     <div className="p-3 rounded-lg bg-amber-50 border border-amber-200">
@@ -270,9 +282,6 @@ export function StudentTaskProgress({
                         <div>
                           <p className="text-sm font-medium text-amber-800">
                             {incompleteTasks.length} task{incompleteTasks.length > 1 ? 's' : ''} remaining
-                          </p>
-                          <p className="text-xs text-amber-600 mt-0.5">
-                            Continue where you left off
                           </p>
                         </div>
                         <Button size="sm" asChild className="bg-amber-600 hover:bg-amber-700">
@@ -285,99 +294,165 @@ export function StudentTaskProgress({
                     </div>
                   )}
 
-                  {/* Hour breakdown */}
-                  {hours.map(hour => {
-                    const hourStats = getHourStats(hour);
-                    const hourComplete = hourStats.completed === hourStats.total;
+                  {/* Hour breakdown - cleaner cards */}
+                  <div className="grid gap-3">
+                    {hours.map(hour => {
+                      const hourStats = getHourStats(hour);
+                      const hourComplete = hourStats.completed === hourStats.total;
+                      const hourProgress = hourStats.total > 0 ? (hourStats.completed / hourStats.total) * 100 : 0;
 
-                    return (
-                      <div key={`${weekNum}-${hour.hourNumber}`} className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <Link 
-                            to={`/week/${weekNum}/hour/${hour.hourNumber}`}
-                            className="text-sm font-medium hover:text-primary flex items-center gap-2"
-                          >
-                            <span className={hourComplete ? "text-green-600" : ""}>
-                              Hour {hour.hourNumber}: {hour.title}
-                            </span>
-                            {hourComplete && <CheckCircle2 className="h-3.5 w-3.5 text-green-600" />}
-                          </Link>
-                          <Badge variant={hourComplete ? "default" : "outline"} className="text-xs">
-                            {hourStats.completed}/{hourStats.total}
-                          </Badge>
-                        </div>
-
-                        {/* Task list */}
-                        <div className="ml-4 grid gap-1.5">
-                          {hour.tasks.map((task, idx) => {
-                            const completed = isTaskCompleted(task, hour.weekNumber, hour.hourNumber, idx);
-                            
-                            return (
-                              <Link
-                                key={task.id}
-                                to={`/week/${weekNum}/hour/${hour.hourNumber}`}
-                                className={`flex items-center gap-2 p-2 rounded text-sm transition-colors ${
-                                  completed 
-                                    ? "bg-green-50 text-green-700 hover:bg-green-100" 
-                                    : "bg-muted/30 hover:bg-muted/50"
-                                }`}
-                              >
-                                {completed ? (
-                                  <CheckCircle2 className="h-4 w-4 text-green-600 shrink-0" />
-                                ) : (
-                                  <Circle className="h-4 w-4 text-muted-foreground shrink-0" />
-                                )}
-                                <span className="flex items-center gap-1.5">
-                                  {getTaskTypeIcon(task.type)}
-                                  <Badge variant="outline" className="text-[10px] px-1 py-0">
-                                    {getTaskTypeLabel(task.type)}
-                                  </Badge>
-                                </span>
-                                <span className="truncate flex-1">{task.question}</span>
-                                {!completed && (
-                                  <ArrowRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                                )}
-                              </Link>
-                            );
-                          })}
-
-                          {/* Writing task */}
-                          {hour.writingTask && (
-                            <Link
-                              to={`/week/${weekNum}/hour/${hour.hourNumber}`}
-                              className={`flex items-center gap-2 p-2 rounded text-sm transition-colors ${
-                                isWritingCompleted(hour.weekNumber, hour.hourNumber)
-                                  ? "bg-green-50 text-green-700 hover:bg-green-100" 
-                                  : "bg-blue-50 hover:bg-blue-100 border border-blue-200"
-                              }`}
-                            >
-                              {isWritingCompleted(hour.weekNumber, hour.hourNumber) ? (
-                                <CheckCircle2 className="h-4 w-4 text-green-600 shrink-0" />
-                              ) : (
-                                <Circle className="h-4 w-4 text-blue-500 shrink-0" />
-                              )}
-                              <span className="flex items-center gap-1.5">
-                                <PenLine className="h-3.5 w-3.5" />
-                                <Badge variant="outline" className="text-[10px] px-1 py-0 border-blue-300 text-blue-600">
-                                  Writing
-                                </Badge>
-                              </span>
-                              <span className="truncate flex-1">{hour.writingTask.prompt}</span>
-                              {!isWritingCompleted(hour.weekNumber, hour.hourNumber) && (
-                                <ArrowRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                              )}
-                            </Link>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
+                      return (
+                        <HourProgressCard 
+                          key={`${weekNum}-${hour.hourNumber}`}
+                          hour={hour}
+                          weekNum={weekNum}
+                          completed={hourStats.completed}
+                          total={hourStats.total}
+                          hourComplete={hourComplete}
+                          hourProgress={hourProgress}
+                          tasks={hour.tasks}
+                          writingTask={hour.writingTask}
+                          isTaskCompleted={(task, idx) => isTaskCompleted(task, hour.weekNumber, hour.hourNumber, idx)}
+                          isWritingCompleted={() => isWritingCompleted(hour.weekNumber, hour.hourNumber)}
+                        />
+                      );
+                    })}
+                  </div>
                 </CardContent>
               </CollapsibleContent>
             </Collapsible>
           </Card>
         );
       })}
+    </div>
+  );
+}
+
+// Separate component for cleaner hour display
+interface HourProgressCardProps {
+  hour: HourData;
+  weekNum: number;
+  completed: number;
+  total: number;
+  hourComplete: boolean;
+  hourProgress: number;
+  tasks: HourTask[];
+  writingTask?: HourData['writingTask'];
+  isTaskCompleted: (task: HourTask, idx: number) => boolean;
+  isWritingCompleted: () => boolean;
+}
+
+function HourProgressCard({
+  hour,
+  weekNum,
+  completed,
+  total,
+  hourComplete,
+  hourProgress,
+  tasks,
+  writingTask,
+  isTaskCompleted,
+  isWritingCompleted,
+}: HourProgressCardProps) {
+  const [showTasks, setShowTasks] = useState(false);
+
+  return (
+    <div className={`rounded-lg border p-3 ${hourComplete ? 'bg-green-50/50 border-green-200' : 'bg-card'}`}>
+      {/* Hour header - always visible */}
+      <div className="flex items-center justify-between gap-3">
+        <Link 
+          to={`/week/${weekNum}/hour/${hour.hourNumber}`}
+          className="flex-1 min-w-0 hover:text-primary transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            {hourComplete ? (
+              <CheckCircle2 className="h-4 w-4 text-green-600 shrink-0" />
+            ) : (
+              <Circle className="h-4 w-4 text-muted-foreground shrink-0" />
+            )}
+            <span className={`font-medium text-sm truncate ${hourComplete ? 'text-green-700' : ''}`}>
+              Hour {hour.hourNumber}: {hour.title}
+            </span>
+          </div>
+        </Link>
+        
+        {/* Progress indicator */}
+        <div className="flex items-center gap-3 shrink-0">
+          <div className="hidden sm:block w-20">
+            <Progress value={hourProgress} className="h-1.5" />
+          </div>
+          <Badge 
+            variant={hourComplete ? "default" : "outline"} 
+            className={`text-xs font-semibold min-w-[52px] justify-center ${hourComplete ? 'bg-green-600' : ''}`}
+          >
+            {completed}/{total}
+          </Badge>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 w-7 p-0"
+            onClick={(e) => {
+              e.preventDefault();
+              setShowTasks(!showTasks);
+            }}
+          >
+            <ChevronDown className={`h-4 w-4 transition-transform ${showTasks ? 'rotate-180' : ''}`} />
+          </Button>
+        </div>
+      </div>
+
+      {/* Expandable task list */}
+      {showTasks && (
+        <div className="mt-3 pt-3 border-t space-y-1.5">
+          {tasks.map((task, idx) => {
+            const taskCompleted = isTaskCompleted(task, idx);
+            
+            return (
+              <Link
+                key={task.id}
+                to={`/week/${weekNum}/hour/${hour.hourNumber}`}
+                className={`flex items-center gap-2 p-2 rounded text-sm transition-colors ${
+                  taskCompleted 
+                    ? "bg-green-100/70 text-green-700" 
+                    : "bg-muted/40 hover:bg-muted/60"
+                }`}
+              >
+                {taskCompleted ? (
+                  <CheckCircle2 className="h-3.5 w-3.5 text-green-600 shrink-0" />
+                ) : (
+                  <Circle className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                )}
+                <Badge variant="outline" className="text-[10px] px-1.5 py-0 shrink-0">
+                  {getTaskTypeLabel(task.type)}
+                </Badge>
+                <span className="truncate text-xs">{task.question}</span>
+              </Link>
+            );
+          })}
+
+          {/* Writing task */}
+          {writingTask && (
+            <Link
+              to={`/week/${weekNum}/hour/${hour.hourNumber}`}
+              className={`flex items-center gap-2 p-2 rounded text-sm transition-colors ${
+                isWritingCompleted()
+                  ? "bg-green-100/70 text-green-700" 
+                  : "bg-blue-50 hover:bg-blue-100 border border-blue-200"
+              }`}
+            >
+              {isWritingCompleted() ? (
+                <CheckCircle2 className="h-3.5 w-3.5 text-green-600 shrink-0" />
+              ) : (
+                <Circle className="h-3.5 w-3.5 text-blue-500 shrink-0" />
+              )}
+              <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-blue-300 text-blue-600 shrink-0">
+                Writing
+              </Badge>
+              <span className="truncate text-xs">{writingTask.prompt}</span>
+            </Link>
+          )}
+        </div>
+      )}
     </div>
   );
 }
