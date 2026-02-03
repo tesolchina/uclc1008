@@ -1,0 +1,1 @@
+export { AWQWritingGame } from "./AWQWritingGame";
