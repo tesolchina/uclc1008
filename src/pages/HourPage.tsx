@@ -2706,7 +2706,7 @@ Provide focused feedback (4-5 sentences):
           />
         )}
 
-        {/* Week 4 Hour 1: AI Agent Demo with Embedded Iframes */}
+        {/* Week 4 Hour 1: AI Agent Demo with Chat History and Links */}
         {weekNumber === 4 && hourNumber === 1 && hourData.integratedSections && (
           <section className="space-y-6">
             {hourData.integratedSections.map((section, sectionIndex) => (
@@ -2716,10 +2716,12 @@ Provide focused feedback (4-5 sentences):
                 description={section.subsections[0]?.content?.substring(0, 100) + "..."}
                 icon={sectionIndex === 0 ? <Lightbulb className="h-4 w-4 text-amber-600" /> : 
                       sectionIndex === 1 ? <BookOpen className="h-4 w-4 text-blue-600" /> :
-                      <FileText className="h-4 w-4 text-green-600" />}
+                      sectionIndex === 2 ? <FileText className="h-4 w-4 text-purple-600" /> :
+                      <Sparkles className="h-4 w-4 text-green-600" />}
                 defaultOpen={sectionIndex === 0}
                 className={sectionIndex === 0 ? "border-2 border-amber-500/30 bg-amber-500/5" :
                           sectionIndex === 1 ? "border-2 border-blue-500/30 bg-blue-500/5" :
+                          sectionIndex === 2 ? "border-2 border-purple-500/30 bg-purple-500/5" :
                           "border-2 border-green-500/30 bg-green-500/5"}
               >
                 <div className="space-y-4">
@@ -2732,6 +2734,64 @@ Provide focused feedback (4-5 sentences):
                       </p>
                     </div>
                   ))}
+
+                  {/* External Link */}
+                  {section.externalLink && (
+                    <Button variant="outline" size="sm" asChild className="mt-2">
+                      <a
+                        href={section.externalLink.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="gap-2"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                        {section.externalLink.label}
+                      </a>
+                    </Button>
+                  )}
+
+                  {/* Chat History Display */}
+                  {section.chatHistory && section.chatHistory.length > 0 && (
+                    <div className="space-y-3 pt-4 border-t">
+                      <h4 className="font-medium text-sm flex items-center gap-2">
+                        <Users className="h-4 w-4" />
+                        Conversation Highlights
+                      </h4>
+                      <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
+                        {section.chatHistory.map((msg, msgIndex) => (
+                          <div 
+                            key={msgIndex} 
+                            className={`rounded-lg p-3 ${
+                              msg.role === 'teacher' 
+                                ? 'bg-primary/10 border-l-4 border-primary' 
+                                : msg.role === 'student-john'
+                                ? 'bg-blue-500/10 border-l-4 border-blue-500 ml-4'
+                                : msg.role === 'student-karen'
+                                ? 'bg-pink-500/10 border-l-4 border-pink-500 ml-4'
+                                : 'bg-muted'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className={`text-xs font-semibold ${
+                                msg.role === 'teacher' ? 'text-primary' :
+                                msg.role === 'student-john' ? 'text-blue-600' :
+                                msg.role === 'student-karen' ? 'text-pink-600' :
+                                'text-muted-foreground'
+                              }`}>
+                                {msg.role === 'teacher' ? '👨‍🏫 Dr. Wang' :
+                                 msg.role === 'student-john' ? '🧑‍🎓 John' :
+                                 msg.role === 'student-karen' ? '👩‍🎓 Karen' : 'System'}
+                              </span>
+                              {msg.action && (
+                                <span className="text-xs text-muted-foreground italic">{msg.action}</span>
+                              )}
+                            </div>
+                            <p className="text-sm">{msg.content}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Iframe Embed */}
                   {section.iframeEmbed && (
