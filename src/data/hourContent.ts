@@ -67,6 +67,12 @@ export interface IframeEmbed {
   height?: number;
 }
 
+export interface ChatMessage {
+  role: 'teacher' | 'student-john' | 'student-karen' | 'system';
+  content: string;
+  action?: string; // e.g., "_John leans forward eagerly_"
+}
+
 export interface IntegratedSubsection {
   title: string;
   content: string;
@@ -77,6 +83,8 @@ export interface IntegratedSection {
   title: string;
   subsections: IntegratedSubsection[];
   iframeEmbed?: IframeEmbed;
+  chatHistory?: ChatMessage[];
+  externalLink?: { url: string; label: string };
 }
 
 export interface HourData {
@@ -2095,22 +2103,35 @@ export const week4Hours: HourData[] = [
       },
       {
         id: "w4h1-chat-demo",
-        title: "Part 1: Class Roleplay Demo (Poe Chat)",
+        title: "Part 1: Class Roleplay Demo",
         subsections: [
           {
-            title: "About This Chat",
-            content: "This is a roleplay conversation between Dr. Simon Wang (teacher) and two AI-simulated students: John (highly motivated) and Karen (a bit laid-back). The conversation demonstrates how to use AI agents for AWQ preparation, including reading context files and extracting useful information from source materials."
-          },
-          {
-            title: "Key Points Covered",
-            content: "• AWQ format: 50 minutes, 300 words max, synthesise two excerpts\\n• Source: Excerpts come from Ho et al. (2025) systematic review references\\n• Strategy: Use AI to extract the 23 included studies from the review\\n• Practice: Create focused reading materials and mock tasks"
+            title: "About This Conversation",
+            content: "This roleplay demonstrates how teachers can use AI agents for AWQ preparation. Dr. Simon Wang explains the concept to two students: John (highly motivated) and Karen (a bit laid-back)."
           }
         ],
-        iframeEmbed: {
+        externalLink: {
           url: "https://poe.com/s/e4bKuU0Pg2KNCWZDzHhu",
-          title: "AI Agent Demo - Poe Chat",
-          height: 600
-        }
+          label: "View full chat on Poe.com"
+        },
+        chatHistory: [
+          { role: "teacher", content: "Hello section 53 students! Great news - we now have more info about the Academic Writing Quiz. Check out the email from the course coordinator." },
+          { role: "student-john", action: "_leans forward eagerly_", content: "Dr. Wang! I've been reviewing the syllabus. Will it focus more on grammar or reading comprehension?" },
+          { role: "student-karen", action: "_glances up from her phone_", content: "Oh, the exam's coming up already? When is it again?" },
+          { role: "teacher", content: "The AWQ is in Week 6. You have 50 minutes to summarise, paraphrase, and synthesise TWO journal excerpts about 'The impact of AI chatbots and companion apps on humans' in NO MORE THAN 300 words." },
+          { role: "student-john", content: "So it's closed-book, 50 minutes, 300 words max. We need to synthesise two excerpts. Dr. Wang, should I read all the references in the Ho et al. review article?" },
+          { role: "student-karen", content: "Wait, we can't use our phones or notes at all? What's the difference between summarising and synthesising again?" },
+          { role: "student-john", content: "Summarising is condensing one source's main ideas. Synthesising is combining ideas from multiple sources and showing how they connect." },
+          { role: "teacher", content: "That's right! Now, I want to show you how AI agents can help with the grunt work. I've prepared a context.md file that briefs the AI agent on our task..." },
+          { role: "student-john", action: "_eyes light up_", content: "So the agent can read the Ho et al. review and help identify which references might appear as excerpts? That's clever!" },
+          { role: "student-karen", content: "Wait, so there's an AI agent that can read files on your computer? Is it like ChatGPT but with file access?" },
+          { role: "teacher", content: "Yes! Instead of chatting back-and-forth, we write instructions in files like context.md. The agent reads the file path, finds more paths and instructions inside, and processes everything systematically." },
+          { role: "student-john", content: "So it's like programming the agent through markdown files! The files become both the data and the instructions. That's why it can handle complex multi-step tasks." },
+          { role: "student-karen", action: "_looks impressed_", content: "And because it's all in files, we can reuse and modify them. So the agent is like... a research assistant who reads everything first and tells you what's important?" },
+          { role: "teacher", content: "Exactly! The agent created focusReading.md with the top 20 most likely articles for the quiz, plus taskOrientation.md with 10 key facts about the AWQ. All available on GitHub." },
+          { role: "student-john", content: "This is really powerful! The log shows the agent's reasoning at each step. Can we set this up ourselves?" },
+          { role: "teacher", content: "Yes! Register for GitHub with your HKBU email, apply for student education benefits, then fork my repo. You can run it all in the browser using Codespaces - no local setup needed!" }
+        ]
       },
       {
         id: "w4h1-github",
@@ -2129,10 +2150,9 @@ export const week4Hours: HourData[] = [
             content: "The **teacherJumpIntoWater** folder contains an interactive writing guide game that walks you through the AWQ writing process step by step."
           }
         ],
-        iframeEmbed: {
+        externalLink: {
           url: "https://github.com/tesolchina/genAI2026/tree/main/courses/UCLC1008/AIagentDemo",
-          title: "GitHub Repository - AIagentDemo",
-          height: 500
+          label: "Browse repository on GitHub"
         }
       },
       {
