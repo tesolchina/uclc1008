@@ -59,7 +59,7 @@ import { Hour3PracticeSession } from "@/components/lessons/Hour3PracticeSession"
 import { ClassroomDiscussionPage } from "@/features/classroom-discussion";
 import { AWQWritingGame } from "@/components/awq-game";
 import { OCRWritingReview } from "@/components/ocr-review";
-import { AWQGuideGame, SampleAWQQuiz, HTMLGameWithAI } from "@/components/awq-guide";
+import { AWQGuideGame, SampleAWQQuiz, HTMLGameWithAI, AWQWritingGame as NativeAWQGame } from "@/components/awq-guide";
 
 // UI components and icons
 import { 
@@ -2848,8 +2848,23 @@ Provide focused feedback (4-5 sentences):
             {/* Sample AWQ Quiz Materials (Articles, Rubric, Sample Scripts) */}
             <SampleAWQQuiz />
             
-            {/* HTML Game with AI Feedback Chat */}
+            {/* HTML Game Demo (iframe - no saving) */}
             <HTMLGameWithAI weekNumber={weekNumber} hourNumber={hourNumber} />
+            
+            {/* Native AWQ Writing Game with AI Feedback and Saving */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  AWQ Writing Game
+                  <Badge className="bg-green-500">With AI Feedback</Badge>
+                </CardTitle>
+                <CardDescription>
+                  Complete the 12-step writing process with AI feedback at each step. Your progress is saved automatically.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            <NativeAWQGame weekNumber={weekNumber} hourNumber={hourNumber} />
           </section>
         )}
 
