@@ -1,18 +1,29 @@
 # Database Schema
 
-> **Last Updated:** 2025-02-03
+> **Last Updated:** 2026-02-03
 
 ## Overview
 
 The UCLC 1008 Learning Hub uses Lovable Cloud (Supabase) for data persistence. This document describes the actual database schema in production.
 
-## Table Size Summary (as of Feb 2025)
+## Production Stats (Feb 2026)
 
-| Table | Size | Description |
-|-------|------|-------------|
-| `process_logs` | ~1.6 MB | Debug/operation logs (auto-cleanup to 500 rows) |
-| `student_task_responses` | ~544 KB | Student answers to tasks |
-| `writing_drafts` | ~256 KB | Student writing submissions |
+| Table | Rows | Size | Last Activity |
+|-------|------|------|---------------|
+| `process_logs` | 500 | 1.6 MB | Auto-cleanup active |
+| `student_task_responses` | 550 | 544 KB | 2026-02-03 |
+| `writing_drafts` | 177 | 256 KB | 2026-02-03 |
+| `students` | 27 | 112 KB | 2026-01-21 |
+| `assignment_chat_history` | 13 | 152 KB | Active |
+| `live_sessions` | 18 | 48 KB | 2026-01-23 |
+
+## Health Status
+- ✅ No orphaned records
+- ✅ Unique constraints working (blocking duplicates)
+- ✅ Process log cleanup active (500 row limit)
+- ⚠️ 34 permissive RLS policies (intentional for educational access)
+
+## Table Size Summary
 | `staff_materials` | ~192 KB | Teacher-uploaded content |
 | `assignment_chat_history` | ~152 KB | AI chat sessions per assignment |
 | `students` | ~112 KB | Student profiles and API keys |
