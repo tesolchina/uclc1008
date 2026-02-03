@@ -2134,8 +2134,34 @@ export const week4Hours: HourData[] = [
         ]
       },
       {
-        id: "w4h1-github",
-        title: "Part 2: GitHub Materials Walkthrough",
+        id: "w4h1-github-setup",
+        title: "Part 2: Set Up Your GitHub Account",
+        subsections: [
+          {
+            title: "Step 1: Create GitHub Account",
+            content: "**Sign up using your HKBU email address** at [github.com](https://github.com/signup). Using your university email is essential for the next step - getting free student benefits including Copilot access."
+          },
+          {
+            title: "Step 2: Apply for Student Benefits",
+            content: "GitHub offers FREE premium features for students! Apply at [GitHub Education](https://docs.github.com/en/education/about-github-education/github-education-for-students/apply-to-github-education-as-a-student). You'll get **GitHub Copilot free**, unlimited private repos, and more. This usually takes 1-7 days to approve."
+          },
+          {
+            title: "Step 3: Fork the Repository",
+            content: "Go to [tesolchina/genAI2026](https://github.com/tesolchina/genAI2026) and click the **Fork** button (top right). This creates your own copy of the repository. Direct link: [Fork this repo](https://github.com/tesolchina/genAI2026/fork)"
+          },
+          {
+            title: "Step 4: Open Codespace",
+            content: "After forking, click the green **Code** button on YOUR forked repo, then select **Codespaces** → **Create codespace on main**. This opens a VS Code environment in your browser - no installation needed! You can now talk to the AI agent directly."
+          }
+        ],
+        externalLink: {
+          url: "https://github.com/tesolchina/genAI2026/tree/main",
+          label: "View repository on GitHub"
+        }
+      },
+      {
+        id: "w4h1-materials",
+        title: "Part 3: Demo Materials Walkthrough",
         subsections: [
           {
             title: "Repository Overview",
@@ -2157,7 +2183,7 @@ export const week4Hours: HourData[] = [
       },
       {
         id: "w4h1-practice",
-        title: "Part 3: Try the Interactive Guide",
+        title: "Part 4: Try the Interactive Guide",
         subsections: [
           {
             title: "Interactive Writing Guide",
@@ -2171,12 +2197,7 @@ export const week4Hours: HourData[] = [
         }
       }
     ],
-    tasks: [],
-    writingTask: {
-      prompt: "After exploring the demo materials, write a brief reflection (100-150 words) on how you could use AI agents to help prepare for the AWQ.",
-      wordLimit: 150,
-      rubricCriteria: ["Understanding of AI agents", "Practical application ideas", "Clear writing"]
-    }
+    tasks: []
   },
   {
     weekNumber: 4,
@@ -2276,17 +2297,34 @@ export const week4Hours: HourData[] = [
         definition: "The skill of identifying and fixing your own mistakes before submitting work.",
         example: "After OCR extraction, check for typos, missing words, and formatting errors.",
         tip: "Read the extracted text aloud to catch errors the OCR might have introduced."
+      },
+      {
+        term: "Beta Platform Notice",
+        definition: "This platform is in beta testing mode. Some features may not work perfectly.",
+        example: "If OCR fails to extract your handwriting, you can manually type your summary instead.",
+        tip: "Take screenshots of your work regularly to save your progress. We apologize for any inconvenience!"
       }
     ],
     articles: [ARTICLE_A, ARTICLE_B],
     agenda: [
+      { 
+        title: "Important Notes", 
+        duration: "2 min", 
+        activities: [
+          "⚠️ The actual test paper will be provided in class",
+          "🧪 This platform is in BETA mode - some features may have issues",
+          "💾 Take screenshots to save your work as backup",
+          "✍️ If OCR doesn't work, type your summary manually"
+        ] 
+      },
       { 
         title: "Upload & Extract", 
         duration: "5 min", 
         activities: [
           "Take a clear photo of your handwritten summary",
           "Upload to the OCR tool",
-          "Review extracted text"
+          "Review extracted text",
+          "If OCR fails: manually type your summary"
         ] 
       },
       { 
