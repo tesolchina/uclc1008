@@ -182,40 +182,50 @@ export function HTMLGameWithAI({ weekNumber = 4, hourNumber = 2 }: HTMLGameWithA
   if (!studentId) {
     return (
       <div className="space-y-6">
-        {/* HTML Game Iframe - always visible */}
-        <Card>
-          <CardHeader>
+      {/* HTML Game Iframe - DEMO ONLY */}
+      <Card className="border-dashed border-2 border-muted-foreground/30">
+        <CardHeader>
+          <div className="flex items-center gap-2 flex-wrap">
             <CardTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
+              <Sparkles className="h-5 w-5 text-muted-foreground" />
               Interactive AWQ Writing Guide
             </CardTitle>
-            <CardDescription>
-              Work through the 12-step writing process. Complete each step to build your AWQ response.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="aspect-[16/10] w-full rounded-lg overflow-hidden border bg-white">
-              <iframe
-                src="https://tesolchina.github.io/genAI2026/courses/UCLC1008/AIagentDemo/teacherJumpIntoWater/guide_game_FRT.html"
-                width="100%"
-                height="100%"
-                className="border-0"
-                title="AWQ Writing Guide Game"
-              />
-            </div>
-            <Button variant="outline" size="sm" asChild>
-              <a
-                href="https://tesolchina.github.io/genAI2026/courses/UCLC1008/AIagentDemo/teacherJumpIntoWater/guide_game_FRT.html"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="gap-2"
-              >
-                <ExternalLink className="h-4 w-4" />
-                Open in New Tab
-              </a>
-            </Button>
-          </CardContent>
-        </Card>
+            <Badge variant="secondary" className="bg-amber-100 text-amber-700">DEMO ONLY</Badge>
+          </div>
+          <CardDescription>
+            ⚠️ This is a <strong>demonstration only</strong>. Responses are NOT saved and there is NO AI feedback. 
+            Use the native game below for the full experience.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Alert className="bg-amber-50 border-amber-200">
+            <AlertDescription className="text-amber-700 text-sm">
+              <strong>Note:</strong> This iframe demo does not save your work or provide AI feedback. 
+              Scroll down to use the <strong>AWQ Writing Game</strong> with full features.
+            </AlertDescription>
+          </Alert>
+          <div className="aspect-[16/10] w-full rounded-lg overflow-hidden border bg-white opacity-80">
+            <iframe
+              src="https://tesolchina.github.io/genAI2026/courses/UCLC1008/AIagentDemo/teacherJumpIntoWater/guide_game_FRT.html"
+              width="100%"
+              height="100%"
+              className="border-0"
+              title="AWQ Writing Guide Game (Demo)"
+            />
+          </div>
+          <Button variant="outline" size="sm" asChild>
+            <a
+              href="https://tesolchina.github.io/genAI2026/courses/UCLC1008/AIagentDemo/teacherJumpIntoWater/guide_game_FRT.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="gap-2"
+            >
+              <ExternalLink className="h-4 w-4" />
+              Open Demo in New Tab
+            </a>
+          </Button>
+        </CardContent>
+      </Card>
 
         {/* Login reminder for AI chat */}
         <Card className="border-amber-200 bg-amber-50/50">
@@ -240,25 +250,34 @@ export function HTMLGameWithAI({ weekNumber = 4, hourNumber = 2 }: HTMLGameWithA
 
   return (
     <div className="space-y-6">
-      {/* HTML Game Iframe */}
-      <Card>
+      {/* HTML Game Iframe - DEMO ONLY */}
+      <Card className="border-dashed border-2 border-muted-foreground/30">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
-            Interactive AWQ Writing Guide
-          </CardTitle>
+          <div className="flex items-center gap-2 flex-wrap">
+            <CardTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-muted-foreground" />
+              Interactive AWQ Writing Guide
+            </CardTitle>
+            <Badge variant="secondary" className="bg-amber-100 text-amber-700">DEMO ONLY</Badge>
+          </div>
           <CardDescription>
-            Work through the 12-step writing process. Use the AI chat below to get feedback on your writing at any step.
+            ⚠️ This is a <strong>demonstration only</strong>. Responses are NOT saved and there is NO AI feedback.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="aspect-[16/10] w-full rounded-lg overflow-hidden border bg-white">
+          <Alert className="bg-amber-50 border-amber-200">
+            <AlertDescription className="text-amber-700 text-sm">
+              <strong>Note:</strong> This iframe demo does not save your work or provide AI feedback.
+              Scroll down to use the <strong>AWQ Writing Game</strong> with full features.
+            </AlertDescription>
+          </Alert>
+          <div className="aspect-[16/10] w-full rounded-lg overflow-hidden border bg-white opacity-80">
             <iframe
               src="https://tesolchina.github.io/genAI2026/courses/UCLC1008/AIagentDemo/teacherJumpIntoWater/guide_game_FRT.html"
               width="100%"
               height="100%"
               className="border-0"
-              title="AWQ Writing Guide Game"
+              title="AWQ Writing Guide Game (Demo)"
             />
           </div>
           <Button variant="outline" size="sm" asChild>
@@ -269,7 +288,7 @@ export function HTMLGameWithAI({ weekNumber = 4, hourNumber = 2 }: HTMLGameWithA
               className="gap-2"
             >
               <ExternalLink className="h-4 w-4" />
-              Open in New Tab
+              Open Demo in New Tab
             </a>
           </Button>
         </CardContent>
