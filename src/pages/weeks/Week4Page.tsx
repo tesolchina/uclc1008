@@ -1,5 +1,6 @@
 import { week4, week4Meta } from "@/data/weeks/week4";
 import { WeekOverviewTemplate } from "./WeekOverviewTemplate";
+import { Week4AdHocNotes } from "@/components/Week4AdHocNotes";
 
 const classHours = [
   { 
@@ -10,25 +11,28 @@ const classHours = [
   },
   { 
     hour: 2, 
-    title: "AWQ Structure & Thesis Writing", 
-    theme: "3-paragraph model and sample analysis",
+    title: "AWQ Writing Practice", 
+    theme: "12-step guided writing with AI feedback",
     unitCount: 4
   },
   { 
     hour: 3, 
-    title: "Introduction to Argument Construction", 
-    theme: "Topic to be updated",
+    title: "AWQ Review & Feedback", 
+    theme: "OCR-based handwritten summary review",
     unitCount: 3
   },
 ];
 
 const Week4Page = () => {
   return (
-    <WeekOverviewTemplate 
-      week={week4} 
-      meta={week4Meta}
-      classHours={classHours}
-    />
+    <div className="space-y-6">
+      <WeekOverviewTemplate 
+        week={week4} 
+        meta={week4Meta}
+        classHours={classHours}
+      />
+      <Week4AdHocNotes />
+    </div>
   );
 };
 

@@ -61,6 +61,7 @@ import { ClassroomDiscussionPage } from "@/features/classroom-discussion";
 import { AWQWritingGame } from "@/components/awq-game";
 import { OCRWritingReview } from "@/components/ocr-review";
 import { AWQGuideGame, SampleAWQQuiz, HTMLGameWithAI, AWQWritingGame as NativeAWQGame } from "@/components/awq-guide";
+import { Week4AdHocNotes } from "@/components/Week4AdHocNotes";
 
 // UI components and icons
 import { 
@@ -2850,6 +2851,9 @@ Provide focused feedback (4-5 sentences):
                 to help agents assist with AWQ preparation systematically.
               </AlertDescription>
             </Alert>
+            
+            {/* Ad Hoc Notes */}
+            <Week4AdHocNotes />
           </section>
         )}
 
@@ -2876,9 +2880,12 @@ Provide focused feedback (4-5 sentences):
               </CardHeader>
             </Card>
             <NativeAWQGame weekNumber={weekNumber} hourNumber={hourNumber} />
+            
+            {/* Ad Hoc Notes */}
+            <Week4AdHocNotes />
           </section>
         )}
-
+        
         {/* Week 4 Hour 3: OCR Writing Review */}
         {weekNumber === 4 && hourNumber === 3 && (
           <section className="space-y-6">
@@ -2892,6 +2899,9 @@ Provide focused feedback (4-5 sentences):
             </Alert>
             
             <OCRWritingReview weekNumber={weekNumber} hourNumber={hourNumber} />
+            
+            {/* Ad Hoc Notes */}
+            <Week4AdHocNotes />
           </section>
         )}
 
