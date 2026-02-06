@@ -2994,20 +2994,14 @@ Provide focused feedback (4-5 sentences):
                     </Button>
                   </div>
 
-                  <div className="p-4 rounded-lg border bg-background space-y-3">
+                  <div className="p-4 rounded-lg border bg-muted/30 space-y-2">
                     <h4 className="font-medium flex items-center gap-2">
-                      <PenLine className="h-4 w-4 text-blue-600" />
+                      <PenLine className="h-4 w-4 text-muted-foreground" />
                       Option 2: Type Manually
                     </h4>
                     <p className="text-sm text-muted-foreground">
                       If OCR doesn't work well with your handwriting, type your text directly in the OCR tool's text editor.
                     </p>
-                    <Button variant="outline" asChild className="w-full">
-                      <Link to="/ocr">
-                        <PenLine className="h-4 w-4 mr-2" />
-                        Type Your Text
-                      </Link>
-                    </Button>
                   </div>
                 </div>
               </CardContent>
