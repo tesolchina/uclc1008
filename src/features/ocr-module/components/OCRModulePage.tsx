@@ -1,50 +1,106 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { FileText, AlertTriangle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { OCRUploader } from './OCRUploader';
 import { TextEditor } from './TextEditor';
 import { useOCRExtraction } from '../hooks/useOCRExtraction';
+import { ImageItem } from './ImageGallery';
 
 type Step = 'upload' | 'edit';
 
 export function OCRModulePage() {
   const [step, setStep] = useState<Step>('upload');
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [images, setImages] = useState<ImageItem[]>([]);
   const [extractedText, setExtractedText] = useState('');
+  const [isProcessingBatch, setIsProcessingBatch] = useState(false);
   
   const { extractText, isExtracting, error, clearError } = useOCRExtraction();
+  const idCounter = useRef(0);
 
-  const handleImageSelected = useCallback(async (base64: string, mimeType: string, previewUrl: string) => {
-    setImagePreview(previewUrl);
+  const handleImagesAdded = useCallback((newImages: Array<{ base64: string; mimeType: string; previewUrl: string }>) => {
+    const imageItems: ImageItem[] = newImages.map(img => ({
+      id: `img-${++idCounter.current}`,
+      previewUrl: img.previewUrl,
+      base64: img.base64,
+      mimeType: img.mimeType,
+      status: 'pending' as const
+    }));
+    setImages(prev => [...prev, ...imageItems]);
+    clearError();
+  }, [clearError]);
+
+  const handleRemoveImage = useCallback((id: string) => {
+    setImages(prev => {
+      const img = prev.find(i => i.id === id);
+      if (img) {
+        URL.revokeObjectURL(img.previewUrl);
+      }
+      return prev.filter(i => i.id !== id);
+    });
+  }, []);
+
+  const handleStartExtraction = useCallback(async () => {
+    setIsProcessingBatch(true);
     clearError();
     
-    try {
-      const text = await extractText(base64, mimeType);
-      setExtractedText(text);
-      setStep('edit');
-    } catch (err) {
-      // Error is handled by the hook
-      console.error('Extraction failed:', err);
-    }
-  }, [extractText, clearError]);
+    const allExtractedTexts: string[] = [];
+    
+    // Process images sequentially
+    for (let i = 0; i < images.length; i++) {
+      const image = images[i];
+      if (image.status === 'done' && image.extractedText) {
+        allExtractedTexts.push(image.extractedText);
+        continue;
+      }
 
-  const handleClearImage = useCallback(() => {
-    if (imagePreview) {
-      URL.revokeObjectURL(imagePreview);
+      // Update status to processing
+      setImages(prev => prev.map(img => 
+        img.id === image.id ? { ...img, status: 'processing' as const } : img
+      ));
+
+      try {
+        const text = await extractText(image.base64, image.mimeType);
+        allExtractedTexts.push(text);
+        
+        // Update status to done
+        setImages(prev => prev.map(img => 
+          img.id === image.id ? { ...img, status: 'done' as const, extractedText: text } : img
+        ));
+      } catch (err) {
+        // Update status to error
+        setImages(prev => prev.map(img => 
+          img.id === image.id ? { 
+            ...img, 
+            status: 'error' as const, 
+            error: err instanceof Error ? err.message : 'Extraction failed' 
+          } : img
+        ));
+      }
     }
-    setImagePreview(null);
-    clearError();
-  }, [imagePreview, clearError]);
+
+    setIsProcessingBatch(false);
+    
+    if (allExtractedTexts.length > 0) {
+      // Combine texts with page separators
+      const combinedText = allExtractedTexts.length === 1 
+        ? allExtractedTexts[0]
+        : allExtractedTexts.map((text, i) => `## Page ${i + 1}\n\n${text}`).join('\n\n---\n\n');
+      
+      setExtractedText(combinedText);
+      setStep('edit');
+    }
+  }, [images, extractText, clearError]);
 
   const handleReset = useCallback(() => {
-    if (imagePreview) {
-      URL.revokeObjectURL(imagePreview);
-    }
-    setImagePreview(null);
+    images.forEach(img => URL.revokeObjectURL(img.previewUrl));
+    setImages([]);
     setExtractedText('');
     setStep('upload');
     clearError();
-  }, [imagePreview, clearError]);
+  }, [images, clearError]);
+
+  // Get first image for preview in editor
+  const firstImagePreview = images.length > 0 ? images[0].previewUrl : null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -56,7 +112,7 @@ export function OCRModulePage() {
           </div>
           <h1 className="text-3xl font-bold mb-2">OCR Text Extractor</h1>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            Upload a photo of handwritten text and get accurate digital text extraction. 
+            Upload multiple photos of handwritten text and get accurate digital text extraction. 
             Edit the results and download as a Markdown file.
           </p>
         </div>
@@ -83,10 +139,12 @@ export function OCRModulePage() {
         {/* Main Content */}
         {step === 'upload' && (
           <OCRUploader
-            onImageSelected={handleImageSelected}
-            isProcessing={isExtracting}
-            currentPreview={imagePreview}
-            onClearImage={handleClearImage}
+            images={images}
+            onImagesAdded={handleImagesAdded}
+            onRemoveImage={handleRemoveImage}
+            isProcessing={isProcessingBatch || isExtracting}
+            onStartExtraction={handleStartExtraction}
+            hasExtractedText={extractedText.length > 0}
           />
         )}
 
@@ -94,15 +152,16 @@ export function OCRModulePage() {
           <TextEditor
             text={extractedText}
             onTextChange={setExtractedText}
-            imagePreview={imagePreview}
+            imagePreview={firstImagePreview}
             onReset={handleReset}
+            totalImages={images.length}
           />
         )}
 
         {/* Footer Info */}
         <div className="mt-8 text-center text-sm text-muted-foreground">
           <p>
-            Powered by Gemini 2.5 Pro for high-accuracy handwriting recognition.
+            Powered by Gemini for fast, accurate handwriting recognition.
             <br />
             No login required. Your images are not stored.
           </p>

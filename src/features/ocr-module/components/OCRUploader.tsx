@@ -1,86 +1,95 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { Camera, Upload, X, ImageIcon, Loader2 } from 'lucide-react';
+import { Camera, Upload, ImageIcon, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { ImageGallery, ImageItem } from './ImageGallery';
 
 interface OCRUploaderProps {
-  onImageSelected: (base64: string, mimeType: string, previewUrl: string) => void;
+  images: ImageItem[];
+  onImagesAdded: (newImages: Array<{ base64: string; mimeType: string; previewUrl: string }>) => void;
+  onRemoveImage: (id: string) => void;
   isProcessing: boolean;
-  currentPreview: string | null;
-  onClearImage: () => void;
+  onStartExtraction: () => void;
+  hasExtractedText: boolean;
 }
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic'];
 
 export function OCRUploader({ 
-  onImageSelected, 
+  images,
+  onImagesAdded,
+  onRemoveImage,
   isProcessing, 
-  currentPreview,
-  onClearImage 
+  onStartExtraction,
+  hasExtractedText
 }: OCRUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
-  const processFile = useCallback(async (file: File) => {
+  const processFiles = useCallback(async (files: FileList) => {
     setError(null);
+    const newImages: Array<{ base64: string; mimeType: string; previewUrl: string }> = [];
 
-    // Validate file type
-    if (!ACCEPTED_TYPES.includes(file.type) && !file.name.toLowerCase().endsWith('.heic')) {
-      setError('Please upload a JPG, PNG, or WebP image');
-      return;
+    for (const file of Array.from(files)) {
+      // Validate file type
+      if (!ACCEPTED_TYPES.includes(file.type) && !file.name.toLowerCase().endsWith('.heic')) {
+        setError('Please upload JPG, PNG, or WebP images');
+        continue;
+      }
+
+      // Validate file size
+      if (file.size > MAX_FILE_SIZE) {
+        setError('Images must be smaller than 10MB');
+        continue;
+      }
+
+      try {
+        const previewUrl = URL.createObjectURL(file);
+        const base64 = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const result = e.target?.result as string;
+            resolve(result.split(',')[1]);
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+        
+        newImages.push({
+          base64,
+          mimeType: file.type || 'image/jpeg',
+          previewUrl
+        });
+      } catch (err) {
+        console.error('Failed to process file:', err);
+        setError('Failed to process one or more images');
+      }
     }
 
-    // Validate file size
-    if (file.size > MAX_FILE_SIZE) {
-      setError('Image must be smaller than 10MB');
-      return;
+    if (newImages.length > 0) {
+      onImagesAdded(newImages);
     }
-
-    try {
-      // Create preview URL
-      const previewUrl = URL.createObjectURL(file);
-
-      // Convert to base64
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        // Remove data URL prefix to get pure base64
-        const base64 = result.split(',')[1];
-        const mimeType = file.type || 'image/jpeg';
-        onImageSelected(base64, mimeType, previewUrl);
-      };
-      reader.onerror = () => {
-        setError('Failed to read image file');
-      };
-      reader.readAsDataURL(file);
-    } catch (err) {
-      setError('Failed to process image');
-      console.error('Image processing error:', err);
-    }
-  }, [onImageSelected]);
+  }, [onImagesAdded]);
 
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      processFile(file);
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      processFiles(files);
     }
-    // Reset input
     e.target.value = '';
-  }, [processFile]);
+  }, [processFiles]);
 
   const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
-    
-    const file = e.dataTransfer.files[0];
-    if (file) {
-      processFile(file);
+    if (e.dataTransfer.files.length > 0) {
+      processFiles(e.dataTransfer.files);
     }
-  }, [processFile]);
+  }, [processFiles]);
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -92,40 +101,9 @@ export function OCRUploader({
     setIsDragging(false);
   }, []);
 
-  // If we have a preview, show the image
-  if (currentPreview) {
-    return (
-      <Card className="relative">
-        <CardContent className="p-4">
-          <div className="relative">
-            <img 
-              src={currentPreview} 
-              alt="Uploaded image" 
-              className="w-full max-h-[400px] object-contain rounded-lg"
-            />
-            {!isProcessing && (
-              <Button
-                variant="destructive"
-                size="icon"
-                className="absolute top-2 right-2"
-                onClick={onClearImage}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            )}
-            {isProcessing && (
-              <div className="absolute inset-0 bg-background/80 flex items-center justify-center rounded-lg">
-                <div className="flex flex-col items-center gap-2">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  <span className="text-sm text-muted-foreground">Extracting text...</span>
-                </div>
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  const pendingImages = images.filter(i => i.status === 'pending').length;
+  const processingImage = images.find(i => i.status === 'processing');
+  const canExtract = images.length > 0 && !isProcessing;
 
   return (
     <div className="space-y-4">
@@ -144,34 +122,60 @@ export function OCRUploader({
           <div className="p-4 bg-muted rounded-full mb-4">
             <ImageIcon className="h-8 w-8 text-muted-foreground" />
           </div>
-          <h3 className="font-medium mb-1">Drop an image here</h3>
+          <h3 className="font-medium mb-1">
+            {images.length > 0 ? 'Add more images' : 'Drop images here'}
+          </h3>
           <p className="text-sm text-muted-foreground mb-4">
-            or click to browse (JPG, PNG, WebP up to 10MB)
+            Upload multiple photos at once (JPG, PNG, WebP up to 10MB each)
           </p>
           <Button variant="outline" type="button">
             <Upload className="h-4 w-4 mr-2" />
-            Choose File
+            {images.length > 0 ? 'Add More' : 'Choose Files'}
           </Button>
         </CardContent>
       </Card>
 
       {/* Camera Button for Mobile */}
-      <div className="flex justify-center">
+      <div className="flex justify-center gap-2">
         <Button 
           variant="secondary" 
-          className="w-full sm:w-auto"
+          className="flex-1 sm:flex-none"
           onClick={() => cameraInputRef.current?.click()}
         >
           <Camera className="h-4 w-4 mr-2" />
           Take Photo
         </Button>
+        {images.length > 0 && (
+          <Button
+            variant="default"
+            className="flex-1 sm:flex-none"
+            onClick={onStartExtraction}
+            disabled={!canExtract || hasExtractedText}
+          >
+            {isProcessing ? (
+              <>Processing {images.filter(i => i.status === 'done').length + 1}/{images.length}...</>
+            ) : hasExtractedText ? (
+              'Extraction Complete'
+            ) : (
+              `Extract Text (${images.length} ${images.length === 1 ? 'image' : 'images'})`
+            )}
+          </Button>
+        )}
       </div>
+
+      {/* Image Gallery */}
+      <ImageGallery
+        images={images}
+        onRemove={onRemoveImage}
+        currentProcessingId={processingImage?.id}
+      />
 
       {/* Hidden File Inputs */}
       <input
         ref={fileInputRef}
         type="file"
         accept="image/jpeg,image/png,image/webp,image/heic"
+        multiple
         className="hidden"
         onChange={handleFileChange}
       />
