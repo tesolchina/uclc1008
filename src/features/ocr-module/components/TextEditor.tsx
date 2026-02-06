@@ -13,9 +13,10 @@ interface TextEditorProps {
   onTextChange: (text: string) => void;
   imagePreview: string | null;
   onReset: () => void;
+  totalImages?: number;
 }
 
-export function TextEditor({ text, onTextChange, imagePreview, onReset }: TextEditorProps) {
+export function TextEditor({ text, onTextChange, imagePreview, onReset, totalImages }: TextEditorProps) {
   const [title, setTitle] = React.useState('');
   const [copied, setCopied] = React.useState(false);
   const { toast } = useToast();
@@ -55,7 +56,9 @@ export function TextEditor({ text, onTextChange, imagePreview, onReset }: TextEd
       {imagePreview && (
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Original Image</CardTitle>
+            <CardTitle className="text-base">
+              Original Image{totalImages && totalImages > 1 ? ` (1 of ${totalImages})` : ''}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <img 
