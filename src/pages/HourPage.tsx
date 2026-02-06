@@ -2857,49 +2857,162 @@ Provide focused feedback (4-5 sentences):
           </section>
         )}
 
-        {/* Week 4 Hour 2: HTML Game with AI Feedback + Sample Quiz */}
-        {weekNumber === 4 && hourNumber === 2 && (
+        {/* Week 4 Hour 2-3: On-Paper AWQ Practice Session */}
+        {weekNumber === 4 && (hourNumber === 2 || hourNumber === 3) && (
           <section className="space-y-6">
-            {/* Sample AWQ Quiz Materials (Articles, Rubric, Sample Scripts) */}
-            <SampleAWQQuiz />
-            
-            {/* HTML Game Demo (iframe - no saving) */}
-            <HTMLGameWithAI weekNumber={weekNumber} hourNumber={hourNumber} />
-            
-            {/* Native AWQ Writing Game with AI Feedback and Saving */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-primary" />
-                  AWQ Writing Game
-                  <Badge className="bg-green-500">With AI Feedback</Badge>
-                </CardTitle>
-                <CardDescription>
-                  Complete the 12-step writing process with AI feedback at each step. Your progress is saved automatically.
-                </CardDescription>
-              </CardHeader>
-            </Card>
-            <NativeAWQGame weekNumber={weekNumber} hourNumber={hourNumber} />
-            
-            {/* Ad Hoc Notes */}
-            <Week4AdHocNotes />
-          </section>
-        )}
-        
-        {/* Week 4 Hour 3: OCR Writing Review */}
-        {weekNumber === 4 && hourNumber === 3 && (
-          <section className="space-y-6">
+            {/* Session Overview */}
             <Alert className="border-primary/30 bg-primary/5">
-              <Camera className="h-4 w-4 text-primary" />
-              <AlertTitle>OCR Writing Review</AlertTitle>
+              <PenLine className="h-4 w-4 text-primary" />
+              <AlertTitle>Hour 2-3: On-Paper Practice Session</AlertTitle>
               <AlertDescription>
-                Upload a photo of your handwritten AWQ summary. The AI will extract the text, 
-                let you edit it, then provide feedback based on your teacher's criteria.
+                This session focuses on <strong>handwritten AWQ practice</strong>. Work through the practice materials on paper, 
+                then use the OCR tool to get AI feedback on your writing.
               </AlertDescription>
             </Alert>
-            
-            <OCRWritingReview weekNumber={weekNumber} hourNumber={hourNumber} />
-            
+
+            {/* Important Resources Cards */}
+            <div className="grid md:grid-cols-2 gap-4">
+              {/* Mock Exam Link */}
+              <Card className="border-2 border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10 transition-colors">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-amber-600" />
+                    <CardTitle className="text-base">Mock Exam Materials</CardTitle>
+                  </div>
+                  <CardDescription>Practice AWQ questions and sample papers</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="outline" size="sm" asChild className="w-full gap-2">
+                    <a
+                      href="https://docs.google.com/document/d/182xbd3rh66VcnqXugXg3UKxF-ZdXQWtgWOR11LDmL8Y/edit?tab=t.9f0pigmhimul#heading=h.wz3hyvmzh01i"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      Open Mock Exam
+                    </a>
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Consultation Schedule Link */}
+              <Card className="border-2 border-blue-500/30 bg-blue-500/5 hover:bg-blue-500/10 transition-colors">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-5 w-5 text-blue-600" />
+                    <CardTitle className="text-base">One-on-One Consultations</CardTitle>
+                  </div>
+                  <CardDescription>Schedule for individual meetings</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="outline" size="sm" asChild className="w-full gap-2">
+                    <a
+                      href="https://docs.google.com/document/d/182xbd3rh66VcnqXugXg3UKxF-ZdXQWtgWOR11LDmL8Y/edit?tab=t.hwe8ax9t84nn"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      View Schedule
+                    </a>
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Embedded Week 4 Notes */}
+            <Card className="border-2 border-green-500/30 bg-green-500/5">
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="h-5 w-5 text-green-600" />
+                  <CardTitle className="text-lg">Week 4 Notes</CardTitle>
+                </div>
+                <CardDescription>Reference materials and instructions for on-paper practice</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="aspect-[4/3] w-full rounded-lg overflow-hidden border bg-white">
+                  <iframe
+                    src="https://docs.google.com/document/d/182xbd3rh66VcnqXugXg3UKxF-ZdXQWtgWOR11LDmL8Y/preview?tab=t.gilua5f2n8gd"
+                    width="100%"
+                    height="100%"
+                    className="border-0"
+                    title="Week 4 Notes"
+                    allow="autoplay"
+                  />
+                </div>
+                <Button variant="outline" size="sm" asChild>
+                  <a
+                    href="https://docs.google.com/document/d/182xbd3rh66VcnqXugXg3UKxF-ZdXQWtgWOR11LDmL8Y/edit?tab=t.gilua5f2n8gd"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="gap-2"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    Open in Google Docs
+                  </a>
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* OCR Tool Section */}
+            <Card className="border-2 border-purple-500/30 bg-purple-500/5">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Camera className="h-5 w-5 text-purple-600" />
+                  <CardTitle className="text-lg">Submit Your Handwritten Work</CardTitle>
+                  <Badge variant="outline" className="text-xs">Beta</Badge>
+                </div>
+                <CardDescription>
+                  After completing your on-paper practice, use the OCR tool to get AI feedback
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Warning about OCR */}
+                <Alert className="border-amber-500/30 bg-amber-500/10">
+                  <AlertCircle className="h-4 w-4 text-amber-600" />
+                  <AlertTitle className="text-amber-700">OCR Tool Disclaimer</AlertTitle>
+                  <AlertDescription className="text-amber-600 space-y-2">
+                    <p>The OCR (text extraction) feature is in <strong>Beta</strong> and may not work properly with all handwriting styles.</p>
+                    <p><strong>Fallback option:</strong> If OCR doesn't work, you can simply type your text manually in the tool.</p>
+                  </AlertDescription>
+                </Alert>
+
+                {/* Two options */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="p-4 rounded-lg border bg-background space-y-3">
+                    <h4 className="font-medium flex items-center gap-2">
+                      <Camera className="h-4 w-4 text-purple-600" />
+                      Option 1: Use OCR Tool
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      Upload a photo of your handwritten work. The AI will attempt to extract the text for feedback.
+                    </p>
+                    <Button asChild className="w-full">
+                      <Link to="/ocr-tool">
+                        <Camera className="h-4 w-4 mr-2" />
+                        Open OCR Tool
+                      </Link>
+                    </Button>
+                  </div>
+
+                  <div className="p-4 rounded-lg border bg-background space-y-3">
+                    <h4 className="font-medium flex items-center gap-2">
+                      <PenLine className="h-4 w-4 text-blue-600" />
+                      Option 2: Type Manually
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      If OCR doesn't work well with your handwriting, type your text directly in the OCR tool's text editor.
+                    </p>
+                    <Button variant="outline" asChild className="w-full">
+                      <Link to="/ocr-tool">
+                        <PenLine className="h-4 w-4 mr-2" />
+                        Type Your Text
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Ad Hoc Notes */}
             <Week4AdHocNotes />
           </section>
