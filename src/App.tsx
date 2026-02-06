@@ -24,6 +24,7 @@ import HourPage from "./pages/HourPage";
 import StudentDashboard from "./pages/StudentDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import LabSpacePage from "./pages/LabSpacePage";
+import OCRToolPage from "./pages/OCRToolPage";
 import {
   Week1Page,
   Week2Page,
@@ -95,6 +96,7 @@ const App = () => (
                 <Route path="lab" element={<LabSpacePage />} />
                 <Route path="my-progress" element={<StudentDashboard />} />
                 <Route path="teacher-dashboard" element={<TeacherDashboard />} />
+                <Route path="ocr" element={<OCRToolPage />} />
               </Route>
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
