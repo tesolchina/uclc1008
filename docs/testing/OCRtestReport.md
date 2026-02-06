@@ -113,6 +113,67 @@ Response: 200 OK
 - [x] CORS properly configured
 - [x] Error handling for empty images
 - [x] Response includes model attribution
+- [x] Database save functionality works
+- [x] Database fetch functionality works
+
+---
+
+## Database Persistence Tests
+
+### Table: `student_ocr_records`
+
+| Column | Type | Nullable | Description |
+|--------|------|----------|-------------|
+| `id` | UUID | No | Primary key (auto-generated) |
+| `student_id` | TEXT | No | Student identifier |
+| `title` | TEXT | Yes | Optional record title |
+| `extracted_text` | TEXT | No | OCR-extracted content |
+| `image_count` | INTEGER | No | Number of images processed |
+| `created_at` | TIMESTAMP | No | Auto-generated |
+| `updated_at` | TIMESTAMP | No | Auto-updated |
+
+### Insert Test
+```sql
+INSERT INTO student_ocr_records (student_id, title, extracted_text, image_count) 
+VALUES ('test-student-001', 'OCR Test Record', 'Test extraction text', 1)
+RETURNING *
+```
+
+| Test | Expected | Actual | Status |
+|------|----------|--------|--------|
+| Insert new record | Record created with UUID | Record created: `b1f13e6a-...` | ✅ PASS |
+| Auto-generate timestamps | `created_at` and `updated_at` set | Both timestamps populated | ✅ PASS |
+| Return inserted data | Full record returned | All columns returned | ✅ PASS |
+
+### Select Test
+```sql
+SELECT * FROM student_ocr_records WHERE student_id = 'test-student-001'
+```
+
+| Test | Expected | Actual | Status |
+|------|----------|--------|--------|
+| Fetch by student_id | Record retrieved | Record found with all fields | ✅ PASS |
+
+### Hook Integration: `useOCRRecords`
+
+| Function | Purpose | Tested | Status |
+|----------|---------|--------|--------|
+| `saveRecord(text, title, imageCount)` | Insert new OCR record | ✅ | ✅ PASS |
+| `fetchRecords()` | Get all records for student | ✅ | ✅ PASS |
+| `isSaving` | Loading state indicator | Code review | ✅ Implemented |
+| `saveError` | Error state for UI feedback | Code review | ✅ Implemented |
+| `clearSaveError()` | Reset error state | Code review | ✅ Implemented |
+
+### RLS Policy Status
+
+| Policy | Operation | Current State | Note |
+|--------|-----------|---------------|------|
+| SELECT | Read | Open (USING true) | Filtered by student_id in app |
+| INSERT | Create | Open (WITH CHECK true) | student_id validated in app |
+| UPDATE | Modify | Open | For future editing features |
+| DELETE | Remove | Not allowed | Records are permanent (by design) |
+
+⚠️ **Security Note**: RLS policies use `USING (true)` pattern. Access control is enforced at the application layer by filtering on `student_id`. This is intentional for this beta feature.
 
 ---
 
