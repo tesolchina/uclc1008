@@ -3,6 +3,7 @@ import { FileText, AlertTriangle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { OCRUploader } from './OCRUploader';
 import { TextEditor } from './TextEditor';
+import { ProcessingStatus } from './ProcessingStatus';
 import { useOCRExtraction } from '../hooks/useOCRExtraction';
 import { ImageItem } from './ImageGallery';
 
@@ -13,6 +14,7 @@ export function OCRModulePage() {
   const [images, setImages] = useState<ImageItem[]>([]);
   const [extractedText, setExtractedText] = useState('');
   const [isProcessingBatch, setIsProcessingBatch] = useState(false);
+  const [currentProcessingIndex, setCurrentProcessingIndex] = useState(-1);
   
   const { extractText, isExtracting, error, clearError } = useOCRExtraction();
   const idCounter = useRef(0);
@@ -41,6 +43,7 @@ export function OCRModulePage() {
 
   const handleStartExtraction = useCallback(async () => {
     setIsProcessingBatch(true);
+    setCurrentProcessingIndex(0);
     clearError();
     
     const allExtractedTexts: string[] = [];
@@ -48,6 +51,8 @@ export function OCRModulePage() {
     // Process images sequentially
     for (let i = 0; i < images.length; i++) {
       const image = images[i];
+      setCurrentProcessingIndex(i);
+      
       if (image.status === 'done' && image.extractedText) {
         allExtractedTexts.push(image.extractedText);
         continue;
@@ -79,6 +84,7 @@ export function OCRModulePage() {
     }
 
     setIsProcessingBatch(false);
+    setCurrentProcessingIndex(-1);
     
     if (allExtractedTexts.length > 0) {
       // Combine texts with page separators
@@ -136,8 +142,18 @@ export function OCRModulePage() {
           </Alert>
         )}
 
+        {/* Progress Status */}
+        {isProcessingBatch && (
+          <ProcessingStatus
+            totalImages={images.length}
+            processedImages={images.filter(i => i.status === 'done').length}
+            currentImageIndex={currentProcessingIndex}
+            isProcessing={isProcessingBatch}
+          />
+        )}
+
         {/* Main Content */}
-        {step === 'upload' && (
+        {step === 'upload' && !isProcessingBatch && (
           <OCRUploader
             images={images}
             onImagesAdded={handleImagesAdded}

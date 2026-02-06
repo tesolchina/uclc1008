@@ -152,9 +152,7 @@ export function OCRUploader({
             onClick={onStartExtraction}
             disabled={!canExtract || hasExtractedText}
           >
-            {isProcessing ? (
-              <>Processing {images.filter(i => i.status === 'done').length + 1}/{images.length}...</>
-            ) : hasExtractedText ? (
+            {hasExtractedText ? (
               'Extraction Complete'
             ) : (
               `Extract Text (${images.length} ${images.length === 1 ? 'image' : 'images'})`
