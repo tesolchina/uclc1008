@@ -216,7 +216,28 @@ SELECT * FROM student_ocr_records WHERE student_id = 'test-student-001'
 
 ## Conclusion
 
-The OCR Text Extractor feature passes all automated end-to-end tests. The edge function is correctly deployed, the AI integration is functioning, and the UI components render as expected. Manual testing is recommended for actual handwritten image extraction accuracy verification.
+The OCR Text Extractor feature passes all automated end-to-end tests. The edge function is correctly deployed, the AI integration is functioning, and the UI components render as expected. **Teachers can now view student OCR records in the Teacher Dashboard under the student detail view.**
+
+---
+
+## Teacher Dashboard Integration
+
+### Implementation Added
+
+| Feature | Status | Description |
+|---------|--------|-------------|
+| OCR Records Fetching | ✅ Added | Dashboard fetches `student_ocr_records` table |
+| Student Summary Stats | ✅ Added | OCR record count shown in student list |
+| Detail View Card | ✅ Added | "OCR Records" stat card in student detail (6-column grid) |
+| OCR Records Tab | ✅ Added | New tab showing all OCR extractions with full text preview |
+
+### Data Displayed Per Record
+
+- **Title**: Record title (or "Untitled Extraction")
+- **Image Count**: Number of images processed
+- **Date**: Creation timestamp
+- **Character Count**: Badge showing text length
+- **Full Text**: Scrollable preview of extracted text
 
 ---
 

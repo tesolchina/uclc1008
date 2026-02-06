@@ -124,6 +124,16 @@ interface AiTutorReport {
   created_at: string;
 }
 
+interface OcrRecord {
+  id: string;
+  student_id: string;
+  title: string | null;
+  extracted_text: string;
+  image_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
 interface WeekProgressData {
   week: number;
   completed: number;
@@ -142,6 +152,7 @@ interface StudentSummary {
   questions: number;
   aiTutorSessions: number;
   avgTutorRating: number;
+  ocrRecords: number;
   lastActive: string;
   weekProgress: WeekProgressData[];
 }
@@ -161,6 +172,7 @@ export default function TeacherDashboard() {
   const [taskFeedback, setTaskFeedback] = useState<TaskFeedback[]>([]);
   const [aiChats, setAiChats] = useState<AiChatHistory[]>([]);
   const [aiTutorReports, setAiTutorReports] = useState<AiTutorReport[]>([]);
+  const [ocrRecords, setOcrRecords] = useState<OcrRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [responding, setResponding] = useState<string | null>(null);
   const [responseText, setResponseText] = useState<Record<string, string>>({});
@@ -203,7 +215,7 @@ export default function TeacherDashboard() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [questionsRes, responsesRes, draftsRes, notesRes, teacherNotesRes, feedbackRes, studentsRes, chatsRes, tutorReportsRes] = await Promise.all([
+      const [questionsRes, responsesRes, draftsRes, notesRes, teacherNotesRes, feedbackRes, studentsRes, chatsRes, tutorReportsRes, ocrRecordsRes] = await Promise.all([
         supabase
           .from("student_questions")
           .select("*")
@@ -243,6 +255,11 @@ export default function TeacherDashboard() {
           .from("ai_tutor_reports")
           .select("*")
           .order("created_at", { ascending: false })
+          .limit(500),
+        supabase
+          .from("student_ocr_records")
+          .select("*")
+          .order("created_at", { ascending: false })
           .limit(500)
       ]);
 
@@ -256,6 +273,7 @@ export default function TeacherDashboard() {
       setStudentRecords(studentsRes.data || []);
       setAiChats((chatsRes.data || []) as AiChatHistory[]);
       setAiTutorReports((tutorReportsRes.data || []) as AiTutorReport[]);
+      setOcrRecords((ocrRecordsRes.data || []) as OcrRecord[]);
     } catch (err) {
       console.error("Error fetching data:", err);
       toast.error("Failed to load data");
@@ -302,7 +320,8 @@ export default function TeacherDashboard() {
       ...writingDrafts.map(d => d.student_id),
       ...paragraphNotes.map(n => n.student_id),
       ...questions.map(q => q.student_id),
-      ...aiTutorReports.map(r => r.student_id)
+      ...aiTutorReports.map(r => r.student_id),
+      ...ocrRecords.map(r => r.student_id)
     ]);
 
     return Array.from(allStudentIds).map(studentId => {
@@ -311,6 +330,7 @@ export default function TeacherDashboard() {
       const studentNotes = paragraphNotes.filter(n => n.student_id === studentId);
       const studentQuestions = questions.filter(q => q.student_id === studentId);
       const studentTutorReports = aiTutorReports.filter(r => r.student_id === studentId);
+      const studentOcrRecords = ocrRecords.filter(r => r.student_id === studentId);
       const sectionNumber = getStudentSection(studentId);
 
       const allDates = [
@@ -359,6 +379,7 @@ export default function TeacherDashboard() {
         questions: studentQuestions.length,
         aiTutorSessions: studentTutorReports.length,
         avgTutorRating,
+        ocrRecords: studentOcrRecords.length,
         lastActive,
         weekProgress,
       };
@@ -540,6 +561,7 @@ export default function TeacherDashboard() {
     const studentNotes = paragraphNotes.filter(n => n.student_id === selectedStudent);
     const studentQuestions = questions.filter(q => q.student_id === selectedStudent);
     const studentTutorReports = aiTutorReports.filter(r => r.student_id === selectedStudent);
+    const studentOcrRecords = ocrRecords.filter(r => r.student_id === selectedStudent);
     const teacherNote = getTeacherNote(selectedStudent);
     const studentFeedback = taskFeedback.filter(f => f.student_id === selectedStudent);
 
@@ -600,7 +622,7 @@ export default function TeacherDashboard() {
           </CardContent>
         </Card>
 
-        <div className="grid gap-4 md:grid-cols-5">
+        <div className="grid gap-4 md:grid-cols-6">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">MC Responses</CardTitle>
@@ -634,6 +656,15 @@ export default function TeacherDashboard() {
           </Card>
           <Card>
             <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">OCR Records</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{studentOcrRecords.length}</div>
+              <p className="text-xs text-muted-foreground">text extractions</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Notes</CardTitle>
             </CardHeader>
             <CardContent>
@@ -658,6 +689,7 @@ export default function TeacherDashboard() {
             <TabsTrigger value="mc">MC Responses ({studentMc.length})</TabsTrigger>
             <TabsTrigger value="writing">Writing ({studentDrafts.length})</TabsTrigger>
             <TabsTrigger value="ai-tutor">AI Tutor ({studentTutorReports.length})</TabsTrigger>
+            <TabsTrigger value="ocr">OCR Records ({studentOcrRecords.length})</TabsTrigger>
             <TabsTrigger value="notes">Notes ({studentNotes.length})</TabsTrigger>
             <TabsTrigger value="questions">Questions ({studentQuestions.length})</TabsTrigger>
           </TabsList>
@@ -708,6 +740,31 @@ export default function TeacherDashboard() {
                       <p>{report.teacher_comment}</p>
                     </div>
                   )}
+                </CardContent>
+              </Card>
+            ))}
+          </TabsContent>
+
+          <TabsContent value="ocr" className="space-y-3 mt-4">
+            {studentOcrRecords.length === 0 ? (
+              <Card><CardContent className="py-6 text-center text-muted-foreground">No OCR records</CardContent></Card>
+            ) : studentOcrRecords.map(record => (
+              <Card key={record.id}>
+                <CardContent className="pt-4 space-y-3">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="font-medium text-sm">{record.title || 'Untitled Extraction'}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {record.image_count} image{record.image_count !== 1 ? 's' : ''} • {new Date(record.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <Badge variant="secondary">{record.extracted_text.length} chars</Badge>
+                  </div>
+                  
+                  <div className="p-3 bg-muted/50 rounded text-sm max-h-48 overflow-y-auto">
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Extracted Text:</p>
+                    <p className="text-sm whitespace-pre-wrap">{record.extracted_text}</p>
+                  </div>
                 </CardContent>
               </Card>
             ))}
