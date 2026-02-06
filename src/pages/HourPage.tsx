@@ -3012,9 +3012,6 @@ Provide focused feedback (4-5 sentences):
                 </div>
               </CardContent>
             </Card>
-
-            {/* Ad Hoc Notes */}
-            <Week4AdHocNotes />
           </section>
         )}
 
