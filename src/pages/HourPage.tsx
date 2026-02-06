@@ -2987,7 +2987,7 @@ Provide focused feedback (4-5 sentences):
                       Upload a photo of your handwritten work. The AI will attempt to extract the text for feedback.
                     </p>
                     <Button asChild className="w-full">
-                      <Link to="/ocr-tool">
+                      <Link to="/ocr">
                         <Camera className="h-4 w-4 mr-2" />
                         Open OCR Tool
                       </Link>
@@ -3003,7 +3003,7 @@ Provide focused feedback (4-5 sentences):
                       If OCR doesn't work well with your handwriting, type your text directly in the OCR tool's text editor.
                     </p>
                     <Button variant="outline" asChild className="w-full">
-                      <Link to="/ocr-tool">
+                      <Link to="/ocr">
                         <PenLine className="h-4 w-4 mr-2" />
                         Type Your Text
                       </Link>
