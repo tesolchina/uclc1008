@@ -22,8 +22,12 @@ import {
   Download,
   PenLine,
   Sparkles,
-  ChevronDown
+  ChevronDown,
+  ScanText,
+  Copy,
+  ExternalLink
 } from "lucide-react";
+import { copyToClipboard, downloadMarkdown } from "@/features/ocr-module/utils/downloadMarkdown";
 import { getWeekHours } from "@/data/hourContent";
 
 interface AiChatHistory {
@@ -84,6 +88,16 @@ interface ParagraphNote {
   notes: string;
 }
 
+interface OCRRecord {
+  id: string;
+  student_id: string;
+  title: string | null;
+  extracted_text: string;
+  image_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export default function StudentDashboard() {
   const { isLoading, isAuthenticated, studentId, isStudent } = useAuth();
   const [questions, setQuestions] = useState<StudentQuestion[]>([]);
@@ -92,7 +106,9 @@ export default function StudentDashboard() {
   const [paragraphNotes, setParagraphNotes] = useState<ParagraphNote[]>([]);
   const [aiChats, setAiChats] = useState<AiChatHistory[]>([]);
   const [aiTutorReports, setAiTutorReports] = useState<AiTutorReport[]>([]);
+  const [ocrRecords, setOcrRecords] = useState<OCRRecord[]>([]);
   const [expandedChats, setExpandedChats] = useState<Set<string>>(new Set());
+  const [expandedOcrRecords, setExpandedOcrRecords] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -103,6 +119,7 @@ export default function StudentDashboard() {
     setParagraphNotes([]);
     setAiChats([]);
     setAiTutorReports([]);
+    setOcrRecords([]);
     setLoading(true);
 
     const fetchData = async () => {
@@ -113,7 +130,7 @@ export default function StudentDashboard() {
 
       try {
         // Fetch all data in parallel
-        const [questionsRes, responsesRes, draftsRes, notesRes, chatsRes, tutorReportsRes] = await Promise.all([
+        const [questionsRes, responsesRes, draftsRes, notesRes, chatsRes, tutorReportsRes, ocrRecordsRes] = await Promise.all([
           supabase
             .from("student_questions")
             .select("*")
@@ -142,6 +159,11 @@ export default function StudentDashboard() {
             .from("ai_tutor_reports")
             .select("*")
             .eq("student_id", studentId)
+            .order("created_at", { ascending: false }),
+          supabase
+            .from("student_ocr_records")
+            .select("*")
+            .eq("student_id", studentId)
             .order("created_at", { ascending: false })
         ]);
 
@@ -151,6 +173,7 @@ export default function StudentDashboard() {
         if (notesRes.data) setParagraphNotes(notesRes.data as ParagraphNote[]);
         if (chatsRes.data) setAiChats(chatsRes.data as AiChatHistory[]);
         if (tutorReportsRes.data) setAiTutorReports(tutorReportsRes.data as AiTutorReport[]);
+        if (ocrRecordsRes.data) setOcrRecords(ocrRecordsRes.data as OCRRecord[]);
       } catch (err) {
         console.error("Error fetching data:", err);
       } finally {
@@ -332,6 +355,10 @@ export default function StudentDashboard() {
           <TabsTrigger value="ai-chats" className="gap-1">
             <MessageCircle className="h-4 w-4" />
             AI Chats
+          </TabsTrigger>
+          <TabsTrigger value="ocr-records" className="gap-1">
+            <ScanText className="h-4 w-4" />
+            OCR Records ({ocrRecords.length})
           </TabsTrigger>
         </TabsList>
 
@@ -735,6 +762,105 @@ export default function StudentDashboard() {
                                   <p className="whitespace-pre-wrap">{msg.content}</p>
                                 </div>
                               ))}
+                            </div>
+                          </CollapsibleContent>
+                        </div>
+                      </Collapsible>
+                    );
+                  })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* OCR Records Tab */}
+        <TabsContent value="ocr-records" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg">Saved OCR Extractions</CardTitle>
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/ocr">
+                    <ScanText className="h-4 w-4 mr-2" />
+                    New Extraction
+                  </Link>
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {ocrRecords.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <ScanText className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p>No OCR extractions saved yet.</p>
+                  <p className="text-xs mt-1">Use the OCR Tool to extract text from handwritten images.</p>
+                  <Button variant="link" asChild className="mt-2">
+                    <Link to="/ocr">
+                      <ExternalLink className="h-4 w-4 mr-1" />
+                      Go to OCR Tool
+                    </Link>
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {ocrRecords.map((record) => {
+                    const isExpanded = expandedOcrRecords.has(record.id);
+                    const toggleExpand = () => {
+                      setExpandedOcrRecords(prev => {
+                        const newSet = new Set(prev);
+                        if (newSet.has(record.id)) {
+                          newSet.delete(record.id);
+                        } else {
+                          newSet.add(record.id);
+                        }
+                        return newSet;
+                      });
+                    };
+                    const wordCount = record.extracted_text.trim() ? record.extracted_text.trim().split(/\s+/).length : 0;
+                    
+                    return (
+                      <Collapsible key={record.id} open={isExpanded} onOpenChange={toggleExpand}>
+                        <div className="p-3 rounded-lg border space-y-2">
+                          <CollapsibleTrigger className="w-full">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="space-y-1 text-left">
+                                <p className="text-sm font-medium flex items-center gap-2">
+                                  {record.title || 'Untitled Extraction'}
+                                  <ChevronDown className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {wordCount} words • {record.image_count} {record.image_count === 1 ? 'image' : 'images'} • {new Date(record.created_at).toLocaleString()}
+                                </p>
+                              </div>
+                            </div>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent>
+                            <div className="mt-3 space-y-3 pt-3 border-t">
+                              <div className="p-3 rounded bg-muted/50 text-sm whitespace-pre-wrap font-mono max-h-80 overflow-y-auto">
+                                {record.extracted_text}
+                              </div>
+                              <div className="flex flex-wrap gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    copyToClipboard(record.extracted_text);
+                                  }}
+                                >
+                                  <Copy className="h-4 w-4 mr-1" />
+                                  Copy Text
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    downloadMarkdown(record.extracted_text, record.title || undefined);
+                                  }}
+                                >
+                                  <Download className="h-4 w-4 mr-1" />
+                                  Download
+                                </Button>
+                              </div>
                             </div>
                           </CollapsibleContent>
                         </div>
