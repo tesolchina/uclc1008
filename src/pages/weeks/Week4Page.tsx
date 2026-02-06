@@ -11,15 +11,10 @@ const classHours = [
   },
   { 
     hour: 2, 
-    title: "AWQ Writing Practice", 
-    theme: "12-step guided writing with AI feedback",
-    unitCount: 4
-  },
-  { 
-    hour: 3, 
-    title: "AWQ Review & Feedback", 
-    theme: "OCR-based handwritten summary review",
-    unitCount: 3
+    title: "On-Paper AWQ Practice", 
+    theme: "Timed practice session with OCR-based review",
+    unitCount: 4,
+    label: "Hour 2-3"
   },
 ];
 

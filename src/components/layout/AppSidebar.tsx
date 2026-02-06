@@ -42,9 +42,9 @@ const weeks: WeekNavItem[] = Array.from({ length: 13 }, (_, index) => {
     })
     .filter((a): a is { id: string; title: string; weight: string } => a !== null);
 
-  // Add hours for weeks 1-5 (Week 3 has merged Hour 2-3)
+  // Add hours for weeks 1-5 (Week 3 and 4 have merged Hour 2-3)
   const hours = id <= 5 ? (
-    id === 3 ? [
+    (id === 3 || id === 4) ? [
       { number: 1, title: "Hour 1" },
       { number: 2, title: "Hour 2-3" },
     ] : [

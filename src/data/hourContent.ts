@@ -2202,145 +2202,68 @@ export const week4Hours: HourData[] = [
   {
     weekNumber: 4,
     hourNumber: 2,
-    title: "AI-Guided Writing Game",
-    theme: "Step-by-Step AWQ Practice with AI Feedback",
-    behaviourChange: "Get feedback at EACH step, not just at the end. Learning happens during the process.",
+    title: "On-Paper AWQ Practice",
+    theme: "Timed Practice Session with OCR-Based Review",
+    behaviourChange: "Practice handwriting your AWQ response - just like the real exam. Get AI feedback via OCR.",
     learningGoals: [
-      "Practice AWQ writing with step-by-step AI guidance",
-      "Receive immediate feedback on introduction, body, and conclusion",
-      "Learn to synthesise sources through guided practice",
-      "Build confidence for the real AWQ"
+      "Complete a timed handwritten AWQ practice session",
+      "Use the mock exam materials to simulate exam conditions",
+      "Submit handwritten work via OCR for AI feedback",
+      "If OCR doesn't work, type your response manually"
     ],
     ciloLinks: ["CILO 2: All Skills", "CILO 3: Drafting", "CILO 5: AI as Learning Partner"],
-    keyConcepts: [],
-    agenda: [
-      { 
-        title: "Read & Understand", 
-        duration: "5 min", 
-        activities: [
-          "Read both article excerpts",
-          "Identify main argument of each",
-          "Chat with AI tutor for clarification"
-        ] 
-      },
-      { 
-        title: "Plan Your Response", 
-        duration: "5 min", 
-        activities: [
-          "List 2-3 key points from each source",
-          "Identify relationships (agree/contrast/elaborate)",
-          "Get AI feedback on your plan"
-        ] 
-      },
-      { 
-        title: "Write with AI Guidance", 
-        duration: "25 min", 
-        activities: [
-          "Write introduction (2-3 sentences) → Get feedback",
-          "Write body paragraph (4-6 sentences) → Get feedback",
-          "Write conclusion (1-2 sentences) → Get feedback"
-        ] 
-      },
-      { 
-        title: "Final Review", 
-        duration: "10 min", 
-        activities: [
-          "Get comprehensive AI review",
-          "Check word count and citations",
-          "Receive score on 5 AWQ criteria"
-        ] 
-      }
-    ],
-    tasks: []
-  },
-  {
-    weekNumber: 4,
-    hourNumber: 3,
-    title: "OCR Writing Review",
-    theme: "AI-Assisted Handwriting Analysis",
-    behaviourChange: "Get feedback on your handwritten work immediately - no need to retype!",
-    learningGoals: [
-      "Upload a photo of your handwritten AWQ summary",
-      "Review and correct OCR-extracted text",
-      "Receive AI feedback based on teacher's criteria",
-      "Discuss improvements with the AI tutor"
-    ],
-    ciloLinks: ["CILO 3: Revision Skills", "CILO 5: AI as Learning Partner"],
     keyConcepts: [
       {
-        term: "OCR (Optical Character Recognition)",
-        definition: "Technology that converts images of text into editable digital text.",
-        example: "Upload a photo of your handwritten notes and the AI extracts the text for review.",
-        tip: "Take clear, well-lit photos for best results. Ensure your handwriting is reasonably neat."
+        term: "On-Paper Practice",
+        definition: "Writing your AWQ response by hand to simulate actual exam conditions.",
+        example: "Use the mock exam materials, set a timer for 50 minutes, and write on paper.",
+        tip: "Practice writing neatly and managing your time - both crucial for the real exam."
       },
       {
-        term: "Self-Correction",
-        definition: "The skill of identifying and fixing your own mistakes before submitting work.",
-        example: "After OCR extraction, check for typos, missing words, and formatting errors.",
-        tip: "Read the extracted text aloud to catch errors the OCR might have introduced."
+        term: "OCR Review (Beta)",
+        definition: "Upload a photo of your handwritten work to get AI feedback.",
+        example: "Take a clear photo and use the OCR tool to extract text for review.",
+        tip: "If OCR doesn't work well with your handwriting, simply type your response manually."
       },
       {
-        term: "Beta Platform Notice",
-        definition: "This platform is in beta testing mode. Some features may not work perfectly.",
-        example: "If OCR fails to extract your handwriting, you can manually type your summary instead.",
-        tip: "Take screenshots of your work regularly to save your progress. We apologize for any inconvenience!"
+        term: "One-on-One Consultations",
+        definition: "Individual meetings with your teacher to discuss your progress and get personalized feedback.",
+        example: "Book a slot to review your practice AWQ and get detailed guidance.",
+        tip: "Come prepared with specific questions about areas you find challenging."
       }
     ],
     articles: [ARTICLE_A, ARTICLE_B],
     agenda: [
       { 
-        title: "Important Notes", 
-        duration: "2 min", 
-        activities: [
-          "⚠️ The actual test paper will be provided in class",
-          "🧪 This platform is in BETA mode - some features may have issues",
-          "💾 Take screenshots to save your work as backup",
-          "✍️ If OCR doesn't work, type your summary manually"
-        ] 
-      },
-      { 
-        title: "Upload & Extract", 
+        title: "Resources & Setup", 
         duration: "5 min", 
         activities: [
-          "Take a clear photo of your handwritten summary",
-          "Upload to the OCR tool",
-          "Review extracted text",
-          "If OCR fails: manually type your summary"
+          "Review Week 4 notes (embedded below)",
+          "Access mock exam materials",
+          "Check consultation schedule"
         ] 
       },
       { 
-        title: "Edit & Correct", 
-        duration: "10 min", 
+        title: "Timed Practice", 
+        duration: "50 min", 
         activities: [
-          "Fix any OCR errors",
-          "Correct spelling and grammar",
-          "Ensure proper citations are included"
+          "Write AWQ response on paper",
+          "Follow exam conditions (no resources)",
+          "Manage your time: 10-20-20"
         ] 
       },
       { 
-        title: "AI Review", 
+        title: "Submit for Feedback", 
         duration: "15 min", 
         activities: [
-          "Get comprehensive feedback on your summary",
-          "Ask follow-up questions",
-          "Identify areas for improvement"
-        ] 
-      },
-      { 
-        title: "Revision", 
-        duration: "15 min", 
-        activities: [
-          "Apply feedback to improve your work",
-          "Re-submit for updated feedback if time permits"
+          "Take photo of handwritten work",
+          "Use OCR tool to extract text",
+          "OR type your response manually",
+          "Get AI feedback"
         ] 
       }
     ],
-    tasks: [],
-    writingTask: {
-      prompt: "Upload a photo of your handwritten AWQ summary. The AI will extract and review it.",
-      wordLimit: 220,
-      rubricCriteria: ["Summary Accuracy (20%)", "Synthesis (20%)", "Paraphrasing (20%)", "Academic Tone (20%)", "Citations (20%)"]
-    }
+    tasks: []
   }
 ];
 
