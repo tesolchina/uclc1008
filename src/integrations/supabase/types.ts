@@ -1179,6 +1179,36 @@ export type Database = {
           },
         ]
       }
+      student_ocr_records: {
+        Row: {
+          created_at: string
+          extracted_text: string
+          id: string
+          image_count: number
+          student_id: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          extracted_text: string
+          id?: string
+          image_count?: number
+          student_id: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          extracted_text?: string
+          id?: string
+          image_count?: number
+          student_id?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       student_questions: {
         Row: {
           context: string | null

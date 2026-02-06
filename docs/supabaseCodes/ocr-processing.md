@@ -1,6 +1,6 @@
 # OCR & Document Processing
 
-Edge functions for extracting text from handwritten documents.
+Edge functions and client-side features for extracting text from handwritten documents.
 
 ---
 
@@ -97,3 +97,52 @@ if (response.data?.text) {
 - Fallback model (gemini-2.5-pro): ~8-12 seconds per image
 - Maximum image size: 20MB
 - Recommended resolution: 300 DPI for best results
+
+---
+
+## OCR Records Storage
+
+### Database Table: `student_ocr_records`
+
+Stores extracted OCR text for logged-in students.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID | Primary key |
+| `student_id` | TEXT | Student identifier |
+| `title` | TEXT | Optional title for the extraction |
+| `extracted_text` | TEXT | The OCR-extracted text |
+| `image_count` | INTEGER | Number of images processed |
+| `created_at` | TIMESTAMP | Creation timestamp |
+| `updated_at` | TIMESTAMP | Last update timestamp |
+
+### RLS Policies
+
+- **SELECT**: Open access (filtered by student_id in application)
+- **INSERT**: Open access (student_id validated in application)
+- **UPDATE**: Open access
+- **DELETE**: Not allowed (records are permanent)
+
+### Client Hook: `useOCRRecords`
+
+**Path:** `src/features/ocr-module/hooks/useOCRRecords.ts`
+
+```typescript
+import { useOCRRecords } from '@/features/ocr-module';
+
+const { saveRecord, fetchRecords, isSaving, saveError } = useOCRRecords();
+
+// Save a new record
+await saveRecord(extractedText, 'My Document Title', imageCount);
+
+// Fetch all records for current student
+const records = await fetchRecords();
+```
+
+### Important Notes
+
+1. **Save to Database may fail** - Users are warned to always:
+   - Copy text to clipboard
+   - Download as Markdown file
+2. Records are **never deleted** to preserve student work
+3. Records viewable in **Student Dashboard → OCR Records** tab
