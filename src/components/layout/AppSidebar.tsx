@@ -1,4 +1,4 @@
-import { BookOpen, CalendarRange, MessageCircle, PanelLeftClose, Sparkles, Target, Settings, CheckCircle2, XCircle, Loader2, Shield, Radio } from "lucide-react";
+import { BookOpen, CalendarRange, MessageCircle, PanelLeftClose, Sparkles, Target, Settings, CheckCircle2, XCircle, Loader2, Shield, Radio, FileText } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { getWeekMetaById, getAssignmentById } from "@/data";
 import { useLocation } from "react-router-dom";
@@ -96,6 +96,7 @@ export function AppSidebar() {
   const overviewItems = [
     { title: "Course overview", url: "/course_info", icon: BookOpen },
     { title: "Lab Space", url: "/lab", icon: Radio },
+    { title: "OCR Tool", url: "/ocr", icon: FileText },
     { title: "Settings", url: "/settings", icon: Settings, showStatus: true },
   ];
 
