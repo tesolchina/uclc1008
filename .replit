@@ -42,6 +42,8 @@ waitForPort = 5000
 
 [userenv.shared]
 SUPABASE_URL = "https://dlqnolcnkzmyeortwjhf.supabase.co"
+VITE_SUPABASE_URL = "https://dlqnolcnkzmyeortwjhf.supabase.co"
+VITE_SUPABASE_PROJECT_ID = "dlqnolcnkzmyeortwjhf"
 
 [deployment]
 deploymentTarget = "autoscale"
