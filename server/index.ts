@@ -39,14 +39,7 @@ app.get("/api/health", (_req, res) => {
 const isDev = process.env.NODE_ENV !== "production";
 
 async function start() {
-  if (isDev) {
-    const { createServer } = await import("vite");
-    const vite = await createServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-    });
-    app.use(vite.middlewares);
-  } else {
+  if (!isDev) {
     const path = await import("path");
     const distPath = path.resolve(process.cwd(), "dist");
     app.use(express.static(distPath));
@@ -55,9 +48,19 @@ async function start() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
+  const server = app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on port ${PORT} (${isDev ? "development" : "production"})`);
   });
+
+  if (isDev) {
+    const { createServer } = await import("vite");
+    const vite = await createServer({
+      server: { middlewareMode: true },
+      appType: "spa",
+    });
+    app.use(vite.middlewares);
+    console.log("Vite dev middleware attached");
+  }
 }
 
 start().catch((err) => {
