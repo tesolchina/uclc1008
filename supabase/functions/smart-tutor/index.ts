@@ -232,7 +232,7 @@ serve(async (req) => {
     const systemPrompt = buildSystemPrompt(topic, state, currentTask);
 
     // Use Lovable AI
-    const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
+    const lovableApiKey = Deno.env.get("OPENROUTER_API_KEY");
     if (!lovableApiKey) {
       return new Response(
         JSON.stringify({ error: "AI service not configured" }),
@@ -240,7 +240,7 @@ serve(async (req) => {
       );
     }
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${lovableApiKey}`,

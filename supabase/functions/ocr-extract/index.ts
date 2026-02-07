@@ -35,7 +35,7 @@ const MODELS = [
 async function callOCR(apiKey: string, imageBase64: string, mimeType: string, model: string) {
   console.log(`Attempting OCR with model: ${model}`);
   
-  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
@@ -85,9 +85,9 @@ serve(async (req) => {
       );
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      console.error("LOVABLE_API_KEY is not configured");
+    const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY");
+    if (!OPENROUTER_API_KEY) {
+      console.error("OPENROUTER_API_KEY is not configured");
       return new Response(
         JSON.stringify({ error: "AI service not configured" }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -100,7 +100,7 @@ serve(async (req) => {
     // Try each model in order until one succeeds
     for (const model of MODELS) {
       try {
-        const response = await callOCR(LOVABLE_API_KEY, imageBase64, mimeType, model);
+        const response = await callOCR(OPENROUTER_API_KEY, imageBase64, mimeType, model);
 
         if (response.ok) {
           const data = await response.json();

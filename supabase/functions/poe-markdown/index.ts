@@ -40,7 +40,7 @@ serve(async (req) => {
         Authorization: `Bearer ${poeApiKey}`,
         "Content-Type": "application/json",
         // Recommended headers for Poe external apps
-        "HTTP-Referer": "https://uclc1008.lovable.app",
+        "HTTP-Referer": "https://uclc1008-1.replit.app",
         "X-Title": "UCLC1008 Staff Markdown Helper",
       },
       body: JSON.stringify({

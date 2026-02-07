@@ -163,7 +163,7 @@ async function convertTextToMarkdown(text: string): Promise<string> {
     headers: {
       Authorization: `Bearer ${poeApiKey}`,
       "Content-Type": "application/json",
-      "HTTP-Referer": "https://uclc1008.lovable.app",
+      "HTTP-Referer": "https://uclc1008-1.replit.app",
       "X-Title": "UCLC1008 Staff Library Agent",
     },
     body: JSON.stringify({
@@ -413,7 +413,7 @@ async function planOperations(instruction: string, folders: FolderRow[], files: 
     headers: {
       Authorization: `Bearer ${poeApiKey}`,
       "Content-Type": "application/json",
-      "HTTP-Referer": "https://uclc1008.lovable.app",
+      "HTTP-Referer": "https://uclc1008-1.replit.app",
       "X-Title": "UCLC1008 Staff Library Agent",
     },
     body: JSON.stringify({

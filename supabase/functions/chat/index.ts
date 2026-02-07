@@ -242,7 +242,7 @@ serve(async (req) => {
       }
 
       // Use Lovable AI as fallback (no API key required)
-      const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
+      const lovableApiKey = Deno.env.get("OPENROUTER_API_KEY");
       if (!lovableApiKey) {
         return new Response(
           JSON.stringify({ error: "No AI service available. Please configure an API key in Settings." }),
@@ -254,7 +254,7 @@ serve(async (req) => {
       apiConfig = {
         key: lovableApiKey,
         provider: "lovable",
-        endpoint: "https://ai.gateway.lovable.dev/v1/chat/completions",
+        endpoint: "https://openrouter.ai/api/v1/chat/completions",
       };
       source = "shared";
       usageInfo = { used: sharedAccess.used, limit: sharedAccess.limit };
