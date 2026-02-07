@@ -61,9 +61,10 @@ src/
 
 ### AI Provider Strategy (Two-Tier)
 
-1. **Primary: HKBU GenAI Platform** – Azure OpenAI-compatible API at `genai.hkbu.edu.hk`. Uses per-user API keys resolved in order: OAuth access token → student's saved key → system shared key.
-2. **Fallback: Replit AI** – OpenAI-compatible API via Replit's built-in AI Integrations. Used when no HKBU key is available. Has daily usage limits per student (default 50/day). Currently only the `chat` function implements the full hierarchy; other functions use Replit AI directly.
-3. **Models used**: `gpt-4.1` (HKBU), `google/gemini-2.5-flash` and `google/gemini-2.5-pro` (for OCR), `google/gemini-3-flash-preview` (for writing feedback), `gpt-4o` (Replit fallback)
+1. **Primary: HKBU GenAI Platform** – Azure OpenAI-compatible API at `genai.hkbu.edu.hk`. Uses per-user API keys resolved in order: OAuth access token → student's saved key → system shared key. Currently only the `chat` edge function implements this full hierarchy.
+2. **Current Fallback: OpenRouter** – Used when no HKBU key is available (in `chat`), or directly by all other edge functions. Uses `OPENROUTER_API_KEY` stored in Supabase Edge Function secrets. Daily usage limits per student (default 50/day) are enforced only in the `chat` function.
+3. **Planned Fallback: Replit AI** – Target state is to replace OpenRouter with Replit AI Integrations (OpenAI-compatible, billed to Replit credits). See `docs/AIapi.md` for the full migration plan.
+4. **Models used**: `gpt-4.1` (HKBU), `google/gemini-2.5-flash` and `google/gemini-2.5-pro` (OCR), `google/gemini-3-flash-preview` (writing feedback/smart-tutor)
 
 ### Content Architecture
 
@@ -81,7 +82,7 @@ src/
 | **Supabase (Lovable Cloud)** | Database, Edge Functions, file storage | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ANON_KEY` |
 | **HKBU GenAI Platform** | Primary AI provider (Azure OpenAI compatible) | `HKBU_CLIENT_ID`, `HKBU_CLIENT_SECRET`, per-user API keys |
 | **HKBU OAuth (auth.hkbu.tech)** | Teacher/admin authentication | `HKBU_CLIENT_ID`, `HKBU_CLIENT_SECRET`, `FRONTEND_URL` |
-| **Replit AI** | Fallback AI provider | Billed to Replit account credits, no separate key needed |
+| **OpenRouter** | Current fallback AI provider | `OPENROUTER_API_KEY` in Supabase secrets (to be replaced with Replit AI) |
 | **Poe API** | Claude access for staff-agent and markdown conversion | `POE_API_KEY` |
 
 ### Key NPM Packages
