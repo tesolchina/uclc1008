@@ -132,14 +132,12 @@ Write an improved paraphrase based on the student's work that:
 Be constructive and explain WHY your version is an improvement.`,
       };
 
-      const chatUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
+      const chatUrl = `/api/chat`;
       
       const response = await fetch(chatUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
         body: JSON.stringify({
           messages: [{ role: "user", content: stepContext[currentStep as keyof typeof stepContext] }],

@@ -24,7 +24,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 
-const FUNCTION_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ocr-writing-review`;
+const FUNCTION_URL = `/api/ocr-writing-review`;
 
 type Message = { role: "user" | "assistant"; content: string };
 type Step = "upload" | "edit" | "review";
@@ -154,7 +154,6 @@ export function OCRWritingReview({ weekNumber = 4, hourNumber = 3 }: OCRWritingR
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
         body: JSON.stringify({
           action: "ocr",
@@ -197,7 +196,6 @@ export function OCRWritingReview({ weekNumber = 4, hourNumber = 3 }: OCRWritingR
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
         body: JSON.stringify({
           action: "feedback",
@@ -273,7 +271,6 @@ export function OCRWritingReview({ weekNumber = 4, hourNumber = 3 }: OCRWritingR
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
         body: JSON.stringify({
           action: "chat",

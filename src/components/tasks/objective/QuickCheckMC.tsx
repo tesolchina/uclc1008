@@ -234,8 +234,10 @@ export const QuickCheckMC = ({
     
     setIsGettingAiFeedback(true);
     try {
-      const response = await supabase.functions.invoke("chat", {
-        body: {
+      const fetchResponse = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           messages: [
             {
               role: "user",
@@ -250,12 +252,12 @@ Give a 1-2 sentence response: affirm their answer and add one quick insight abou
           ],
           studentId,
           meta: { taskKey: uniqueQuestionId, type: "mc-feedback" },
-        },
+        }),
       });
 
       let feedback = "";
-      if (response.data) {
-        const reader = response.data?.getReader?.();
+      if (fetchResponse.ok) {
+        const reader = fetchResponse.body?.getReader();
         if (reader) {
           const decoder = new TextDecoder();
           while (true) {
@@ -273,8 +275,11 @@ Give a 1-2 sentence response: affirm their answer and add one quick insight abou
               }
             }
           }
-        } else if (typeof response.data === "string") {
-          feedback = response.data;
+        } else {
+          const data = await fetchResponse.json();
+          if (typeof data === "string") {
+            feedback = data;
+          }
         }
       }
 

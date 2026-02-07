@@ -113,7 +113,12 @@ function AdminDashboardContent() {
       }
 
       // Check API status
-      const { data: apiData } = await supabase.functions.invoke('check-api-status');
+      const apiStatusResponse = await fetch('/api/check-api-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      });
+      const apiData = apiStatusResponse.ok ? await apiStatusResponse.json() : null;
       if (apiData?.statuses) {
         const hkbuStatus = apiData.statuses.find((s: any) => s.provider === 'hkbu');
         setApiStatus({

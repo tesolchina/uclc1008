@@ -4,7 +4,11 @@
 
 This is an AI-assisted learning platform for UCLC 1008 University English I, a university-level academic English course at Hong Kong Baptist University (HKBU). The platform provides 13 weeks of structured lessons covering academic reading, summarizing, paraphrasing, citation practices, and argumentation. Key features include AI-powered tutoring chat, OCR text extraction from handwritten work, guided academic writing exercises (AWQ), student/teacher dashboards, and live classroom sessions.
 
-The app is a React single-page application built with Vite, using Supabase (via Lovable Cloud) for the backend including PostgreSQL database, Edge Functions (Deno), and OAuth authentication.
+The app is a React single-page application with an Express backend server. Supabase is used for the PostgreSQL database, authentication (OAuth), and RLS policies. AI functions have been migrated from Supabase Edge Functions to Express routes on the server.
+
+## Recent Changes
+
+- **2026-02-07**: Migrated all 9 AI Edge Functions from Supabase to Express server routes (`/api/*`). Frontend updated to call Express routes instead of Supabase Edge Functions. Server uses Vite as middleware in development.
 
 ## User Preferences
 
@@ -19,11 +23,36 @@ Preferred communication style: Simple, everyday language.
 - **Routing**: React Router v6 with route-per-page pattern
 - **State Management**: React Context (AuthContext, ApiKeyContext) + TanStack React Query for server state
 - **Path aliases**: `@/` maps to `./src/`
-- **Dev server**: Runs on port 8080 with `host: "::"` for external access
+- **Dev server**: Vite runs as Express middleware on port 5000
+
+### Backend (Express Server)
+
+- **Entry point**: `server/index.ts` — Express server on port 5000
+- **Dev mode**: Uses Vite as middleware (SPA mode)
+- **Production mode**: Serves static files from `dist/`
+- **Startup**: `npx tsx server/index.ts`
 
 ### Directory Structure
 
 ```
+server/
+├── index.ts              # Express entry point (port 5000)
+├── middleware/
+│   └── cors.ts           # CORS configuration
+├── lib/
+│   ├── supabase.ts       # Supabase admin client
+│   ├── ai-providers.ts   # AI provider resolution (HKBU → OpenRouter fallback)
+│   └── usage-tracker.ts  # Daily usage limits and token tracking
+├── routes/
+│   ├── chat.ts           # /api/chat — General AI chat with streaming, HKBU key hierarchy
+│   ├── smart-tutor.ts    # /api/smart-tutor — Progressive AI tutoring with 3-level tests
+│   ├── precourse-assistant.ts  # /api/precourse-assistant — Pre-course writing guidance
+│   ├── ocr-extract.ts    # /api/ocr-extract — Handwriting OCR (Gemini vision models)
+│   ├── ocr-writing-review.ts   # /api/ocr-writing-review — Writing feedback from OCR
+│   ├── awq-writing-guide.ts    # /api/awq-writing-guide — AWQ step-by-step writing
+│   ├── awq-guide-feedback.ts   # /api/awq-guide-feedback — AWQ sentence-level feedback
+│   ├── poe-markdown.ts   # /api/poe-markdown — Poe API for markdown conversion
+│   └── staff-agent.ts    # /api/staff-agent — AI file management for teachers
 src/
 ├── pages/              # Route-level page components (Index, WeekPages, Lessons, Dashboards)
 ├── pages/weeks/        # Individual week pages (Week1Page through Week13Page)
@@ -42,29 +71,33 @@ src/
 - **Static data + dynamic content**: Course structure and lesson content are stored as TypeScript data files; student responses, progress, and AI interactions are stored in Supabase.
 - **No strict TypeScript**: `strict: false`, `noImplicitAny: false` — the codebase is lenient with types.
 
-### Backend (Supabase / Lovable Cloud)
+### Database (Supabase)
 
-- **Database**: PostgreSQL via Supabase with tables for `students`, `student_task_responses`, `writing_drafts`, `lesson_progress`, `live_sessions`, `assignment_chat_history`, `staff_materials`, `api_keys`, `student_api_usage`, `process_logs`
-- **Authentication**: Custom OAuth flow with HKBU platform (not Supabase Auth). Students use a lightweight ID system (student number + initials) without email/password. OAuth handles teacher/admin authentication via HKBU SSO.
-- **Edge Functions** (Deno): Located in `supabase/functions/`. Key functions include:
-  - `chat` – General AI chat with multi-provider key resolution
-  - `smart-tutor` – Progressive AI tutoring
-  - `precourse-assistant` – Pre-course writing guidance
-  - `ocr-extract` – Handwriting OCR using Gemini models
-  - `ocr-writing-review` – Handwriting feedback
-  - `awq-guide-feedback` / `awq-writing-guide` – Academic Writing Quiz step-by-step guidance
-  - `staff-agent` – AI-powered file management for teachers
-  - `oauth-init` / `oauth-callback` / `get-session-access-token` – Authentication flow
-  - `check-api-status` / `save-api-key` / `revoke-api-key` – API key management
+- **Database**: PostgreSQL via Supabase with tables for `students`, `student_task_responses`, `writing_drafts`, `lesson_progress`, `live_sessions`, `assignment_chat_history`, `staff_materials`, `api_keys`, `student_api_usage`, `process_logs`, `ai_tutor_reports`, `system_settings`, `staff_library_folders`, `staff_library_files`
+- **Authentication**: Custom OAuth flow with HKBU platform (not Supabase Auth). Students use a lightweight ID system (student number + initials) without email/password. OAuth handles teacher/admin authentication via HKBU SSO. OAuth endpoints still on Supabase Edge Functions (`oauth-init`, `oauth-callback`).
 - **RLS**: 34 permissive Row Level Security policies (intentional for educational access)
-- **No JWT verification** on edge functions — they handle auth internally where needed
 
 ### AI Provider Strategy (Two-Tier)
 
-1. **Primary: HKBU GenAI Platform** – Azure OpenAI-compatible API at `genai.hkbu.edu.hk`. Uses per-user API keys resolved in order: OAuth access token → student's saved key → system shared key. Currently only the `chat` edge function implements this full hierarchy.
-2. **Current Fallback: OpenRouter** – Used when no HKBU key is available (in `chat`), or directly by all other edge functions. Uses `OPENROUTER_API_KEY` stored in Supabase Edge Function secrets. Daily usage limits per student (default 50/day) are enforced only in the `chat` function.
+1. **Primary: HKBU GenAI Platform** – Azure OpenAI-compatible API at `genai.hkbu.edu.hk`. Uses per-user API keys resolved in order: OAuth access token → student's saved key → system shared key. Only the `chat` route implements this full hierarchy.
+2. **Current Fallback: OpenRouter** – Used when no HKBU key is available (in `chat`), or directly by all other routes. Uses `OPENROUTER_API_KEY` env var. Daily usage limits per student (default 50/day) enforced in `chat` route.
 3. **Planned Fallback: Replit AI** – Target state is to replace OpenRouter with Replit AI Integrations (OpenAI-compatible, billed to Replit credits). See `docs/AIapi.md` for the full migration plan.
 4. **Models used**: `gpt-4.1` (HKBU), `google/gemini-2.5-flash` and `google/gemini-2.5-pro` (OCR), `google/gemini-3-flash-preview` (writing feedback/smart-tutor)
+
+### API Routes
+
+| Route | Purpose | Streaming |
+|-------|---------|-----------|
+| `POST /api/chat` | General AI chat with HKBU key hierarchy, usage limits | Yes |
+| `POST /api/smart-tutor` | Progressive tutoring with 3-level task system | Yes |
+| `POST /api/precourse-assistant` | Pre-course writing guidance | Yes |
+| `POST /api/ocr-extract` | Handwriting OCR with Gemini vision models | No |
+| `POST /api/ocr-writing-review` | OCR + writing feedback (3 actions: ocr, feedback, chat) | Mixed |
+| `POST /api/awq-writing-guide` | AWQ step-by-step writing guide | Yes |
+| `POST /api/awq-guide-feedback` | AWQ sentence-level feedback | Yes |
+| `POST /api/poe-markdown` | Markdown conversion via Poe API | No |
+| `POST /api/staff-agent` | AI file management for teachers (Poe API) | No |
+| `GET /api/health` | Health check | No |
 
 ### Content Architecture
 
@@ -79,17 +112,20 @@ src/
 
 | Service | Purpose | Configuration |
 |---------|---------|---------------|
-| **Supabase (Lovable Cloud)** | Database, Edge Functions, file storage | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ANON_KEY` |
+| **Supabase** | Database, OAuth auth, RLS, file storage | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (server), `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` (client) |
 | **HKBU GenAI Platform** | Primary AI provider (Azure OpenAI compatible) | `HKBU_CLIENT_ID`, `HKBU_CLIENT_SECRET`, per-user API keys |
 | **HKBU OAuth (auth.hkbu.tech)** | Teacher/admin authentication | `HKBU_CLIENT_ID`, `HKBU_CLIENT_SECRET`, `FRONTEND_URL` |
-| **OpenRouter** | Current fallback AI provider | `OPENROUTER_API_KEY` in Supabase secrets (to be replaced with Replit AI) |
-| **Poe API** | Claude access for staff-agent and markdown conversion | `POE_API_KEY` |
+| **OpenRouter** | Current fallback AI provider | `OPENROUTER_API_KEY` (env var on server) |
+| **Poe API** | Claude access for staff-agent and markdown conversion | `POE_API_KEY` (env var on server) |
 
 ### Key NPM Packages
 
 | Package | Purpose |
 |---------|---------|
-| `@supabase/supabase-js` | Supabase client for database and edge function calls |
+| `express` | Backend HTTP server |
+| `cors` | CORS middleware |
+| `tsx` | TypeScript execution for server |
+| `@supabase/supabase-js` | Supabase client for database operations |
 | `@tanstack/react-query` | Server state management and caching |
 | `react-router-dom` | Client-side routing |
 | `shadcn/ui` + Radix UI primitives | UI component library |
@@ -102,3 +138,20 @@ src/
 | `embla-carousel-react` | Carousel component |
 | `cmdk` | Command palette |
 | `tailwindcss-animate` | Animation utilities for Tailwind |
+
+## Environment Variables
+
+### Server-side (process.env)
+- `SUPABASE_URL` — Supabase project URL
+- `SUPABASE_SERVICE_ROLE_KEY` — Supabase service role key (secret, needed for admin operations)
+- `OPENROUTER_API_KEY` — OpenRouter API key for AI fallback
+- `POE_API_KEY` — Poe API key for staff tools
+- `NODE_ENV` — "development" or "production"
+
+### Client-side (import.meta.env)
+- `VITE_SUPABASE_URL` — Supabase project URL (public)
+- `VITE_SUPABASE_PUBLISHABLE_KEY` — Supabase anon key (public)
+
+### Still on Supabase Edge Functions
+- OAuth flow (`oauth-init`, `oauth-callback`, `get-session-access-token`) — still deployed as Supabase Edge Functions
+- `check-api-status`, `save-api-key`, `revoke-api-key` — not yet migrated to Express (frontend updated to call `/api/*` but routes not yet created)

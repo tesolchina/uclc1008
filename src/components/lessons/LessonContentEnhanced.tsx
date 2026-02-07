@@ -131,8 +131,10 @@ export function LessonContentEnhanced({
 
     setLoadingAI(taskId);
     try {
-      const { data, error } = await supabase.functions.invoke('chat', {
-        body: {
+      const fetchResponse = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           accessToken,
           messages: [
             {
@@ -144,11 +146,12 @@ export function LessonContentEnhanced({
               content: response.response
             }
           ]
-        }
+        }),
       });
 
-      if (error) throw error;
+      if (!fetchResponse.ok) throw new Error('Failed to get AI feedback');
 
+      const data = await fetchResponse.json();
       const feedback = data?.message || "Good attempt! Consider developing your argument further with specific examples from the text. Think about how your analysis connects to the broader themes of the lesson.";
       
       setOpenEndedResponses(prev => 

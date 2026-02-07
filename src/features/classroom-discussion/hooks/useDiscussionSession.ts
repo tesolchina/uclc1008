@@ -154,8 +154,10 @@ export function useDiscussionSession({ weekNumber, teacherId }: UseDiscussionSes
     const selectedResponses = responses.filter(r => responseIds.includes(r.id));
     
     try {
-      const { data, error } = await supabase.functions.invoke('chat', {
-        body: {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           messages: [
             {
               role: 'system',
@@ -177,11 +179,12 @@ Format your response for classroom display - use simple formatting, be encouragi
             }
           ],
           studentId: teacherId,
-        }
+        }),
       });
 
-      if (error) throw error;
+      if (!response.ok) throw new Error('Failed to generate AI commentary');
 
+      const data = await response.json();
       const commentary = data?.content || data?.message || null;
 
       // Save AI commentary as a thread

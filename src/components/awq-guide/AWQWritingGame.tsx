@@ -15,7 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 
-const FUNCTION_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/awq-guide-feedback`;
+const FUNCTION_URL = `/api/awq-guide-feedback`;
 
 // The 12 AWQ writing steps
 const WRITING_STEPS = [
@@ -171,7 +171,6 @@ export function AWQWritingGame({ weekNumber = 4, hourNumber = 2 }: AWQWritingGam
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
         body: JSON.stringify({
           stepIndex: currentStep,
@@ -253,7 +252,6 @@ export function AWQWritingGame({ weekNumber = 4, hourNumber = 2 }: AWQWritingGam
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
         body: JSON.stringify({
           mode: "chat",

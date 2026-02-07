@@ -51,17 +51,20 @@ Format your response EXACTLY as JSON:
   "recommendations": ["First recommendation", "Second recommendation"]
 }`;
 
-      const response = await supabase.functions.invoke("chat", {
-        body: {
+      const fetchResponse = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           messages: [{ role: "user", content: prompt }],
           meta: { weekTitle: `Week ${weekNumber}`, theme: "Practice Rating", aiPromptHint: "rating" },
           studentId
-        }
+        }),
       });
 
-      if (response.data) {
+      if (fetchResponse.ok) {
+        const responseData = await fetchResponse.json();
         // Parse the AI response
-        const responseText = response.data.content || response.data;
+        const responseText = responseData.content || responseData;
         try {
           // Extract JSON from response
           const jsonMatch = responseText.match(/\{[\s\S]*\}/);

@@ -323,10 +323,6 @@ export function useAIConversation(options: UseAIConversationOptions): AIConversa
         content: content.trim(),
       });
 
-      // Prepare the request
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-
       // Create a placeholder for the AI response
       const aiMessageId = crypto.randomUUID();
       const aiMessage: ConversationMessage = {
@@ -342,12 +338,10 @@ export function useAIConversation(options: UseAIConversationOptions): AIConversa
 
       // Make the streaming request
       const result = await handleStreamingResponse(
-        () => fetch(`${supabaseUrl}/functions/v1/chat`, {
+        () => fetch(`/api/chat`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${supabaseKey}`,
-            'apikey': supabaseKey,
           },
           body: JSON.stringify({
             messages: [

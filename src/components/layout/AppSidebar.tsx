@@ -80,7 +80,12 @@ export function AppSidebar() {
   useEffect(() => {
     const checkStatus = async () => {
       try {
-        const { data } = await supabase.functions.invoke("check-api-status");
+        const response = await fetch('/api/check-api-status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({}),
+        });
+        const data = response.ok ? await response.json() : null;
         const hasActive = data?.statuses?.some((s: { available: boolean }) => s.available);
         setAiStatus(hasActive ? "active" : "inactive");
       } catch {

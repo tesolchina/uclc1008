@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 
 interface OCRResult {
   text: string;
@@ -26,16 +25,20 @@ export function useOCRExtraction(): UseOCRExtractionReturn {
     setError(null);
 
     try {
-      console.log('Calling ocr-extract edge function...');
+      console.log('Calling ocr-extract API...');
       
-      const { data, error: fnError } = await supabase.functions.invoke<OCRResult>('ocr-extract', {
-        body: { imageBase64, mimeType }
+      const response = await fetch('/api/ocr-extract', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageBase64, mimeType }),
       });
 
-      if (fnError) {
-        console.error('Edge function error:', fnError);
-        throw new Error(fnError.message || 'Failed to extract text');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || errorData.message || 'Failed to extract text');
       }
+
+      const data: OCRResult = await response.json();
 
       if (!data?.text) {
         throw new Error('No text extracted from image');

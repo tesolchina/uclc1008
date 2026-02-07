@@ -79,19 +79,13 @@ export function useStudentDiscussion({ weekNumber, studentId }: UseStudentDiscus
       // Get AI feedback using streaming response
       const task = tasks.find(t => t.id === taskId);
       
-      // Use fetch directly to handle streaming response
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-      
       let aiFeedback: string | null = null;
       
       try {
-        const chatResponse = await fetch(`${supabaseUrl}/functions/v1/chat`, {
+        const chatResponse = await fetch(`/api/chat`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${supabaseKey}`,
-            'apikey': supabaseKey,
           },
           body: JSON.stringify({
             messages: [

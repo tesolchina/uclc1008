@@ -113,8 +113,10 @@ export function LessonContent({
     setLoadingAI(questionId);
     try {
       const question = openEndedQuestions.find(q => q.id === questionId);
-      const { data, error } = await supabase.functions.invoke('chat', {
-        body: {
+      const fetchResponse = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           accessToken,
           messages: [
             {
@@ -126,11 +128,12 @@ export function LessonContent({
               content: response.response
             }
           ]
-        }
+        }),
       });
 
-      if (error) throw error;
+      if (!fetchResponse.ok) throw new Error('Failed to get AI feedback');
 
+      const data = await fetchResponse.json();
       const feedback = data?.message || "Great attempt! Consider expanding on your analysis by connecting the concept to specific examples from the reading. Think about how this applies to real-world academic writing scenarios.";
       
       setOpenEndedResponses(prev => 

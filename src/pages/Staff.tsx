@@ -291,24 +291,32 @@ const StaffSpace = () => {
     }
 
     setIsConvertingMaterial(true);
-    const { data, error } = await supabase.functions.invoke("poe-markdown", {
-      body: { text: materialOriginal },
-    });
-    setIsConvertingMaterial(false);
+    try {
+      const response = await fetch('/api/poe-markdown', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: materialOriginal }),
+      });
+      setIsConvertingMaterial(false);
 
-    if (error) {
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || errorData.message || 'AI conversion failed');
+      }
+
+      const data = await response.json();
+      const markdown = (data as { markdown?: string } | null)?.markdown ?? "";
+      setMaterialMarkdown(markdown);
+      toast({ title: "Material converted to Markdown." });
+    } catch (error: any) {
+      setIsConvertingMaterial(false);
       console.error("Error converting material", error);
       toast({
         variant: "destructive",
         title: "AI conversion failed",
         description: error.message ?? "Please try again or check the Poe API key.",
       });
-      return;
     }
-
-    const markdown = (data as { markdown?: string } | null)?.markdown ?? "";
-    setMaterialMarkdown(markdown);
-    toast({ title: "Material converted to Markdown." });
   };
 
   const handleSaveMaterial = async (e: React.FormEvent) => {

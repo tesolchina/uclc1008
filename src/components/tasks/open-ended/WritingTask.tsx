@@ -41,8 +41,10 @@ export function WritingTask({
   const handleGetFeedback = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("chat", {
-        body: {
+      const fetchResponse = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           messages: [
             {
               role: "system",
@@ -63,11 +65,12 @@ Student's response:
 Please provide feedback on this response.`
             }
           ]
-        }
+        }),
       });
 
-      if (error) throw error;
+      if (!fetchResponse.ok) throw new Error('Failed to get feedback');
       
+      const data = await fetchResponse.json();
       const feedbackText = data?.response || data?.message || "Feedback unavailable. Please try again.";
       setFeedback(feedbackText);
       setSubmitted(true);

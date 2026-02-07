@@ -25,7 +25,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 
-const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/awq-writing-guide`;
+const CHAT_URL = `/api/awq-writing-guide`;
 
 // Writing steps configuration
 const STEPS = [
@@ -179,7 +179,6 @@ export function AWQWritingGame({ weekNumber = 4, hourNumber = 2 }: AWQWritingGam
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
         body: JSON.stringify({
           messages: newMessages.map(m => ({ role: m.role, content: m.content })),

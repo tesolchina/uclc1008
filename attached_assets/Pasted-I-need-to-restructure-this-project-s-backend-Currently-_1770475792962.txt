@@ -1,0 +1,226 @@
+I need to restructure this project's backend. Currently all AI API calls are in Supabase Edge Functions (the Lovable pattern). I want to move AI logic into an Express server running on Replit, so Supabase only handles database and OAuth.
+
+**IMPORTANT: Read `docs/architecture/current-architecture.md` and `docs/architecture/migration-plan-c.md` first to understand the full architecture before making any changes.**
+
+Here is what I need you to do, phase by phase:
+
+---
+
+### Phase 1: Set up Express server skeleton
+
+1. Install dependencies: `express`, `tsx`, `@types/express`, `cors`, `@types/cors`
+
+2. Create `server/index.ts` as the main entry point:
+   - In development mode: integrate Vite as middleware (use `createServer` from `vite` with `middlewareMode: true`)
+   - In production mode: serve static files from `dist/`
+   - Register all API routes under `/api`
+   - Listen on port 5000
+
+3. Create `server/middleware/cors.ts` for CORS configuration
+
+4. Create `server/lib/supabase.ts`:
+   - Create a Supabase admin client using `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` from environment variables
+   - This is the server-side client with full access (bypasses RLS)
+
+5. Create `server/lib/ai-providers.ts` with a unified AI provider interface:
+   - Function `resolveAIProvider(options)` that returns the best available provider:
+     - Priority 1: HKBU GenAI (if user has API key via accessToken, saved key, or system key)
+     - Priority 2: Replit AI integration (if running on Replit - use OpenAI-compatible format via Replit managed credentials)
+     - Priority 3: OpenRouter (if `OPENROUTER_API_KEY` env var is set - for local development)
+   - The function should check HKBU key availability by querying Supabase `students` and `api_keys` tables
+   - HKBU endpoint: `https://genai.hkbu.edu.hk/api/v0/rest/deployments/gpt-4.1/chat/completions`
+   - HKBU uses `api-key` header instead of `Authorization: Bearer`
+
+6. Create `server/lib/usage-tracker.ts`:
+   - Function to check daily usage limits from `system_settings` and `student_api_usage` tables
+   - Function to increment usage count
+   - Function to track token usage
+
+7. Update `package.json` scripts:
+   ```json
+   "dev": "tsx server/index.ts",
+   "build": "vite build",
+   "start": "NODE_ENV=production tsx server/index.ts",
+   "dev:frontend": "vite"
+   ```
+
+8. Update `vite.config.ts`:
+   - Keep `allowedHosts: true`
+   - In non-middleware mode, add proxy: `'/api': 'http://localhost:5000'`
+
+9. Test that the Express + Vite dev server starts and the React app loads.
+
+**Do NOT proceed to Phase 2 until Phase 1 is working.**
+
+---
+
+### Phase 2: Migrate AI Edge Functions to Express routes
+
+For each of the following, create an Express route in `server/routes/` that replicates the Edge Function logic. Convert from Deno syntax to Node.js syntax (replace `Deno.env.get()` with `process.env`, replace `Deno.serve()` with Express route handler, etc.).
+
+**Read the corresponding Edge Function source code in `supabase/functions/*/index.ts` before creating each route.**
+
+1. `server/routes/chat.ts` → POST `/api/chat`
+   - This is the most complex function. It has:
+     - Multi-provider key resolution (HKBU OAuth token → student saved key → system key → fallback)
+     - Daily usage limit checking
+     - SSE streaming response
+     - Token usage tracking
+   - Use `resolveAIProvider()` from `server/lib/ai-providers.ts`
+   - Use `usage-tracker.ts` for limits and tracking
+   - Must support streaming (SSE) responses
+
+2. `server/routes/smart-tutor.ts` → POST `/api/smart-tutor`
+   - Copy the system prompt and topic/state logic from the Edge Function
+   - Uses streaming
+   - Fallback provider only (no HKBU key resolution)
+
+3. `server/routes/precourse-assistant.ts` → POST `/api/precourse-assistant`
+   - Non-streaming
+   - Fallback provider only
+
+4. `server/routes/ocr-extract.ts` → POST `/api/ocr-extract`
+   - Accepts base64 image data
+   - Needs a model with vision/image understanding capability
+   - Has model fallback chain: gemini-2.5-flash → gemini-2.5-pro
+   - Non-streaming
+
+5. `server/routes/ocr-writing-review.ts` → POST `/api/ocr-writing-review`
+   - Has 3 actions: 'ocr', 'feedback', 'chat'
+   - OCR uses vision model, feedback/chat use text model
+   - Non-streaming
+
+6. `server/routes/awq-writing-guide.ts` → POST `/api/awq-writing-guide`
+   - Non-streaming, fallback provider only
+
+7. `server/routes/awq-guide-feedback.ts` → POST `/api/awq-guide-feedback`
+   - Has 2 modes: step feedback and free chat
+   - Non-streaming, fallback provider only
+
+8. `server/routes/poe-markdown.ts` → POST `/api/poe-markdown`
+   - Uses POE_API_KEY (from env) to call Poe API
+   - Endpoint: `https://api.poe.com/v1/chat/completions`
+   - Model: Claude-Sonnet-4.5
+
+9. `server/routes/staff-agent.ts` → POST `/api/staff-agent`
+   - Uses POE_API_KEY
+   - Has planning and execution phases
+   - Interacts with Supabase for staff_library_files/folders
+
+Test each route after creating it.
+
+---
+
+### Phase 3: Update frontend to call local API
+
+1. Create `src/lib/api.ts` with a helper function:
+   ```typescript
+   export async function callAI(endpoint: string, body: object, options?: { stream?: boolean }) {
+     const res = await fetch(`/api/${endpoint}`, {
+       method: 'POST',
+       headers: { 'Content-Type': 'application/json' },
+       body: JSON.stringify(body),
+     });
+     if (!res.ok) {
+       const error = await res.json().catch(() => ({ error: 'Unknown error' }));
+       throw new Error(error.error || `API error ${res.status}`);
+     }
+     return res;
+   }
+   ```
+
+2. Update ALL frontend files that call Supabase Edge Functions for AI. There are two patterns to replace:
+
+   **Pattern A** — `fetch` to Supabase Functions URL:
+   ```typescript
+   // BEFORE:
+   const response = await fetch(
+     `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`,
+     { headers: { 'apikey': ..., 'Authorization': ... }, body: ... }
+   );
+   // AFTER:
+   const response = await fetch('/api/chat', {
+     method: 'POST',
+     headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify({ messages, studentId, accessToken }),
+   });
+   ```
+
+   **Pattern B** — `supabase.functions.invoke()`:
+   ```typescript
+   // BEFORE:
+   const { data } = await supabase.functions.invoke('chat', { body: { messages } });
+   // AFTER:
+   const response = await fetch('/api/chat', {
+     method: 'POST',
+     headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify({ messages }),
+   });
+   const data = await response.json();
+   ```
+
+   Files to update (complete list):
+   - `src/features/ai-live-class/hooks/useAIConversation.ts`
+   - `src/features/classroom-discussion/hooks/useStudentDiscussion.ts`
+   - `src/features/classroom-discussion/hooks/useDiscussionSession.ts`
+   - `src/components/tasks/open-ended/ConceptSelectTask.tsx`
+   - `src/components/tasks/open-ended/StrategyPracticeTask.tsx`
+   - `src/components/tasks/open-ended/ParaphraseCoach.tsx`
+   - `src/components/tasks/open-ended/IntegratedParaphraseTask.tsx`
+   - `src/components/tasks/open-ended/WritingTask.tsx`
+   - `src/components/tasks/WritingPracticeWithHistory.tsx`
+   - `src/components/tasks/objective/QuickCheckMC.tsx`
+   - `src/components/hours/WritingTaskWithFeedback.tsx`
+   - `src/components/lessons/LessonContent.tsx`
+   - `src/components/lessons/LessonContentEnhanced.tsx`
+   - `src/components/lessons/AiTutorRating.tsx`
+   - `src/components/LessonAiTutor.tsx`
+   - `src/components/lessons/SmartAiTutor.tsx`
+   - `src/components/assignments/PreCourseAssistant.tsx`
+   - `src/components/awq-game/AWQWritingGame.tsx`
+   - `src/components/awq-guide/AWQGuideGame.tsx`
+   - `src/components/awq-guide/AWQWritingGame.tsx`
+   - `src/components/awq-guide/HTMLGameWithAI.tsx`
+   - `src/features/ocr-module/hooks/useOCRExtraction.ts`
+   - `src/components/ocr-review/OCRWritingReview.tsx`
+   - `src/pages/Staff.tsx`
+
+3. Do NOT change any Supabase database calls (`supabase.from(...)`) — only change the Edge Function invocations for AI.
+
+4. Do NOT change the OAuth-related Edge Function calls (oauth-init, oauth-callback, etc.) — those stay on Supabase.
+
+---
+
+### Phase 4: Cleanup
+
+1. The following Supabase Edge Functions should be KEPT (they stay on Supabase):
+   - `oauth-init`
+   - `oauth-callback`
+   - `get-session-access-token`
+   - `save-api-key`
+   - `check-api-status`
+   - `revoke-api-key`
+
+2. The following can be removed from `supabase/functions/` later (their logic is now in `server/routes/`):
+   - `chat`, `smart-tutor`, `precourse-assistant`, `ocr-extract`, `ocr-writing-review`, `awq-writing-guide`, `awq-guide-feedback`, `poe-markdown`, `staff-agent`
+   - Do NOT delete them yet — just leave them. I will clean up later.
+
+3. Make sure all Replit Secrets are configured:
+   - `SUPABASE_URL`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_PUBLISHABLE_KEY`
+   - `VITE_SUPABASE_PROJECT_ID`
+   - `POE_API_KEY` (for staff tools)
+
+4. Test the app end-to-end.
+
+---
+
+### Key rules:
+- Do NOT modify any database schema or Supabase migrations
+- Do NOT modify any Supabase data queries in the frontend (only change AI function calls)
+- Do NOT modify the OAuth Edge Functions
+- Do NOT delete any Supabase Edge Functions (I'll do that later)
+- Work phase by phase, confirm each phase works before proceeding
+- If a phase fails, stop and report the error

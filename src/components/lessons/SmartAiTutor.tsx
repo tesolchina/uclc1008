@@ -84,12 +84,11 @@ export function SmartAiTutor({
 
   const sendToTutor = async (messagesToSend: Message[]) => {
     const response = await fetch(
-      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/smart-tutor`,
+      `/api/smart-tutor`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
         body: JSON.stringify({
           messages: messagesToSend,
@@ -206,12 +205,11 @@ export function SmartAiTutor({
     setIsGeneratingReport(true);
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/smart-tutor`,
+        `/api/smart-tutor`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
           },
           body: JSON.stringify({
             action: "generate_report",

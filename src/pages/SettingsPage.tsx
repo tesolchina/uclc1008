@@ -105,8 +105,14 @@ export default function SettingsPage() {
       const today = new Date().toISOString().split('T')[0];
 
       // Run all async operations in parallel
+      const apiResponsePromise = fetch('/api/check-api-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accessToken, studentId: effectiveStudentId }),
+      }).then(r => r.ok ? r.json() : null).then(data => ({ data })).catch(() => ({ data: null }));
+
       const [apiResponse, settingsResponse, todayUsageResponse, allUsageResponse] = await Promise.all([
-        supabase.functions.invoke('check-api-status', { body: { accessToken, studentId: effectiveStudentId } }),
+        apiResponsePromise,
         supabase.from('system_settings').select('key, value'),
         supabase
           .from('student_api_usage')
@@ -188,17 +194,22 @@ export default function SettingsPage() {
 
     try {
       // This will test and save in one call
-      const { data, error } = await supabase.functions.invoke('save-api-key', {
-        body: {
+      const saveResponse = await fetch('/api/save-api-key', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           provider: 'hkbu',
           apiKey: apiKey.trim(),
           studentId: effectiveStudentId,
-        },
+        }),
       });
 
-      if (error) {
-        throw new Error(error.message || 'Failed to connect');
+      if (!saveResponse.ok) {
+        const errorData = await saveResponse.json().catch(() => ({}));
+        throw new Error(errorData.error || errorData.message || 'Failed to connect');
       }
+
+      const data = await saveResponse.json();
 
       if (data?.success && data?.validated) {
         setValidationStatus('success');
@@ -243,15 +254,22 @@ export default function SettingsPage() {
 
     setIsRevoking(true);
     try {
-      const { data, error } = await supabase.functions.invoke('revoke-api-key', {
-        body: {
+      const revokeResponse = await fetch('/api/revoke-api-key', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           provider: 'hkbu',
           studentId: effectiveStudentId,
           accessToken: accessToken || undefined,
-        },
+        }),
       });
 
-      if (error) throw error;
+      if (!revokeResponse.ok) {
+        const errorData = await revokeResponse.json().catch(() => ({}));
+        throw new Error(errorData.error || errorData.message || 'Failed to revoke key');
+      }
+
+      const data = await revokeResponse.json();
 
       if (data?.warning) {
         toast({ 
