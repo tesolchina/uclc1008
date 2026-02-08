@@ -11,6 +11,12 @@ export interface AIProviderConfig {
   model: string;
 }
 
+const REPLIT_MODEL_MAP: Record<string, string> = {
+  "google/gemini-2.5-flash": "gpt-4.1-mini",
+  "google/gemini-2.5-pro": "gpt-4.1",
+  "google/gemini-3-flash-preview": "gpt-4.1-mini",
+};
+
 export interface ResolveOptions {
   accessToken?: string;
   studentId?: string;
@@ -120,7 +126,12 @@ export async function resolveAIProvider(options: ResolveOptions): Promise<{
     };
   }
 
-  throw new Error("No AI provider available. Please configure OPENROUTER_API_KEY.");
+  const replitProvider = getReplitAIProvider(preferredModel);
+  if (replitProvider) {
+    return { provider: replitProvider, source: "replit" };
+  }
+
+  throw new Error("No AI provider available. Please configure an API key in Settings.");
 }
 
 export function getFallbackProvider(preferredModel?: string): AIProviderConfig {
@@ -137,7 +148,32 @@ export function getFallbackProvider(preferredModel?: string): AIProviderConfig {
     };
   }
 
-  throw new Error("No AI provider available. Please configure OPENROUTER_API_KEY.");
+  const replitProvider = getReplitAIProvider(preferredModel);
+  if (replitProvider) {
+    return replitProvider;
+  }
+
+  throw new Error("No AI provider available. Please configure an API key in Settings.");
+}
+
+function getReplitAIProvider(preferredModel?: string): AIProviderConfig | null {
+  const baseURL = process.env.AI_INTEGRATIONS_OPENAI_BASE_URL;
+  const apiKey = process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
+  if (!baseURL || !apiKey) return null;
+
+  const replitModel = preferredModel
+    ? REPLIT_MODEL_MAP[preferredModel] || "gpt-4.1-mini"
+    : "gpt-4.1-mini";
+
+  return {
+    name: "replit",
+    endpoint: `${baseURL}/chat/completions`,
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    model: replitModel,
+  };
 }
 
 export function getPoeProvider(): { endpoint: string; headers: Record<string, string>; model: string } {

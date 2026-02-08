@@ -89,7 +89,7 @@ chatRouter.post("/", async (req: Request, res: Response) => {
       };
       source = "shared";
       usageInfo = { used: sharedAccess.used, limit: sharedAccess.limit };
-      provider = "openrouter";
+      provider = fallback.name;
 
       await incrementUsage(effectiveStudentId);
     }

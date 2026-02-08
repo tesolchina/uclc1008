@@ -8,6 +8,7 @@ The app is a React single-page application with an Express backend server. Supab
 
 ## Recent Changes
 
+- **2026-02-08**: Configured Replit AI Integrations (OpenAI-compatible) as the third-tier fallback AI provider. Priority: HKBU GenAI → OpenRouter → Replit AI. Model mapping: Gemini models map to gpt-4.1-mini. Environment vars: `AI_INTEGRATIONS_OPENAI_BASE_URL`, `AI_INTEGRATIONS_OPENAI_API_KEY` (auto-managed by Replit).
 - **2026-02-07**: Migrated all 9 AI Edge Functions from Supabase to Express server routes (`/api/*`). Frontend updated to call Express routes instead of Supabase Edge Functions. Server uses Vite as middleware in development.
 
 ## User Preferences
@@ -77,12 +78,12 @@ src/
 - **Authentication**: Custom OAuth flow with HKBU platform (not Supabase Auth). Students use a lightweight ID system (student number + initials) without email/password. OAuth handles teacher/admin authentication via HKBU SSO. OAuth endpoints still on Supabase Edge Functions (`oauth-init`, `oauth-callback`).
 - **RLS**: 34 permissive Row Level Security policies (intentional for educational access)
 
-### AI Provider Strategy (Two-Tier)
+### AI Provider Strategy (Three-Tier)
 
 1. **Primary: HKBU GenAI Platform** – Azure OpenAI-compatible API at `genai.hkbu.edu.hk`. Uses per-user API keys resolved in order: OAuth access token → student's saved key → system shared key. Only the `chat` route implements this full hierarchy.
-2. **Current Fallback: OpenRouter** – Used when no HKBU key is available (in `chat`), or directly by all other routes. Uses `OPENROUTER_API_KEY` env var. Daily usage limits per student (default 50/day) enforced in `chat` route.
-3. **Planned Fallback: Replit AI** – Target state is to replace OpenRouter with Replit AI Integrations (OpenAI-compatible, billed to Replit credits). See `docs/AIapi.md` for the full migration plan.
-4. **Models used**: `gpt-4.1` (HKBU), `google/gemini-2.5-flash` and `google/gemini-2.5-pro` (OCR), `google/gemini-3-flash-preview` (writing feedback/smart-tutor)
+2. **Second Tier: OpenRouter** – Used when no HKBU key is available. Uses `OPENROUTER_API_KEY` env var. Daily usage limits per student (default 50/day) enforced in `chat` route.
+3. **Third Tier: Replit AI** – OpenAI-compatible API via Replit AI Integrations. Uses auto-managed `AI_INTEGRATIONS_OPENAI_BASE_URL` and `AI_INTEGRATIONS_OPENAI_API_KEY`. Gemini model names mapped to GPT equivalents (`gemini-2.5-flash` → `gpt-4.1-mini`, `gemini-2.5-pro` → `gpt-4.1`). Billed to Replit credits.
+4. **Models used**: `gpt-4.1` (HKBU), `google/gemini-2.5-flash` / `google/gemini-2.5-pro` (OCR via OpenRouter), `google/gemini-3-flash-preview` (writing feedback/smart-tutor via OpenRouter), `gpt-4.1-mini` (Replit AI fallback)
 
 ### API Routes
 

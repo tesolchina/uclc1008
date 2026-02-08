@@ -64,6 +64,9 @@ checkApiStatusRouter.post("/", async (req: Request, res: Response) => {
     const kimiKey = hkbuPlatformKeys.kimi || localKeyMap.get("kimi");
     statuses.push({ provider: "kimi", available: !!kimiKey, name: "Kimi", source: hkbuPlatformKeys.kimi ? "hkbu_platform" : localKeyMap.get("kimi") ? "local" : null, maskedKey: maskApiKey(kimiKey) });
 
+    const replitAvailable = !!(process.env.AI_INTEGRATIONS_OPENAI_BASE_URL && process.env.AI_INTEGRATIONS_OPENAI_API_KEY);
+    statuses.push({ provider: "replit", available: replitAvailable, name: "Replit AI (Fallback)", source: replitAvailable ? "managed" : null, maskedKey: null });
+
     res.json({ statuses, authenticated: !!accessToken });
   } catch (error) {
     console.error("check-api-status error:", error);
